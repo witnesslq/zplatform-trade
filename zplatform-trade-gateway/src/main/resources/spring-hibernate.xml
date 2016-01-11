@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+	http://www.springframework.org/schema/aop 
+	http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+	">
+	<!-- 使用C3P0数据源，Oracle数据库 
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass" value="${driverClassName}"></property>
+		<property name="jdbcUrl" value="${url}"></property>
+		<property name="user" value="${username}"></property>
+		<property name="password" value="${password}"></property>
+		<property name="maxPoolSize" value="40"></property>
+		<property name="minPoolSize" value="1"></property>
+		<property name="initialPoolSize" value="1"></property>
+		<property name="maxIdleTime" value="20"></property>
+	</bean>-->
+
+
+<!-- 	<bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">  -->
+<!-- 		<property name="jndiName" value="java:comp/env/jdbc/trade" /> </bean> -->
+
+	<!-- --> 
+ 	<bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean"> 
+ 		<property name="jndiName" value="java:comp/env/jdbc/trade" /> 
+ 		
+ 		</bean> 
+
+<!--		<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+			<property name="driverClass" value="oracle.jdbc.OracleDriver" />
+			<property name="jdbcUrl" value="jdbc:oracle:thin:@192.168.101.178:1521:oradb" />
+			<property name="user" value="PAYSERVICE" />
+			<property name="password" value="PAYSERVICE" />
+			<property name="maxPoolSize" value="40" />
+			<property name="minPoolSize" value="1" />
+			<property name="initialPoolSize" value="1" />
+			<property name="maxIdleTime" value="20" />
+		</bean>-->
+
+
+	<!-- session工厂 -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.Oracle9Dialect</prop>
+				<!-- <prop key="hibernate.hbm2ddl.auto">validate</prop> -->
+
+				<prop key="hibernate.autoReconnect">true</prop>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<!-- <propery name="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</property> -->
+
+				<prop key="hibernate.temp.use_jdbc_metadata_defaults">false</prop>
+			</props>
+		</property>
+		<!-- <property name="annotatedClasses">
+			<list>
+				<value>com.zlebank.zplatform.acc.pojo.PojoAbstractSubject</value>
+				<value>com.zlebank.zplatform.acc.pojo.PojoSubject</value>
+				<value>com.zlebank.zplatform.acc.pojo.PojoAccount</value>
+				<value>com.zlebank.zplatform.acc.pojo.PojoAccFrozenTask</value>
+				<value>com.zlebank.zplatform.acc.pojo.PojoBusiAcct</value>
+				<value>com.zlebank.zplatform.acc.pojo.PojoBusiAcctSubjectMapping
+				</value>
+				<value>com.zlebank.zplatform.acc.pojo.PojoSubjectRuleConfigure
+				</value>
+				<value>com.zlebank.zplatform.acc.pojo.PojoAccEntry</value>
+				<value>com.zlebank.zplatform.member.pojo.PojoMemberBase</value>
+				<value>com.zlebank.zplatform.member.pojo.PojoMerchDeta</value>
+				<value>com.zlebank.zplatform.member.pojo.PojoPersonDeta</value>
+				<value>com.zlebank.zplatform.member.pojo.PojoParaDic</value>
+				<value>com.zlebank.zplatform.member.pojo.PojoMember</value>
+				<value>com.zlebank.zplatform.member.pojo.PojoMerchMK</value>
+				<value>com.zlebank.zplatform.specification.pojo.PojoEntranceAPILog</value>
+				<value>com.zlebank.zplatform.specification.pojo.PojoMemberEntranceInfo</value>
+				<value>com.zlebank.zplatform.specification.pojo.PojoMemberEntranceLink</value>  
+				<value>com.zlebank.zplatform.commons.dao.pojo.PojoCounty</value>
+				<value>com.zlebank.zplatform.commons.dao.pojo.PojoBankInfo</value>
+				<value>com.zlebank.zplatform.specification.pojo.PojoNotifyTask</value>
+				<value>com.zlebank.zplatform.commons.dao.pojo.PojoChannel</value>
+				<value>com.zlebank.zplatform.commons.dao.pojo.PojoCardBin</value>
+				<value>com.zlebank.zplatform.commons.dao.pojo.PojoRspmsg</value>
+				<value>com.zlebank.zplatform.commons.dao.pojo.PojoTxnsSplitAccount</value>
+				<value>com.zlebank.zplatform.trade.model.PojoInsteadPayBatch</value>
+				<value>com.zlebank.zplatform.trade.model.PojoInsteadPayDetail</value>
+				<value>com.zlebank.zplatform.trade.model.PojoRealnameAuth</value>
+			</list>
+		</property> -->
+
+
+
+		<!-- 注解方式配置 -->
+		<property name="packagesToScan">
+			<list>
+				<value>com.zlebank.zplatform.trade.model</value>
+				<value>com.zlebank.zplatform.acc.pojo</value>
+				<value>com.zlebank.zplatform.commons.dao.pojo</value>
+				<value>com.zlebank.zplatform.member.pojo</value>
+				<value>com.zlebank.zplatform.specification.pojo</value>
+			</list>
+		</property>
+
+
+	</bean>
+
+	<!-- 配置事务 -->
+	<bean name="txManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+		<property name="globalRollbackOnParticipationFailure" value="false" />
+		<property name="nestedTransactionAllowed" value="true"></property>
+		
+	</bean>
+	<tx:annotation-driven transaction-manager="txManager" />
+
+
+</beans>

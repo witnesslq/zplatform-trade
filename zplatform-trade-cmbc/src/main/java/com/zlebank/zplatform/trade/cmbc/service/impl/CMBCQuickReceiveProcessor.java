@@ -1,0 +1,299 @@
+/* 
+ * TestReceiveProcessor.java  
+ * 
+ * version TODO
+ *
+ * 2015年11月17日 
+ * 
+ * Copyright (c) 2015,zlebank.All rights reserved.
+ * 
+ */
+package com.zlebank.zplatform.trade.cmbc.service.impl;
+
+import java.net.URLEncoder;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.zlebank.zplatform.commons.dao.pojo.BusiTypeEnum;
+import com.zlebank.zplatform.commons.utils.RSAUtils;
+import com.zlebank.zplatform.commons.utils.StringUtil;
+import com.zlebank.zplatform.member.service.MerchMKService;
+import com.zlebank.zplatform.trade.adapter.accounting.IAccounting;
+import com.zlebank.zplatform.trade.bean.AppPartyBean;
+import com.zlebank.zplatform.trade.bean.PayPartyBean;
+import com.zlebank.zplatform.trade.bean.ResultBean;
+import com.zlebank.zplatform.trade.bean.TradeBean;
+import com.zlebank.zplatform.trade.bean.enums.TradeTypeEnum;
+import com.zlebank.zplatform.trade.bean.gateway.OrderAsynRespBean;
+import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
+import com.zlebank.zplatform.trade.dao.RspmsgDAO;
+import com.zlebank.zplatform.trade.factory.AccountingAdapterFactory;
+import com.zlebank.zplatform.trade.model.TxnsLogModel;
+import com.zlebank.zplatform.trade.model.TxnsOrderinfoModel;
+import com.zlebank.zplatform.trade.model.TxnsWithholdingModel;
+import com.zlebank.zplatform.trade.service.IQuickpayCustService;
+import com.zlebank.zplatform.trade.service.ITradeReceiveProcessor;
+import com.zlebank.zplatform.trade.service.ITxnsLogService;
+import com.zlebank.zplatform.trade.service.ITxnsQuickpayService;
+import com.zlebank.zplatform.trade.service.ITxnsWithholdingService;
+import com.zlebank.zplatform.trade.utils.ConsUtil;
+import com.zlebank.zplatform.trade.utils.DateUtil;
+import com.zlebank.zplatform.trade.utils.ObjectDynamic;
+import com.zlebank.zplatform.trade.utils.SynHttpRequestThread;
+import com.zlebank.zplatform.trade.utils.UUIDUtil;
+
+
+/**
+ * Class Description
+ *
+ * @author guojia
+ * @version
+ * @date 2015年11月17日 下午2:29:36
+ * @since 
+ */
+@Service("cmbcQuickReceiveProcessor")
+public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
+    @Autowired
+    private ITxnsLogService txnsLogService;
+    @Autowired
+    private IQuickpayCustService quickpayCustService;
+    @Autowired
+    private ITxnsOrderinfoDAO txnsOrderinfoDAO;
+    @Autowired
+    private MerchMKService merchMKService;
+    @Autowired
+    private ITxnsQuickpayService txnsQuickpayService;
+    @Autowired 
+    private ITxnsWithholdingService txnsWithholdingService;
+    @Autowired 
+    private RspmsgDAO rspmsgDAO;
+    /**
+     *
+     * @param resultBean
+     * @param tradeBean
+     * @param tradeType
+     */
+    public void onReceive(ResultBean resultBean,TradeBean tradeBean,TradeTypeEnum tradeType) {
+        // TODO Auto-generated method stub
+        if(tradeType==TradeTypeEnum.SENDMARGINSMS){//发送/重发短信验证码
+           
+        }else if(tradeType==TradeTypeEnum.MARGINREGISTER){//开户/银行卡签约
+           
+        }else if(tradeType==TradeTypeEnum.ONLINEDEPOSITSHORT){//在线入金（基金产品）
+           
+        }else if(tradeType==TradeTypeEnum.WITHDRAWNOTIFY){//在线出金（基金产品）
+            
+        }else if(tradeType==TradeTypeEnum.SUBMITPAY){//确认支付（第三方快捷支付渠道）
+            saveCMBCTradeResult(resultBean,tradeBean);
+        }else if(tradeType==TradeTypeEnum.BANKSIGN){//交易查询
+            
+        }else if(tradeType==TradeTypeEnum.UNKNOW){//银行卡签约
+           
+        }else if(tradeType==TradeTypeEnum.ACCOUNTING){
+            dealWithSuccessTrade(tradeBean.getTxnseqno(),(TxnsWithholdingModel)resultBean.getResultObj());
+        }
+    }
+    
+    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    public void saveCMBCTradeResult(ResultBean resultBean,TradeBean tradeBean){
+            
+            if(resultBean.isResultBool()){//交易成功
+                TxnsWithholdingModel withholding = (TxnsWithholdingModel) resultBean.getResultObj();
+                PayPartyBean payPartyBean = new PayPartyBean(tradeBean.getTxnseqno(),"01", tradeBean.getOrderId(), "93000002", ConsUtil.getInstance().cons.getCmbc_merid(), "", DateUtil.getCurrentDateTime(), "",tradeBean.getCardNo(),"","");
+                //更新支付方信息
+                txnsLogService.updatePayInfo_Fast(payPartyBean);
+                //更新交易流水中心应答信息
+                txnsLogService.updateCMBCWithholdingRetInfo(tradeBean.getTxnseqno(), withholding);
+                
+                
+                
+                String commiteTime = DateUtil.getCurrentDateTime();
+               
+                String merchOrderNo =  tradeBean.getOrderId();
+                // 处理同步通知和异步通知
+                // 根据原始订单拼接应答报文，异步通知商户
+                TxnsOrderinfoModel gatewayOrderBean = txnsOrderinfoDAO.getOrderinfoByOrderNo(merchOrderNo,tradeBean.getMerchId());
+                /**账务处理开始 **/
+                // 应用方信息
+                try {
+                    AppPartyBean appParty = new AppPartyBean("123",
+                            "000000000000", commiteTime,
+                            DateUtil.getCurrentDateTime(), tradeBean.getTxnseqno(), "AC000000");
+                    txnsLogService.updateAppInfo(appParty);
+                    IAccounting accounting = AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue(tradeBean.getBusitype()));
+                    ResultBean accountResultBean = accounting.accountedFor(tradeBean.getTxnseqno());
+                    txnsLogService.updateAppStatus(tradeBean.getTxnseqno(), accountResultBean.getErrCode(), accountResultBean.getErrMsg());
+                    
+                    
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                /**账务处理结束 **/
+                saveSuccessCMBCTrade(tradeBean.getTxnseqno(),
+                        tradeBean.getOrderId(), withholding,tradeBean.getMerchId());
+                /**异步通知处理开始 **/
+                ResultBean orderResp = 
+                        generateAsyncRespMessage(merchOrderNo,
+                                tradeBean.getMerchId());
+                if (orderResp.isResultBool()) {
+                    OrderAsynRespBean respBean = (OrderAsynRespBean) orderResp
+                            .getResultObj();
+                    new SynHttpRequestThread(
+                            gatewayOrderBean.getFirmemberno(),
+                            gatewayOrderBean.getRelatetradetxn(),
+                            gatewayOrderBean.getBackurl(),
+                            respBean.getNotifyParam()).start();
+                }
+                /**异步通知处理结束 **/
+            }else{
+                if(resultBean.getErrCode().equals("R")){//对于交易结果不确定的，需要启动查询机制进行处理，最多3分钟后有明确结果
+                    PayPartyBean payPartyBean = new PayPartyBean(tradeBean.getTxnseqno(),"01", tradeBean.getOrderId(), "93000002", ConsUtil.getInstance().cons.getCmbc_merid(), "", DateUtil.getCurrentDateTime(), "",tradeBean.getCardNo(),"","");
+                    //更新支付方信息
+                    txnsLogService.updatePayInfo_Fast(payPartyBean);
+                }else{
+                    //订单状态更新为失败
+                    txnsOrderinfoDAO.updateOrderToFail(tradeBean.getOrderId(),tradeBean.getMerUserId());
+                    PayPartyBean payPartyBean = new PayPartyBean(tradeBean.getTxnseqno(),"01", tradeBean.getOrderId(), "93000002", ConsUtil.getInstance().cons.getCmbc_merid(), "", DateUtil.getCurrentDateTime(), "",tradeBean.getCardNo(),"","");
+                    //更新支付方信息
+                    txnsLogService.updatePayInfo_Fast(payPartyBean);
+                    //更新支付方返回结果
+                    txnsLogService.updatePayInfo_Fast_result(tradeBean.getTxnseqno(), resultBean.getErrCode(),resultBean.getErrMsg());
+                }
+            }
+    }
+    
+    
+    public void saveSuccessCMBCTrade(String txnseqno,String gateWayOrderNo,TxnsWithholdingModel withholding,String merchId){
+        TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(txnseqno);
+        //txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
+        txnsLog.setPayordfintime(DateUtil.getCurrentDateTime());
+        txnsLog.setRetdatetime(DateUtil.getCurrentDateTime());
+        txnsLog.setTradestatflag("00000001");//交易完成结束位
+        txnsLog.setTradetxnflag("10000000");//证联支付快捷（基金交易）
+        txnsLog.setRelate("10000000");
+        txnsLog.setTradeseltxn(UUIDUtil.uuid());
+        txnsLog.setPayrettsnseqno(withholding.getPayserialno());
+        txnsLogService.updateTxnsLog(txnsLog);
+        TxnsOrderinfoModel orderinfo = txnsOrderinfoDAO.getOrderinfoByOrderNo(gateWayOrderNo,merchId);
+        orderinfo.setStatus("00");
+        orderinfo.setOrderfinshtime(DateUtil.getCurrentDateTime());
+        txnsOrderinfoDAO.updateOrderinfo(orderinfo);
+        
+    }
+    
+    public ResultBean generateAsyncRespMessage(String orderNo,String memberId){
+        ResultBean resultBean = null;
+        try {
+            TxnsOrderinfoModel orderinfo = txnsOrderinfoDAO.getOrderinfoByOrderNo(orderNo,memberId);
+            
+            
+            TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(orderinfo.getRelatetradetxn());
+             String version="v1.0";// 网关版本
+             String encoding="1";// 编码方式
+             String certId="";// 证书 ID
+             String signature="";// 签名
+             String signMethod="01";// 签名方法
+             String merId=txnsLog.getAccfirmerno();// 商户代码
+             String orderId=txnsLog.getAccordno();// 商户订单号
+             String txnType=orderinfo.getTxntype();// 交易类型
+             String txnSubType=orderinfo.getTxnsubtype();// 交易子类
+             String bizType=orderinfo.getBiztype();// 产品类型
+             String accessType="2";// 接入类型
+             String txnTime=orderinfo.getOrdercommitime();// 订单发送时间
+             String txnAmt=orderinfo.getOrderamt()+"";// 交易金额
+             String currencyCode="156";// 交易币种
+             String reqReserved=orderinfo.getReqreserved();// 请求方保留域
+             String reserved="";// 保留域
+             String queryId=txnsLog.getTradeseltxn();// 交易查询流水号
+             String respCode=txnsLog.getRetcode();// 响应码
+             String respMsg=txnsLog.getRetinfo();// 应答信息
+             String settleAmt="";// 清算金额
+             String settleCurrencyCode="";// 清算币种
+             String settleDate=txnsLog.getAccsettledate();// 清算日期
+             String traceNo=txnsLog.getTradeseltxn();// 系统跟踪号
+             String traceTime=DateUtil.getCurrentDateTime();// 交易传输时间
+             String exchangeDate="";// 兑换日期
+             String exchangeRate="";// 汇率
+             String accNo="";// 账号
+             String payCardType="";// 支付卡类型
+             String payType="";// 支付方式
+             String payCardNo="";// 支付卡标识
+             String payCardIssueName="";// 支付卡名称
+             String bindId="";// 绑定标识号
+            
+             OrderAsynRespBean orderRespBean = new OrderAsynRespBean(version, encoding, certId, signature, signMethod, merId, orderId, txnType, txnSubType, bizType, accessType, txnTime, txnAmt, currencyCode, reqReserved, reserved, queryId, respCode, respMsg, settleAmt, settleCurrencyCode, settleDate, traceNo, traceTime, exchangeDate, exchangeRate, accNo, payCardType, payType, payCardNo, payCardIssueName, bindId);
+            
+            
+            String privateKey = merchMKService.get(orderinfo.getFirmemberno()).getLocalPriKey().trim();
+            resultBean = new ResultBean(generateAsyncOrderResult(orderRespBean, privateKey));
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            resultBean = new ResultBean("RC99", "系统异常");
+        }
+        return resultBean;
+    }
+    public OrderAsynRespBean generateAsyncOrderResult(OrderAsynRespBean orderAsyncRespBean,String privateKey) throws Exception{   
+        String[] unParamstring = {"signature"};
+        String dataMsg = ObjectDynamic.generateParamer(orderAsyncRespBean, false, unParamstring).trim();
+        byte[] data =  URLEncoder.encode(dataMsg,"utf-8").getBytes();
+        orderAsyncRespBean.setSignature(URLEncoder.encode(RSAUtils.sign(data, privateKey),"utf-8"));
+        return orderAsyncRespBean;
+    }
+    
+    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    public void dealWithSuccessTrade(String txnseqno,TxnsWithholdingModel withholding){
+        TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(txnseqno);
+        PayPartyBean payPartyBean = null;
+        if(StringUtil.isNotEmpty(withholding.getOrireqserialno())){
+            TxnsWithholdingModel old_withholding = txnsWithholdingService.getWithholdingBySerialNo(withholding.getOrireqserialno());
+            //更新支付方信息
+            payPartyBean = new PayPartyBean(txnseqno,"01", withholding.getSerialno(), old_withholding.getChnlcode(), ConsUtil.getInstance().cons.getCmbc_merid(), "", DateUtil.getCurrentDateTime(), "",old_withholding.getAccno(),"","");
+        }else{
+            payPartyBean = new PayPartyBean(txnseqno,"01", withholding.getSerialno(), withholding.getChnlcode(), ConsUtil.getInstance().cons.getCmbc_merid(), "", DateUtil.getCurrentDateTime(), "",withholding.getAccno(),"","");
+        }
+        
+        txnsLogService.updatePayInfo_Fast(payPartyBean);
+        
+        
+        //更新交易流水中心应答信息
+        txnsLogService.updateCMBCWithholdingRetInfo(txnseqno, withholding);
+        saveSuccessCMBCTrade(txnseqno,
+                txnsLog.getAccordno(), withholding,txnsLog.getAccfirmerno());
+        String commiteTime = DateUtil.getCurrentDateTime();
+       
+        
+        // 处理同步通知和异步通知
+        // 根据原始订单拼接应答报文，异步通知商户
+        TxnsOrderinfoModel gatewayOrderBean = txnsOrderinfoDAO.getOrderinfoByOrderNo(txnsLog.getAccordno(),txnsLog.getAccfirmerno());
+        /**账务处理开始 **/
+        // 应用方信息
+        try {
+            AppPartyBean appParty = new AppPartyBean("123","000000000000", commiteTime,DateUtil.getCurrentDateTime(), txnseqno, "");
+            txnsLogService.updateAppInfo(appParty);
+            IAccounting accounting = AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue(txnsLog.getBusitype()));
+            accounting.accountedFor(txnseqno);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        /**账务处理结束 **/
+        
+        /**异步通知处理开始 **/
+        ResultBean orderResp = 
+                generateAsyncRespMessage(txnsLog.getAccordno(),
+                        txnsLog.getAccfirmerno());
+        if (orderResp.isResultBool()) {
+            OrderAsynRespBean respBean = (OrderAsynRespBean) orderResp
+                    .getResultObj();
+            new SynHttpRequestThread(
+                    gatewayOrderBean.getFirmemberno(),
+                    gatewayOrderBean.getRelatetradetxn(),
+                    gatewayOrderBean.getBackurl(),
+                    respBean.getNotifyParam()).start();
+        }
+    }
+}

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE specification-instance SYSTEM "specification-configuration-1.0.dtd">
+<specification-instance>
+	<request>
+		<head>
+			<request-type>SAC102</request-type>
+			<version>1.0</version>
+		</head>
+		<content>
+		<!--根据业务账户查询账户信息-->
+			<property-field id="merchNo" type="an" name="merchNo" nullable="false" length="15"/>
+			<property-field id="sessionId" type="an" name="sessionId" nullable="false" length="16"/>
+		    <property-field id="acctCode" type="an" name="acctCode" nullable="false"  length="32"/>
+			<property-field id="mac" type="ans" name="mac" nullable="false"  length="256"/>
+		</content>
+	</request>
+	<response>
+		<content>
+			<property-field id="merchNo" type="an" name="merchNo" nullable="false" length="15"/>
+			<property-field id="sessionId" type="an" name="sessionId" nullable="false" length="16"/>
+			<property-field id="rescode" type="an" name="rescode" nullable="false"  length="2"/>
+			<property-field id="resdes" type="ans" name="resdes" nullable="false"  length="128"/>
+			<property-field id="mac" type="ans" name="mac" nullable="false" />
+			<complex-field id="account" name="account"
+				typeClass="com.zlebank.zplatform.specification.message.content.Account">
+				<property-field name="acctCode" id="acctCode" type="an"  length="32"/>
+				<property-field name="acctName" id="acctName" type="ans"  length="256"/>
+				<property-field name="balance" id="balance" type="money"  length="12"/>
+				<property-field name="frozenBalance" id="frozenBalance" type="money" length="12"/>
+				<property-field name="totalBalance" id="totalBalance" type="money" length="12"/>
+				<property-field name="currency" id="currency" type="an"  length="3"/>
+				<property-field name="usage" id="usage" type="an"  length="128"/>
+				<property-field name="status" id="status" type="an"  length="128"/>
+			</complex-field> 
+	
+		</content>
+	</response>
+</specification-instance>

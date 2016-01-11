@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE specification-instance SYSTEM "specification-configuration-1.0.dtd">
+<specification-instance>
+	<request>
+		<head>
+			<request-type>SME102</request-type>
+			<version>1.0</version>
+		</head>
+		<content>
+	<!-- 	商户同步查询 -->
+			<property-field id="merchNo" type="an" name="merchNo" nullable="false" length="15"/>
+			<property-field id="sessionId" type="an" name="sessionId" nullable="false" length="16"/>
+			<property-field id="minorMerchNo" type="an" name="minorMerchNo" nullable="true" length="15" optional="true"></property-field>
+			<property-field id="entranceMemId" type="an" name="entranceMemId" nullable="false"  length="32"/>
+			<property-field id="mac" type="ans" name="mac" nullable="false" length="256"></property-field>			
+		</content>
+	</request>
+	<response>
+		<content>			
+			<property-field id="merchNo" type="an" name="merchNo" nullable="false" length="15"/>
+			<property-field id="sessionId" type="an" name="sessionId" nullable="false" length="16"/>
+			<property-field id="rescode" type="an" name="rescode" nullable="false"  length="2"></property-field>
+			<property-field id="resdes" type="ans" name="resdes" nullable="false" optional="true"  length="128"></property-field>
+			<property-field id="minorMerchNo" type="an" name="minorMerchNo" nullable="false" length="15"></property-field>
+			<property-field id="status" type="an" name="status" nullable="false"  length="2"></property-field>
+			<property-field id="mac" type="ans" name="mac" nullable="false"  length="256"></property-field>
+		</content>
+	</response>
+</specification-instance>

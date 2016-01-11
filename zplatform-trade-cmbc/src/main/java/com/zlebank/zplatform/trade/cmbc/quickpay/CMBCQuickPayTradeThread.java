@@ -1,0 +1,266 @@
+package com.zlebank.zplatform.trade.cmbc.quickpay;
+
+import java.util.Date;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.alibaba.fastjson.JSON;
+import com.zlebank.zplatform.commons.dao.ProvinceDAO;
+import com.zlebank.zplatform.commons.utils.DateUtil;
+import com.zlebank.zplatform.trade.adapter.quickpay.IQuickPayTrade;
+import com.zlebank.zplatform.trade.bean.PayPartyBean;
+import com.zlebank.zplatform.trade.bean.ResultBean;
+import com.zlebank.zplatform.trade.bean.TradeBean;
+import com.zlebank.zplatform.trade.bean.enums.TradeTypeEnum;
+import com.zlebank.zplatform.trade.cmbc.exception.CMBCTradeException;
+import com.zlebank.zplatform.trade.cmbc.service.ICMBCQuickPayService;
+import com.zlebank.zplatform.trade.cmbc.service.ICMBCTransferService;
+import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
+import com.zlebank.zplatform.trade.exception.TradeException;
+import com.zlebank.zplatform.trade.model.PojoRealnameAuth;
+import com.zlebank.zplatform.trade.model.TxnsSmsModel;
+import com.zlebank.zplatform.trade.model.TxnsWithholdingModel;
+import com.zlebank.zplatform.trade.service.IQuickpayCustService;
+import com.zlebank.zplatform.trade.service.ITxnsLogService;
+import com.zlebank.zplatform.trade.service.ITxnsQuickpayService;
+import com.zlebank.zplatform.trade.service.ITxnsSMSService;
+import com.zlebank.zplatform.trade.utils.ConsUtil;
+import com.zlebank.zplatform.trade.utils.SMSThreadPool;
+import com.zlebank.zplatform.trade.utils.SMSUtil;
+import com.zlebank.zplatform.trade.utils.SpringContext;
+/**
+ * 民生银行代扣快捷支付
+ * Class Description
+ *
+ * @author guojia
+ * @version
+ * @date 2015年12月11日 上午11:46:07
+ * @since
+ */
+public class CMBCQuickPayTradeThread implements IQuickPayTrade{
+    private static final Log log = LogFactory.getLog(CMBCQuickPayTradeThread.class);
+    private static final String PAYINSTID = "93000002";
+    private TradeBean tradeBean;
+    private TradeTypeEnum tradeType;
+    
+    private ITxnsQuickpayService txnsQuickpayService;
+    private ITxnsSMSService txnsSMSService;
+    private ICMBCQuickPayService cmbcQuickPayService;
+    private ProvinceDAO provinceDAO;
+    private ITxnsLogService txnsLogService;
+    private ICMBCTransferService cmbcTransferService;
+    private ITxnsOrderinfoDAO txnsOrderinfoDAO;
+    private IQuickpayCustService quickpayCustService;
+    public CMBCQuickPayTradeThread() {
+         txnsQuickpayService = (ITxnsQuickpayService) SpringContext.getContext().getBean("txnsQuickpayService");
+         txnsSMSService = (ITxnsSMSService) SpringContext.getContext().getBean("txnsSMSService");;
+         provinceDAO = (ProvinceDAO) SpringContext.getContext().getBean("provinceDAO");
+         txnsLogService = (ITxnsLogService) SpringContext.getContext().getBean("txnsLogService");;
+         cmbcQuickPayService = (ICMBCQuickPayService) SpringContext.getContext().getBean("cmbcQuickPayService");
+         cmbcTransferService = (ICMBCTransferService) SpringContext.getContext().getBean("cmbcTransferService");
+         txnsOrderinfoDAO = (ITxnsOrderinfoDAO) SpringContext.getContext().getBean("txnsOrderinfo");
+         quickpayCustService = (IQuickpayCustService) SpringContext.getContext().getBean("quickpayCustService");
+    }
+    
+    @Override
+    public void run() {
+        if(tradeBean==null){
+            return;
+        }
+        if(tradeType==TradeTypeEnum.SENDMARGINSMS){//发送/重发短信验证码
+            sendMarginSms(tradeBean);
+        }else if(tradeType==TradeTypeEnum.MARGINREGISTER){//开户/银行卡签约
+            marginRegister(tradeBean);
+        }else if(tradeType==TradeTypeEnum.ONLINEDEPOSITSHORT){//在线入金（基金产品）
+            onlineDepositShort(tradeBean);
+        }else if(tradeType==TradeTypeEnum.WITHDRAWNOTIFY){//在线出金（基金产品）
+            withdrawNotify(tradeBean);
+        }else if(tradeType==TradeTypeEnum.SUBMITPAY){//确认支付（第三方快捷支付渠道）
+            submitPay(tradeBean);
+        }else if(tradeType==TradeTypeEnum.BANKSIGN){//银行卡签约
+            bankSign(tradeBean);
+        }else if(tradeType==TradeTypeEnum.UNKNOW){//
+           
+        }
+        
+    }
+
+    @Override
+    public ResultBean sendMarginSms(TradeBean trade) {
+        String verifyCode = getVerifyCode();
+        String content ="校验码："+verifyCode+"，您正使用尾号"+trade.getMiniCardNo()+"进行支付，注意保密哦！";
+        String mobile = trade.getMobile();
+        TxnsSmsModel sms = new TxnsSmsModel(0L, trade.getTn(), mobile, verifyCode, content, DateUtil.getCurrentDateTime(), DateUtil.formatDateTime(DateUtil.addMin(new Date(), 10L)), trade.getBusicode(), trade.getBusitype(), "", "");
+        txnsSMSService.saveSMS(sms);
+        String payorderNo = txnsQuickpayService.saveCMBCOuterBankSign(trade);
+        SMSThreadPool.getInstance().executeMission(new SMSUtil(mobile,content,trade.getTn(),sms.getSendtime(),payorderNo));
+        return null;
+    }
+
+    /**
+     * 银行卡签约
+     *
+     * @param trade
+     * @return
+     */
+    @Override
+    public ResultBean marginRegister(TradeBean trade) {
+        ResultBean resultBean = null;
+        //民生银行的实名认证和白名单采集已经做完，这里只发送短信验证码发送短信验证码
+        log.info("CMBC withholding bank sign start!");
+        if(log.isDebugEnabled()){
+                log.debug(JSON.toJSONString(trade));
+        }
+        trade.setPayinstiId(PAYINSTID);
+        sendMarginSms(trade);
+        resultBean = new ResultBean("success");
+        //已绑卡支付
+        /*if(StringUtil.isNotEmpty(trade.getCardId()+"")){
+            sendMarginSms(trade);
+            resultBean = new ResultBean("success");
+            return resultBean;
+        }*/
+        
+        /*Long bindId=trade.getCardId();
+        if(bindId!=null){
+            quickpayCustService.updateBindCardId(bindId, "");
+            trade.setBindCardId(bindId+"");
+        }*/
+        log.info("CMBC withholding bank sign end!");
+        return resultBean;
+    }
+
+    @Override
+    public ResultBean onlineDepositShort(TradeBean trade) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public ResultBean withdrawNotify(TradeBean trade) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public ResultBean submitPay(TradeBean trade) {
+        ResultBean resultBean = null;
+        try {
+            log.info("CMBC submit Pay start!");
+            if(log.isDebugEnabled()){
+                try {
+                    log.debug(JSON.toJSONString(trade));
+                } catch (Exception e) {
+                }
+            }
+            resultBean = null;
+            //验证码校验
+            TxnsSmsModel sms = txnsSMSService.getLastSMSByTN(trade.getTn());
+            
+            if(sms==null){
+                //更新支付方返回结果
+                resultBean = new ResultBean("0051", "交易失败，验证码已过期");
+            }else{
+                if(!sms.getVerifycode().equals(trade.getIdentifyingCode())){
+                    resultBean = new ResultBean("0051", "验证码错误");
+                }
+            }
+            //更新支付方信息
+            PayPartyBean payPartyBean = new PayPartyBean(trade.getTxnseqno(),"01", "", "93000002", ConsUtil.getInstance().cons.getCmbc_merid(), "", DateUtil.getCurrentDateTime(), "",trade.getCardNo(),"","");
+            txnsLogService.updatePayInfo_Fast(payPartyBean);
+            if(resultBean!=null){
+                txnsLogService.updatePayInfo_Fast_result(tradeBean.getTxnseqno(), resultBean.getErrCode(),resultBean.getErrMsg());
+                log.info(JSON.toJSONString(resultBean));
+                return resultBean;
+            }
+            trade.setPayinstiId(PAYINSTID);
+            
+            //获取持卡人所属省份代码
+            trade.setProvno(provinceDAO.getProvinceByXZCode(trade.getCertId().substring(0, 2)).getProvinceId()+"");
+            //记录快捷交易流水
+            String payorderno = txnsQuickpayService.saveCMBCOuterWithholding(trade);
+            resultBean = cmbcQuickPayService.crossLineWithhold(trade);
+            if(resultBean.isResultBool()){
+               TxnsWithholdingModel withholding = (TxnsWithholdingModel) resultBean.getResultObj();
+               //更新快捷交易流水
+               txnsQuickpayService.updateCMBCWithholdingResult(withholding, payorderno);
+            }
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            txnsOrderinfoDAO.updateOrderToFail(tradeBean.getOrderId(),tradeBean.getMerchId());
+            resultBean = new ResultBean("T000", "交易失败");
+        }
+        
+        log.info("CMBC submit Pay end!");
+        
+        return resultBean;
+    }
+
+    @Override
+    public ResultBean queryTrade(TradeBean trade) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public ResultBean bankSign(TradeBean trade) {
+        // TODO Auto-generated method stub
+        ResultBean resultBean = null;
+        try {
+            //卡信息进行实名认证
+            PojoRealnameAuth realnameAuth = new PojoRealnameAuth(trade);
+            //保存卡信息认证流水
+            String payorderNo = txnsQuickpayService.saveCMBCOuterBankCardSign(trade);
+            resultBean = cmbcTransferService.realNameAuth(realnameAuth);
+            if(resultBean.isResultBool()){
+                txnsQuickpayService.updateCMBCSMSResult(payorderNo, "00", "签约成功");
+                //保存绑卡信息
+                quickpayCustService.updateCardStatus(trade.getMerUserId(), trade.getCardNo());
+            }else{
+                txnsQuickpayService.updateCMBCSMSResult(payorderNo, resultBean.getErrCode(), resultBean.getErrMsg());
+            }
+        } catch (CMBCTradeException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        } catch (TradeException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return marginRegister(trade);
+    }
+
+    /**
+    *
+    * @param tradeType
+    */
+   @Override
+   public void setTradeType(TradeTypeEnum tradeType) {
+       // TODO Auto-generated method stub
+       this.tradeType = tradeType;
+   }
+   /**
+    *
+    * @param tradeBean
+    */
+   @Override
+   public void setTradeBean(TradeBean tradeBean) {
+       // TODO Auto-generated method stub
+       this.tradeBean = tradeBean;
+   }
+
+   private String getVerifyCode(){
+       String verifyCode = "";
+       for(int i=0;i<6;i++){
+           int x=1+(int)(Math.random()*9);
+           verifyCode+=x;
+       }
+       return verifyCode;
+   }
+   
+   public static void main(String[] args) {
+       System.out.println(DateUtil.formatDateTime(DateUtil.addMin(new Date(), 10L)));
+       
+   }
+}
