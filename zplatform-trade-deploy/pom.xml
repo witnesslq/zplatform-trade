@@ -46,7 +46,7 @@
 		<repository>
 			<id>zplatform-Snapshots</id>
 			<name>zplatform-Snapshots</name>
-			<url>${project.nexus}/nexus/content/repositories/zpay-Snapshots</url>
+			<url>${project.nexus}/nexus/content/repositories/zplatform-Snapshots</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
@@ -57,7 +57,7 @@
 		<repository>
 			<id>zplatform-Releases</id>
 			<name>zplatform-Releases</name>
-			<url>${project.nexus}/nexus/content/repositories/zpay-Releases</url>
+			<url>${project.nexus}/nexus/content/repositories/zplatform-Releases</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
