@@ -37,6 +37,7 @@ import com.zlebank.zplatform.trade.cmbc.service.ICMBCTransferService;
 import com.zlebank.zplatform.trade.dao.ConfigInfoDAO;
 import com.zlebank.zplatform.trade.dao.RealnameAuthDAO;
 import com.zlebank.zplatform.trade.dao.RealnameAuthOrderDAO;
+import com.zlebank.zplatform.trade.exception.BalanceNotEnoughException;
 import com.zlebank.zplatform.trade.exception.DuplicateOrderIdException;
 import com.zlebank.zplatform.trade.exception.MessageDecryptFailException;
 import com.zlebank.zplatform.trade.exception.RealNameAuthFailException;
@@ -87,9 +88,10 @@ public class RealNameAuthServiceImpl  implements RealNameAuthService{
      * @param request
      * @throws MessageDecryptFailException 
      * @throws RealNameAuthFailException 
+     * @throws BalanceNotEnoughException 
      */
     @Override
-    public boolean realNameAuth(RealnameAuth_Request request, RealnameAuthFile realNameAuth, Long orderId) throws MessageDecryptFailException, RealNameAuthFailException {
+    public boolean realNameAuth(RealnameAuth_Request request, RealnameAuthFile realNameAuth, Long orderId) throws MessageDecryptFailException, RealNameAuthFailException, BalanceNotEnoughException {
         if (log.isDebugEnabled()) {
             log.debug("认证处理开始");
             log.debug(JSONObject.fromObject(request));
@@ -140,7 +142,14 @@ public class RealNameAuthServiceImpl  implements RealNameAuthService{
         // 分录流水插入
         try {
             accEntryInsert(para, isCost ? BusinessCodeEnum.REALNAME_AUTH_COST : BusinessCodeEnum.REALNAME_AUTH_NO_COST);
-        } catch (Exception e) {
+        } catch (AccBussinessException e) {
+            log.error(e.getMessage(),e);
+            if ("E000019".equals(e.getCode()) || "E000018".equals(e.getCode())) {
+                throw new BalanceNotEnoughException();
+            }
+        } catch (AbstractBusiAcctException e) {
+            log.error(e.getMessage(),e);
+        } catch (NumberFormatException e) {
             log.error(e.getMessage(),e);
         } 
         return true;
