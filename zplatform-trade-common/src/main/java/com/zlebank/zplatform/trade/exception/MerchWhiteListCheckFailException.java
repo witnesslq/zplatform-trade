@@ -10,7 +10,6 @@
  */
 package com.zlebank.zplatform.trade.exception;
 
-import com.zlebank.zplatform.commons.exception.AbstractDescribeException;
 
 /**
  * 商户白名单检查失败
@@ -20,7 +19,7 @@ import com.zlebank.zplatform.commons.exception.AbstractDescribeException;
  * @date 2015年11月25日 下午2:10:30
  * @since 
  */
-public class MerchWhiteListCheckFailException extends AbstractDescribeException {
+public class MerchWhiteListCheckFailException extends AbstractTradeDescribeException {
 
     public MerchWhiteListCheckFailException(Object... params) {
         this.params = params;

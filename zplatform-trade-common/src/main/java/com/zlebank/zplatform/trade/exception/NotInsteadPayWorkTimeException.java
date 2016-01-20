@@ -10,7 +10,6 @@
  */
 package com.zlebank.zplatform.trade.exception;
 
-import com.zlebank.zplatform.commons.exception.AbstractDescribeException;
 
 /**
  * 非代付时间异常
@@ -20,7 +19,7 @@ import com.zlebank.zplatform.commons.exception.AbstractDescribeException;
  * @date 2015年11月25日 下午2:10:30
  * @since 
  */
-public class NotInsteadPayWorkTimeException extends AbstractDescribeException {
+public class NotInsteadPayWorkTimeException extends AbstractTradeDescribeException {
 
     /**
      * serialVersionUID

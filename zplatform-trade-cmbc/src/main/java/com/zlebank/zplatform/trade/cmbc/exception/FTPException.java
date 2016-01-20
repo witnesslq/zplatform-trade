@@ -10,6 +10,8 @@
  */
 package com.zlebank.zplatform.trade.cmbc.exception;
 
+import java.util.ResourceBundle;
+
 import com.zlebank.zplatform.commons.exception.AbstractDescribeException;
 
 /**
@@ -27,6 +29,11 @@ public class FTPException extends AbstractDescribeException{
     private static final long serialVersionUID = 3491502227581371748L;
     
     private String code;
+    private static final  ResourceBundle RESOURCE = ResourceBundle.getBundle("exception_des");
+    @Override
+    public ResourceBundle getResourceBundle() {
+        return RESOURCE;
+    }
     public FTPException(String code,Object ...param) {
         this.code=code;
         this.setParams(param);

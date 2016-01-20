@@ -78,4 +78,5 @@ public interface IGateWayService extends IBaseService<TxnsOrderinfoModel, Long>{
     public ResultBean validateMemberBusiness(OrderBean orderBean,RiskRateInfoBean rateInfoBean);
     public TxnsOrderinfoModel getOrderinfoByOrderNoAndMemberId(String orderNo,String memberId) ;
     public Long getTxnFee(TxnsLogModel txnsLog);
+    public String dealWithWapOrder(OrderBean order) throws TradeException;
 }
