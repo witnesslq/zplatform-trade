@@ -63,7 +63,7 @@ public class QuickpayCustServiceImpl extends BaseServiceImpl<QuickpayCustModel, 
         if(StringUtil.isEmpty(trade.getMerUserId())){
             return null;
         }
-        List<QuickpayCustModel> custList =  (List<QuickpayCustModel>) super.queryByHQL("from QuickpayCustModel where relatememberno=? and cardno = ? and status = ?", new Object[]{trade.getMerUserId(),trade.getCardNo(),"00"});
+        List<QuickpayCustModel> custList =  (List<QuickpayCustModel>) super.queryByHQL("from QuickpayCustModel where relatememberno=? and cardno = ? and (status = ? or status = ?) ", new Object[]{trade.getMerUserId(),trade.getCardNo(),"00","01"});
         if(custList.size()>0){
             return custList.get(0).getId();
         }else{//没有保存卡信息

@@ -53,6 +53,9 @@ public class TxnsOrderinfoModel implements java.io.Serializable {
     private String paytimeout;
     private String payerip;
     private String syncnotify="01";
+    private String accesstype;
+    private String currencycode="156";
+    private String memberid;
     // Constructors
 
     /** default constructor */
@@ -506,6 +509,52 @@ public class TxnsOrderinfoModel implements java.io.Serializable {
         this.syncnotify = syncnotify;
     }
 
+	/**
+	 * @return the accesstype
+	 */
+    @Column(name = "ACCESSTYPE", length = 2)
+	public String getAccesstype() {
+		return accesstype;
+	}
+
+	/**
+	 * @param accesstype the accesstype to set
+	 */
+	public void setAccesstype(String accesstype) {
+		this.accesstype = accesstype;
+	}
+
+	/**
+	 * @return the currencycode
+	 */
+	@Column(name = "CURRENCYCODE", length = 3)
+	public String getCurrencycode() {
+		return currencycode;
+	}
+
+	/**
+	 * @param currencycode the currencycode to set
+	 */
+	public void setCurrencycode(String currencycode) {
+		this.currencycode = currencycode;
+	}
+
+	/**
+	 * @return the memberid
+	 */
+	@Column(name = "MEMBERID", length = 15)
+	public String getMemberid() {
+		return memberid;
+	}
+
+	/**
+	 * @param memberid the memberid to set
+	 */
+	public void setMemberid(String memberid) {
+		this.memberid = memberid;
+	}
+
+	
     
     
    

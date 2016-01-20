@@ -33,6 +33,7 @@ import com.zlebank.zplatform.trade.insteadPay.message.RealnameAuth_Request;
 import com.zlebank.zplatform.trade.utils.HibernateValidatorUtil;
 
 
+
 /**
  * 
  * 代付报文生成

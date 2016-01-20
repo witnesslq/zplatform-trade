@@ -9,6 +9,8 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.zlebank.zplatform.sms.pojo.enums.ModuleTypeEnum;
+import com.zlebank.zplatform.sms.service.ISMSService;
 import com.zlebank.zplatform.trade.model.TxnsSmsModel;
 import com.zlebank.zplatform.trade.service.ITxnsQuickpayService;
 import com.zlebank.zplatform.trade.service.ITxnsSMSService;
@@ -25,7 +27,9 @@ public class SMSUtil implements Runnable{
     private String tn;
     private String sendtime;
     private String payorderno;
-    private ITxnsSMSService txnsSMSService;
+    private String miniCardNo;
+    private String amount;
+    private ISMSService smsService;
     private ITxnsQuickpayService txnsQuickpayService;
     /**
      * 发送短信
@@ -36,57 +40,40 @@ public class SMSUtil implements Runnable{
     public int sendSMS(String mobile,String content){
         int inputLine = 999;
         try {
-            //String send_content=URLEncoder.encode(content.replaceAll("<br/>", " "), "GBK");//发送内容
-            Map<String, String> paramMap = new HashMap<String, String>();
-            paramMap.put("Name", CorpID);
-            paramMap.put("Passwd", Pwd);
-            paramMap.put("Phone", mobile);
-            paramMap.put("Content", content);
-            HttpUtils httpUtils = new HttpUtils();
-            httpUtils.openConnection();
-            log.info("start send sms,the mobile phone numbuer:"+mobile+"--- send content: "+content);
-            String responseContent = "";//httpUtils.executeHttpPost(smsURL, setHttpParams(paramMap), ENCODE);
-            if(ConsUtil.getInstance().cons.isSms_send_flag()){
-                responseContent = httpUtils.executeHttpPost(smsURL, setHttpParams(paramMap), ENCODE);
-            }else{
-                responseContent = "100";
-            }
-            httpUtils.closeConnection();
-            inputLine = Integer.valueOf(responseContent);
-            TxnsSmsModel sms = new TxnsSmsModel();
-            sms.setTn(tn);
-            sms.setSendtime(sendtime);
-            sms.setRetcode(responseContent);
+            //验证码:%s(为了资金安全,切勿将验证码泄露于他人),请在10分钟内按页面提示提交验证码,您正使用尾号%s进行支付,支付金额%s元。
+           
+            inputLine = smsService.sendSMS(ModuleTypeEnum.PAY, mobile, tn, miniCardNo,amount);
+            String retInfo="";
             switch (inputLine) {
                 case 100 :
-                    sms.setRetinfo("短信发送成功");
+                    retInfo="短信发送成功";
                     break;
                 case 101 :
-                    sms.setRetinfo("账号密码不能为空");
+                    retInfo="账号密码不能为空";
                     break;
                 case 102 :
-                    sms.setRetinfo("手机号,短信内容均不能为空");
+                    retInfo="手机号,短信内容均不能为空";
                     break;
                 case 103 :
-                    sms.setRetinfo("数据库连接失败");
+                    retInfo="数据库连接失败";
                     break;
                 case 104 :
-                    sms.setRetinfo("账号密码错误");
+                    retInfo="账号密码错误";
                     break;
                 case 105 :
-                    sms.setRetinfo("短信发送成功,等待审核!");
+                    retInfo="短信发送成功,等待审核!";
                     break;
                 case 106 :
-                    sms.setRetinfo("短信发送失败");
+                    retInfo="短信发送失败";
                     break;
                 case 999 :
-                    sms.setRetinfo("未知错误");
+                    retInfo="未知错误";
                     break;
             }
             
-            txnsSMSService.updateSMSResult(sms);
-            txnsQuickpayService.updateCMBCSMSResult(payorderno, sms.getRetcode(), sms.getRetinfo());
-            log.info("end send sms, response content is :"+responseContent);
+           
+            txnsQuickpayService.updateCMBCSMSResult(payorderno, inputLine+"", retInfo);
+            log.info("end send sms, response content is :"+inputLine);
         }catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -137,7 +124,20 @@ public class SMSUtil implements Runnable{
         this.tn = tn;
         this.sendtime = sendtime;
         this.payorderno = payorderno;
-        txnsSMSService = (ITxnsSMSService) SpringContext.getContext().getBean("txnsSMSService");
+        smsService = (ISMSService) SpringContext.getContext().getBean("smsService");
+        txnsQuickpayService = (ITxnsQuickpayService) SpringContext.getContext().getBean("txnsQuickpayService");
+    }
+    
+    public SMSUtil(String mobile, String content,String tn,String sendtime,String payorderno,String miniCardNo,String amount) {
+        super();
+        this.mobile = mobile;
+        this.content = content;
+        this.tn = tn;
+        this.sendtime = sendtime;
+        this.payorderno = payorderno;
+        this.miniCardNo = miniCardNo;
+        this.amount = amount;
+        smsService = (ISMSService) SpringContext.getContext().getBean("smsService");
         txnsQuickpayService = (ITxnsQuickpayService) SpringContext.getContext().getBean("txnsQuickpayService");
     }
 
@@ -164,6 +164,34 @@ public class SMSUtil implements Runnable{
     public void setPayorderno(String payorderno) {
         this.payorderno = payorderno;
     }
+
+	/**
+	 * @return the miniCardNo
+	 */
+	public String getMiniCardNo() {
+		return miniCardNo;
+	}
+
+	/**
+	 * @param miniCardNo the miniCardNo to set
+	 */
+	public void setMiniCardNo(String miniCardNo) {
+		this.miniCardNo = miniCardNo;
+	}
+
+	/**
+	 * @return the amount
+	 */
+	public String getAmount() {
+		return amount;
+	}
+
+	/**
+	 * @param amount the amount to set
+	 */
+	public void setAmount(String amount) {
+		this.amount = amount;
+	}
     
     
     

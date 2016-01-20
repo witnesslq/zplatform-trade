@@ -99,4 +99,12 @@ public interface ITxnsLogService extends IBaseService<TxnsLogModel, String>{
      * @throws TradeException
      */
     public void saveTxnsLog(TxnsLogModel txnsLogModel) throws TradeException;
+    
+    /**
+     * 更新中心应答信息
+     * @param txnseqno
+     * @param retcode
+     * @param retinfo
+     */
+    public void updateCoreRetResult(String txnseqno,String retcode,String retinfo);
 }

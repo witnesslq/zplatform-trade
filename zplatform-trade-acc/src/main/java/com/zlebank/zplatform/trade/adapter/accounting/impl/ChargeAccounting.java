@@ -21,7 +21,7 @@ import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
 import com.zlebank.zplatform.acc.exception.AccBussinessException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.commons.utils.StringUtil;
-import com.zlebank.zplatform.member.bean.enums.MemberType;
+import com.zlebank.zplatform.member.bean.enums.BusinessActorType;
 import com.zlebank.zplatform.member.pojo.PojoMember;
 import com.zlebank.zplatform.member.service.MemberService;
 import com.zlebank.zplatform.trade.adapter.accounting.IAccounting;
@@ -73,7 +73,7 @@ public class ChargeAccounting implements IAccounting{
                 if(StringUtil.isEmpty(memberId)){
                     throw new TradeException("AP08");
                 }
-                PojoMember member =memberService.getMbmberByMemberId(memberId, MemberType.Individual);
+                PojoMember member =memberService.getMbmberByMemberId(memberId, BusinessActorType.INDIVIDUAL);
                 if(member==null){
                     throw new TradeException("AP08");
                 }

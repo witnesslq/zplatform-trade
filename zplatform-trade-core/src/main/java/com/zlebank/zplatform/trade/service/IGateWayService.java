@@ -21,6 +21,7 @@ import com.zlebank.zplatform.trade.bean.gateway.OrderRespBean;
 import com.zlebank.zplatform.trade.bean.gateway.QueryBean;
 import com.zlebank.zplatform.trade.bean.gateway.QueryResultBean;
 import com.zlebank.zplatform.trade.bean.gateway.RiskRateInfoBean;
+import com.zlebank.zplatform.trade.bean.wap.WapCardBean;
 import com.zlebank.zplatform.trade.bean.wap.WapDebitCardSingRespBean;
 import com.zlebank.zplatform.trade.bean.wap.WapOrderRespBean;
 import com.zlebank.zplatform.trade.bean.wap.WapRefundBean;
@@ -75,7 +76,43 @@ public interface IGateWayService extends IBaseService<TxnsOrderinfoModel, Long>{
     public ResultBean generateAsyncRespMessage(String orderNo,String memberId);
     public void updateOrderToFail(String orderNo);
     public OrderRespBean generateWithdrawRespMessage(String orderNo);
+    /**
+     * 校验会员业务
+     * @param orderBean
+     * @param rateInfoBean
+     * @return
+     */
     public ResultBean validateMemberBusiness(OrderBean orderBean,RiskRateInfoBean rateInfoBean);
+    /**
+     * 通过订单号和会员号获取交易订单信息
+     * @param orderNo
+     * @param memberId
+     * @return
+     */
     public TxnsOrderinfoModel getOrderinfoByOrderNoAndMemberId(String orderNo,String memberId) ;
+    /**
+     * 获取手续费
+     * @param txnsLog
+     * @return
+     */
     public Long getTxnFee(TxnsLogModel txnsLog);
+    /**
+     * 绑定银行卡
+     * @param memberId 合作机构号/商户号
+     * @param personMemberId 个人会员号
+     * @param cardBean
+     * @return
+     */
+    public ResultBean bindingBankCard(String memberId,String personMemberId,WapCardBean cardBean);
+    
+    /**
+     * 
+     * @param memberId 会员号
+     * @param beginDate 开始时间
+     * @param endDate 结束时间
+     * @param page 页数
+     * @param rows 行数
+     * @return
+     */
+    public String queryOrderInfo(String memberId,String beginDate,String endDate,int page,int rows);
 }

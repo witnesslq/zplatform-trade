@@ -184,11 +184,11 @@ public class GateWayController {
             MemberBaseModel member = memberService.get(order.getMerId());
             variable.put("checkoutcode", member.getCashver());
             variable.put("status", "00");
-            if (StringUtil.isNotEmpty(order.getSubMerId())
-                    && order.getSubMerId().startsWith("2")) {
+            if (StringUtil.isNotEmpty(order.getMerId())
+                    && order.getMerId().startsWith("2")) {
                 MemberBaseModel subMember = memberService.get(order
-                        .getSubMerId());
-                order.setSubMerName(subMember.getMerchname());
+                        .getMerId());
+                order.setMerName(subMember.getMerchname());
             }
             // 将会员号保存在session
             httpSession.setAttribute("memberId", riskRateInfo.getMerUserId());
@@ -231,7 +231,7 @@ public class GateWayController {
         try {
             String memberId = ((RiskRateInfoBean)riskResultBean.getResultObj()).getMerUserId();
             gateWayService.verifyRepeatWebOrder(order.getOrderId(),
-                    order.getTxnTime(), order.getTxnAmt(), order.getMerId(),memberId);
+                    order.getTxnTime(), order.getTxnAmt(), order.getCoopInstiId(),memberId);
         } catch (TradeException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -249,16 +249,16 @@ public class GateWayController {
         }
 
         // 检验一级商户和二级商户有效性
-        if (StringUtil.isNotEmpty(order.getSubMerId())) {
-            MemberBaseModel subMember = memberService.getMemberByMemberId(order.getSubMerId());
+        if (StringUtil.isNotEmpty(order.getMerId())) {
+            MemberBaseModel subMember = memberService.getMemberByMemberId(order.getMerId());
             if (subMember == null) {
                 model.put("errMsg", "二级商户信息不存");
                 model.put("errCode", "RC10");
                 return false;
             }
-            if (order.getSubMerId().startsWith("2")) {// 对于商户会员需要进行检查
+            if (order.getMerId().startsWith("2")) {// 对于商户会员需要进行检查
                 ResultBean memberResultBean = memberService.verifySubMerch(
-                        order.getMerId(), order.getSubMerId());
+                        order.getCoopInstiId(), order.getMerId());
                 if (!memberResultBean.isResultBool()) {
                     model.put("errMsg", memberResultBean.getErrMsg());
                     model.put("errCode", memberResultBean.getErrCode());
@@ -774,7 +774,7 @@ public class GateWayController {
             // 路由控制,选择正确的交易渠道进行手机验证码 业务获取短信验证码（绑卡）
             ResultBean routResultBean = routeConfigService.getTransRout(
                     DateUtil.getCurrentDateTime(), trade.getAmount(),
-                    trade.getMerchId(), trade.getBusicode(), trade.getCardNo(),
+                    StringUtil.isNotEmpty(trade.getMerchId())?trade.getMerchId():trade.getSubMerchId(), trade.getBusicode(), trade.getCardNo(),
                     trade.getCashCode());
             if (routResultBean.isResultBool()) {
                 String routId = routResultBean.getResultObj().toString();
@@ -820,7 +820,7 @@ public class GateWayController {
                     .getResultObj();
             ResultBean routResultBean = routeConfigService.getTransRout(
                     DateUtil.getCurrentDateTime(), trade.getAmount(),
-                    trade.getMerchId(), trade.getBusicode(), trade.getCardNo(),
+                    StringUtil.isNotEmpty(trade.getMerchId())?trade.getMerchId():trade.getSubMerchId(), trade.getBusicode(), trade.getCardNo(),
                     trade.getCashCode());
 
             if (routResultBean.isResultBool()) {
@@ -1112,7 +1112,7 @@ public class GateWayController {
             //获取路由信息
             ResultBean routResultBean = routeConfigService.getTransRout(
                     DateUtil.getCurrentDateTime(), trade.getAmount(),
-                    trade.getMerchId(), trade.getBusicode(), trade.getCardNo(),
+                    StringUtil.isNotEmpty(trade.getMerchId())?trade.getMerchId():trade.getSubMerchId(), trade.getBusicode(), trade.getCardNo(),
                     trade.getCashCode());
             if (routResultBean.isResultBool()) {
                 String routId = routResultBean.getResultObj().toString();
@@ -1142,6 +1142,8 @@ public class GateWayController {
                         return new ModelAndView("redirect:/gateway/payment.htm?txnseqno="+ trade.getTxnseqno()+"&reapayOrderNo="+trade.getReaPayOrderNo()+"&orderNo="+trade.getOrderId());
                     case CMBCSELFWITHHOLDING:
                         return new ModelAndView("redirect:/gateway/payment.htm?txnseqno="+ trade.getTxnseqno()+"&reapayOrderNo="+trade.getReaPayOrderNo()+"&orderNo="+trade.getOrderId());
+				default:
+					break;
                     
                 }
                 model.put("trade", trade);
@@ -1182,7 +1184,7 @@ public class GateWayController {
         tradeBean.setOrderId(orderNo);
         tradeBean.setReaPayOrderNo(reapayOrderNo);
         model.put("trade", tradeBean);
-         return new ModelAndView("/fastpay/pay_jump_cmbc", model);
+        return new ModelAndView("/fastpay/pay_jump_cmbc", model);
     }
     
     
@@ -1325,6 +1327,8 @@ public class GateWayController {
                                 }
                             }
                             break;
+					default:
+						break;
                     }
                     
                    

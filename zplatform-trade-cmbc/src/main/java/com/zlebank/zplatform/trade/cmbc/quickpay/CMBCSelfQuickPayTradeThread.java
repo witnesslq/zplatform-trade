@@ -7,6 +7,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.commons.utils.DateUtil;
+import com.zlebank.zplatform.sms.service.ISMSService;
 import com.zlebank.zplatform.trade.adapter.quickpay.IQuickPayTrade;
 import com.zlebank.zplatform.trade.bean.PayPartyBean;
 import com.zlebank.zplatform.trade.bean.ResultBean;
@@ -44,7 +45,7 @@ public class CMBCSelfQuickPayTradeThread implements IQuickPayTrade{
     private TradeBean tradeBean;
     private TradeTypeEnum tradeType;
     private ITxnsQuickpayService txnsQuickpayService;
-    private ITxnsSMSService txnsSMSService;
+    private ISMSService smsService;
     private ICMBCQuickPayService cmbcQuickPayService;
     private ITxnsLogService txnsLogService;
     private ITxnsOrderinfoDAO txnsOrderinfoDAO;
@@ -52,7 +53,7 @@ public class CMBCSelfQuickPayTradeThread implements IQuickPayTrade{
     private IQuickpayCustService quickpayCustService;
     public CMBCSelfQuickPayTradeThread() {
          txnsQuickpayService = (ITxnsQuickpayService) SpringContext.getContext().getBean("txnsQuickpayService");
-         txnsSMSService = (ITxnsSMSService) SpringContext.getContext().getBean("txnsSMSService");
+         smsService = (ISMSService) SpringContext.getContext().getBean("smsService");
          txnsLogService = (ITxnsLogService) SpringContext.getContext().getBean("txnsLogService");
          cmbcQuickPayService = (ICMBCQuickPayService) SpringContext.getContext().getBean("cmbcQuickPayService");
          txnsOrderinfoDAO = (ITxnsOrderinfoDAO) SpringContext.getContext().getBean("txnsOrderinfo");
@@ -87,13 +88,11 @@ public class CMBCSelfQuickPayTradeThread implements IQuickPayTrade{
     public ResultBean sendMarginSms(TradeBean trade) {
         ResultBean resultBean = null;
         try {
-            String verifyCode = getVerifyCode();
-            String content ="校验码："+verifyCode+"，您正使用尾号"+trade.getMiniCardNo()+"进行支付，注意保密哦！";
+            
+           
             String mobile = trade.getMobile();
-            TxnsSmsModel sms = new TxnsSmsModel(0L, trade.getTn(), mobile, verifyCode, content, DateUtil.getCurrentDateTime(), DateUtil.formatDateTime(DateUtil.addMin(new Date(), 10L)), trade.getBusicode(), trade.getBusitype(), "", "");
-            txnsSMSService.saveSMS(sms);
             String payorderNo = txnsQuickpayService.saveCMBCOuterBankSign(trade);
-            SMSThreadPool.getInstance().executeMission(new SMSUtil(mobile,content,trade.getTn(),sms.getSendtime(),payorderNo));
+            SMSThreadPool.getInstance().executeMission(new SMSUtil(mobile,"",trade.getTn(),DateUtil.getCurrentDateTime(),payorderNo,trade.getMiniCardNo(),trade.getAmount_y()));
             resultBean = new ResultBean("success");
         } catch (Exception e) {
             // TODO Auto-generated catch block
@@ -146,22 +145,18 @@ public class CMBCSelfQuickPayTradeThread implements IQuickPayTrade{
                 }
             }
             resultBean = null;
-            //验证码校验
-            TxnsSmsModel sms = txnsSMSService.getLastSMSByTN(trade.getTn());
-            
-            if(sms==null){
-                //更新支付方返回结果
-                resultBean = new ResultBean("0051", "交易失败，验证码已过期");
-            }else{
-                if(!sms.getVerifycode().equals(trade.getIdentifyingCode())){
-                    resultBean = new ResultBean("0051", "验证码错误");
-                }
+            int retCode = smsService.verifyCode(trade.getMobile(), trade.getTn(), trade.getIdentifyingCode());
+            if(retCode==2){
+                resultBean = new ResultBean("30HK", "交易失败，动态口令或短信验证码校验失败");
+            }else if(retCode==3){
+                resultBean = new ResultBean("30HK", "交易失败，动态口令或短信验证码校验失败");
             }
-          //更新支付方信息
+            //更新支付方信息
             PayPartyBean payPartyBean = new PayPartyBean(trade.getTxnseqno(),"01", "", ChannelEnmu.CMBCSELFWITHHOLDING.getChnlcode(), ConsUtil.getInstance().cons.getCmbc_merid(), "", DateUtil.getCurrentDateTime(), "",trade.getCardNo(),"","");
             txnsLogService.updatePayInfo_Fast(payPartyBean);
             if(resultBean!=null){
                 txnsLogService.updatePayInfo_Fast_result(tradeBean.getTxnseqno(), resultBean.getErrCode(),resultBean.getErrMsg());
+                txnsLogService.updateCoreRetResult(tradeBean.getTxnseqno(), resultBean.getErrCode(),resultBean.getErrMsg());
                 log.info(JSON.toJSONString(resultBean));
                 return resultBean;
             }

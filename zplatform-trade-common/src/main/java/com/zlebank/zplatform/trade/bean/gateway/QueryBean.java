@@ -56,6 +56,9 @@ public class QueryBean implements Serializable{
     private String accessType;
     @NotEmpty(message="param.empty")
     @Length(max=15,message="param.error")
+    private String coopInstiId="";
+    @NotEmpty(message="param.empty")
+    @Length(max=15,message="param.error")
     private String merId="";
     @Length(max=14,message="param.error")
     private String txnTime="";
@@ -233,6 +236,18 @@ public class QueryBean implements Serializable{
     public void setReserved(String reserved) {
         this.reserved = reserved;
     }
+	/**
+	 * @return the coopInstiId
+	 */
+	public String getCoopInstiId() {
+		return coopInstiId;
+	}
+	/**
+	 * @param coopInstiId the coopInstiId to set
+	 */
+	public void setCoopInstiId(String coopInstiId) {
+		this.coopInstiId = coopInstiId;
+	}
     
     
 }

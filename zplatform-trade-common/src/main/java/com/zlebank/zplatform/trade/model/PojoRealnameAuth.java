@@ -21,6 +21,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
+import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.bean.TradeBean;
 import com.zlebank.zplatform.trade.bean.wap.WapCardBean;
 
@@ -215,7 +216,7 @@ public class PojoRealnameAuth {
         this.certifId = trade.getCertId();
         this.phoneNo = Long.valueOf(trade.getMobile());
         this.cvn2 = trade.getCvv2();
-        this.expired = trade.getMonth()+trade.getYear();
+        this.expired = StringUtil.isNotEmpty(trade.getValidthru())? trade.getValidthru(): trade.getMonth()+trade.getYear();
         this.status = "01";
        
     }

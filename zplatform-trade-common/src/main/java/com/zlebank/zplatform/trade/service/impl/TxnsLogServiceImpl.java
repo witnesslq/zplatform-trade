@@ -130,7 +130,13 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         txnsLog.setPayretinfo(retinfo);
         super.update(txnsLog);
     }
-    
+    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    public void updateCoreRetResult(String txnseqno,String retcode,String retinfo){
+        TxnsLogModel txnsLog = super.get(txnseqno);
+        txnsLog.setRetcode(retcode);
+        txnsLog.setRetinfo(retinfo);
+        super.update(txnsLog);
+    }
     
     
     @Transactional

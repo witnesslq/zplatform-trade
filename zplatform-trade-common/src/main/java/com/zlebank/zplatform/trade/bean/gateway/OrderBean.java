@@ -47,13 +47,14 @@ public class OrderBean implements Serializable{
     private String signMethod="";
     @NotEmpty(message="param.empty.merId")
     @Length(max=15,message="param.error.merId")
+    private String coopInstiId="";
+    @NotEmpty(message="param.empty.merId")
+    @Length(max=15,message="param.error.merId")
     private String merId="";
-    @Length(max=15,message="param.error.subMerId")
-    private String subMerId="";
     @Length(max=40,message="param.error.subMerName")
-    private String subMerName="";
+    private String merName="";
     @Length(max=16,message="param.error.subMerAbbr")
-    private String subMerAbbr="";
+    private String merAbbr="";
     @NotEmpty(message="param.empty.orderId")
     @Length(max=32,message="param.error.orderId")
     private String orderId="";
@@ -215,42 +216,6 @@ public class OrderBean implements Serializable{
      */
     public void setMerId(String merId) {
         this.merId = merId;
-    }
-    /**
-     * @return the subMerId
-     */
-    public String getSubMerId() {
-        return subMerId;
-    }
-    /**
-     * @param subMerId the subMerId to set
-     */
-    public void setSubMerId(String subMerId) {
-        this.subMerId = subMerId;
-    }
-    /**
-     * @return the subMerName
-     */
-    public String getSubMerName() {
-        return subMerName;
-    }
-    /**
-     * @param subMerName the subMerName to set
-     */
-    public void setSubMerName(String subMerName) {
-        this.subMerName = subMerName;
-    }
-    /**
-     * @return the subMerAbbr
-     */
-    public String getSubMerAbbr() {
-        return subMerAbbr;
-    }
-    /**
-     * @param subMerAbbr the subMerAbbr to set
-     */
-    public void setSubMerAbbr(String subMerAbbr) {
-        this.subMerAbbr = subMerAbbr;
     }
     /**
      * @return the orderId
@@ -576,6 +541,42 @@ public class OrderBean implements Serializable{
     public void setOrderDesc(String orderDesc) {
         this.orderDesc = orderDesc;
     }
+	/**
+	 * @return the coopInstiId
+	 */
+	public String getCoopInstiId() {
+		return coopInstiId;
+	}
+	/**
+	 * @param coopInstiId the coopInstiId to set
+	 */
+	public void setCoopInstiId(String coopInstiId) {
+		this.coopInstiId = coopInstiId;
+	}
+	/**
+	 * @return the merName
+	 */
+	public String getMerName() {
+		return merName;
+	}
+	/**
+	 * @param merName the merName to set
+	 */
+	public void setMerName(String merName) {
+		this.merName = merName;
+	}
+	/**
+	 * @return the merAbbr
+	 */
+	public String getMerAbbr() {
+		return merAbbr;
+	}
+	/**
+	 * @param merAbbr the merAbbr to set
+	 */
+	public void setMerAbbr(String merAbbr) {
+		this.merAbbr = merAbbr;
+	}
     
     
     

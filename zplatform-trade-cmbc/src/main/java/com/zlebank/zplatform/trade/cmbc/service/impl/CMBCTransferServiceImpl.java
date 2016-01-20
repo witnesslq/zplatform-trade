@@ -282,8 +282,8 @@ public class CMBCTransferServiceImpl implements ICMBCTransferService{
      */
     @Override
     public ResultBean singleTransfer(WithholdingMessageBean withholdingMsg) {
-        // TODO Auto-generated method stub
-        return null;
+        
+        return new ResultBean("success");
     }
 
 }

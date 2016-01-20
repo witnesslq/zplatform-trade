@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.gateway.OrderBean;
 import com.zlebank.zplatform.trade.bean.wap.WapOrderBean;
@@ -63,7 +64,12 @@ public class ProdCaseServiceImpl extends BaseServiceImpl<ProdCaseModel, Long> im
     @Override
     public ResultBean verifyBusiness(OrderBean order) {
         ResultBean resultBean = null;
-        MemberBaseModel member = memberService.getMemberByMemberId(order.getMerId());
+        MemberBaseModel member = null;
+        if(order.getAccessType().equals("0")){
+        	member = memberService.getMemberByMemberId(order.getMerId());
+        }else{
+        	member = memberService.getMemberByMemberId(order.getCoopInstiId());
+        }
         TxncodeDefModel busiModel = txncodeDefService.getBusiCode(order.getTxnType(), order.getTxnSubType(), order.getBizType());
         ProdCaseModel prodCase= getMerchProd(member.getPrdtver(),busiModel.getBusicode());
         if(prodCase==null){

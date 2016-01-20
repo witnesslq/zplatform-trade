@@ -32,7 +32,8 @@ public class WapWithdrawBean implements Serializable {
     private String signMethod;// 签名方法
     private String backUrl;// 后台通知地址
     private String virtualId;// 虚拟代码
-    private String merId;//一级商户
+    private String coopInstiId;//一级商户
+    private String merId;//子商户
     private String memberId;// 会员ID
     private String orderId;//订单号
     private String txnTime;//提交时间
@@ -260,6 +261,19 @@ public class WapWithdrawBean implements Serializable {
     public void setTxnTime(String txnTime) {
         this.txnTime = txnTime;
     }
+	/**
+	 * @return the coopInstiId
+	 */
+	public String getCoopInstiId() {
+		return coopInstiId;
+	}
+	/**
+	 * @param coopInstiId the coopInstiId to set
+	 */
+	public void setCoopInstiId(String coopInstiId) {
+		this.coopInstiId = coopInstiId;
+	}
+	
     
    
 }

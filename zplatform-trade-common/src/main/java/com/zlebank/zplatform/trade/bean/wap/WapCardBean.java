@@ -129,6 +129,36 @@ public class WapCardBean implements Serializable{
     public void setExpired(String expired) {
         this.expired = expired;
     }
+	/**
+	 * @param cardNo
+	 * @param cardType
+	 * @param customerNm
+	 * @param certifTp
+	 * @param certifId
+	 * @param phoneNo
+	 * @param cvn2
+	 * @param expired
+	 */
+	public WapCardBean(String cardNo, String cardType, String customerNm,
+			String certifTp, String certifId, String phoneNo, String cvn2,
+			String expired) {
+		super();
+		this.cardNo = cardNo;
+		this.cardType = cardType;
+		this.customerNm = customerNm;
+		this.certifTp = certifTp;
+		this.certifId = certifId;
+		this.phoneNo = phoneNo;
+		this.cvn2 = cvn2;
+		this.expired = expired;
+	}
+	/**
+	 * 
+	 */
+	public WapCardBean() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
     
     
 }

@@ -14,7 +14,11 @@ public class TxnsLogModel implements java.io.Serializable {
 
  // Fields
 
-    private String txnseqno;
+    /**
+	 * serialVersionUID
+	 */
+	private static final long serialVersionUID = 294757514028433150L;
+	private String txnseqno;
     private String txndate;
     private String txntime;
     private String apptype;
@@ -73,6 +77,7 @@ public class TxnsLogModel implements java.io.Serializable {
     private String apporderstatus;
     private String apporderinfo;
     private String accbusicode;
+    private String acccoopinstino;
     // Constructors
 
     /** default constructor */
@@ -702,6 +707,21 @@ public class TxnsLogModel implements java.io.Serializable {
     public void setAccbusicode(String accbusicode) {
         this.accbusicode = accbusicode;
     }
-	
 
+	/**
+	 * @return the acccoopinstino
+	 */
+    @Column(name = "ACCCOOPINSTINO", length = 15)
+	public String getAcccoopinstino() {
+		return acccoopinstino;
+	}
+
+	/**
+	 * @param acccoopinstino the acccoopinstino to set
+	 */
+	public void setAcccoopinstino(String acccoopinstino) {
+		this.acccoopinstino = acccoopinstino;
+	}
+	
+    
 }
