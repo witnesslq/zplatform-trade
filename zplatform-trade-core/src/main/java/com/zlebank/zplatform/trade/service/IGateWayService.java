@@ -96,6 +96,7 @@ public interface IGateWayService extends IBaseService<TxnsOrderinfoModel, Long>{
      * @return
      */
     public Long getTxnFee(TxnsLogModel txnsLog);
+
     /**
      * 绑定银行卡
      * @param memberId 合作机构号/商户号
@@ -115,4 +116,7 @@ public interface IGateWayService extends IBaseService<TxnsOrderinfoModel, Long>{
      * @return
      */
     public String queryOrderInfo(String memberId,String beginDate,String endDate,int page,int rows);
+
+    public String dealWithWapOrder(OrderBean order) throws TradeException;
+
 }

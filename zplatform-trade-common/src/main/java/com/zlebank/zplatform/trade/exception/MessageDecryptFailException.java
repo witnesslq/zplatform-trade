@@ -10,7 +10,6 @@
  */
 package com.zlebank.zplatform.trade.exception;
 
-import com.zlebank.zplatform.commons.exception.AbstractDescribeException;
 
 /**
  * 报文解密失败信息
@@ -20,7 +19,7 @@ import com.zlebank.zplatform.commons.exception.AbstractDescribeException;
  * @date 2015年11月25日 下午2:10:30
  * @since 
  */
-public class MessageDecryptFailException extends AbstractDescribeException {
+public class MessageDecryptFailException extends AbstractTradeDescribeException {
 
     /**
      * serialVersionUID
