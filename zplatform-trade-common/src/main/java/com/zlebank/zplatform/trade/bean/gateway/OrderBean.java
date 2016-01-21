@@ -48,7 +48,6 @@ public class OrderBean implements Serializable{
     @NotEmpty(message="param.empty.merId")
     @Length(max=15,message="param.error.merId")
     private String coopInstiId="";
-    @NotEmpty(message="param.empty.merId")
     @Length(max=15,message="param.error.merId")
     private String merId="";
     @Length(max=40,message="param.error.subMerName")

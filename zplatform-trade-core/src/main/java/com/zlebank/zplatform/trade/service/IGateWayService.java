@@ -11,6 +11,8 @@
 package com.zlebank.zplatform.trade.service;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
+import java.util.Map;
 
 import com.alibaba.fastjson.JSONObject;
 import com.zlebank.zplatform.trade.bean.ReaPayResultBean;
@@ -115,8 +117,25 @@ public interface IGateWayService extends IBaseService<TxnsOrderinfoModel, Long>{
      * @param rows 行数
      * @return
      */
-    public String queryOrderInfo(String memberId,String beginDate,String endDate,int page,int rows);
+    public List<Map<String, Object>> queryOrderInfo(String memberId,String beginDate,String endDate,int page,int rows);
 
     public String dealWithWapOrder(OrderBean order) throws TradeException;
+    
+    /**
+     * 
+     * @param orderNo
+     * @param memberId
+     * @return
+     */
+    public TxnsOrderinfoModel getPersonOrder(String orderNo,String memberId);
+    
+    /**
+     * 
+     * @param memberId
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    public long queryOrderInfoCount(String memberId,String beginDate,String endDate);
 
 }

@@ -11,6 +11,7 @@
 package com.zlebank.zplatform.trade.service.impl;
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,6 +24,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,8 +40,11 @@ import com.zlebank.zplatform.commons.utils.RSAUtils;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.member.bean.CoopInstiMK;
 import com.zlebank.zplatform.member.bean.MerchMK;
+import com.zlebank.zplatform.member.bean.enums.MemberType;
 import com.zlebank.zplatform.member.bean.enums.TerminalAccessType;
+import com.zlebank.zplatform.member.pojo.PojoMember;
 import com.zlebank.zplatform.member.service.CoopInstiService;
+import com.zlebank.zplatform.member.service.MemberService;
 import com.zlebank.zplatform.member.service.MerchMKService;
 import com.zlebank.zplatform.trade.adapter.quickpay.IQuickPayTrade;
 import com.zlebank.zplatform.trade.analyzer.GateWayTradeAnalyzer;
@@ -152,7 +157,9 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
     private ITxnsWithholdingService txnsWithholdingService;
     @Autowired
     private CoopInstiService coopInstiService;
-    
+    @Autowired
+    @Qualifier("memberServiceImpl")
+    private MemberService memberService2; 
     /**
      *
      * @return
@@ -360,7 +367,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlcycle().toString())));
         //txnsLog.setTradcomm(GateWayTradeAnalyzer.generateCommAmt(order.getReserved()));
         if(StringUtil.isNotEmpty(riskRateInfoBean.getMerUserId())){
-            MemberBaseModel personMemeber= memberService.get(riskRateInfoBean.getMerUserId());
+            PojoMember personMemeber= memberService2.getMbmberByMemberId(riskRateInfoBean.getMerUserId(), MemberType.INDIVIDUAL);
             if(personMemeber!=null){
                 txnsLog.setAccmemberid(riskRateInfoBean.getMerUserId());
             }else{
@@ -485,7 +492,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlcycle().toString())));
         //txnsLog.setTradcomm(GateWayTradeAnalyzer.generateCommAmt(order.getReserved()));
         if(StringUtil.isNotEmpty(riskRateInfoBean.getMerUserId())){
-            MemberBaseModel personMemeber= memberService.get(riskRateInfoBean.getMerUserId());
+            PojoMember personMemeber= memberService2.getMbmberByMemberId(riskRateInfoBean.getMerUserId(),MemberType.INDIVIDUAL);
             if(personMemeber!=null){
                 txnsLog.setAccmemberid(riskRateInfoBean.getMerUserId());
             }else{
@@ -594,7 +601,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlcycle().toString())));
           //txnsLog.setTradcomm(GateWayTradeAnalyzer.generateCommAmt(order.getReserved()));
             if(StringUtil.isNotEmpty(riskRateInfoBean.getMerUserId())){
-                MemberBaseModel personMemeber= memberService.get(riskRateInfoBean.getMerUserId());
+                PojoMember personMemeber= memberService2.getMbmberByMemberId(riskRateInfoBean.getMerUserId(), MemberType.INDIVIDUAL);
                 if(personMemeber!=null){
                     txnsLog.setAccmemberid(riskRateInfoBean.getMerUserId());
                 }else{
@@ -1923,7 +1930,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
 				e.printStackTrace();
 			}
             TradeBean trade = new TradeBean("", "","0", cardBean.getCardNo(),cardBean.getCustomerNm(),cardBean.getCertifId(), cardBean.getPhoneNo(), "", "", cardBean.getCertifTp(), "", personMemberId, "", memberId, "", "", memberId, "","",BusinessEnum.CONSUMEQUICK.getBusiCode(), cardBean.getCardType(), "", "", cardBean.getCvn2(), cardBean.getExpired());
-           
+            trade.setTradeType("01");//实名认证交易，不发送绑卡短信
             trade.setMerUserId(personMemberId);
             trade.setPayinstiId(routId);
             quickPayTrade.setTradeBean(trade);
@@ -1935,7 +1942,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
     	return resultBean;
     }
     @Transactional(readOnly=true)
-    public String queryOrderInfo(String memberId,String beginDate,String endDate,int page,int rows){
+    public List<Map<String, Object>> queryOrderInfo(String memberId,String beginDate,String endDate,int page,int rows){
     	List<String> paraList = new ArrayList<String>();
     	StringBuffer sqlBuffer = new StringBuffer("select orderno,orderamt,ordercommitime,status,orderdesc,tn,CURRENCYCODE ");
     	sqlBuffer.append("from t_txns_orderinfo ");
@@ -1956,6 +1963,39 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
     	}
     	query.setMaxResults(rows);
     	query.setFirstResult(page);
-    	return JSON.toJSONString(query.list());
+    	return query.list();
     }
+    @Transactional(readOnly=true)
+    public long queryOrderInfoCount(String memberId,String beginDate,String endDate){
+    	List<String> paraList = new ArrayList<String>();
+    	StringBuffer sqlBuffer = new StringBuffer("select count(1) as total ");
+    	sqlBuffer.append("from t_txns_orderinfo ");
+    	sqlBuffer.append("where 1=1 and ");
+    	if(StringUtil.isNotEmpty(beginDate)){
+    		sqlBuffer.append("ordercommitime > ? and ");
+    		paraList.add(beginDate);
+    	}
+    	if(StringUtil.isNotEmpty(endDate)){
+    		sqlBuffer.append("ordercommitime < ? and ");
+    		paraList.add(endDate);
+    	}
+    	sqlBuffer.append("memberId = ? order by id desc");
+    	paraList.add(memberId);
+    	SQLQuery query = (SQLQuery) getSession().createSQLQuery(sqlBuffer.toString()).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+    	for (int i = 0; i < paraList.size(); i++) {
+    		query.setParameter(i, paraList.get(i));
+    	}
+    	Map<String, BigDecimal> valueMap = (Map<String, BigDecimal>) query.uniqueResult();
+		return valueMap.get("TOTAL").longValue();
+    }
+	/**
+	 *
+	 * @param orderNo
+	 * @param memberId
+	 * @return
+	 */
+	@Override
+	public TxnsOrderinfoModel getPersonOrder(String orderNo, String memberId) {
+		return super.getUniqueByHQL("from TxnsOrderinfoModel where orderno = ? and  memberid = ?", new Object[]{orderNo,memberId});
+	}
 }

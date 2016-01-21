@@ -252,7 +252,7 @@ public class GateWayController {
         if (StringUtil.isNotEmpty(order.getMerId())) {
             MemberBaseModel subMember = memberService.getMemberByMemberId(order.getMerId());
             if (subMember == null) {
-                model.put("errMsg", "二级商户信息不存");
+                model.put("errMsg", "商户信息不存");
                 model.put("errCode", "RC10");
                 return false;
             }

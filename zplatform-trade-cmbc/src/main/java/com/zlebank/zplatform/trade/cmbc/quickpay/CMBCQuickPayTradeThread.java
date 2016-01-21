@@ -208,12 +208,19 @@ public class CMBCQuickPayTradeThread implements IQuickPayTrade{
             //保存卡信息认证流水
             String payorderNo = txnsQuickpayService.saveCMBCOuterBankCardSign(trade);
             resultBean = cmbcTransferService.realNameAuth(realnameAuth);
+            
+            
             if(resultBean.isResultBool()){
                 txnsQuickpayService.updateCMBCSMSResult(payorderNo, "00", "签约成功");
-                //保存绑卡信息
-                quickpayCustService.updateCardStatus(trade.getMerUserId(), trade.getCardNo());
+                if(!"01".equals(trade.getTradeType())){
+                	//保存绑卡信息
+                    quickpayCustService.updateCardStatus(trade.getMerUserId(), trade.getCardNo());
+                }
             }else{
                 txnsQuickpayService.updateCMBCSMSResult(payorderNo, resultBean.getErrCode(), resultBean.getErrMsg());
+            }
+            if("01".equals(trade.getTradeType())){
+            	return resultBean;
             }
         } catch (CMBCTradeException e1) {
             // TODO Auto-generated catch block

@@ -25,4 +25,6 @@ import com.zlebank.zplatform.trade.model.CashBankModel;
 public interface ICashBankService extends IBaseService<CashBankModel, Long>{
     public List<CashBankModel> findBankByCashCode(String cashCode);
     public List<CashBankModel> findBankByPaytype(String payType);
+    public List<CashBankModel> findBankPage(int page,int pageSize);
+    public long findBankCount();
 }
