@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.zlebank.zplatform.acc.bean.enums.BusiType;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.gateway.OrderBean;
@@ -76,6 +77,12 @@ public class ProdCaseServiceImpl extends BaseServiceImpl<ProdCaseModel, Long> im
             resultBean = new ResultBean("RC36", "商户未开通此业务");
         }else {
             resultBean = new ResultBean("success");
+        }
+        BusiType busiType = BusiType.fromValue(busiModel.getBusitype());
+        if(busiType==BusiType.CONSUMER||busiType==BusiType.CASH||busiType==BusiType.REPAIDP){
+        	resultBean = new ResultBean("success");
+        }else{
+        	resultBean = new ResultBean("RC36", "个人用户未开通此业务");
         }
         return resultBean;
     }
