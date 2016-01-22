@@ -419,9 +419,12 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         orderinfo.setOrdercommitime(order.getTxnTime());
         orderinfo.setRelatetradetxn(txnsLog.getTxnseqno());//关联的交易流水表中的交易序列号
         orderinfo.setFirmemberno(order.getCoopInstiId());
-        //orderinfo.setFirmembername(order.getc);
-        orderinfo.setSecmemberno(order.getMerId());
-        orderinfo.setSecmembername(order.getMerName());
+        orderinfo.setFirmembername(coopInstiService.getInstiByInstiCode(order.getCoopInstiId()).getInstiName());
+        if(StringUtil.isNotEmpty(order.getMerId())){
+        	orderinfo.setSecmemberno(order.getMerId());
+            orderinfo.setSecmembername(StringUtil.isNotEmpty(order.getMerName())?order.getMerName():member.getMerchname());
+        }
+        
         orderinfo.setSecmembershortname(order.getMerAbbr());
         orderinfo.setPayerip(order.getCustomerIp());
         orderinfo.setAccesstype(order.getAccessType());
@@ -554,9 +557,11 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         orderinfo.setOrdercommitime(order.getTxnTime());
         orderinfo.setRelatetradetxn(txnsLog.getTxnseqno());//关联的交易流水表中的交易序列号
         orderinfo.setFirmemberno(order.getCoopInstiId());
-        //orderinfo.setFirmembername(member.getMerchname());
-        orderinfo.setSecmemberno(order.getMerId());
-        orderinfo.setSecmembername(order.getMerName());
+        orderinfo.setFirmembername(coopInstiService.getInstiByInstiCode(order.getCoopInstiId()).getInstiName());
+        if(StringUtil.isNotEmpty(order.getMerId())){
+        	orderinfo.setSecmemberno(order.getMerId());
+            orderinfo.setSecmembername(StringUtil.isNotEmpty(order.getMerName())?order.getMerName():member.getMerchname());
+        }
         orderinfo.setSecmembershortname(order.getMerAbbr());
         orderinfo.setPayerip(order.getCustomerIp());
         orderinfo.setAccesstype(order.getAccessType());
@@ -671,9 +676,11 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             orderinfo.setOrdercommitime(order.getTxnTime());
             orderinfo.setRelatetradetxn(txnsLog.getTxnseqno());//关联的交易流水表中的交易序列号
             orderinfo.setFirmemberno(order.getCoopInstiId());
-            //orderinfo.setFirmembername(member.getMerchname());
-            orderinfo.setSecmemberno(order.getMerId());
-            orderinfo.setSecmembername(order.getMerName());
+            orderinfo.setFirmembername(coopInstiService.getInstiByInstiCode(order.getCoopInstiId()).getInstiName());
+            if(StringUtil.isNotEmpty(order.getMerId())){
+            	orderinfo.setSecmemberno(order.getMerId());
+                orderinfo.setSecmembername(StringUtil.isNotEmpty(order.getMerName())?order.getMerName():member.getMerchname());
+            }
             orderinfo.setSecmembershortname(order.getMerAbbr());
             orderinfo.setPayerip(order.getCustomerIp());
             orderinfo.setAccesstype(order.getAccessType());
@@ -809,9 +816,9 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             orderinfo.setOrdercommitime(refundBean.getTxnTime());
             orderinfo.setRelatetradetxn(txnsLog.getTxnseqno());//关联的交易流水表中的交易序列号
             orderinfo.setFirmemberno(refundBean.getCoopInstiId());
-            //orderinfo.setFirmembername(member.getMerchname());
-            orderinfo.setSecmembername(refundBean.getMerId());
-            orderinfo.setSecmembername(refundBean.getMerId());
+            orderinfo.setFirmembername(coopInstiService.getInstiByInstiCode(refundBean.getCoopInstiId()).getInstiName());
+            orderinfo.setSecmemberno(refundBean.getMerId());
+            orderinfo.setSecmembername(member==null?"":member.getMerchname());
             orderinfo.setBackurl(refundBean.getBackUrl());
             orderinfo.setTxntype(refundBean.getTxnType());
             orderinfo.setTxnsubtype(refundBean.getTxnSubType());
@@ -942,7 +949,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             orderinfo.setOrdercommitime(withdrawBean.getTxnTime());
             orderinfo.setRelatetradetxn(txnsLog.getTxnseqno());//关联的交易流水表中的交易序列号
             orderinfo.setFirmemberno(withdrawBean.getCoopInstiId());
-           // orderinfo.setFirmembername(member.getMerchname());
+            orderinfo.setFirmembername(coopInstiService.getInstiByInstiCode(withdrawBean.getCoopInstiId()).getInstiName());
             
             
             orderinfo.setBackurl(withdrawBean.getBackUrl());

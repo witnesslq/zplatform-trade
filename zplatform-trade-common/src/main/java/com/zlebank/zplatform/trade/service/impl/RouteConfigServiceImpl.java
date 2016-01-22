@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.dao.IRouteConfigDAO;
+import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.model.MemberBaseModel;
 import com.zlebank.zplatform.trade.model.RouteConfigModel;
 import com.zlebank.zplatform.trade.service.IMemberService;
@@ -175,10 +176,26 @@ public class RouteConfigServiceImpl extends BaseServiceImpl<RouteConfigModel, Lo
         return null;
     }
     @Transactional(propagation=Propagation.REQUIRES_NEW)
+    public String getDefaultVerInfo(String instiCode,String busicode,int verType) throws TradeException{
+    	List<Map<String, Object>> resultList = (List<Map<String, Object>>) super.queryBySQL("select COOP_INSTI_CODE,BUSI_CODE,VER_TYPE,VER_VALUE from T_NONMER_DEFAULT_CONFIG where COOP_INSTI_CODE=? and BUSI_CODE=? and VER_TYPE=?", new Object[]{instiCode,busicode,verType+""});
+    	if(resultList.size()>0){
+    		Map<String, Object> valueMap = resultList.get(0);
+    		return valueMap.get("VER_VALUE").toString();
+    	}
+    	throw new TradeException("GW03");
+		//return null;
+    }
+    @Transactional(propagation=Propagation.REQUIRES_NEW)
     public ResultBean getWapTransRout(String transTime,String transAmt,String memberId,String busiCode,String cardNo){
         try {
             MemberBaseModel merchant =  memberService.get(memberId);
-            String merchRoutver= merchant.getRoutver();
+            String merchRoutver = null;
+            if(merchant==null){
+            	merchRoutver = getDefaultVerInfo(memberId,busiCode,20);
+            }else{
+            	merchRoutver = merchant.getRoutver();
+            }
+            
             if (log.isDebugEnabled()) {
                 log.debug("transTime：" + transTime);
                 log.debug("transAmt：" + transAmt);
@@ -261,6 +278,7 @@ public class RouteConfigServiceImpl extends BaseServiceImpl<RouteConfigModel, Lo
         } catch (Exception e) {
             // TODO: handle exception
            log.error(e);
+           e.printStackTrace();
         }
         log.info("member "+memberId+" no find member rout!!!");
         return new ResultBean("RC99", "交易路由异常");
