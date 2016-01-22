@@ -179,17 +179,7 @@ public class GateWayController {
            
             // 订单记录和业务逻辑处理,取得商户信息，记录交易数据（核心）和订单详细信息，分析交易所属业务
             String txnseqno = gateWayService.dealWithOrder(order, riskRateInfo);
-            // 根据收银台版本，显示收银台对应页面
-            Map<String, Object> variable = new HashMap<String, Object>();
-            MemberBaseModel member = memberService.get(order.getMerId());
-            variable.put("checkoutcode", member.getCashver());
-            variable.put("status", "00");
-            if (StringUtil.isNotEmpty(order.getMerId())
-                    && order.getMerId().startsWith("2")) {
-                MemberBaseModel subMember = memberService.get(order
-                        .getMerId());
-                order.setMerName(subMember.getMerchname());
-            }
+            
             // 将会员号保存在session
             httpSession.setAttribute("memberId", riskRateInfo.getMerUserId());
             return new ModelAndView("redirect:/gateway/cash.htm?txnseqno="

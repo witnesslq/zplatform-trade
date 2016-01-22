@@ -55,7 +55,7 @@ public interface IGateWayService extends IBaseService<TxnsOrderinfoModel, Long>{
     public void updateOrderToStartPay(String orderNo) throws TradeException;
     public ResultBean verifyQueryOrder(QueryBean queryBean);
     public ResultBean generateQueryResultBean(QueryResultBean queryResultBean);
-    public String dealWithWebOrder(OrderBean order,RiskRateInfoBean riskRateInfoBean);
+    public String dealWithWebOrder(OrderBean order,RiskRateInfoBean riskRateInfoBean) throws TradeException;
     public TxnsOrderinfoModel getOrderinfoByTN(String tn) ;
     public void saveAcctTrade(String txnseqno,String gateWayOrderNo,ResultBean resultBean);
     public String createWapOrder(String json)throws TradeException, UnsupportedEncodingException;

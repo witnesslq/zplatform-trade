@@ -66,24 +66,24 @@ public class ProdCaseServiceImpl extends BaseServiceImpl<ProdCaseModel, Long> im
     public ResultBean verifyBusiness(OrderBean order) {
         ResultBean resultBean = null;
         MemberBaseModel member = null;
-        if(order.getAccessType().equals("0")){
-        	member = memberService.getMemberByMemberId(order.getMerId());
-        }else{
-        	member = memberService.getMemberByMemberId(order.getCoopInstiId());
-        }
         TxncodeDefModel busiModel = txncodeDefService.getBusiCode(order.getTxnType(), order.getTxnSubType(), order.getBizType());
-        ProdCaseModel prodCase= getMerchProd(member.getPrdtver(),busiModel.getBusicode());
-        if(prodCase==null){
-            resultBean = new ResultBean("RC36", "商户未开通此业务");
-        }else {
-            resultBean = new ResultBean("success");
-        }
-        BusiType busiType = BusiType.fromValue(busiModel.getBusitype());
-        if(busiType==BusiType.CONSUMER||busiType==BusiType.CASH||busiType==BusiType.REPAIDP){
-        	resultBean = new ResultBean("success");
+        if(StringUtil.isNotEmpty(order.getMerId())){
+        	member = memberService.getMemberByMemberId(order.getMerId());
+        	ProdCaseModel prodCase= getMerchProd(member.getPrdtver(),busiModel.getBusicode());
+            if(prodCase==null){
+                resultBean = new ResultBean("RC36", "商户未开通此业务");
+            }else {
+                resultBean = new ResultBean("success");
+            }
         }else{
-        	resultBean = new ResultBean("RC36", "个人用户未开通此业务");
+        	BusiType busiType = BusiType.fromValue(busiModel.getBusitype());
+            if(busiType==BusiType.CASH||busiType==BusiType.REPAIDP){
+            	resultBean = new ResultBean("success");
+            }else{
+            	resultBean = new ResultBean("RC36", "个人用户未开通此业务");
+            }
         }
+        
         return resultBean;
     }
     
