@@ -1981,7 +1981,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
     public ResultBean bindingBankCard(String memberId,String personMemberId,WapCardBean cardBean){
     	ResultBean resultBean = null;
     	//获取路由信息
-        ResultBean routResultBean = routeConfigService.getWapTransRout(DateUtil.getCurrentDateTime(), "0", memberId, BusinessEnum.CONSUMEQUICK.getBusiCode(), cardBean.getCardNo());
+        ResultBean routResultBean = routeConfigService.getWapTransRout(DateUtil.getCurrentDateTime(), "0", memberId, BusinessEnum.RECHARGE.getBusiCode(), cardBean.getCardNo());
         if (log.isDebugEnabled()) {
             log.debug("获取路由信息："+JSON.toJSON(cardBean));
         }
