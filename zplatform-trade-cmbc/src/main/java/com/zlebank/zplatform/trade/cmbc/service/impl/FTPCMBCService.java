@@ -242,17 +242,13 @@ public class FTPCMBCService implements IFTPCMBCService {
     }
     
     public static void main(String[] args) {
-        try {
-            FTPClient ftpClient=new FTPClient();
-            ftpClient.connect("192.168.101.231", 21);
-            boolean loginFlag =ftpClient.login("mspay", "mspay8341");
-            System.out.println(loginFlag);
-        } catch (SocketException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+       
+            /*FTPClient ftpClient=new FTPClient();
+            ftpClient.connect("192.168.13.106", 21);
+            boolean loginFlag =ftpClient.login("webftp", "webftp");
+            System.out.println(loginFlag);*/
+        	
+        	new FTPCMBCService().uploadCMBCFile(new File("D:\\cmbc\\down.txt"), "1234.txt","");
+        
     }
 }

@@ -85,7 +85,7 @@ public class AccountPayServiceImpl implements IAccountPayService{
             ConsumeAccounting accounting = new ConsumeAccounting();
             ResultBean resultBean =accounting.accountedFor(accountTrade.getTxnseqno());
             if(!resultBean.isResultBool()){
-               // throw new TradeException("AP05");
+                throw new TradeException("AP05");
             }
             //更新账户支付信息
             txnsLogService.updateAccountTrade(accountTrade, resultBean);
