@@ -378,7 +378,6 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
                     tradeBean.getMerUserId(), tradeBean.getMerchId(),
                     tradeBean.getPay_pwd(), tradeBean.getAmount(),
                     tradeBean.getTxnseqno());
-            accountTrade.setMerchId("888888888888888");
             String pwd = accountPayService.encryptPWD(
                     accountTrade.getMerchId(), tradeBean.getPay_pwd());
             accountTrade.setPay_pwd(pwd);

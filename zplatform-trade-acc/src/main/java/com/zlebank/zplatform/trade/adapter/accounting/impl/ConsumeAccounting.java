@@ -20,6 +20,7 @@ import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
 import com.zlebank.zplatform.acc.exception.AccBussinessException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
+import com.zlebank.zplatform.commons.dao.pojo.AccStatusEnum;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.adapter.accounting.IAccounting;
 import com.zlebank.zplatform.trade.bean.ResultBean;
@@ -132,10 +133,10 @@ public class ConsumeAccounting implements IAccounting{
             return resultBean;
         }
         if(resultBean.isResultBool()){
-            txnsLog.setApporderstatus("00");
+            txnsLog.setApporderstatus(AccStatusEnum.Finish.getCode());
             txnsLog.setApporderinfo("消费入账成功");
         }else{
-            txnsLog.setApporderstatus("04");
+            txnsLog.setApporderstatus(AccStatusEnum.AccountingFail.getCode());
             txnsLog.setApporderinfo(resultBean.getErrMsg());
         }
         txnsLogService.updateAppStatus(txnseqno, txnsLog.getApporderstatus(), txnsLog.getApporderinfo());

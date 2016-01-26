@@ -2035,8 +2035,8 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
     	for (int i = 0; i < paraList.size(); i++) {
     		query.setParameter(i, paraList.get(i));
     	}
+    	query.setFirstResult((rows)*((page==0?1:page)-1));
     	query.setMaxResults(rows);
-    	query.setFirstResult(page);
     	return query.list();
     }
     @Transactional(readOnly=true)

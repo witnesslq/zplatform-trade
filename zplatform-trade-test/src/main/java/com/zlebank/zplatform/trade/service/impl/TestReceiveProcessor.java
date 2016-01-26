@@ -16,8 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.zlebank.zplatform.commons.dao.pojo.BusiTypeEnum;
 import com.zlebank.zplatform.commons.utils.RSAUtils;
 import com.zlebank.zplatform.member.service.MerchMKService;
+import com.zlebank.zplatform.trade.adapter.accounting.IAccounting;
 import com.zlebank.zplatform.trade.bean.AppPartyBean;
 import com.zlebank.zplatform.trade.bean.PayPartyBean;
 import com.zlebank.zplatform.trade.bean.ReaPayResultBean;
@@ -26,6 +28,7 @@ import com.zlebank.zplatform.trade.bean.TradeBean;
 import com.zlebank.zplatform.trade.bean.enums.TradeTypeEnum;
 import com.zlebank.zplatform.trade.bean.gateway.OrderAsynRespBean;
 import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
+import com.zlebank.zplatform.trade.factory.AccountingAdapterFactory;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.model.TxnsOrderinfoModel;
 import com.zlebank.zplatform.trade.service.IQuickpayCustService;
@@ -106,19 +109,28 @@ public class TestReceiveProcessor implements ITradeReceiveProcessor{
             String reaPayOrderNo =  tradeBean.getOrderId();
             // 处理同步通知和异步通知
             // 根据原始订单拼接应答报文，异步通知商户
-            TxnsOrderinfoModel gatewayOrderBean = txnsOrderinfoDAO.getOrderinfoByOrderNo(reaPayOrderNo,tradeBean.getOrderId());
+            //TxnsOrderinfoModel gatewayOrderBean = txnsOrderinfoDAO.getOrderinfoByOrderNo(reaPayOrderNo,tradeBean.getMerchId());
             // 应用方信息
             AppPartyBean appParty = new AppPartyBean("123",
                     "000000000000", commiteTime,
                     DateUtil.getCurrentDateTime(), tradeBean.getTxnseqno(), "AC000000");
             txnsLogService.updateAppInfo(appParty);
-            ResultBean orderResp = 
+            try {
+                IAccounting accounting = AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue(txnsLogService.getTxnsLogByTxnseqno(tradeBean.getTxnseqno()).getBusitype()));
+                accounting.accountedFor(tradeBean.getTxnseqno());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            
+            
+            
+            /*ResultBean orderResp = 
                     generateAsyncRespMessage(reaPayOrderNo,
                             tradeBean.getMerchId());
             if (orderResp.isResultBool()) {
                 OrderAsynRespBean respBean = (OrderAsynRespBean) orderResp
                         .getResultObj();
-            }
+            }*/
             
     }
     

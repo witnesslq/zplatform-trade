@@ -37,7 +37,6 @@ import com.zlebank.zplatform.acc.bean.BusiAcctQuery;
 import com.zlebank.zplatform.acc.bean.enums.Usage;
 import com.zlebank.zplatform.acc.pojo.Money;
 import com.zlebank.zplatform.acc.service.AccountQueryService;
-import com.zlebank.zplatform.commons.utils.Base64Utils;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.member.dao.PersonDAO;
 import com.zlebank.zplatform.member.pojo.PojoPersonDeta;
@@ -46,6 +45,7 @@ import com.zlebank.zplatform.trade.adapter.accounting.IAccounting;
 import com.zlebank.zplatform.trade.adapter.quickpay.IQuickPayTrade;
 import com.zlebank.zplatform.trade.analyzer.GateWayTradeAnalyzer;
 import com.zlebank.zplatform.trade.analyzer.ReaPayTradeAnalyzer;
+import com.zlebank.zplatform.trade.bean.AccountTradeBean;
 import com.zlebank.zplatform.trade.bean.AppPartyBean;
 import com.zlebank.zplatform.trade.bean.PayPartyBean;
 import com.zlebank.zplatform.trade.bean.ReaPayResultBean;
@@ -60,20 +60,12 @@ import com.zlebank.zplatform.trade.bean.gateway.OrderRespBean;
 import com.zlebank.zplatform.trade.bean.gateway.QueryBean;
 import com.zlebank.zplatform.trade.bean.gateway.QueryResultBean;
 import com.zlebank.zplatform.trade.bean.gateway.RiskRateInfoBean;
-import com.zlebank.zplatform.trade.cmbc.bean.gateway.CardMessageBean;
-import com.zlebank.zplatform.trade.cmbc.bean.gateway.InsteadPayMessageBean;
-import com.zlebank.zplatform.trade.cmbc.bean.gateway.WhiteListMessageBean;
-import com.zlebank.zplatform.trade.cmbc.bean.gateway.WithholdingMessageBean;
-import com.zlebank.zplatform.trade.cmbc.exception.CMBCTradeException;
 import com.zlebank.zplatform.trade.cmbc.service.ICMBCTransferService;
 import com.zlebank.zplatform.trade.cmbc.service.IWithholdingService;
-import com.zlebank.zplatform.trade.cmbc.service.impl.InsteadPayServiceImpl;
-import com.zlebank.zplatform.trade.cmbc.service.impl.WithholdingServiceImpl;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.factory.AccountingAdapterFactory;
 import com.zlebank.zplatform.trade.factory.TradeAdapterFactory;
 import com.zlebank.zplatform.trade.model.MemberBaseModel;
-import com.zlebank.zplatform.trade.model.PojoRealnameAuth;
 import com.zlebank.zplatform.trade.model.QuickpayCustModel;
 import com.zlebank.zplatform.trade.model.TxncodeDefModel;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
@@ -99,7 +91,6 @@ import com.zlebank.zplatform.trade.service.ITxnsWithdrawService;
 import com.zlebank.zplatform.trade.service.ITxnsWithholdingService;
 import com.zlebank.zplatform.trade.service.IWebGateWayService;
 import com.zlebank.zplatform.trade.service.IZlTradeService;
-import com.zlebank.zplatform.trade.service.impl.GateWayServiceImpl;
 import com.zlebank.zplatform.trade.utils.AmountUtil;
 import com.zlebank.zplatform.trade.utils.BankCardUtil;
 import com.zlebank.zplatform.trade.utils.ConsUtil;
@@ -485,82 +476,6 @@ public class GateWayController {
             model.put("txnseqno", tradeBean.getTxnseqno());
             return new ModelAndView("/erro", model);
         }
-        
-        
-   /*     
-        
-        try {
-            if (validateBalance(tradeBean.getMerUserId(),
-                    Long.valueOf(tradeBean.getAmount())) < 0) {
-                throw new TradeException("T025");
-            }
-
-            AccountTradeBean accountTrade = new AccountTradeBean(
-                    tradeBean.getMerUserId(), tradeBean.getMerchId(),
-                    tradeBean.getPay_pwd(), tradeBean.getAmount(),
-                    tradeBean.getTxnseqno());
-            accountTrade.setMerchId("888888888888888");
-            String pwd = accountPayService.encryptPWD(
-                    accountTrade.getMerchId(), tradeBean.getPay_pwd());
-            accountTrade.setPay_pwd(pwd);
-            TxnsOrderinfoModel orderinfo = gateWayService
-                    .getOrderinfoByOrderNoAndMemberId(tradeBean.getOrderId(),
-                            tradeBean.getMerchId());
-            if("00".equals(orderinfo.getStatus())){
-                throw new TradeException("T004");
-            }    
-            if("02".equals(orderinfo.getStatus())){
-                throw new TradeException("T009");
-            }
-            if(!orderinfo.getOrderamt().toString().equals(tradeBean.getAmount())){
-                throw new TradeException("T033");
-            }
-            accountPayService.accountPay(accountTrade);
-            resultBean = new ResultBean("success");
-            resultBean.setErrCode("0000");
-            resultBean.setErrMsg("交易成功");
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            model.put("errMsg", e.getMessage());
-            model.put("txnseqno", tradeBean.getTxnseqno());
-            resultBean = new ResultBean("9999", e.getMessage());
-            return new ModelAndView("/erro", model);
-        }
-        gateWayService.saveAcctTrade(tradeBean.getTxnseqno(),
-                tradeBean.getOrderId(), resultBean);
-        if (resultBean.isResultBool()) {
-            ResultBean orderResp = gateWayService.generateRespMessage(
-                    tradeBean.getOrderId(), tradeBean.getMerchId());
-            if (orderResp.isResultBool()) {
-                TxnsOrderinfoModel gatewayOrderBean = gateWayService
-                        .getOrderinfoByOrderNoAndMemberId(
-                                tradeBean.getOrderId(), tradeBean.getMerchId());
-                OrderRespBean respBean = (OrderRespBean) orderResp
-                        .getResultObj();
-                try {
-                    model.put(
-                            "suburl",
-                            gatewayOrderBean.getFronturl()
-                                    + "?"
-                                    + ObjectDynamic.generateReturnParamer(
-                                            respBean, false, null));
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                // 异步消息通知
-                new SynHttpRequestThread(tradeBean.getMerchId(),
-                        tradeBean.getTxnseqno(), gatewayOrderBean.getBackurl(),
-                        respBean.getNotifyParam()).start();
-            }
-            model.put("errMsg", "交易成功");
-            return new ModelAndView("/fastpay/success", model);
-        } else {
-            model.put("txnseqno", tradeBean.getTxnseqno());
-            return new ModelAndView("/erro", model);
-        }*/
-
     }
 
     @RequestMapping("/toFastPay.htm")

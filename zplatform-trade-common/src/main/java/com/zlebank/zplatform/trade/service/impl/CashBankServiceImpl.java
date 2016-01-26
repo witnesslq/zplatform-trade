@@ -58,10 +58,10 @@ public class CashBankServiceImpl extends BaseServiceImpl<CashBankModel, Long> im
     
     @SuppressWarnings("unchecked")
 	public List<CashBankModel> findBankPage(int page,int pageSize){
-    	Query query = cashBankDAO.getSession().createQuery("from CashBankModel where paytype = ? and status = ? ");
+    	Query query = cashBankDAO.getSession().createQuery("from CashBankModel where paytype = ? and status = ? order by  tid asc");
     	query.setString(0, "01");
     	query.setString(1, "00");
-    	query.setFirstResult(page==0?1:page);
+    	query.setFirstResult((pageSize)*((page==0?1:page)-1));
     	query.setMaxResults(pageSize);
 		return query.list();
     }
