@@ -1196,8 +1196,14 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             orderRespBean.setRespMsg(respMsg);
             orderRespBean.setAccNo(accNo);
             orderRespBean.setTn(tn);
-            String privateKey = merchMKService.get(orderinfo.getFirmemberno()).getLocalPriKey().trim();
+            String privateKey = "";
+            if("0".equals(orderinfo.getAccesstype())){
+            	privateKey = merchMKService.get(orderinfo.getSecmemberno()).getLocalPriKey().trim();
+            }else if("2".equals(orderinfo.getAccesstype())){
+            	privateKey = coopInstiService.getCoopInstiMK(orderinfo.getFirmemberno(), TerminalAccessType.MERPORTAL).getZplatformPriKey();
+            }
             resultBean = new ResultBean(GateWayTradeAnalyzer.generateOrderResult(orderRespBean, privateKey));
+            
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -1240,7 +1246,12 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             orderRespBean.setRespMsg(respMsg);
             orderRespBean.setAccNo(accNo);
             orderRespBean.setTn(tn);
-            String privateKey = merchMKService.get(orderinfo.getFirmemberno()).getLocalPriKey().trim();
+            String privateKey = "";
+            if("0".equals(orderinfo.getAccesstype())){
+            	privateKey = merchMKService.get(orderinfo.getSecmemberno()).getLocalPriKey().trim();
+            }else if("2".equals(orderinfo.getAccesstype())){
+            	privateKey = coopInstiService.getCoopInstiMK(orderinfo.getFirmemberno(), TerminalAccessType.MERPORTAL).getZplatformPriKey();
+            }
             return GateWayTradeAnalyzer.generateOrderResult(orderRespBean, privateKey);
         } catch (Exception e) {
             // TODO Auto-generated catch block
