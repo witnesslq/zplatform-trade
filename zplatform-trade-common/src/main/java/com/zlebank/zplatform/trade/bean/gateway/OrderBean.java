@@ -45,14 +45,14 @@ public class OrderBean implements Serializable{
     @NotEmpty(message="param.empty.signMethod")
     @Length(max=2,message="param.error.signMethod")
     private String signMethod="";
-    @NotEmpty(message="param.empty.merId")
-    @Length(max=15,message="param.error.merId")
+    @NotEmpty(message="param.empty.coopInstiId")
+    @Length(max=15,message="param.error.coopInstiId")
     private String coopInstiId="";
     @Length(max=15,message="param.error.merId")
     private String merId="";
-    @Length(max=40,message="param.error.subMerName")
+    @Length(max=40,message="param.error.merName")
     private String merName="";
-    @Length(max=16,message="param.error.subMerAbbr")
+    @Length(max=16,message="param.error.merAbbr")
     private String merAbbr="";
     @NotEmpty(message="param.empty.orderId")
     @Length(max=32,message="param.error.orderId")

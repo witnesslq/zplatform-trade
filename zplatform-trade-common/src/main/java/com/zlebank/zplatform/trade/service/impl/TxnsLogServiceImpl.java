@@ -331,7 +331,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         return null;
     }
     
-    @Transactional
+    @Transactional(propagation=Propagation.REQUIRES_NEW)
     public void saveAccountTrade(AccountTradeBean accountTrade) throws TradeException{
         
         try {
@@ -349,14 +349,13 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
           txnsLog.setCashcode("");
           //支付定单完成时间
           super.update(txnsLog);
-          
       } catch (Exception e) {
          throw new TradeException("AC03");
       }
       
     }
     
-    @Transactional
+    @Transactional(propagation=Propagation.REQUIRES_NEW)
     public void updateAccountTrade(AccountTradeBean accountTrade,ResultBean resultBean) throws TradeException{
         try {
             TxnsLogModel txnsLog = super.get(accountTrade.getTxnseqno());

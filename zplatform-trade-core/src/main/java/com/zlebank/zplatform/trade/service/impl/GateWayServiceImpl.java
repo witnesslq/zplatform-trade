@@ -916,20 +916,12 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
                 txnsLog.setBusitype(busiModel.getBusitype());
                 txnsLog.setTxnseqno(OrderNumber.getInstance().generateTxnseqno(txnsLog.getBusicode()));
                 txnsLog.setAmount(Long.valueOf(withdrawBean.getAmount()));
-                txnsLog.setRiskver(member.getRiskver());
-                txnsLog.setSplitver(member.getSpiltver());
-                txnsLog.setFeever(member.getFeever());
-                txnsLog.setPrdtver(member.getPrdtver());
-                txnsLog.setCheckstandver(member.getCashver());
-                txnsLog.setRoutver(member.getRoutver());
                 txnsLog.setAccordno(withdrawBean.getOrderId());
-                txnsLog.setAccordinst(member.getMerchinsti());
                 txnsLog.setAccfirmerno(withdrawBean.getCoopInstiId());
                 txnsLog.setAccsecmerno(withdrawBean.getMerId());
                 txnsLog.setAcccoopinstino(withdrawBean.getCoopInstiId());
                 txnsLog.setAccordcommitime(withdrawBean.getTxnTime());
                 txnsLog.setTradestatflag("00000000");//交易初始状态
-                txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlcycle().toString())));
                 txnsLog.setAccmemberid(withdrawBean.getMemberId());
                 txnsLogService.save(txnsLog);
             } catch (Exception e) {
@@ -1759,7 +1751,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
      * @param json
      * @throws TradeException
      */
-    @Transactional
+    @Transactional(propagation=Propagation.REQUIRES_NEW)
     public void accountPay(String json) throws TradeException{
         WapAcctPayBean acctPayBean = JSON.parseObject(json, WapAcctPayBean.class);
         TxnsOrderinfoModel orderinfo = getOrderinfoByTN(acctPayBean.getTn());

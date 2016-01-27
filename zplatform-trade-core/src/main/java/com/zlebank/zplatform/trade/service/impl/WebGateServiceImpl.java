@@ -435,8 +435,7 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
      * @return
      */
     @Override
-    public Session getSession() {
-        
+    public Session getSession(){
         return txnsOrderinfoDAO.getSession();
     }
 

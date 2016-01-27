@@ -62,10 +62,12 @@ import com.zlebank.zplatform.trade.bean.gateway.QueryResultBean;
 import com.zlebank.zplatform.trade.bean.gateway.RiskRateInfoBean;
 import com.zlebank.zplatform.trade.cmbc.service.ICMBCTransferService;
 import com.zlebank.zplatform.trade.cmbc.service.IWithholdingService;
+import com.zlebank.zplatform.trade.dao.RspmsgDAO;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.factory.AccountingAdapterFactory;
 import com.zlebank.zplatform.trade.factory.TradeAdapterFactory;
 import com.zlebank.zplatform.trade.model.MemberBaseModel;
+import com.zlebank.zplatform.trade.model.PojoRspmsg;
 import com.zlebank.zplatform.trade.model.QuickpayCustModel;
 import com.zlebank.zplatform.trade.model.TxncodeDefModel;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
@@ -154,6 +156,9 @@ public class GateWayController {
     private ICMBCTransferService cmbcTransferService;
     @Autowired
     private ITxnsWithholdingService txnsWithholdingService;
+    @Autowired
+    private RspmsgDAO rspmsgDAO;
+    
     @RequestMapping("/coporder.htm")
     public ModelAndView pay(OrderBean order,HttpSession httpSession,HttpServletRequest request) {
         log.info("receive web message(json):" + JSON.toJSONString(order));
@@ -164,15 +169,12 @@ public class GateWayController {
             }
             RiskRateInfoBean riskRateInfo = (RiskRateInfoBean) GateWayTradeAnalyzer
                     .generateRiskBean(order.getRiskRateInfo()).getResultObj();
+            //记录付款人的IP
             if(StringUtil.isEmpty(order.getCustomerIp())){
                 order.setCustomerIp(getIpAddr(request));
             }
-           
             // 订单记录和业务逻辑处理,取得商户信息，记录交易数据（核心）和订单详细信息，分析交易所属业务
             String txnseqno = gateWayService.dealWithOrder(order, riskRateInfo);
-            
-            // 将会员号保存在session
-            httpSession.setAttribute("memberId", riskRateInfo.getMerUserId());
             return new ModelAndView("redirect:/gateway/cash.htm?txnseqno="
                     + txnseqno);
         } catch (Exception e) {
@@ -208,7 +210,7 @@ public class GateWayController {
             return false;
         }
 
-        // 验证订单号是否重复
+        //验证订单号是否重复
         try {
             String memberId = ((RiskRateInfoBean)riskResultBean.getResultObj()).getMerUserId();
             gateWayService.verifyRepeatWebOrder(order.getOrderId(),
@@ -216,8 +218,9 @@ public class GateWayController {
         } catch (TradeException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-            model.put("errMsg", e.getMessage());
-            model.put("errCode", e.getCode());
+            PojoRspmsg msg = rspmsgDAO.get(e.getCode());
+            model.put("errMsg", msg.getRspinfo());
+            model.put("errCode", msg.getWebrspcode());
             return false;
         }
 
