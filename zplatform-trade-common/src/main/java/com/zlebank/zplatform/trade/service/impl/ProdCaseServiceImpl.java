@@ -71,7 +71,7 @@ public class ProdCaseServiceImpl extends BaseServiceImpl<ProdCaseModel, Long> im
         	member = memberService.getMemberByMemberId(order.getMerId());
         	ProdCaseModel prodCase= getMerchProd(member.getPrdtver(),busiModel.getBusicode());
             if(prodCase==null){
-                resultBean = new ResultBean("GW03", "商户未开通此业务");
+                resultBean = new ResultBean("GW26", "商户未开通此业务");
             }else {
                 resultBean = new ResultBean("success");
             }
@@ -80,7 +80,7 @@ public class ProdCaseServiceImpl extends BaseServiceImpl<ProdCaseModel, Long> im
             if(busiType==BusiType.CASH||busiType==BusiType.REPAIDP){
             	resultBean = new ResultBean("success");
             }else{
-            	resultBean = new ResultBean("GW03", "个人用户未开通此业务");
+            	resultBean = new ResultBean("GW26", "个人用户未开通此业务");
             }
         }
         

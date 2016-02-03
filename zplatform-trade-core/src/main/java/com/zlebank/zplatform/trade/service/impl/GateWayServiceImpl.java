@@ -40,10 +40,12 @@ import com.zlebank.zplatform.commons.utils.RSAUtils;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.member.bean.CoopInstiMK;
 import com.zlebank.zplatform.member.bean.MerchMK;
+import com.zlebank.zplatform.member.bean.QuickpayCustBean;
 import com.zlebank.zplatform.member.bean.enums.MemberType;
 import com.zlebank.zplatform.member.bean.enums.TerminalAccessType;
 import com.zlebank.zplatform.member.pojo.PojoMember;
 import com.zlebank.zplatform.member.service.CoopInstiService;
+import com.zlebank.zplatform.member.service.MemberBankCardService;
 import com.zlebank.zplatform.member.service.MemberService;
 import com.zlebank.zplatform.member.service.MerchMKService;
 import com.zlebank.zplatform.trade.adapter.quickpay.IQuickPayTrade;
@@ -55,6 +57,7 @@ import com.zlebank.zplatform.trade.bean.TradeBean;
 import com.zlebank.zplatform.trade.bean.ZLPayResultBean;
 import com.zlebank.zplatform.trade.bean.enums.BusinessEnum;
 import com.zlebank.zplatform.trade.bean.enums.ChannelEnmu;
+import com.zlebank.zplatform.trade.bean.enums.ChnlTypeEnum;
 import com.zlebank.zplatform.trade.bean.enums.TradeTypeEnum;
 import com.zlebank.zplatform.trade.bean.gateway.OrderAsynRespBean;
 import com.zlebank.zplatform.trade.bean.gateway.OrderBean;
@@ -78,10 +81,12 @@ import com.zlebank.zplatform.trade.bean.wap.WapWithdrawAccBean;
 import com.zlebank.zplatform.trade.bean.wap.WapWithdrawBean;
 import com.zlebank.zplatform.trade.cmbc.service.ICMBCTransferService;
 import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
+import com.zlebank.zplatform.trade.dao.RspmsgDAO;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.factory.TradeAdapterFactory;
 import com.zlebank.zplatform.trade.model.CashBankModel;
 import com.zlebank.zplatform.trade.model.MemberBaseModel;
+import com.zlebank.zplatform.trade.model.PojoRspmsg;
 import com.zlebank.zplatform.trade.model.QuickpayCustModel;
 import com.zlebank.zplatform.trade.model.TxncodeDefModel;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
@@ -160,6 +165,12 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
     @Autowired
     @Qualifier("memberServiceImpl")
     private MemberService memberService2; 
+    @Autowired
+    private RspmsgDAO rspmsgDAO;
+    @Autowired
+    private MemberBankCardService memberBankCardService;
+    
+    
     /**
      *
      * @return
@@ -1000,7 +1011,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         TxnsLogModel txnsLog = txnsLogService.get(txnseqno);
         //txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
         txnsLog.setPayordfintime(DateUtil.getCurrentDateTime());
-        txnsLog.setRetcode("RP00");
+        txnsLog.setRetcode("0000");
         txnsLog.setRetinfo("交易成功");
         txnsLog.setRetdatetime(DateUtil.getCurrentDateTime());
         txnsLog.setTradestatflag("00000001");//交易完成结束位
@@ -1308,8 +1319,15 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         TxnsLogModel txnsLog = txnsLogService.get(txnseqno);
         //txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
         txnsLog.setPayordfintime(DateUtil.getCurrentDateTime());
-        txnsLog.setRetcode("9999");
-        txnsLog.setRetinfo(payResultBean.getResult_msg());
+        PojoRspmsg rspmsg = rspmsgDAO.getRspmsgByChnlCode(ChnlTypeEnum.REAPAY, payResultBean.getResult_code());
+        if(rspmsg!=null){
+        	txnsLog.setRetcode(rspmsg.getWebrspcode());
+            txnsLog.setRetinfo(rspmsg.getRspinfo());
+        }else{
+        	txnsLog.setRetcode("01HH");
+            txnsLog.setRetinfo("交易失败。详情请咨询证联金融客服010-84298418");
+        }
+        
         txnsLog.setRetdatetime(DateUtil.getCurrentDateTime());
         txnsLog.setTradestatflag("00000001");//交易完成结束位
         txnsLog.setTradetxnflag("10000000");//证联支付快捷（基金交易）
@@ -1585,15 +1603,10 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             IQuickPayTrade quickPayTrade = null;
             try {
                 quickPayTrade = TradeAdapterFactory.getInstance().getQuickPayTrade(routId);
-            } catch (ClassNotFoundException e) {
+            } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
-            } catch (InstantiationException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                throw new TradeException("T001");
             }
             TradeBean trade = new TradeBean("", orderinfo.getOrderno(), txnsLog.getAmount()+"", cardBean.getCardNo(),cardBean.getCustomerNm(),cardBean.getCertifId(), cardBean.getPhoneNo(), "", "", cardBean.getCertifTp(), "", txnsLog.getAccmemberid(), txnsLog.getTxnseqno(), txnsLog.getAccfirmerno(), "", "", txnsLog.getAccsecmerno(), "", txnsLog.getCheckstandver(),txnsLog.getBusicode(), cardBean.getCardType(), "", "", cardBean.getCvn2(), cardBean.getExpired());
             trade.setTn(debitCardSign.getTn());
@@ -1602,17 +1615,27 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             trade.setPayinstiId(routId);
             quickPayTrade.setTradeBean(trade);
             quickPayTrade.setTradeType(TradeTypeEnum.MARGINREGISTER);
-            Long bindId=quickpayCustService.saveQuickpayCust(trade);
+            QuickpayCustBean bean = new QuickpayCustBean();
+            bean.setCardno(cardBean.getCardNo());
+            bean.setCardtype(cardBean.getCardType());
+            bean.setAccname(cardBean.getCustomerNm());
+            bean.setIdtype(cardBean.getCertifTp());
+            bean.setIdnum(cardBean.getCertifId());
+            Map<String, Object> cardMap = routeConfigService.getCardInfo(cardBean.getCardNo());
+            bean.setBankcode(cardMap.get("BANKCODE")+"");
+            bean.setBankname(cardMap.get("bankname")+"");
+            bean.setPhone(cardBean.getPhoneNo());
+            Long bindId=memberBankCardService.saveQuickPayCust(bean);//quickpayCustService.saveQuickpayCust(trade);
             trade.setCardId(bindId);
             ResultBean resultBean = quickPayTrade.bankSign(trade);
             if (resultBean.isResultBool()) {
                 if(routId.equals("93000002")||routId.equals("93000003")){
                     
                 }else{
-                    ReaPayResultBean bean = (ReaPayResultBean) resultBean
+                    ReaPayResultBean payResultBean = (ReaPayResultBean) resultBean
                             .getResultObj();
-                    if (!"0000".equals(bean.getResult_code())) {
-                        throw new TradeException("T000",bean.getResult_msg());
+                    if (!"0000".equals(payResultBean.getResult_code())) {
+                        throw new TradeException("GW27");
                     }
                 }
                 return bindId+"";
@@ -1658,15 +1681,10 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             IQuickPayTrade quickPayTrade = null;
             try {
                 quickPayTrade = TradeAdapterFactory.getInstance().getQuickPayTrade(routId);
-            } catch (ClassNotFoundException e) {
+            } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
-            } catch (InstantiationException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                throw new TradeException("T001");
             }
             quickPayTrade.setTradeBean(trade);
             quickPayTrade.setTradeType(TradeTypeEnum.MARGINREGISTER);
@@ -1677,7 +1695,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
                     ReaPayResultBean bean = (ReaPayResultBean) resultBean
                             .getResultObj();
                     if (!"0000".equals(bean.getResult_code())) {
-                        throw new TradeException("T000",bean.getResult_msg());
+                        throw new TradeException("T002",bean.getResult_msg());
                     }
                 }
             }
@@ -1742,7 +1760,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         //TradeAdapterFactory.getInstance().getThreadPool(routId).executeMission(quickPayTrade);
         ResultBean resultBean = quickPayTrade.submitPay(trade);
         if(!resultBean.isResultBool()){
-            throw new TradeException("T000",resultBean.getErrMsg());
+            throw new TradeException("T000",resultBean.getErrCode());
         }
     }
     
@@ -1915,7 +1933,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
                
                 MemberBaseModel member = memberService.getMemberByMemberId(splitAcctBean.getMerId());
                 if(member==null){
-                    return new ResultBean("GW19", splitAcctBean.getMerId()+"分账会员不存在");
+                    return new ResultBean("GW24", splitAcctBean.getMerId()+"分账会员不存在");
                 }
             }
         }

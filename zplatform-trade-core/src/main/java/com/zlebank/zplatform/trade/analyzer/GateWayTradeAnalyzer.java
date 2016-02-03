@@ -88,7 +88,7 @@ public class GateWayTradeAnalyzer {
             }
             //验证消费分账交易类型
             if("01".equals(order.getTxnType())&&"99".equals(order.getTxnSubType())){
-                String json = order.getReserved().trim();
+                String json = order.getReserved();
                 if(StringUtil.isNotEmpty(json)){
                     try {
                         List<SplitAcctBean> resultList =  JSON.parseArray(json, SplitAcctBean.class);
@@ -111,7 +111,7 @@ public class GateWayTradeAnalyzer {
                     
                 }
             }else{
-                String json = order.getReserved().trim();
+                String json = order.getReserved();
                 if(StringUtil.isNotEmpty(json)){
                     try {
                         JSON.parseObject(json, SplitAcctBean.class);

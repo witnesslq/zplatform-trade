@@ -227,8 +227,9 @@ public class GateWayController {
         // 验证商户产品版本中是否有对应的业务
         ResultBean busiResultBean = prodCaseService.verifyBusiness(order);
         if (!busiResultBean.isResultBool()) {
-            model.put("errMsg", busiResultBean.getErrMsg());
-            model.put("errCode", busiResultBean.getErrCode());
+        	PojoRspmsg msg = rspmsgDAO.get(busiResultBean.getErrCode());
+        	model.put("errMsg", msg.getRspinfo());
+            model.put("errCode", msg.getWebrspcode());
             return false;
         }
 
@@ -236,16 +237,18 @@ public class GateWayController {
         if (StringUtil.isNotEmpty(order.getMerId())) {
             MemberBaseModel subMember = memberService.getMemberByMemberId(order.getMerId());
             if (subMember == null) {
-                model.put("errMsg", "商户信息不存");
-                model.put("errCode", "RC10");
+            	PojoRspmsg msg = rspmsgDAO.get("GW05");
+            	model.put("errMsg", msg.getRspinfo());
+                model.put("errCode", msg.getWebrspcode());
                 return false;
             }
             if (order.getMerId().startsWith("2")) {// 对于商户会员需要进行检查
                 ResultBean memberResultBean = memberService.verifySubMerch(
                         order.getCoopInstiId(), order.getMerId());
                 if (!memberResultBean.isResultBool()) {
-                    model.put("errMsg", memberResultBean.getErrMsg());
-                    model.put("errCode", memberResultBean.getErrCode());
+                	PojoRspmsg msg = rspmsgDAO.get(memberResultBean.getErrCode());
+                	model.put("errMsg", msg.getRspinfo());
+                    model.put("errCode", msg.getWebrspcode());
                     return false;
                 }
             }
@@ -259,8 +262,9 @@ public class GateWayController {
                 .validateMemberBusiness(order,
                         (RiskRateInfoBean) riskResultBean.getResultObj());
         if (!memberBusiResultBean.isResultBool()) {// 验证风控信息的正确性
-            model.put("errMsg", memberBusiResultBean.getErrMsg());
-            model.put("errCode", memberBusiResultBean.getErrCode());
+        	PojoRspmsg msg = rspmsgDAO.get(memberBusiResultBean.getErrCode());
+        	model.put("errMsg", msg.getRspinfo());
+            model.put("errCode", msg.getWebrspcode());
             return false;
         }
         return true;
@@ -271,7 +275,7 @@ public class GateWayController {
         Map<String, Object> model = new HashMap<String, Object>();
         try {
             if (StringUtil.isEmpty(txnseqno)) {
-                model.put("errMsg", "订单信息错误，请重新提交");
+                model.put("errMsg", "交易失败，查无此交易");
                 return new ModelAndView("/erro_gw", model);
             }
             TxnsLogModel txnsLog = txnsLogService
@@ -286,7 +290,7 @@ public class GateWayController {
                     .getOrderinfoByOrderNoAndMemberId(txnsLog.getAccordno(),
                             txnsLog.getAccfirmerno());
             if ("00".equals(orderInfo.getStatus())) {// 支付成功的订单不可重复支付
-                model.put("errMsg", "订单已经支付成功，请不要重复支付");
+                model.put("errMsg", "交易成功，请不要重复支付");
                 model.put("errCode", "RC10");
                 return new ModelAndView("/erro_gw", model);
             }
@@ -328,7 +332,7 @@ public class GateWayController {
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    model.put("errMsg", "银行卡验证信息错误，请重新提交订单！");
+                    model.put("errMsg", "交易失败，银行卡信息错误");
                     model.put("errCode", "RC10");
                     return new ModelAndView("/erro_gw", model);
                 }
@@ -381,7 +385,7 @@ public class GateWayController {
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-            model.put("errMsg", "订单信息错误，请重新提交");
+            model.put("errMsg", "交易失败，系统忙，请稍后再试！");
             model.put("errCode", "RC10");
             return new ModelAndView("/erro_gw", model);
         }

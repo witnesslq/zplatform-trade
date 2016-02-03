@@ -12,6 +12,7 @@ package com.zlebank.zplatform.trade.bean;
 
 import java.io.Serializable;
 
+import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.utils.AmountUtil;
 
@@ -690,7 +691,7 @@ public class TradeBean implements Serializable,Cloneable{
      */
     
     public String getAmount_y() {
-        return AmountUtil.numberFormat(Long.valueOf(amount));
+        return AmountUtil.numberFormat(Long.valueOf(StringUtil.isNotEmpty(amount)?amount:"0"));
     }
     /**
      * @param amount_y the amount_y to set

@@ -54,7 +54,7 @@ public class MemberServiceImpl extends BaseServiceImpl<MemberBaseModel, String> 
         String queryString = "from MemberBaseModel mem where memberid=? and parent=?";
         MemberBaseModel membModel = super.getUniqueByHQL(queryString, new Object[]{subMerchId,merchId});
         if(membModel==null){
-            return new ResultBean("RC48","二级商户与一级商户不匹配");
+            return new ResultBean("GW07","二级商户与一级商户不匹配");
         }
         return new ResultBean(null);
     }

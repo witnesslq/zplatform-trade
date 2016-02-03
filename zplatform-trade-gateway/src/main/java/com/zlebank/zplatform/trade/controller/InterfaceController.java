@@ -720,6 +720,7 @@ public class InterfaceController {
         } catch (TradeException e) {
             log.error("签约支付时发生错误，请求数据："+data);
             log.error("错误信息："+e.getMessage());
+            
             responseBean.setRespCode(ERROR_CODE);
             responseBean.setRespMsg(e.getMessage());
             responseData(responseStream, responseBean);

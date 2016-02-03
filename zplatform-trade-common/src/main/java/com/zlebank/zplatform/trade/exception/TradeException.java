@@ -27,7 +27,7 @@ public class TradeException extends AbstractDescribeException{
      * serialVersionUID
      */
     private static final long serialVersionUID = -3716682104238215841L;
-    private static final  ResourceBundle RESOURCE = ResourceBundle.getBundle("exception_des");
+    private static final  ResourceBundle RESOURCE = ResourceBundle.getBundle("trade_exception_des");
    
     public ResourceBundle getResourceBundle() {
         return RESOURCE;
