@@ -34,7 +34,9 @@ public class BaseMessage {
     /**签名方法**/
     @Length(max=2)
     protected String signMethod ;
-    /**会员id**/
+    /**合作机构代码**/
+    protected String coopInstiId;
+    /**商户代码**/
     protected String merId;
     /**交易类型**/
     @N(max=2,isNull=false)
@@ -94,4 +96,11 @@ public class BaseMessage {
     public void setBizType(String bizType) {
         this.bizType = bizType;
     }
+    public String getCoopInstiId() {
+        return coopInstiId;
+    }
+    public void setCoopInstiId(String coopInstiId) {
+        this.coopInstiId = coopInstiId;
+    }
+    
 }

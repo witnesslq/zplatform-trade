@@ -10,6 +10,9 @@
  */
 package com.zlebank.zplatform.trade.controller;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.util.ArrayList;
@@ -30,8 +33,6 @@ import com.zlebank.zplatform.trade.insteadPay.message.InsteadPay_Request;
 import com.zlebank.zplatform.trade.insteadPay.message.MerWhiteList_Request;
 import com.zlebank.zplatform.trade.insteadPay.message.RealnameAuthFile;
 import com.zlebank.zplatform.trade.insteadPay.message.RealnameAuth_Request;
-import com.zlebank.zplatform.trade.utils.HibernateValidatorUtil;
-
 
 
 /**
@@ -44,14 +45,26 @@ import com.zlebank.zplatform.trade.utils.HibernateValidatorUtil;
  * @since
  */
 public class CreateInsteadPayMassage {
-    /**私钥**/
-    public static final String PRIVATE_KEY = "MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBANf1wsgo1oBUdhPlihXA3zMwHd6S94rnlw/BH2PqmEYGMJyHFx03UF6RRVUfPiqipemtixrmiO2WcdCpa0OjsKOvJ1YZbK7SJdjxQxsaQ35vvoG3ztdKiuBrnzPnUVUbSRrv2eYzBbA0MkBt3DCoSUapy8xGw9RmqP7gLAa711/fAgMBAAECgYEAumN3SG/OqhW7j3KWGi5LtY86yGXJ1o4JF+TTZdYMtKsU+5OwhFvANs5kq5H6gqu8TJGmtIHx/jTRaIlAdbFqelR65elHJa/PeHu3s/8VHhfFHesPGjQ8w2C5q/QoGH+iTO0HIhagwHkSFbrIKoKx8a4vM6i0G1N8HOngggLJKakCQQD8ygXa8hghc8yhw0uEZOelTtYCX1uCpI7+er7CjiODm6NILXzvc0ld2HjX2ATjzMaUUdSlnYC7L//EJnlYXthbAkEA2rP7scWlklgLTzjrBcbsEsTExJs2Orokae3Eiu9fc027gr3c1abDbfUqJvkgWpBis3RWd1hECgNDBDobnU6NzQJAK3pz11ycWeSY5Zm5e2P/k6cjl/TewHGdRpfGB6B66z/xrZBlVKn3jHSXFEjLToMCBLCuam3Unl17GDml1VU60QJAEqruPvxZ56XwQTDgjruuBuQYz5dYB6c/2HLdJebMxPDLoptGME5tvAMDOBRnuJM+eYbiook8NYaVv9Sd6s17uQJBAJ6aLix3qhY0oinxWEaIV7kRWRUT6fDWGouN4lyl5+NH9Hr11ZfqJrwSf+xsCtA5QCqqRXbseRmsJbvXT9kfrAE=";
+    
+    private Clipboard sysc = Toolkit.getDefaultToolkit().getSystemClipboard();
+    
+//    /**私钥**/
+//    public static final String PRIVATE_KEY = "MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBANf1wsgo1oBUdhPlihXA3zMwHd6S94rnlw/BH2PqmEYGMJyHFx03UF6RRVUfPiqipemtixrmiO2WcdCpa0OjsKOvJ1YZbK7SJdjxQxsaQ35vvoG3ztdKiuBrnzPnUVUbSRrv2eYzBbA0MkBt3DCoSUapy8xGw9RmqP7gLAa711/fAgMBAAECgYEAumN3SG/OqhW7j3KWGi5LtY86yGXJ1o4JF+TTZdYMtKsU+5OwhFvANs5kq5H6gqu8TJGmtIHx/jTRaIlAdbFqelR65elHJa/PeHu3s/8VHhfFHesPGjQ8w2C5q/QoGH+iTO0HIhagwHkSFbrIKoKx8a4vM6i0G1N8HOngggLJKakCQQD8ygXa8hghc8yhw0uEZOelTtYCX1uCpI7+er7CjiODm6NILXzvc0ld2HjX2ATjzMaUUdSlnYC7L//EJnlYXthbAkEA2rP7scWlklgLTzjrBcbsEsTExJs2Orokae3Eiu9fc027gr3c1abDbfUqJvkgWpBis3RWd1hECgNDBDobnU6NzQJAK3pz11ycWeSY5Zm5e2P/k6cjl/TewHGdRpfGB6B66z/xrZBlVKn3jHSXFEjLToMCBLCuam3Unl17GDml1VU60QJAEqruPvxZ56XwQTDgjruuBuQYz5dYB6c/2HLdJebMxPDLoptGME5tvAMDOBRnuJM+eYbiook8NYaVv9Sd6s17uQJBAJ6aLix3qhY0oinxWEaIV7kRWRUT6fDWGouN4lyl5+NH9Hr11ZfqJrwSf+xsCtA5QCqqRXbseRmsJbvXT9kfrAE=";
+//    /**公钥**/
+//    public static final String PUBLIC_KEY = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDX9cLIKNaAVHYT5YoVwN8zMB3ekveK55cPwR9j6phGBjCchxcdN1BekUVVHz4qoqXprYsa5ojtlnHQqWtDo7CjrydWGWyu0iXY8UMbGkN+b76Bt87XSorga58z51FVG0ka79nmMwWwNDJAbdwwqElGqcvMRsPUZqj+4CwGu9df3wIDAQAB";;
+//    /**平台公钥**/
+//    public static final String LOCAL_PUB = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDEAZ+Uakvf6Fr2jCanHl/0q1cE9YWWj8SMe4JYKNjAZ5SS20sVZ7MRly3c7KwnkHZ9M2z3882eV/6bHulKM4W+by77W/voFsH+b6RTJ49QQrLU2joHlrPU4CHH6BZTmAxLr1RNCIbHv7WRE0Gch1MEnf9maYDl2yXd6xiyjmCbSQIDAQAB";
+
+     /**私钥**/
+    public static final String PRIVATE_KEY = "MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBAI1xcwY4R0j/2uwZH1sKuRaZmPBy4TUdBei2enKEj7Ipikp9La0sc9xtlmqgBXGglbo1JbEpw6izu1AsRcAFUYojWAJ8H3TZb7a/23EfffA+Rr4uqzmsEYts88rsO977oP17xYvGTACj/eeFxAzWjVjG40spsMjmAGuHKPdujKgHAgMBAAECgYAMKnbvUQXopIErD5of1ZNH+1wpSmhOjjmE47Uyhm5pr6MCdzPnkkxA6Hgooaz2Mg7O3mVokKQQrazt33D8bDiwHEqr4vTn0fNoUEdzCJYgQSzG8dpbDh/NQBezA4+DumJDgJh7NcxLSpWknLJ/sh+/xWy1/cmvbZOXUOS4AIRnQQJBAPQeR7ycwR7QRrGznH6OvucWeRp3wyHOWNT/1o9JTk9LhlWTEWN4sUPPwS2FnnxOYQ6+txxUWUovGnLSAGMjnGECQQCUU9Wmc4s53PZEwRbi6foxrMpLrv5xbWp1Np4nsrMaDhRVkKFt+XQ2T7O0KEBGMrXn/NJtvqg6ctwpRiqf2d1nAkEAwpPEIC1drP7b6lY8fY+v0CfUfWlKKo77tUL6tRj8By4us9TWfk+8E03sLyma6n/a0tLmxvjgdsXWsgB6+Ipw4QJAHhn1XdZNBu0kvUdCUcKSF8qtMzbMRFCkLi1rYzsMxdjdn4++cwcQ4oTCP2l7wcNAz1erjMIIefQdYfLva4lXOQJBAJWWmhsiUzkOX/tsshSq+TIA5SYhJU6sc9w0Mv5OH+oDLsTz61wNh6qaWNOOYFQXEBOsIGj5SHO4vXKzUXCh+ig=";
     /**公钥**/
-    public static final String PUBLIC_KEY = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDX9cLIKNaAVHYT5YoVwN8zMB3ekveK55cPwR9j6phGBjCchxcdN1BekUVVHz4qoqXprYsa5ojtlnHQqWtDo7CjrydWGWyu0iXY8UMbGkN+b76Bt87XSorga58z51FVG0ka79nmMwWwNDJAbdwwqElGqcvMRsPUZqj+4CwGu9df3wIDAQAB";;
+    public static final String PUBLIC_KEY = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCNcXMGOEdI/9rsGR9bCrkWmZjwcuE1HQXotnpyhI+yKYpKfS2tLHPcbZZqoAVxoJW6NSWxKcOos7tQLEXABVGKI1gCfB902W+2v9txH33wPka+Lqs5rBGLbPPK7Dve+6D9e8WLxkwAo/3nhcQM1o1YxuNLKbDI5gBrhyj3boyoBwIDAQAB";
     /**平台公钥**/
-    public static final String LOCAL_PUB = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDEAZ+Uakvf6Fr2jCanHl/0q1cE9YWWj8SMe4JYKNjAZ5SS20sVZ7MRly3c7KwnkHZ9M2z3882eV/6bHulKM4W+by77W/voFsH+b6RTJ49QQrLU2joHlrPU4CHH6BZTmAxLr1RNCIbHv7WRE0Gch1MEnf9maYDl2yXd6xiyjmCbSQIDAQAB";
+    public static final String LOCAL_PUB = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQChnpVKt4IQAiJr6L8eGNEmYRvhQQCFC2rfIBTP5QYu6tNSKrTj42ghyxCLCczb5hZxDKh/Yu56XMMy/8LSszdOY9TfdYhONYi10nIJuysjkWtkPpG/h8ffcXR0dool18BJrmA0zpv5b7WhCC4+Nvqoc8Dhku3sgrGwWiEwp4qB9QIDAQAB";
+
+    
     /**商户号**/
-    public static final String MER_ID = "200000000000443";
+    public static final String MER_ID = "200000000000590";
 
     /**
      * 总指挥
@@ -61,9 +74,9 @@ public class CreateInsteadPayMassage {
     public static void main(String[] args) throws Exception {
         CreateInsteadPayMassage run = new CreateInsteadPayMassage();
         // 生成代付报文
-//        run.createInsteadPay();
+        run.createInsteadPay();
         // 生成代付查询结果
-        run.createInsteadPayQuery();
+//        run.createInsteadPayQuery();
         // 生成实名认证 
 //        run.createRealNameAuth();
         // 生成实名认证查询
@@ -75,7 +88,7 @@ public class CreateInsteadPayMassage {
         
 //        run.test();
         
-        run.privateDecyptData();
+//        run.privateDecyptData();
     }
     
     private void privateDecyptData() throws Exception {
@@ -102,9 +115,11 @@ public class CreateInsteadPayMassage {
         // 加签生成
         JSONObject jsonData = JSONObject.fromObject(request);
         String beforeSign = jsonData.toString();
-        String signedData = RSAUtils.sign(beforeSign.getBytes(), PRIVATE_KEY);
+        String signedData = RSAUtils.sign(beforeSign.getBytes("UTF-8"), PRIVATE_KEY);
         jsonData.put("signature", signedData);
         System.out.println("完整json："+jsonData.toString());
+        // 复制到ClipBoard
+        sysc.setContents(new StringSelection(jsonData.toString()), null);
     }
 
     /**
@@ -129,11 +144,11 @@ public class CreateInsteadPayMassage {
         commSetter(request, "72");
         request.setChannelType("00");
         request.setAccessType("0");
-        request.setOrderId("1000000000028");
+        request.setOrderId("2000000000030");
         request.setTxnTime("20151126121212");
         // 加密信息
         RealnameAuthFile file = new RealnameAuthFile();
-        file.setCardNo("6226091212413806");
+        file.setCardNo("6226091212413805");
         file.setCardType("1");
         file.setCertifId("13112219880904243X");
         file.setCertifTp("01");
@@ -151,6 +166,8 @@ public class CreateInsteadPayMassage {
         String signedData = RSAUtils.sign(beforeSign.getBytes(), PRIVATE_KEY);
         jsonData.put("signature", signedData);
         System.out.println("完整json："+jsonData.toString());
+        // 复制到ClipBoard
+        sysc.setContents(new StringSelection(jsonData.toString()), null);
     }
 
     /**
@@ -171,7 +188,8 @@ public class CreateInsteadPayMassage {
         String signedData = RSAUtils.sign(beforeSign.getBytes(), PRIVATE_KEY);
         jsonData.put("signature", signedData);
         System.out.println("完整json："+jsonData.toString());
-        
+        // 复制到ClipBoard
+        sysc.setContents(new StringSelection(jsonData.toString()), null);
     }
 
     private void compressionByDeflated() throws Exception {
@@ -232,6 +250,8 @@ public class CreateInsteadPayMassage {
         jsonData.put("signature", signedData);
         System.out.println("加签结果："+signedData);
         System.out.println("完整json："+jsonData.toString());
+        // 复制到ClipBoard
+        sysc.setContents(new StringSelection(jsonData.toString()), null);
     }
 
     /**
@@ -286,7 +306,8 @@ public class CreateInsteadPayMassage {
         jsonData.put("signature", signedData);
 //        System.out.println("加签结果："+signedData);
         System.out.println("完整json："+jsonData.toString());
-        
+        // 复制到ClipBoard
+        sysc.setContents(new StringSelection(jsonData.toString()), null);
     }
 
     /**

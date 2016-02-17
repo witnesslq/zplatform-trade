@@ -318,10 +318,9 @@ public class InsteadPayServiceImpl
         txnsLog.setBusicode(BusinessEnum.INSTEADPAY.getBusiCode());
         txnsLog.setAccfirmerno(merchPojo.getParent() == null ? memberId  : merchPojo.getParent());
         CardBin card = cardBinDao.getCard(merchPojo.getAccnum());
-        if (card == null) {
-            throw new InvalidCardException();
+        if (card != null) {
+            txnsLog.setCardtype(card.getType());
         }
-        txnsLog.setCardtype(card.getType());
         txnsLog.setAmount(Long.valueOf(detail.getAmt().toPlainString()));
         Long fee = gateWayService.getTxnFee(txnsLog );
         return fee;
