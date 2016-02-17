@@ -678,7 +678,9 @@ public class TradeBean implements Serializable,Cloneable{
      * @return the miniCardNo
      */
     public String getMiniCardNo() {
-        return cardNo.substring(cardNo.length()-4);
+    	
+    	
+        return StringUtil.isNotEmpty(cardNo)?cardNo.substring(cardNo.length()-4):"";
     }
     /**
      * @param miniCardNo the miniCardNo to set

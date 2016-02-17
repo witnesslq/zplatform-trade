@@ -1709,7 +1709,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
      * @param json
      * @throws TradeException
      */
-    @Transactional
+    @Transactional(propagation=Propagation.REQUIRES_NEW)
     public void submitPay(String json) throws TradeException{
         WapSubmitPayBean submitPayBean = JSON.parseObject(json, WapSubmitPayBean.class);
         TxnsOrderinfoModel orderinfo = getOrderinfoByTN(submitPayBean.getTn());//原始订单信息

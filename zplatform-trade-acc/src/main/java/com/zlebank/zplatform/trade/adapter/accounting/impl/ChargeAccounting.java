@@ -14,6 +14,8 @@ import java.math.BigDecimal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.acc.bean.TradeInfo;
@@ -22,9 +24,6 @@ import com.zlebank.zplatform.acc.exception.AccBussinessException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.commons.dao.pojo.AccStatusEnum;
 import com.zlebank.zplatform.commons.utils.StringUtil;
-import com.zlebank.zplatform.member.bean.enums.BusinessActorType;
-import com.zlebank.zplatform.member.bean.enums.MemberType;
-import com.zlebank.zplatform.member.pojo.PojoMember;
 import com.zlebank.zplatform.member.service.MemberService;
 import com.zlebank.zplatform.trade.adapter.accounting.IAccounting;
 import com.zlebank.zplatform.trade.bean.ResultBean;
@@ -52,6 +51,7 @@ public class ChargeAccounting implements IAccounting{
      * @return
      */
    
+    @Transactional(propagation=Propagation.REQUIRES_NEW)
     public ResultBean accountedFor(String txnseqno) {
         ResultBean resultBean = null;
         log.info("交易:"+txnseqno+"充值入账开始");
@@ -75,10 +75,10 @@ public class ChargeAccounting implements IAccounting{
                 if(StringUtil.isEmpty(memberId)){
                     throw new TradeException("AP08");
                 }
-                PojoMember member =memberService.getMbmberByMemberId(memberId, MemberType.INDIVIDUAL);
-                if(member==null){
+                //PojoMember member =memberService.getMbmberByMemberId(memberId, MemberType.INDIVIDUAL);
+                /*if(member==null){
                     throw new TradeException("AP08");
-                }
+                }*/
                 payMemberId = memberId;
                 payToMemberId = memberId;
             }

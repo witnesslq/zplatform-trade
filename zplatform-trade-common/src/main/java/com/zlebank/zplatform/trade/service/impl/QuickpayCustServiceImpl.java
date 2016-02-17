@@ -76,7 +76,7 @@ public class QuickpayCustServiceImpl extends BaseServiceImpl<QuickpayCustModel, 
             quickpayCust.setBankname(cardMap.get("BANKNAME")+"");
             //super.save(quickpayCust);
             quickpayCust  = super.getUniqueByHQL("from QuickpayCustModel where relatememberno=? and cardno = ? and status=?",  new Object[]{trade.getMerUserId(),trade.getCardNo(),"01"});
-            return quickpayCust.getId();
+            return 0L;
         }
     }
     @Transactional

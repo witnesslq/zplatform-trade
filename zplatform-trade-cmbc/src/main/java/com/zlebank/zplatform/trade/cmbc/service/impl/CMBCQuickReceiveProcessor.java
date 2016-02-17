@@ -20,6 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.zlebank.zplatform.commons.dao.pojo.BusiTypeEnum;
 import com.zlebank.zplatform.commons.utils.RSAUtils;
 import com.zlebank.zplatform.commons.utils.StringUtil;
+import com.zlebank.zplatform.member.bean.enums.TerminalAccessType;
+import com.zlebank.zplatform.member.service.CoopInstiMKService;
+import com.zlebank.zplatform.member.service.CoopInstiService;
 import com.zlebank.zplatform.member.service.MerchMKService;
 import com.zlebank.zplatform.trade.adapter.accounting.IAccounting;
 import com.zlebank.zplatform.trade.bean.AppPartyBean;
@@ -70,6 +73,8 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
     private ITxnsWithholdingService txnsWithholdingService;
     @Autowired 
     private RspmsgDAO rspmsgDAO;
+    @Autowired
+    private CoopInstiService coopInstiService;
     /**
      *
      * @param resultBean
@@ -189,6 +194,13 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
         ResultBean resultBean = null;
         try {
             TxnsOrderinfoModel orderinfo = txnsOrderinfoDAO.getOrderinfoByOrderNo(orderNo,memberId);
+            if(StringUtil.isEmpty(orderinfo.getBackurl())){
+            	return new ResultBean("09", "no need async");
+            }else {
+				if(orderinfo.getBackurl().indexOf("http")<0){
+					return new ResultBean("09", "no need async");
+				}
+			}
             
             
             TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(orderinfo.getRelatetradetxn());
@@ -226,9 +238,13 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
              String bindId="";// 绑定标识号
             
              OrderAsynRespBean orderRespBean = new OrderAsynRespBean(version, encoding, certId, signature, signMethod, merId, orderId, txnType, txnSubType, bizType, accessType, txnTime, txnAmt, currencyCode, reqReserved, reserved, queryId, respCode, respMsg, settleAmt, settleCurrencyCode, settleDate, traceNo, traceTime, exchangeDate, exchangeRate, accNo, payCardType, payType, payCardNo, payCardIssueName, bindId);
+             String privateKey= "";
+             if("000204".equals(orderinfo.getBiztype())){
+            	 privateKey = coopInstiService.getCoopInstiMK(orderinfo.getFirmemberno(), TerminalAccessType.WIRELESS).getZplatformPriKey();
+             }else if("000201".equals(orderinfo.getBiztype())){
+            	 privateKey = merchMKService.get(orderinfo.getFirmemberno()).getLocalPriKey();
+             }
             
-            
-            String privateKey = merchMKService.get(orderinfo.getFirmemberno()).getLocalPriKey().trim();
             resultBean = new ResultBean(generateAsyncOrderResult(orderRespBean, privateKey));
         } catch (Exception e) {
             // TODO Auto-generated catch block
@@ -283,17 +299,22 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
         /**账务处理结束 **/
         
         /**异步通知处理开始 **/
-        ResultBean orderResp = 
-                generateAsyncRespMessage(txnsLog.getAccordno(),
-                        txnsLog.getAccfirmerno());
-        if (orderResp.isResultBool()) {
-            OrderAsynRespBean respBean = (OrderAsynRespBean) orderResp
-                    .getResultObj();
-            new SynHttpRequestThread(
-                    gatewayOrderBean.getFirmemberno(),
-                    gatewayOrderBean.getRelatetradetxn(),
-                    gatewayOrderBean.getBackurl(),
-                    respBean.getNotifyParam()).start();
-        }
+        try {
+			ResultBean orderResp = 
+			        generateAsyncRespMessage(txnsLog.getAccordno(),
+			                txnsLog.getAccfirmerno());
+			if (orderResp.isResultBool()) {
+			    OrderAsynRespBean respBean = (OrderAsynRespBean) orderResp
+			            .getResultObj();
+			    new SynHttpRequestThread(
+			            gatewayOrderBean.getFirmemberno(),
+			            gatewayOrderBean.getRelatetradetxn(),
+			            gatewayOrderBean.getBackurl(),
+			            respBean.getNotifyParam()).start();
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 }

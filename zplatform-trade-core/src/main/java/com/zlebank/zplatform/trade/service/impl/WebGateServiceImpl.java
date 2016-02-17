@@ -182,7 +182,7 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         }
         txnsLogService.initretMsg(txnsLog.getTxnseqno());
         //交易风控
-        txnsLogService.tradeRiskControl(txnsLog.getTxnseqno(),txnsLog.getAccfirmerno(),txnsLog.getAccsecmerno(),txnsLog.getAccmemberid(),txnsLog.getBusicode(),txnsLog.getAmount()+"",card.getCardtype(),card.getCardno());
+        //txnsLogService.tradeRiskControl(txnsLog.getTxnseqno(),txnsLog.getAccfirmerno(),txnsLog.getAccsecmerno(),txnsLog.getAccmemberid(),txnsLog.getBusicode(),txnsLog.getAmount()+"",card.getCardtype(),card.getCardno());
         updateOrderToStartPay(orderinfo.getOrderno(),orderinfo.getFirmemberno());
         quickPayTrade.setTradeType(TradeTypeEnum.SUBMITPAY);
         quickPayTrade.setTradeBean(tradeBean);
