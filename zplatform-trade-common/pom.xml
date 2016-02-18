@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.zlebank.zplatform</groupId>
-		<artifactId>zplatform-trade-deploy</artifactId>
+		<artifactId>zplatform-trade-deploy</artifactId> 
 		<version>1.2.0</version>
 		<relativePath>../zplatform-trade-deploy/pom.xml</relativePath>
 	</parent> 
