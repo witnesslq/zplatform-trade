@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE specification-instance SYSTEM "specification-configuration-1.0.dtd">
+<specification-instance>
+	<request>
+		<head>
+			<request-type>SAC103</request-type>
+			<version>1.0</version>
+		</head>
+		<content>
+		<!-- 账户收支明细查询-->
+			<property-field id="merchNo" type="an" name="merchNo" nullable="false"  length="15"/>
+			<property-field id="sessionId" type="an" name="sessionId" nullable="false"  length="16"/>
+			<property-field id="acctCode" type="an" name="acctCode" nullable="false" length="32"/>
+			<property-field id="from" type="ans" name="from" nullable="false" length="10"/>
+			<property-field id="to" type="ans" name="to" nullable="false" length="10"/>
+			<property-field id="mac" type="ans" name="mac" nullable="false"  length="256"/>
+			
+		</content>
+	</request>
+	<response>
+		<content>
+			<property-field id="merchNo" type="an" name="merchNo" nullable="false"  length="15"/>
+			<property-field id="sessionId" type="an" name="sessionId" nullable="false"  length="16"/>
+			<property-field id="rescode" type="an" name="rescode" nullable="false" length="2"/>
+			<property-field id="resdes" type="ans" name="resdes" nullable="false" length="128"/>
+			<list-field id="entryDetails" name="entryDetails">
+				<ref value="entryDetail"></ref>
+			</list-field>
+			<complex-field id="entryDetail" name="entryDetail"
+				typeClass="com.zlebank.zplatform.specification.message.content.EntryDetail">
+				<property-field name="seqNo" id="seqNo" type="an" length="16"/>
+				<property-field name="acctCode" id="acctCode" type="an" length="32"/>
+				<property-field name="flag" id="flag" type="a" length="1"/>
+				<property-field name="amount" id="amount" type="ans" length="12"/>
+				<property-field name="currency" id="currency" type="an" length="3"/>
+			</complex-field>
+			<property-field id="mac" type="ans" name="mac" nullable="false"  length="256"/>
+
+		</content>
+	</response>
+</specification-instance>

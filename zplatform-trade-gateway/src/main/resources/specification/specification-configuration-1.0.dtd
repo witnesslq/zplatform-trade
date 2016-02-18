@@ -1,0 +1,56 @@
+<!-- Specification file-based configuration document.
+
+<!DOCTYPE specification-configuration SYSTEM "specification-configuration-1.0.dtd">
+
+An instance of this document contains property settings and references
+to specification definition files for a Specification Context instance to be loaded 
+on a spring startup listener.
+-->
+
+<!-- element  hierarchy definition-->
+<!ELEMENT specification-instance (request,response)>
+
+<!ELEMENT request (head,content)>
+
+<!ELEMENT response (content)>
+<!ELEMENT head (request-type,version)>
+<!ELEMENT request-type (#PCDATA)>
+<!ELEMENT version (#PCDATA)>
+<!ELEMENT content (property-field|complex-field|list-field)+>
+
+<!-- field type definition:field,complex-field-->
+
+<!-- field-->
+<!ELEMENT property-field ANY>
+<!ATTLIST property-field id CDATA #REQUIRED>
+<!ATTLIST property-field name CDATA #REQUIRED>
+<!ATTLIST property-field length CDATA  #IMPLIED>
+<!ATTLIST property-field nullable (false|true) "false">
+<!ATTLIST property-field type (a|n|s|ans|an|date|timestamp|money|o|c) "ans"> 
+<!ATTLIST property-field optional (false|true) "false" >
+<!ATTLIST property-field depend-field IDREFS #IMPLIED>
+<!ATTLIST property-field depend-value CDATA #IMPLIED>
+
+<!--complex-field-->
+<!ELEMENT complex-field (property-field)+>
+<!ATTLIST complex-field id ID #REQUIRED>
+<!ATTLIST complex-field name CDATA #REQUIRED> 
+<!ATTLIST complex-field nullable (false|true) "false"> 
+<!ATTLIST complex-field typeClass CDATA #REQUIRED> 
+<!ATTLIST complex-field optional (false|true) "false" >
+<!ATTLIST complex-field depend-field IDREFS #IMPLIED>
+<!ATTLIST complex-field depend-value CDATA #IMPLIED> 
+
+
+<!--list-field -->
+<!ELEMENT list-field (ref)> 
+<!ATTLIST list-field id ID #REQUIRED>
+<!ATTLIST list-field name CDATA #REQUIRED> 
+<!ATTLIST list-field nullable (false|true) "false">  
+<!ATTLIST list-field optional (false|true) "false" >
+<!ATTLIST list-field depend-field IDREFS #IMPLIED>
+<!ATTLIST list-field depend-value CDATA #IMPLIED> 
+
+<!--list:ref -->
+<!ELEMENT ref EMPTY> 
+<!ATTLIST ref value IDREFS #REQUIRED>

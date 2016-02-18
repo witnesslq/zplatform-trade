@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE specification-instance SYSTEM "specification-configuration-1.0.dtd">
+<specification-instance>
+	<request>
+		<head>
+			<request-type>SMA101</request-type>
+			<version>1.0</version>
+		</head>
+		<content>
+		<!--签到 -->
+			<property-field id="merchNo" type="an" name="merchNo" nullable="false" length="15"></property-field>
+			<property-field id="sessionId" type="an" name="sessionId" nullable="false" length="16"></property-field>
+			<property-field id="notifyUrl" type="ans" name="notifyUrl" nullable="false"  length="256"></property-field>
+			<property-field id="mac" type="ans" name="mac" nullable="false"  length="256"></property-field>			
+		</content>
+	</request>
+	<response>
+		<content>			
+			<property-field id="merchNo" type="an" name="merchNo" nullable="false"  length="15"></property-field>
+			<property-field id="sessionId" type="an" name="sessionId" nullable="false"  length="16"></property-field>
+			<property-field id="rescode" type="an" name="rescode" nullable="false"  length="2"></property-field>
+			<property-field id="resdes" type="an" name="resdes" nullable="false" optional="true"  length="128"></property-field>
+			<property-field id="mac" type="ans" name="mac" nullable="false"  length="256"></property-field>
+		</content>
+	</response>
+</specification-instance>
