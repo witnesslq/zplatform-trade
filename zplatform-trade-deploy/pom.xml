@@ -270,6 +270,7 @@
 						</flowInitContext>
 						<pushReleases>true</pushReleases>
 						<pushHotfixes>true</pushHotfixes>
+						<allowSnapshots>false</allowSnapshots>
 					</configuration>
 				</plugin>
 			</plugins>
