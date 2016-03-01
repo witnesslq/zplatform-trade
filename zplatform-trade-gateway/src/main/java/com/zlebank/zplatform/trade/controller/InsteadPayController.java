@@ -426,10 +426,7 @@ public class InsteadPayController {
         } catch (DuplicateOrderIdException e) {
             errorMsg = "请不要提交重复的订单";
             log.error(e.getMessage(), e);
-        }  catch (BalanceNotEnoughException e) {
-            errorMsg = "余额不足";
-            log.error(e.getMessage(), e);
-        } catch (Exception e) {
+        }  catch (Exception e) {
             errorMsg = "实名认证失败";
             log.error(e.getMessage(), e);
         }
