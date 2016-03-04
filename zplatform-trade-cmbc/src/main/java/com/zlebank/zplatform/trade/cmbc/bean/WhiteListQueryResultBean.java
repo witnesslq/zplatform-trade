@@ -24,7 +24,11 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  */
 @XStreamAlias("Ans")
 public class WhiteListQueryResultBean implements Serializable{
-    @XStreamAlias("Version")
+    /**
+	 * serialVersionUID
+	 */
+	private static final long serialVersionUID = -704084250743205887L;
+	@XStreamAlias("Version")
     private String version;// 版本号
     @XStreamAlias("TransDate")
     private String transdate;// 交易日期

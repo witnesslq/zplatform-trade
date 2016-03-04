@@ -317,6 +317,8 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
             case REEXCHANGE://退汇回盘                         报盘日期|报盘批次|第三方流水号|银行流水号|帐号|户名|金额|付款结果|失败返回码|失败原因|退汇日期
                 analyzeReexchangeFile(file);
                 break;
+		default:
+			break;
         }
     }
     
@@ -324,7 +326,8 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
         if(file.isFile() && file.exists()) { 
             //判断文件是否存在
             InputStreamReader read = new InputStreamReader(new FileInputStream(file), ENCODE);// 考虑到编码格式
-            BufferedReader bufferedReader = new BufferedReader(read);
+            @SuppressWarnings("resource")
+			BufferedReader bufferedReader = new BufferedReader(read);
             String lineTxt = null;
             int i=0;
             long sumItems = 0;//总笔数
@@ -442,8 +445,10 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
             long succItems_self = 0;//成功笔数
             long sumAmt_self = 0;//总金额
             long succAmt_self = 0;//成功金额
-            long failItems = 0;
-            long failAmt = 0;
+            @SuppressWarnings("unused")
+			long failItems = 0;
+            @SuppressWarnings("unused")
+			long failAmt = 0;
             for(ReexchangeBean bean : resultList){
                 if("S".equals(bean.getRespType())){//成功
                     succItems_self++;

@@ -22,7 +22,6 @@ import com.zlebank.zplatform.trade.model.PojoTransferData;
 import com.zlebank.zplatform.trade.model.TxnsRefundModel;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
 import com.zlebank.zplatform.trade.service.ITxnsRefundService;
-import com.zlebank.zplatform.trade.service.ITxnsWithdrawService;
 import com.zlebank.zplatform.trade.utils.DateUtil;
 import com.zlebank.zplatform.trade.utils.SpringContext;
 /**
@@ -36,22 +35,15 @@ import com.zlebank.zplatform.trade.utils.SpringContext;
  */
 public class RefundAccounting implements IAccounting{
     
-    //@Autowired
     private TransferBatchDAO transferBatchDAO;
-    //@Autowired
     private TransferDataDAO transferDataDAO;
-    //@Autowired
     private AccEntryService accEntryService;
-    //@Autowired
-    private ITxnsWithdrawService txnsWithdrawService;
-    //@Autowired
     private ITxnsRefundService txnsRefundService;
     private ITxnsLogService txnsLogService;
     public RefundAccounting(){
         transferBatchDAO = (TransferBatchDAO) SpringContext.getContext().getBean("transferBatchDAO");
         transferDataDAO = (TransferDataDAO) SpringContext.getContext().getBean("transferDataDAO");
         accEntryService = (AccEntryService) SpringContext.getContext().getBean("accEntryService");
-        txnsWithdrawService = (ITxnsWithdrawService) SpringContext.getContext().getBean("txnsWithdrawService");
         txnsRefundService = (ITxnsRefundService) SpringContext.getContext().getBean("txnsRefundService");
         txnsLogService = (ITxnsLogService) SpringContext.getContext().getBean("txnsLogService");
     }

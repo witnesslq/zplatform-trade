@@ -56,7 +56,8 @@ public class ClientSocket {
     private boolean running=false;  
     private long lastSendTime;  
     private static ClientSocket clientSocket;
-    private ConcurrentHashMap<Class, ObjectAction> actionMapping = new ConcurrentHashMap<Class,ObjectAction>();  
+    @SuppressWarnings("rawtypes")
+	private ConcurrentHashMap<Class, ObjectAction> actionMapping = new ConcurrentHashMap<Class,ObjectAction>();  
       
     private  ClientSocket(String serverIp, int port) {  
         this.serverIp=serverIp;this.port=port;  
@@ -149,7 +150,7 @@ public class ClientSocket {
                     if(in.available()>0){  
                         //读取报文长度
                         byte[] head = new byte[6];
-                        int r = in.read(head);
+                        //int r = in.read(head);
                         System.out.println("接收报文头：\t"+new String(head,"UTF-8"));  
                         byte[] serviceCode = new byte[15];
                         in.read(serviceCode);

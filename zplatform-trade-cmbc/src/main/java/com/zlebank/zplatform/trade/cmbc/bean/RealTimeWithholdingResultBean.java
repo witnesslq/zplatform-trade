@@ -24,7 +24,11 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  */
 @XStreamAlias("Ans")
 public class RealTimeWithholdingResultBean implements Serializable {
-    @XStreamAlias("Version")
+    /**
+	 * serialVersionUID
+	 */
+	private static final long serialVersionUID = -5053851736070620156L;
+	@XStreamAlias("Version")
     private String version;// 版本号
     @XStreamAlias("SettDate")
     private String settdate;// 清算日期

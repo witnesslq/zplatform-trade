@@ -34,7 +34,11 @@ import com.zlebank.zplatform.trade.utils.OrderNumber;
  */
 @XStreamAlias("TRAN_REQ")
 public class CMBCRealTimeWithholdingBean implements Serializable{
-    public static final String XMLHEAD = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+    /**
+	 * serialVersionUID
+	 */
+	private static final long serialVersionUID = -7300191497989671924L;
+	public static final String XMLHEAD = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
     private static final String SERVICECODE = "130071001";
     @XStreamAlias("COMPANY_ID")
     private String company_id;//合作方id

@@ -148,7 +148,7 @@ public class CMBCTransferServiceImpl implements ICMBCTransferService{
                         break;
                     }
                 }
-                Thread.currentThread().sleep(timeArray[i]);
+                Thread.sleep(timeArray[i]);
             }
         } catch (InterruptedException e) {
             // TODO Auto-generated catch block
@@ -259,6 +259,8 @@ public class CMBCTransferServiceImpl implements ICMBCTransferService{
                 case OUTERBANK :
                     insteadPayService.batchOuterPay(batchNo);
                     break;
+				default:
+					break;
             }
             resultBean = new ResultBean("success");
         } catch (CMBCTradeException e) {

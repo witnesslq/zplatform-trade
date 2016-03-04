@@ -37,7 +37,6 @@ public class RealNameAuthBean implements Serializable {
      */
     private static final long serialVersionUID = 1L;
     public static final String XMLHEAD = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-    private static final String SERVICECODE = "1004";
     // 版本号
     @XStreamAlias("Version")
     private String version;

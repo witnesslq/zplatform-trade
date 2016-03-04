@@ -7,21 +7,19 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.alibaba.fastjson.JSON;
-import com.zlebank.zplatform.trade.cmbc.service.IInsteadPayService;
 import com.zlebank.zplatform.trade.dao.TransferBatchDAO;
-import com.zlebank.zplatform.trade.dao.TransferDataDAO;
 import com.zlebank.zplatform.trade.model.PojoTransferBatch;
 
 public class TransferBatchTest {
     private ApplicationContext context;
     private TransferBatchDAO transferBatchDAO;
-    private TransferDataDAO transferDataDAO;
-    private IInsteadPayService insteadPayService;
+    //private TransferDataDAO transferDataDAO;
+    //private IInsteadPayService insteadPayService;
     public void init(){
         context = new ClassPathXmlApplicationContext("CmbcContextTest.xml");
         transferBatchDAO = (TransferBatchDAO) context.getBean("transferBatchDAO");
-        transferDataDAO = (TransferDataDAO) context.getBean("transferDataDAO");
-        insteadPayService = (IInsteadPayService) context.getBean("insteadPayService");
+        //transferDataDAO = (TransferDataDAO) context.getBean("transferDataDAO");
+        //insteadPayService = (IInsteadPayService) context.getBean("insteadPayService");
     }
     @Test
     public void testJob() { 

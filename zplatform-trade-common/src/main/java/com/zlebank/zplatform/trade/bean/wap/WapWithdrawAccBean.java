@@ -12,6 +12,7 @@ package com.zlebank.zplatform.trade.bean.wap;
 
 import java.io.Serializable;
 
+import com.zlebank.zplatform.member.pojo.PojoQuickpayCust;
 import com.zlebank.zplatform.trade.model.QuickpayCustModel;
 
 /**
@@ -133,6 +134,14 @@ public class WapWithdrawAccBean implements Serializable{
         this.certifId = quickpayCust.getIdnum();
         this.phoneNo = quickpayCust.getPhone();
     }
-    
+    public WapWithdrawAccBean(PojoQuickpayCust quickpayCust) {
+        this.accNo = quickpayCust.getCardno();
+        this.accName = quickpayCust.getAccname();
+        this.bankCode = quickpayCust.getBankcode();
+        this.bankName = quickpayCust.getBankname();
+        this.certifTp = quickpayCust.getIdtype();
+        this.certifId = quickpayCust.getIdnum();
+        this.phoneNo = quickpayCust.getPhone();
+    }
     
 }

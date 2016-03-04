@@ -18,6 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.zlebank.zplatform.acc.bean.enums.BusiType;
 import com.zlebank.zplatform.commons.utils.StringUtil;
+import com.zlebank.zplatform.member.bean.MerchMK;
+import com.zlebank.zplatform.member.pojo.PojoMerchDeta;
+import com.zlebank.zplatform.member.service.MerchMKService;
+import com.zlebank.zplatform.member.service.MerchService;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.gateway.OrderBean;
 import com.zlebank.zplatform.trade.bean.wap.WapOrderBean;
@@ -48,6 +52,8 @@ public class ProdCaseServiceImpl extends BaseServiceImpl<ProdCaseModel, Long> im
     private IMemberService memberService;
     @Autowired
     private ITxncodeDefService txncodeDefService;
+    @Autowired
+    private MerchService merchService;
     /**
      *
      * @return
@@ -65,10 +71,10 @@ public class ProdCaseServiceImpl extends BaseServiceImpl<ProdCaseModel, Long> im
     @Override
     public ResultBean verifyBusiness(OrderBean order) {
         ResultBean resultBean = null;
-        MemberBaseModel member = null;
+        PojoMerchDeta member = null;
         TxncodeDefModel busiModel = txncodeDefService.getBusiCode(order.getTxnType(), order.getTxnSubType(), order.getBizType());
         if(StringUtil.isNotEmpty(order.getMerId())){
-        	member = memberService.getMemberByMemberId(order.getMerId());
+        	member = merchService.getMerchBymemberId(order.getMerId());//memberService.getMemberByMemberId(order.getMerId());
         	ProdCaseModel prodCase= getMerchProd(member.getPrdtver(),busiModel.getBusicode());
             if(prodCase==null){
                 resultBean = new ResultBean("GW26", "商户未开通此业务");

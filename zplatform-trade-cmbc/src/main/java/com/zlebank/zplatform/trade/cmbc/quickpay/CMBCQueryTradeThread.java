@@ -4,9 +4,6 @@ import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.trade.bean.enums.ChannelEnmu;
 import com.zlebank.zplatform.trade.cmbc.exception.CMBCTradeException;
@@ -26,7 +23,7 @@ import com.zlebank.zplatform.trade.utils.SpringContext;
  * @since
  */
 public class CMBCQueryTradeThread implements Runnable{
-    private static final Log log = LogFactory.getLog(CMBCQueryTradeThread.class);
+    //private static final Log log = LogFactory.getLog(CMBCQueryTradeThread.class);
    
     private String tranDate;
     private String serialno;
@@ -41,7 +38,7 @@ public class CMBCQueryTradeThread implements Runnable{
    
     public void queryTrade(String tranDate,String serialno,String txnseqno){
         try {
-            Thread.currentThread().sleep(10*1000);
+            Thread.sleep(10*1000);
             TxnsWithholdingModel withholding = new TxnsWithholdingModel(tranDate, serialno, txnseqno,ChannelEnmu.CMBCSELFWITHHOLDING);
             withholding.setSerialno(generateSerialDateNumber("SEQ_CMBC_REALNAME_NO"));
             txnsWithholdingService.saveWithholdingLog(withholding);
@@ -68,7 +65,8 @@ public class CMBCQueryTradeThread implements Runnable{
     }
     
     public String generateSerialDateNumber(String sequences){
-        List<Map<String,Object>> resultList = (List<Map<String, Object>>) txnsLogService.queryBySQL("select "+sequences+".NEXTVAL seq from dual", new Object[]{});
+        @SuppressWarnings("unchecked")
+		List<Map<String,Object>> resultList = (List<Map<String, Object>>) txnsLogService.queryBySQL("select "+sequences+".NEXTVAL seq from dual", new Object[]{});
         DecimalFormat df = new DecimalFormat("00000000");
         String seqNo = df.format( resultList.get(0).get("SEQ"));
         return DateUtil.getCurrentDate()+seqNo;

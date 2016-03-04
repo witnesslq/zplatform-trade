@@ -23,7 +23,11 @@ import com.zlebank.zplatform.trade.model.TxnsWithholdingModel;
  * @since 
  */
 public class WhiteListMessageBean implements Serializable{
-    private String bankinscode;//银联机构号   
+    /**
+	 * serialVersionUID
+	 */
+	private static final long serialVersionUID = -8455881070190652189L;
+	private String bankinscode;//银联机构号   
     private String bankname ;//开户行名称   
     private String bankaccno;//银行账号
     private String bankaccname;//银行户名

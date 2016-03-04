@@ -100,7 +100,6 @@ import com.zlebank.zplatform.trade.service.ITxnsQuickpayService;
 import com.zlebank.zplatform.trade.service.ITxnsWithdrawService;
 import com.zlebank.zplatform.trade.service.ITxnsWithholdingService;
 import com.zlebank.zplatform.trade.service.IWebGateWayService;
-import com.zlebank.zplatform.trade.service.IZlTradeService;
 import com.zlebank.zplatform.trade.utils.AmountUtil;
 import com.zlebank.zplatform.trade.utils.BankCardUtil;
 import com.zlebank.zplatform.trade.utils.ConsUtil;
@@ -127,7 +126,7 @@ public class GateWayController {
     private IGateWayService gateWayService;
     @Autowired
     private IWebGateWayService webGateWayService;
-    private IZlTradeService zlTradeService;
+    //private IZlTradeService zlTradeService;
     @Autowired
     private ITxnsQuickpayService txnsQuickpayService;
     @Autowired
@@ -279,6 +278,16 @@ public class GateWayController {
             model.put("errCode", msg.getWebrspcode());
             return false;
         }
+        
+        try {
+			gateWayService.checkBusiAcct(order.getMerId(), ((RiskRateInfoBean)riskResultBean.getResultObj()).getMerUserId());
+		} catch (TradeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			PojoRspmsg msg = rspmsgDAO.get(e.getCode());
+        	model.put("errMsg", msg.getRspinfo());
+            model.put("errCode", msg.getWebrspcode());
+		}
         return true;
     }
 
@@ -361,23 +370,22 @@ public class GateWayController {
                 }
                 // 显示会员已绑定的银行卡
                 PagedResult<QuickpayCustBean> cardPageList = memberBankCardService.queryMemberBankCard(txnsLog.getAccmemberid(), cardType, 0, 10);
-                        List<QuickpayCustBean> cardList = cardPageList.getPagedResult();
-                if (quickpayCust != null) {
-                    for (QuickpayCustBean cust : cardList) {
-                        // 判断依据卡号相同，账户名称相同，身份证号相同
-                        if (cust.getAccname().equals(quickpayCust.getAccname())
-                                && cust.getCardno().equals(
-                                        quickpayCust.getCardno())
-                                && cust.getIdnum().equals(
-                                        quickpayCust.getIdnum())) {
-                            // 此时卡已绑定，移除出原有集合，赋值到默认第一支付卡中
-                            cardList.remove(cust);
-                            quickpayCust = cust;
-                            model.put("bindFlag", "1");
-                            break;
-                        }
+                List<QuickpayCustBean> cardList = cardPageList.getPagedResult();
+                for (QuickpayCustBean cust : cardList) {
+                    // 判断依据卡号相同，账户名称相同，身份证号相同
+                    if (cust.getAccname().equals(cust.getAccname())
+                            && cust.getCardno().equals(
+                            		cust.getCardno())
+                            && cust.getIdnum().equals(
+                            		cust.getIdnum())) {
+                        // 此时卡已绑定，移除出原有集合，赋值到默认第一支付卡中
+                        cardList.remove(cust);
+                        quickpayCust = cust;
+                        model.put("bindFlag", "1");
+                        break;
                     }
                 }
+                
 
                 model.put("cardList", cardList);
                 model.put("memberCard", quickpayCust);
@@ -464,6 +472,7 @@ public class GateWayController {
         }
         BusiAcctQuery memberAcct = accountQueryService
                 .getMemberQueryByID(fundAcct.getBusiAcctCode());
+       
         // 会员资金账户余额
         return memberAcct.getBalance().compareTo(
                 Money.valueOf(new BigDecimal(amt)));

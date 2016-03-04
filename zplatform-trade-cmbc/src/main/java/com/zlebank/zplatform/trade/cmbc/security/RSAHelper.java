@@ -47,6 +47,7 @@ import sun.misc.BASE64Decoder;
  * @date 2015年11月12日 上午9:11:00
  * @since 
  */
+@SuppressWarnings("restriction")
 public class RSAHelper {
     public static final String KEY_ALGORITHM = "RSA";
     public static final String SIGNATURE_ALGORITHM = "SHA1withRSA";

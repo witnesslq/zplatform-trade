@@ -4,8 +4,6 @@ import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -40,7 +38,7 @@ import com.zlebank.zplatform.trade.service.ITxnsWithholdingService;
 @Service("cmbcQuickPayService")
 public class CMBCQuickPayServiceImpl implements ICMBCQuickPayService{
 
-    private static final Log log = LogFactory.getLog(CMBCQuickPayServiceImpl.class);
+    //private static final Log log = LogFactory.getLog(CMBCQuickPayServiceImpl.class);
     @Autowired
     private ICMBCTransferService cmbcTransferService;
     @Autowired
@@ -80,7 +78,8 @@ public class CMBCQuickPayServiceImpl implements ICMBCQuickPayService{
         return new ResultBean("success");
     }
     
-    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    @SuppressWarnings("unchecked")
+	@Transactional(propagation=Propagation.REQUIRES_NEW)
     private String generateSerialDateNumber(String sequences){
         List<Map<String,Object>> resultList = (List<Map<String, Object>>) txnsWithholdingService.queryBySQL("select "+sequences+".NEXTVAL seq from dual", new Object[]{});
         DecimalFormat df = new DecimalFormat("00000000");
@@ -108,7 +107,7 @@ public class CMBCQuickPayServiceImpl implements ICMBCQuickPayService{
                         break;
                     }
                 }
-                Thread.currentThread().sleep(timeArray[i]);
+                Thread.sleep(timeArray[i]);
             }
         } catch (InterruptedException e) {
             // TODO Auto-generated catch block

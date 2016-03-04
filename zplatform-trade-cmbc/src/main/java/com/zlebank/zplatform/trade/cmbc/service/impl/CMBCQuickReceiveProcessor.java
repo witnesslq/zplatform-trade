@@ -21,7 +21,6 @@ import com.zlebank.zplatform.commons.dao.pojo.BusiTypeEnum;
 import com.zlebank.zplatform.commons.utils.RSAUtils;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.member.bean.enums.TerminalAccessType;
-import com.zlebank.zplatform.member.service.CoopInstiMKService;
 import com.zlebank.zplatform.member.service.CoopInstiService;
 import com.zlebank.zplatform.member.service.MerchMKService;
 import com.zlebank.zplatform.trade.adapter.accounting.IAccounting;
@@ -242,10 +241,15 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
              if("000204".equals(orderinfo.getBiztype())){
             	 privateKey = coopInstiService.getCoopInstiMK(orderinfo.getFirmemberno(), TerminalAccessType.WIRELESS).getZplatformPriKey();
              }else if("000201".equals(orderinfo.getBiztype())){
-            	 privateKey = merchMKService.get(orderinfo.getFirmemberno()).getLocalPriKey();
+            	 if("0".equals(orderinfo.getAccesstype())){
+                 	privateKey = merchMKService.get(orderinfo.getSecmemberno()).getLocalPriKey().trim();
+                 }else if("2".equals(orderinfo.getAccesstype())){
+                 	privateKey = coopInstiService.getCoopInstiMK(orderinfo.getFirmemberno(), TerminalAccessType.MERPORTAL).getZplatformPriKey();
+                 }
+            	 //privateKey = merchMKService.get(orderinfo.getFirmemberno()).getLocalPriKey();
              }
             
-            resultBean = new ResultBean(generateAsyncOrderResult(orderRespBean, privateKey));
+            resultBean = new ResultBean(generateAsyncOrderResult(orderRespBean, privateKey.trim()));
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

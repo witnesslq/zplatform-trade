@@ -29,7 +29,6 @@ public class RealTimeSelfWithholdingBean implements Serializable{
      */
     private static final long serialVersionUID = 672914196972492716L;
     public static final String XMLHEAD = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-    private static final String SERVICECODE = "1009";
     @XStreamAlias("VERSION")
     private String version;// 版本号
     @XStreamAlias("MCHNT_CD")

@@ -115,6 +115,8 @@ public class CMBCSelfWithholdingReciveProcessor implements ReceiveProcessor{
                     CMBCBillFileResponseBean billFileResponseBean = (CMBCBillFileResponseBean) xstream.fromXML(xml);
                     log.info("recive response insteadpay message:"+JSON.toJSONString(billFileResponseBean));
                     break;
+				default:
+					break;
             }
             
         } catch (UnsupportedEncodingException e) {

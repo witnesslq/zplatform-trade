@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.zlebank.zplatform.commons.utils.Md5;
+import com.zlebank.zplatform.trade.utils.ConsUtil;
 
 /**
  * Class Description
@@ -37,7 +38,7 @@ import com.zlebank.zplatform.commons.utils.Md5;
 public class CMBCAESUtils {
     private static final Log logger = LogFactory.getLog(CMBCAESUtils.class);
     private static final String MD5KEY="1234567887654321";
-    private static final String REALTIMEPAYMD5="12345678901234567890123456789012";
+    private static final String REALTIMEPAYMD5=ConsUtil.getInstance().cons.getCmbc_insteadpay_sign_md5();
     private static final String SELFWITHHOLDMD5="123456";
     /**
      * AES加密

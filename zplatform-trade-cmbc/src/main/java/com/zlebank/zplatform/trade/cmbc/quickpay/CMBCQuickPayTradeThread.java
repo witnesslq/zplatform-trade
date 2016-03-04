@@ -20,12 +20,10 @@ import com.zlebank.zplatform.trade.cmbc.service.ICMBCTransferService;
 import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.model.PojoRealnameAuth;
-import com.zlebank.zplatform.trade.model.TxnsSmsModel;
 import com.zlebank.zplatform.trade.model.TxnsWithholdingModel;
 import com.zlebank.zplatform.trade.service.IQuickpayCustService;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
 import com.zlebank.zplatform.trade.service.ITxnsQuickpayService;
-import com.zlebank.zplatform.trade.service.ITxnsSMSService;
 import com.zlebank.zplatform.trade.utils.ConsUtil;
 import com.zlebank.zplatform.trade.utils.SMSThreadPool;
 import com.zlebank.zplatform.trade.utils.SMSUtil;
@@ -253,14 +251,6 @@ public class CMBCQuickPayTradeThread implements IQuickPayTrade{
        this.tradeBean = tradeBean;
    }
 
-   private String getVerifyCode(){
-       String verifyCode = "";
-       for(int i=0;i<6;i++){
-           int x=1+(int)(Math.random()*9);
-           verifyCode+=x;
-       }
-       return verifyCode;
-   }
    
    public static void main(String[] args) {
        System.out.println(DateUtil.formatDateTime(DateUtil.addMin(new Date(), 10L)));
