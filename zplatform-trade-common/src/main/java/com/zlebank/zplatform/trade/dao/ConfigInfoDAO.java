@@ -28,4 +28,11 @@ public interface ConfigInfoDAO  extends BaseDAO<ConfigInfoModel>{
      * @return
      */
     public ConfigInfoModel getConfigByParaName(String paraName) ;
+    
+    /**
+     * 得到指定序列
+     * @param sequences
+     * @return
+     */
+    public long getSequence(String sequences);
 }

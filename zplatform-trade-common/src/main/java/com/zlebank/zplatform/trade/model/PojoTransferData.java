@@ -22,7 +22,7 @@ import org.hibernate.annotations.Parameter;
 @Entity
 @Table(name = "T_TRANSFER_DATA")
 public class PojoTransferData implements java.io.Serializable {
-
+    private String bankTranDataNo;
     /**
 	 * 
 	 */
@@ -438,6 +438,12 @@ public class PojoTransferData implements java.io.Serializable {
     }
     public void setTxnseqno(String txnseqno) {
         this.txnseqno = txnseqno;
+    }
+    public String getBankTranDataNo() {
+        return bankTranDataNo;
+    }
+    public void setBankTranDataNo(String bankTranDataNo) {
+        this.bankTranDataNo = bankTranDataNo;
     }
     
    
