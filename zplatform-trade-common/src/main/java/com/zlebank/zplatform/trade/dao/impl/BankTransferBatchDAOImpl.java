@@ -1,7 +1,10 @@
 package com.zlebank.zplatform.trade.dao.impl;
 
 import java.awt.color.CMMException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -19,10 +22,11 @@ import com.zlebank.zplatform.commons.bean.TransferBatchQuery;
 import com.zlebank.zplatform.commons.dao.impl.AbstractPagedQueryDAOImpl;
 import com.zlebank.zplatform.commons.dao.pojo.AccStatusEnum;
 import com.zlebank.zplatform.commons.utils.StringUtil;
+import com.zlebank.zplatform.trade.bean.page.QueryTransferBean;
 import com.zlebank.zplatform.trade.dao.BankTransferBatchDAO;
 import com.zlebank.zplatform.trade.model.PojoBankTransferBatch;
 
-@Repository("transferBatchDAO")
+@Repository("bankTransferBatchDAO")
 public class BankTransferBatchDAOImpl extends
 		AbstractPagedQueryDAOImpl<PojoBankTransferBatch, TransferBatchQuery>
 		implements BankTransferBatchDAO {
@@ -242,4 +246,39 @@ public class BankTransferBatchDAOImpl extends
         return (PojoBankTransferBatch) crite.uniqueResult();
 
     }
+
+	@Override
+	@Transactional(readOnly=true)
+	public Map<String, Object> queryBankTransferByPage(
+			QueryTransferBean queryTransferBean, int page, int pageSize) {
+		StringBuffer sqlBuffer = new StringBuffer("from PojoBankTransferBatch where 1=1 ");
+		StringBuffer sqlCountBuffer = new StringBuffer("select count(*) from PojoBankTransferBatch where 1=1 ");
+		List<String> parameterList = new ArrayList<String>();
+		if(queryTransferBean!=null){
+			if(StringUtil.isNotEmpty(queryTransferBean.getBatchNo())){
+				sqlBuffer.append(" and bankTranBatchNo = ? ");
+				sqlCountBuffer.append(" and bankTranBatchNo = ? ");
+				parameterList.add(queryTransferBean.getBatchNo());
+			}
+			if(StringUtil.isNotEmpty(queryTransferBean.getEndDate())){
+				sqlBuffer.append(" and status = ? ");
+				sqlCountBuffer.append(" and status = ? ");
+				parameterList.add(queryTransferBean.getStatus());
+			}
+		}
+		Query query = getSession().createQuery(sqlBuffer.toString());
+		Query countQuery = getSession().createQuery(sqlCountBuffer.toString());
+		int i = 0;
+		for(String parameter : parameterList){
+			query.setParameter(i, parameter);
+			countQuery.setParameter(i, parameter);
+			i++;
+		}
+		query.setFirstResult((pageSize)*((page==0?1:page)-1));
+    	query.setMaxResults(pageSize);
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		resultMap.put("total", ((Long) countQuery.uniqueResult()).longValue());
+		resultMap.put("rows", query.list());
+		return resultMap;
+	}
 }

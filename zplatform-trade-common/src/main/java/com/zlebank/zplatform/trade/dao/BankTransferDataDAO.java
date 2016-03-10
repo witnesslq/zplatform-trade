@@ -1,13 +1,16 @@
 package com.zlebank.zplatform.trade.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import com.zlebank.zplatform.commons.bean.TransferDataQuery;
+import com.zlebank.zplatform.commons.dao.BaseDAO;
 import com.zlebank.zplatform.commons.dao.BasePagedQueryDAO;
 import com.zlebank.zplatform.trade.bean.enums.InsteadPayTypeEnum;
+import com.zlebank.zplatform.trade.bean.page.QueryTransferBean;
 import com.zlebank.zplatform.trade.model.PojoBankTransferData;
 
-public interface BankTransferDataDAO  extends BasePagedQueryDAO<PojoBankTransferData, TransferDataQuery>{
+public interface BankTransferDataDAO  extends BaseDAO<PojoBankTransferData>{
 	/**
      * 通过批次号查找划拨数据
      * @param batchNo
@@ -52,5 +55,14 @@ public interface BankTransferDataDAO  extends BasePagedQueryDAO<PojoBankTransfer
      * @return
      */
     public List<PojoBankTransferData> getByTranDataId(Long id);
+    
+    /**
+     * 分页查询转账明细
+     * @param queryTransferBean
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    public Map<String, Object> queryBankTransferDataByPage(QueryTransferBean queryTransferBean,int page,int pageSize);
 
 }

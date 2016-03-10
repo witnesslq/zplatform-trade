@@ -62,7 +62,6 @@ String path = request.getContextPath();
         <tr>
           <th field="name1" width="50">订单号</th>
           <th field="name2" width="50">商户名称</th>
-          <th field="name3" width="50">子商户名称</th>
           <th field="name4" width="50">交易时间</th>
           <th field="name5" width="50">金额（元）</th>
           <th field="name6" width="50">备注</th>
@@ -72,7 +71,6 @@ String path = request.getContextPath();
         <tr>
 			<td>${orderId }</td>
 			<td>${merchName }</td>
-			<td>${subMerName }</td>
 			<td>${txnTime }</td>
 			<td class="red f14b">${amount_y }</td>
 			<td>${orderDesc}</td>

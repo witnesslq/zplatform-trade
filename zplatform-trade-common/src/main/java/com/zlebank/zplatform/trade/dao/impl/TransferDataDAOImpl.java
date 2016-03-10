@@ -149,9 +149,19 @@ public class TransferDataDAOImpl  extends HibernateBaseDAOImpl<PojoTranData> imp
     	query.setParameter(1, "01");
     	Long count = ((Long) query.uniqueResult()).longValue();
     	if(count==0){
+    		transferBatch.setWaitApproveCount(0L);
+    		transferBatch.setWaitApproveAmt(0L);
     		transferBatch.setStatus("03");
     		transferBatch.setApproveFinishTime(new Date());
     	}else{
+    		//查询未审核的总金额
+    		sqlBuffer = new StringBuffer("select sum(tranAmt) from PojoTranData where 1=1 and tranBatchId = ? and status = ?");
+    		query = getSession().createQuery(sqlBuffer.toString());
+    		query.setParameter(0, transferBatch.getBusiBatchNo());
+        	query.setParameter(1, "01");
+        	Long amount = ((Long) query.uniqueResult()).longValue();
+    		transferBatch.setWaitApproveCount(count);
+    		transferBatch.setWaitApproveAmt(amount);
     		transferBatch.setStatus("02");
     	}
     	transferBatchDAO.updateBatchTransferFinish(transferBatch);

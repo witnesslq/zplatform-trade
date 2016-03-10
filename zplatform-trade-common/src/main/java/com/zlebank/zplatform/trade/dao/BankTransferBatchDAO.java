@@ -1,10 +1,12 @@
 package com.zlebank.zplatform.trade.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import com.zlebank.zplatform.commons.bean.TransferBatchQuery;
 import com.zlebank.zplatform.commons.dao.BasePagedQueryDAO;
 import com.zlebank.zplatform.commons.dao.pojo.AccStatusEnum;
+import com.zlebank.zplatform.trade.bean.page.QueryTransferBean;
 import com.zlebank.zplatform.trade.model.PojoBankTransferBatch;
 
 public interface BankTransferBatchDAO extends BasePagedQueryDAO<PojoBankTransferBatch,TransferBatchQuery>{
@@ -72,6 +74,15 @@ public interface BankTransferBatchDAO extends BasePagedQueryDAO<PojoBankTransfer
      * @param channelCode 渠道号
      * @return
      */
-    PojoBankTransferBatch getByChannelCode(String channelCode);
+    public PojoBankTransferBatch getByChannelCode(String channelCode);
+    
+    /**
+     * 分页查询转账批次数据
+     * @param queryTransferBean
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    public Map<String, Object> queryBankTransferByPage(QueryTransferBean queryTransferBean,int page,int pageSize);
 }
 

@@ -1,6 +1,9 @@
 package com.zlebank.zplatform.trade.dao.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.logging.Log;
@@ -15,15 +18,17 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.commons.bean.TransferDataQuery;
-import com.zlebank.zplatform.commons.dao.impl.AbstractPagedQueryDAOImpl;
+import com.zlebank.zplatform.commons.dao.impl.HibernateBaseDAOImpl;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.bean.enums.InsteadPayTypeEnum;
+import com.zlebank.zplatform.trade.bean.page.QueryTransferBean;
 import com.zlebank.zplatform.trade.dao.BankTransferDataDAO;
 import com.zlebank.zplatform.trade.model.PojoBankTransferData;
-@Repository("transferDataDAO")
+@Repository("bankTransferDataDAO")
 public class BankTransferDataDAOImpl  extends
-AbstractPagedQueryDAOImpl<PojoBankTransferData, TransferDataQuery>
+HibernateBaseDAOImpl<PojoBankTransferData>
         implements
         BankTransferDataDAO {
     private static final Log log = LogFactory.getLog(BankTransferDataDAOImpl.class);
@@ -167,7 +172,7 @@ AbstractPagedQueryDAOImpl<PojoBankTransferData, TransferDataQuery>
     * @param e
     * @return
     */
-   @Override
+   
    protected Criteria buildCriteria(TransferDataQuery e) {
        Criteria crite = this.getSession().createCriteria(
                PojoBankTransferData.class);
@@ -255,4 +260,44 @@ AbstractPagedQueryDAOImpl<PojoBankTransferData, TransferDataQuery>
         crite.add(Restrictions.eq("tranDataId", id));
         return crite.list();
     }
+
+	@Override
+	@Transactional(readOnly=true)
+	public Map<String, Object> queryBankTransferDataByPage(
+			QueryTransferBean queryTransferBean, int page, int pageSize) {
+		StringBuffer sqlBuffer = new StringBuffer("from PojoBankTransferData where 1=1 ");
+		StringBuffer sqlCountBuffer = new StringBuffer("select count(*) from PojoBankTransferData where 1=1 ");
+		List<Object> parameterList = new ArrayList<Object>();
+		if(queryTransferBean!=null){
+			if(StringUtil.isNotEmpty(queryTransferBean.getBatchNo())){
+				sqlBuffer.append(" and bankTranBatchId = ? ");
+				sqlCountBuffer.append(" and bankTranBatchId = ? ");
+				parameterList.add(Long.valueOf(queryTransferBean.getBatchNo()));
+			}
+			if(StringUtil.isNotEmpty(queryTransferBean.getStatus())){
+				sqlBuffer.append(" and status = ? ");
+				sqlCountBuffer.append(" and status = ? ");
+				parameterList.add(queryTransferBean.getStatus());
+			}
+		}
+		Query query = getSession().createQuery(sqlBuffer.toString());
+		Query countQuery = getSession().createQuery(sqlCountBuffer.toString());
+		int i = 0;
+		for(Object parameter : parameterList){
+			query.setParameter(i, parameter);
+			countQuery.setParameter(i, parameter);
+			i++;
+		}
+		query.setFirstResult((pageSize)*((page==0?1:page)-1));
+    	query.setMaxResults(pageSize);
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		System.out.println(JSON.toJSONString(countQuery.list()));
+		resultMap.put("total", countQuery.uniqueResult());
+		resultMap.put("rows", query.list());
+		return resultMap;
+	}
+	
+	
+
+	
 }
