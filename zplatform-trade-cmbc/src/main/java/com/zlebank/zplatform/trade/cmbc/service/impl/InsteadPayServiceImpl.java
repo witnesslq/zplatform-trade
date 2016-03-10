@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -30,8 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.commons.utils.DateUtil;
-import com.zlebank.zplatform.commons.utils.StringUtil;
-import com.zlebank.zplatform.trade.bean.enums.InsteadPayTypeEnum;
 import com.zlebank.zplatform.trade.cmbc.bean.InsteadPayBean;
 import com.zlebank.zplatform.trade.cmbc.bean.RealTimePayBean;
 import com.zlebank.zplatform.trade.cmbc.bean.RealTimeQueryBean;
@@ -41,18 +38,13 @@ import com.zlebank.zplatform.trade.cmbc.bean.gateway.InsteadPayMessageBean;
 import com.zlebank.zplatform.trade.cmbc.exception.CMBCTradeException;
 import com.zlebank.zplatform.trade.cmbc.net.BaseSocketLongClient;
 import com.zlebank.zplatform.trade.cmbc.processor.CMBCInsteadPayReciveProcessor;
-import com.zlebank.zplatform.trade.cmbc.security.CMBCAESUtils;
 import com.zlebank.zplatform.trade.cmbc.service.IFTPCMBCService;
 import com.zlebank.zplatform.trade.cmbc.service.IInsteadPayService;
 import com.zlebank.zplatform.trade.dao.TransferBatchDAO;
 import com.zlebank.zplatform.trade.dao.TransferDataDAO;
 import com.zlebank.zplatform.trade.exception.TradeException;
-import com.zlebank.zplatform.trade.model.PojoTransferBatch;
-import com.zlebank.zplatform.trade.model.PojoTransferData;
-import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
 import com.zlebank.zplatform.trade.utils.ConsUtil;
-import com.zlebank.zplatform.trade.utils.OrderNumber;
 
 /**
  * Class Description
@@ -90,7 +82,7 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
     @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void batchOuterPay(String batchNo) throws CMBCTradeException, IOException, TradeException {
         //List<InsteadPayBean> payList = initBatchData();
-        PojoTransferBatch transferBatch = transferBatchDAO.getByBatchNo(batchNo);
+        /*PojoTransferBatch transferBatch = transferBatchDAO.getByBatchNo(batchNo);
         List<PojoTransferData> transferDataList =  transferDataDAO.findTransDataByBatchNo(batchNo);
         Long sumAmt = 0L;
         Long sumItem = 0L;
@@ -160,7 +152,7 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
         transferBatch.setRequestfilename(fileName);
         transferBatch.setResponsefilename(resFileName);
         transferBatch.setTransfertime(DateUtil.getCurrentDateTime());
-        transferBatchDAO.updateBatchToTransfer(transferBatch);
+        transferBatchDAO.updateBatchToTransfer(transferBatch);*/
     }
 
     private File writeFile(String msg) throws CMBCTradeException,
@@ -239,7 +231,7 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
     @Transactional
     public void batchInnerPay(String batchNo) throws CMBCTradeException,IOException, TradeException {
         // TODO Auto-generated method stub
-        PojoTransferBatch transferBatch = transferBatchDAO.getByBatchNo(batchNo);
+        /*PojoTransferBatch transferBatch = transferBatchDAO.getByBatchNo(batchNo);
         List<PojoTransferData> transferDataList =  transferDataDAO.findTransDataByBatchNo(batchNo);
         //List<InsteadPayBean> payList = initBatchData();
         Long sumAmt = 0L;
@@ -303,7 +295,7 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
         transferBatch.setRequestfilename(fileName);
         transferBatch.setResponsefilename(resFileName);
         transferBatch.setTransfertime(DateUtil.getCurrentDateTime());
-        transferBatchDAO.updateBatchToTransfer(transferBatch);
+        transferBatchDAO.updateBatchToTransfer(transferBatch);*/
     }
 
     public void analyzeCMBCFile(File file,String fileName,FileTypeEnmu fileTypeEnmu) throws IOException {
@@ -323,7 +315,7 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
     }
     
     private void analyzeResFile(File file,String fileName) throws NumberFormatException, IOException{
-        if(file.isFile() && file.exists()) { 
+        /*if(file.isFile() && file.exists()) { 
             //判断文件是否存在
             InputStreamReader read = new InputStreamReader(new FileInputStream(file), ENCODE);// 考虑到编码格式
             @SuppressWarnings("resource")
@@ -406,7 +398,7 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
             }
         }else{
             
-        }
+        }*/
     }
     
     private void analyzeReexchangeFile(File file) throws NumberFormatException, IOException{

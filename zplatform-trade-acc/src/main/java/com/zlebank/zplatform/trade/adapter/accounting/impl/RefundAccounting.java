@@ -1,28 +1,21 @@
 package com.zlebank.zplatform.trade.adapter.accounting.impl;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zlebank.zplatform.acc.bean.TradeInfo;
-import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
-import com.zlebank.zplatform.acc.exception.AccBussinessException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
-import com.zlebank.zplatform.commons.dao.pojo.AccStatusEnum;
-import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.adapter.accounting.IAccounting;
-import com.zlebank.zplatform.trade.bean.AppPartyBean;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.dao.TransferBatchDAO;
 import com.zlebank.zplatform.trade.dao.TransferDataDAO;
-import com.zlebank.zplatform.trade.model.PojoTransferBatch;
-import com.zlebank.zplatform.trade.model.PojoTransferData;
+import com.zlebank.zplatform.trade.model.PojoTranBatch;
+import com.zlebank.zplatform.trade.model.PojoTranData;
 import com.zlebank.zplatform.trade.model.TxnsRefundModel;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
 import com.zlebank.zplatform.trade.service.ITxnsRefundService;
-import com.zlebank.zplatform.trade.utils.DateUtil;
 import com.zlebank.zplatform.trade.utils.SpringContext;
 /**
  * 
@@ -50,7 +43,7 @@ public class RefundAccounting implements IAccounting{
     
     @Override
     public ResultBean accountedForInsteadPay(String batchno) {
-        List<PojoTransferBatch> transferBatchList = transferBatchDAO.findByInsteadpaybatchno(batchno);
+        /*List<PojoTransferBatch> transferBatchList = transferBatchDAO.findByInsteadpaybatchno(batchno);
         for(PojoTransferBatch transferBatch : transferBatchList){
             String commiteTime = DateUtil.getCurrentDateTime();
             String transferBatchNo = transferBatch.getBatchno();
@@ -93,19 +86,19 @@ public class RefundAccounting implements IAccounting{
             }
             transferDataDAO.batchUpdateTransDataAccStatus(transferDataList);
            
-        }
+        }*/
         return null;
     }
     
     @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
-    public void updateRefundOrder(PojoTransferData transferData,String batchno,PojoTransferBatch transferBatch){
+    public void updateRefundOrder(PojoTranData transferData,String batchno,PojoTranBatch transferBatch){
         TxnsRefundModel refundModel = new TxnsRefundModel();
         refundModel.setStatus(transferData.getStatus());
-        refundModel.setRefundinstid(transferBatch.getChnlcode());
+        /*refundModel.setRefundinstid(transferBatch.getChnlcode());
         refundModel.setRetcode(transferData.getRespcode());
         refundModel.setRetinfo(transferData.getRespmsg());
         refundModel.setMemberid(transferBatch.getMerchid());
-        refundModel.setRefundorderno(transferData.getRelatedorderno());
+        refundModel.setRefundorderno(transferData.getRelatedorderno());*/
         txnsRefundService.updateRefundResult(refundModel);
     }
 
@@ -114,16 +107,16 @@ public class RefundAccounting implements IAccounting{
         // TODO Auto-generated method stub
         return null;
     }
-    private TradeInfo initAccountingData(PojoTransferData transferData,PojoTransferBatch transferBatch){
-        TxnsRefundModel refund = txnsRefundService.getRefundByRefundorderNo(transferData.getRelatedorderno(),transferData.getMemberid());
+    private TradeInfo initAccountingData(PojoTranData transferData,PojoTranBatch transferBatch){
+        /*TxnsRefundModel refund = txnsRefundService.getRefundByRefundorderNo(transferData.getRelatedorderno(),transferData.getMemberid());
         String txnseqno = transferData.getTxnseqno();
-        /**支付订单号**/
+        *//**支付订单号**//*
         String payordno = transferData.getRelatedorderno();
-        /**交易类型 - 根据交易结果进行判断，**/
+        *//**交易类型 - 根据交易结果进行判断，**//*
         String busiCode = "";
-        /**付款方会员ID**/
+        *//**付款方会员ID**//*
         String payMemberId = transferData.getMemberid();
-        /**收款方会员ID**/
+        *//**收款方会员ID**//*
         String payToMemberId = refund.getMemberid();
         if(transferData.getBusicode().equals("40000001")){
             if("S".equalsIgnoreCase(transferData.getResptype())){//交易成功
@@ -136,25 +129,26 @@ public class RefundAccounting implements IAccounting{
         }
         
         
-        /**收款方父级会员ID**/
+        *//**收款方父级会员ID**//*
         String payToParentMemberId="";
-        /**渠道**/
+        *//**渠道**//*
         String channelId = transferBatch.getChnlcode();//支付机构代码
         
-        /**产品id**/
+        *//**产品id**//*
         String productId = "";
-        /**交易金额**/
+        *//**交易金额**//*
         BigDecimal amount = new BigDecimal(transferData.getTransamt());
-        /**佣金**/
+        *//**佣金**//*
         BigDecimal commission = new BigDecimal(0);
-        /**手续费**/
+        *//**手续费**//*
         long txnfee = 0;
         BigDecimal charge = new BigDecimal(txnfee);
-        /**金额D**/
+        *//**金额D**//*
         BigDecimal amountD = new BigDecimal(0);
-        /**金额E**/
+        *//**金额E**//*
         BigDecimal amountE = new BigDecimal(0);
         TradeInfo tradeInfo = new TradeInfo(txnseqno, payordno, busiCode, payMemberId, payToMemberId, payToParentMemberId, channelId, productId, amount, commission, charge, amountD, amountE, false);
-        return tradeInfo;
+        return tradeInfo;*/
+    	return null;
     }
 }

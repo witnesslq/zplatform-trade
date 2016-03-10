@@ -1,18 +1,11 @@
 
 package com.zlebank.zplatform.trade.cmbc.job;
 
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.zlebank.zplatform.commons.dao.pojo.AccStatusEnum;
-import com.zlebank.zplatform.commons.dao.pojo.BusiTypeEnum;
-import com.zlebank.zplatform.trade.adapter.accounting.IAccounting;
 import com.zlebank.zplatform.trade.dao.TransferBatchDAO;
-import com.zlebank.zplatform.trade.factory.AccountingAdapterFactory;
-import com.zlebank.zplatform.trade.model.PojoTransferBatch;
 
 /**
  * 代付账务处理定时任务
@@ -34,7 +27,7 @@ public class InsteadPayAccountingJob {
     public void execute() {
         log.info("start InsteadPayAccountingJob");
         //查找等待账务处理的批次信息
-        List<PojoTransferBatch> transferBatchList = transferBatchDAO.findWaitAccountingTransferBatch();
+        /*List<PojoTransferBatch> transferBatchList = transferBatchDAO.findWaitAccountingTransferBatch();
         for(PojoTransferBatch transferBatch:transferBatchList){
             try {
                 String busitype = transferBatch.getBusitype();//取得业务代码
@@ -49,7 +42,7 @@ public class InsteadPayAccountingJob {
                 e.printStackTrace();
             }
             
-        }
+        }*/
         log.info("end InsteadPayAccountingJob");
     }
     

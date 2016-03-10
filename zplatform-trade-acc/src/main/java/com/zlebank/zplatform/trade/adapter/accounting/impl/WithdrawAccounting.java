@@ -1,29 +1,22 @@
 package com.zlebank.zplatform.trade.adapter.accounting.impl;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import org.aspectj.bridge.AbortException;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zlebank.zplatform.acc.bean.TradeInfo;
-import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
-import com.zlebank.zplatform.acc.exception.AccBussinessException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
-import com.zlebank.zplatform.commons.dao.pojo.AccStatusEnum;
-import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.adapter.accounting.IAccounting;
-import com.zlebank.zplatform.trade.bean.AppPartyBean;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.dao.TransferBatchDAO;
 import com.zlebank.zplatform.trade.dao.TransferDataDAO;
-import com.zlebank.zplatform.trade.model.PojoTransferBatch;
-import com.zlebank.zplatform.trade.model.PojoTransferData;
+import com.zlebank.zplatform.trade.model.PojoTranBatch;
+import com.zlebank.zplatform.trade.model.PojoTranData;
 import com.zlebank.zplatform.trade.model.TxnsWithdrawModel;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
 import com.zlebank.zplatform.trade.service.ITxnsWithdrawService;
-import com.zlebank.zplatform.trade.utils.DateUtil;
 import com.zlebank.zplatform.trade.utils.SpringContext;
 /**
  * 
@@ -59,7 +52,7 @@ public class WithdrawAccounting implements IAccounting{
     @Override
     public ResultBean accountedForInsteadPay(String batchno) {
         //取得所有代付批次数据
-        PojoTransferBatch transferBatch = transferBatchDAO.getByBatchNo(batchno);
+        /*PojoTransferBatch transferBatch = transferBatchDAO.getByBatchNo(batchno);
         List<PojoTransferData> transferDataList = transferDataDAO.findTransDataByBatchNoAndAccstatus(batchno);
         for(PojoTransferData transferData : transferDataList){
             String commiteTime = DateUtil.getCurrentDateTime();
@@ -95,12 +88,12 @@ public class WithdrawAccounting implements IAccounting{
                 txnsLogService.updateAppStatus(transferData.getTxnseqno(), AccStatusEnum.AccountingFail.getCode(), errorMsg);
             }
         }
-        transferDataDAO.batchUpdateTransDataAccStatus(transferDataList);
+        transferDataDAO.batchUpdateTransDataAccStatus(transferDataList);*/
         return null;
     }
     @Transactional(propagation=Propagation.REQUIRES_NEW)
-    public void updateWithdrawOrder(PojoTransferData transferData,String batchno,PojoTransferBatch transferBatch){
-        TxnsWithdrawModel txnsWithdraw = new TxnsWithdrawModel();
+    public void updateWithdrawOrder(PojoTranData transferData,String batchno,PojoTranBatch transferBatch){
+        /*TxnsWithdrawModel txnsWithdraw = new TxnsWithdrawModel();
         txnsWithdraw.setStatus(transferData.getStatus());
         txnsWithdraw.setWithdrawinstid(transferBatch.getChnlcode());
         
@@ -114,15 +107,15 @@ public class WithdrawAccounting implements IAccounting{
         
         txnsWithdraw.setMemberid(transferData.getMemberid());
         txnsWithdraw.setWithdraworderno(transferData.getRelatedorderno());
-        txnsWithdrawService.updateWithdrawResult(txnsWithdraw);
+        txnsWithdrawService.updateWithdrawResult(txnsWithdraw);*/
     }
     
     
-    private TradeInfo initAccountingData(PojoTransferData transferData,PojoTransferBatch transferBatch){
-        String txnseqno = transferData.getTxnseqno();
-        /**支付订单号**/
+    private TradeInfo initAccountingData(PojoTranData transferData,PojoTranBatch transferBatch){
+        /*String txnseqno = transferData.getTxnseqno();
+        *//**支付订单号**//*
         String payordno = transferData.getRelatedorderno();
-        /**交易类型 - 根据交易结果进行判断，**/
+        *//**交易类型 - 根据交易结果进行判断，**//*
         String busiCode = "";
         if(transferData.getBusicode().equals("30000001")){
             if("S".equalsIgnoreCase(transferData.getResptype())){//交易成功
@@ -134,30 +127,31 @@ public class WithdrawAccounting implements IAccounting{
             throw new AbortException("账务处理失败，批次业务代码和明细业务代码不一致");
         }
         
-        /**付款方会员ID**/
+        *//**付款方会员ID**//*
         String payMemberId = transferData.getMemberid();
-        /**收款方会员ID**/
+        *//**收款方会员ID**//*
         String payToMemberId = transferData.getMemberid();
-        /**收款方父级会员ID**/
+        *//**收款方父级会员ID**//*
         String payToParentMemberId="";
-        /**渠道**/
+        *//**渠道**//*
         String channelId = transferBatch.getChnlcode();//支付机构代码
         
-        /**产品id**/
+        *//**产品id**//*
         String productId = "";
-        /**交易金额**/
+        *//**交易金额**//*
         BigDecimal amount = new BigDecimal(transferData.getTransamt());
-        /**佣金**/
+        *//**佣金**//*
         BigDecimal commission = new BigDecimal(0);
-        /**手续费**/
+        *//**手续费**//*
         long txnfee = 0;
         BigDecimal charge = new BigDecimal(txnfee);
-        /**金额D**/
+        *//**金额D**//*
         BigDecimal amountD = new BigDecimal(0);
-        /**金额E**/
+        *//**金额E**//*
         BigDecimal amountE = new BigDecimal(0);
         txnsLogService.updateAccBusiCode(txnseqno, busiCode);
         TradeInfo tradeInfo = new TradeInfo(txnseqno, payordno, busiCode, payMemberId, payToMemberId, payToParentMemberId, channelId, productId, amount, commission, charge, amountD, amountE, false);
-        return tradeInfo;
+        return tradeInfo;*/
+    	return null;
     }
 }

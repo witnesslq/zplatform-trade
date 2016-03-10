@@ -1,14 +1,10 @@
 package org.zplatform.cmbc;
 
-import java.util.List;
-
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.trade.dao.TransferBatchDAO;
-import com.zlebank.zplatform.trade.model.PojoTransferBatch;
 
 public class TransferBatchTest {
     private ApplicationContext context;
@@ -24,7 +20,7 @@ public class TransferBatchTest {
     @Test
     public void testJob() { 
         init();
-        try {
+        /*try {
             List<PojoTransferBatch> batchList =  transferBatchDAO.findWaitAccountingTransferBatch();
             for(PojoTransferBatch batch:batchList){
                 System.out.println(JSON.toJSONString(batch));
@@ -34,7 +30,7 @@ public class TransferBatchTest {
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        }
+        }*/
          
     }
 }

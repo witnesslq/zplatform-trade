@@ -66,6 +66,7 @@ import com.zlebank.zplatform.trade.bean.gateway.OrderRespBean;
 import com.zlebank.zplatform.trade.bean.gateway.QueryBean;
 import com.zlebank.zplatform.trade.bean.gateway.QueryResultBean;
 import com.zlebank.zplatform.trade.bean.gateway.RiskRateInfoBean;
+import com.zlebank.zplatform.trade.cmbc.bean.gateway.CardMessageBean;
 import com.zlebank.zplatform.trade.cmbc.bean.gateway.InsteadPayMessageBean;
 import com.zlebank.zplatform.trade.cmbc.bean.gateway.WithholdingMessageBean;
 import com.zlebank.zplatform.trade.cmbc.exception.CMBCTradeException;
@@ -1791,11 +1792,11 @@ public class GateWayController {
     @RequestMapping("/testcmbcrealNameAuth")
     @ResponseBody
     public Object testCMBC(){
-        //CardMessageBean card = new CardMessageBean("123");
+        CardMessageBean card = new CardMessageBean("123");
         try {
             PojoRealnameAuth realnameAuth = new PojoRealnameAuth(true);
             System.out.println(JSON.toJSONString(cmbcTransferService.realNameAuth(realnameAuth)));
-            //withholdingService.realNameAuthentication(card);
+            withholdingService.realNameAuthentication(card);
         } catch (CMBCTradeException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

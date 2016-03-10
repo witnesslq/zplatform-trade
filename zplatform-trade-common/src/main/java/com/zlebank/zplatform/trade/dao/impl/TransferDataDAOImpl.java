@@ -1,246 +1,165 @@
 package com.zlebank.zplatform.trade.dao.impl;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
 import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.zlebank.zplatform.commons.bean.TransferDataQuery;
-import com.zlebank.zplatform.commons.dao.impl.AbstractPagedQueryDAOImpl;
-import com.zlebank.zplatform.commons.utils.DateUtil;
+import com.zlebank.zplatform.acc.bean.TradeInfo;
+import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
+import com.zlebank.zplatform.acc.exception.AccBussinessException;
+import com.zlebank.zplatform.acc.service.AccEntryService;
+import com.zlebank.zplatform.commons.dao.impl.HibernateBaseDAOImpl;
 import com.zlebank.zplatform.commons.utils.StringUtil;
+import com.zlebank.zplatform.trade.bean.enums.BusinessEnum;
 import com.zlebank.zplatform.trade.bean.enums.InsteadPayTypeEnum;
+import com.zlebank.zplatform.trade.bean.page.QueryTransferBean;
+import com.zlebank.zplatform.trade.dao.TransferBatchDAO;
 import com.zlebank.zplatform.trade.dao.TransferDataDAO;
-import com.zlebank.zplatform.trade.model.PojoTransferData;
+import com.zlebank.zplatform.trade.model.PojoInsteadPayDetail;
+import com.zlebank.zplatform.trade.model.PojoTranBatch;
+import com.zlebank.zplatform.trade.model.PojoTranData;
 @Repository("transferDataDAO")
-public class TransferDataDAOImpl  extends
-AbstractPagedQueryDAOImpl<PojoTransferData, TransferDataQuery>
-        implements
-            TransferDataDAO {
+public class TransferDataDAOImpl  extends HibernateBaseDAOImpl<PojoTranData> implements TransferDataDAO {
     private static final Log log = LogFactory.getLog(TransferDataDAOImpl.class);
 
-    /**
-     * 通过批次号查找划拨数据
-     * 
-     * @param batchNo
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-	@Override
-    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
-    public List<PojoTransferData> findTransDataByBatchNo(String batchNo) {
-        List<PojoTransferData> result = null;
-        String queryString = " from PojoTransferData where batchno = ? and status = ?";
-        try {
-            log.info("queryString:" + queryString);
-            Query query = getSession().createQuery(queryString);
-            query.setString(0, batchNo);
-            query.setString(1, "01");
-            result = query.list();
-        } catch (HibernateException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return result;
-    }
-
-    /**
-     * 通过批次号更新划拨数据
-     * 
-     * @param batchNo
-     * @param payType
-     */
-    @Override
-    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
-    public void updateTransDataStatusByBatchNo(String batchNo,
-            InsteadPayTypeEnum payType) {
-        try {
-            String hql = "update PojoTransferData set status = ? where batchno = ?";
-            Session session = getSession();
-            Query query = session.createQuery(hql);
-            query.setParameter(0, payType.getCode());
-            query.setParameter(1, batchNo);
-            query.executeUpdate();
-        } catch (HibernateException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-    @SuppressWarnings("unchecked")
-	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
-    public List<PojoTransferData> findTransDataByBatchNoAndAccstatus(String batchNo) {
-        List<PojoTransferData> result = null;
-        String queryString = "from PojoTransferData where batchno = ? and accstatus = ?";
-        try {
-            log.info("queryString:" + queryString);
-            Query query = getSession().createQuery(queryString);
-            query.setString(0, batchNo);
-            query.setString(1, "01");
-            result = query.list();
-        } catch (HibernateException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return result;
-    }
-
-    @Override
-    @Transactional(propagation=Propagation.REQUIRES_NEW)
-    public void batchUpdateTransData(List<PojoTransferData> transferDataList) {
-        StringBuffer hqlBuffer = new StringBuffer();
-        hqlBuffer.append("update PojoTransferData set banktranid = ?, ");
-        hqlBuffer.append("resptype = ?,");
-        hqlBuffer.append("respcode = ?,");
-        hqlBuffer.append("respmsg = ?,");
-        hqlBuffer.append("trandate = ?,");
-        hqlBuffer.append("trantime = ?, ");
-        hqlBuffer.append("status = ?, ");
-        hqlBuffer.append("accstatus = ? ");
-        hqlBuffer.append("where tranid = ? ");
-        Session session = getSession();
-        for (PojoTransferData data : transferDataList) {
-            PojoTransferData data_old = getTransferDataByTranId(data.getTranid());
-            Query query = session.createQuery(hqlBuffer.toString());
-            query.setParameter(0, data.getBanktranid());
-            query.setParameter(1, data.getResptype());
-            query.setParameter(2, data.getRespcode());
-            query.setParameter(3, data.getRespmsg());
-            query.setParameter(4, data.getTrandate());
-            query.setParameter(5, data.getTrantime());
-            query.setParameter(6, "S".equalsIgnoreCase(data.getResptype())? "00": "03");
-            query.setParameter(7, "01");
-            query.setParameter(8, data.getTranid());
-            query.executeUpdate();
-            
-            
-            query = session.createQuery("update TxnsLogModel set payretcode=?,payretinfo=?,payordfintime=?,payrettsnseqno=?,retcode=?,retinfo=?, tradeseltxn=? where txnseqno=?");
-            if("S".equalsIgnoreCase(data.getResptype())){
-                query.setParameter(0, "000000");
-                query.setParameter(1, "交易成功");
-                query.setParameter(4, "0000");
-                query.setParameter(5, "交易成功");
-            }else{
-                query.setParameter(0, data.getRespcode());
-                query.setParameter(1, data.getRespmsg());
-                query.setParameter(4, data.getRespcode());
-                query.setParameter(5, data.getRespmsg());
-            }
-            query.setParameter(2, DateUtil.getCurrentDateTime());
-            query.setParameter(3, data.getBanktranid());
-            query.setParameter(6, UUID.randomUUID().toString().replaceAll("-", "").toUpperCase());
-            query.setParameter(7, data_old.getTxnseqno());
-            query.executeUpdate();
-        }
-
-    }
-
-    @Override
-    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
-    public void batchUpdateTransDataAccStatus(List<PojoTransferData> transferDataList) {
-        // TODO Auto-generated method stub
-        StringBuffer hqlBuffer = new StringBuffer();
-        hqlBuffer.append("update PojoTransferData set ");
-        hqlBuffer.append("accstatus = ?,");
-        hqlBuffer.append("accinfo = ?");
-        hqlBuffer.append("where tranid = ? ");
-        Session session = getSession();
-        for(PojoTransferData data : transferDataList) {
-            Query query = session.createQuery(hqlBuffer.toString());
-            query.setParameter(0, data.getAccstatus());
-            query.setParameter(1, data.getAccinfo());
-            query.setParameter(2, data.getTranid());
-            query.executeUpdate();
-        }
-    }
-
-    /**
-    *
-    * @param e
-    * @return
-    */
-   @Override
-   protected Criteria buildCriteria(TransferDataQuery e) {
-       Criteria crite = this.getSession().createCriteria(
-               PojoTransferData.class);
-
-       if (e != null) {
-           if(StringUtil.isNotEmpty(e.getBusicode())){
-           crite.add(Restrictions.eq("busicode", e.getBusicode()));
-           
-           };
-           if(StringUtil.isNotEmpty(e.getbatchno())){
-           crite.add(Restrictions.eq("batchno", e.getbatchno()));}
-           if(StringUtil.isNotEmpty(e.getTranId())){
-               crite.add(Restrictions.eq("tranid", e.getTranId()));
-           }
-           if(StringUtil.isNotEmpty(e.getAcctType())){
-               crite.add(Restrictions.eq("acctype", e.getAcctType()));
-               
-           }
-         if(StringUtil.isNotEmpty( e.getStatus())){
-             crite.add(Restrictions.eq("status", e.getStatus()));
-             
-         }
-         
-         if(StringUtil.isNotEmpty(e.getRelatedorderno())){
-             crite.add(Restrictions.eq("relatedorderno",e.getRelatedorderno()));
-             
-         }
-         
-         if(e.getStartTime()!=null){
-             crite.add(Restrictions.ge("createtime",e.getStartTime()));
-             
-         }
-         
-         if(e.getEndTime()!=null){
-             crite.add(Restrictions.le("createtime",e.getEndTime()));
-             
-         }
-         
-         if(StringUtil.isNotEmpty(e.getBatch())){
-             crite.add(Restrictions.le("associatedBatch",e.getBatch()));
-             
-         }
-
-
-       }
-       crite.addOrder(Order.asc("createtime"));
-       return crite;
-
-   }
-
-    /**
-     *
-     * @param id
-     * @return
-     */
-    @Override
-    public PojoTransferData getTransferDataByTranId(String tranid,String status) {
-        Criteria crite = this.getSession().createCriteria(
-                PojoTransferData.class);
-        crite.add(Restrictions.eq("tranid", tranid));
-        crite.add(Restrictions.eq("status", status));
-       return  (PojoTransferData) crite.uniqueResult();
-    }
-
-    public PojoTransferData getTransferDataByTranId(String tranid) {
-        Criteria crite = this.getSession().createCriteria(
-                PojoTransferData.class);
-        crite.add(Restrictions.eq("tranid", tranid));
-       return  (PojoTransferData) crite.uniqueResult();
+    @Autowired
+    private TransferBatchDAO transferBatchDAO;
+    @Autowired
+    private AccEntryService accEntryService;
+    
+    public Map<String, Object> queryTranfersDetaByPage(QueryTransferBean queryTransferBean,int page,int pageSize){
+    	StringBuffer sqlBuffer = new StringBuffer("from PojoTranData where 1=1 ");
+		StringBuffer sqlCountBuffer = new StringBuffer("select count(*) from PojoTranData where 1=1 ");
+		List<String> parameterList = new ArrayList<String>();
+		if(queryTransferBean!=null){
+			if(StringUtil.isNotEmpty(queryTransferBean.getBatchNo())){
+				sqlBuffer.append(" and tranBatchId = ? ");
+				sqlCountBuffer.append(" and tranBatchId = ? ");
+				parameterList.add(queryTransferBean.getBatchNo());
+			}
+			if(StringUtil.isNotEmpty(queryTransferBean.getEndDate())){
+				sqlBuffer.append(" and status = ? ");
+				sqlCountBuffer.append(" and status = ? ");
+				parameterList.add(queryTransferBean.getStatus());
+			}
+		}
+		Query query = getSession().createQuery(sqlBuffer.toString());
+		Query countQuery = getSession().createQuery(sqlCountBuffer.toString());
+		int i = 0;
+		for(String parameter : parameterList){
+			query.setParameter(i, parameter);
+			countQuery.setParameter(i, parameter);
+			i++;
+		}
+		query.setFirstResult((pageSize)*((page==0?1:page)-1));
+    	query.setMaxResults(pageSize);
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		resultMap.put("total", ((Long) countQuery.uniqueResult()).longValue());
+		resultMap.put("rows", query.list());
+		return resultMap;
     }
     
-    public static void main(String[] args) {
-        System.out.println(UUID.randomUUID());
+    @Transactional(readOnly=true)
+    public PojoTranData queryTransferData(String tranDataSeqNo){
+    	StringBuffer sqlBuffer = new StringBuffer("from PojoTranData where 1=1 and tranDataSeqNo = ? and status = ?");
+    	Query query = getSession().createQuery(sqlBuffer.toString());
+    	query.setParameter(0, tranDataSeqNo);
+    	query.setParameter(1, "01");
+    	return (PojoTranData) query.uniqueResult();
     }
+    
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+    public void singleTrailTransfer(String tranDataSeqNo,String status) throws AccBussinessException, AbstractBusiAcctException, NumberFormatException{
+    	
+    	PojoTranData transferData = queryTransferData(tranDataSeqNo);
+    	//统计审核通过和不同过的数据，笔数和金额
+		long approveCount = 0L;
+		long approveAmount = 0L;
+		long unApproveCount = 0L;
+		long unApproveAmount = 0L;
+		//判断划拨明细数据状态
+    	PojoTranBatch transferBatch = transferBatchDAO.getByBatchNo(transferData.getTranBatchId());
+    	if("00".equals(status)){//审核通过的执行分批算法
+    		PojoTranData[] pojoTransferDatas = new PojoTranData[]{transferData};
+    		//
+			if("00".equals(transferData.getStatus())){
+				approveCount++;
+				approveAmount+=transferData.getTranAmt().longValue();
+			}else{
+				unApproveCount++;
+				unApproveAmount+=transferData.getTranAmt().longValue();
+			}
+    		transferBatch.setApproveAmt(transferBatch.getApproveAmt()+approveAmount);
+    		transferBatch.setApproveCount(approveCount+transferBatch.getApproveCount());
+    		transferBatch.setUnapproveAmt(transferBatch.getUnapproveAmt()+unApproveAmount);
+    		transferBatch.setUnapproveCount(unApproveCount+transferBatch.getUnapproveCount());
+    		
+    	}else{
+			unApproveCount++;
+			unApproveAmount+=transferData.getTranAmt().longValue();
+			transferData.setStatus(status);
+			this.update(transferData);
+    		transferBatch.setUnapproveAmt(transferBatch.getUnapproveAmt()+unApproveAmount);
+    		transferBatch.setUnapproveCount(unApproveCount+transferBatch.getUnapproveCount());
+    		BusinessEnum businessEnum = null;
+    		//00：代付01：提现02：退款
+    		if("00".equals(transferBatch.getBusitype())){
+    			businessEnum = BusinessEnum.INSTEADPAY_REFUND;
+    		}else if("01".equals(transferBatch.getBusitype())){
+    			businessEnum = BusinessEnum.WITHDRAWALS_REFUND;
+    		}else if("02".equals(transferBatch.getBusitype())){
+    			businessEnum = BusinessEnum.REFUND_REFUND;
+    		}
+    		businessRefund(transferData,businessEnum);
+    	}
+    	updateBatchTransferSingle(transferBatch);
+    }
+    
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+    public void businessRefund(PojoTranData transferData,BusinessEnum businessEnum) throws AccBussinessException, AbstractBusiAcctException,NumberFormatException {
+        TradeInfo tradeInfo = new TradeInfo();
+        tradeInfo.setAmount(transferData.getTranAmt());
+        tradeInfo.setBusiCode(businessEnum.getBusiCode());
+        tradeInfo.setPayMemberId(transferData.getMemberId());
+        tradeInfo.setTxnseqno(transferData.getTxnseqno());
+        //tradeInfo.setTxnseqno(pojoinstead.getOrderId());
+        tradeInfo.setCommission(new BigDecimal(0));
+        tradeInfo.setCharge(transferData.getTranFee());
+        accEntryService.accEntryProcess(tradeInfo);
+    }
+    
+    
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+    public void updateBatchTransferSingle(PojoTranBatch transferBatch){
+    	StringBuffer sqlBuffer = new StringBuffer("select count(*) from PojoTranData where 1=1 and tranBatchId = ? and status = ?");
+    	Query query = getSession().createQuery(sqlBuffer.toString());
+    	query.setParameter(0, transferBatch.getBusiBatchNo());
+    	query.setParameter(1, "01");
+    	Long count = ((Long) query.uniqueResult()).longValue();
+    	if(count==0){
+    		transferBatch.setStatus("03");
+    		transferBatch.setApproveFinishTime(new Date());
+    	}else{
+    		transferBatch.setStatus("02");
+    	}
+    	transferBatchDAO.updateBatchTransferFinish(transferBatch);
+	}
+
+	@Override
+	public List<PojoTranData> findTransDataByBatchNoAndAccstatus(String batchNo) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

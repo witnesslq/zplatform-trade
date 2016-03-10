@@ -38,8 +38,8 @@ import com.zlebank.zplatform.trade.dao.TransferBatchDAO;
 import com.zlebank.zplatform.trade.dao.TransferDataDAO;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.model.PojoRealnameAuth;
-import com.zlebank.zplatform.trade.model.PojoTransferBatch;
-import com.zlebank.zplatform.trade.model.PojoTransferData;
+import com.zlebank.zplatform.trade.model.PojoTranBatch;
+import com.zlebank.zplatform.trade.model.PojoTranData;
 import com.zlebank.zplatform.trade.model.TxnsWhiteListModel;
 import com.zlebank.zplatform.trade.model.TxnsWithholdingModel;
 import com.zlebank.zplatform.trade.service.IRouteConfigService;
@@ -243,15 +243,15 @@ public class CMBCTransferServiceImpl implements ICMBCTransferService{
         ResultBean resultBean = null;
         try {
             //检查批次信息是否正确
-            PojoTransferBatch transferBatch = transferBatchDAO.getByBatchNo(batchNo);
+            PojoTranBatch transferBatch = null;//transferBatchDAO.getByBatchNo(batchNo);
             if(!"01".equals(transferBatch.getStatus())){
                 return new ResultBean("", "无法划拨");
             }
             //生成交易日志
-            List<PojoTransferData> transferDataList = transferDataDAO.findTransDataByBatchNo(batchNo);
-            txnsLogService.saveTransferLogs(transferDataList);
+            List<PojoTranData> transferDataList = null;//transferDataDAO.findTransDataByBatchNo(batchNo);
+            //txnsLogService.saveTransferLogs(transferDataList);
             
-            TransferTypeEnmu transferType = TransferTypeEnmu.fromValue(transferBatch.getTransfertype());
+            TransferTypeEnmu transferType = null;///TransferTypeEnmu.fromValue(transferBatch.getTransfertype());
             switch (transferType) {
                 case INNERBANK :
                     insteadPayService.batchInnerPay(batchNo);
