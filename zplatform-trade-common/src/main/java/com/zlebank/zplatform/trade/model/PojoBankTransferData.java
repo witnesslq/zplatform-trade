@@ -39,7 +39,7 @@ public class PojoBankTransferData {
     private String bankTranDataSeqNo;
     /**"银行转账批次号"**/
     private Long bankTranBatchId;
-    /**"划拨批次号"**/
+    /**"划拨流水号"**/
     private Long tranDataId;
     /**"转账金额"**/
     private BigDecimal tranAmt;
@@ -59,6 +59,14 @@ public class PojoBankTransferData {
     private String resInfo;
     /**"申请时间"**/
     private Date applyTime;
+    /**"账户类型(0:对私账户1：对公账户)"**/
+    private String accType;
+    /**交易序列号**/
+    private String txnseqno;
+    /**划拨类型，01-行内02-跨行**/
+    private String transferType;
+    /**付款结果**/
+    private String resType;
     
     @GenericGenerator(name = "id_gen", strategy = "enhanced-table", parameters = {
             @Parameter(name = "table_name", value = "T_C_PRIMAY_KEY"),
@@ -159,5 +167,33 @@ public class PojoBankTransferData {
     }
     public void setApplyTime(Date applyTime) {
         this.applyTime = applyTime;
+    }
+    @Column(name = "ACC_TYPE")
+    public String getAccType() {
+        return accType;
+    }
+    public void setAccType(String accType) {
+        this.accType = accType;
+    }
+    @Column(name = "TXNSEQNO")
+    public String getTxnseqno() {
+        return txnseqno;
+    }
+    public void setTxnseqno(String txnseqno) {
+        this.txnseqno = txnseqno;
+    }
+    @Column(name = "TRANSFER_TYPE")
+    public String getTransferType() {
+        return transferType;
+    }
+    public void setTransferType(String transferType) {
+        this.transferType = transferType;
+    }
+    @Column(name = "RES_TYPE")
+    public String getResType() {
+        return resType;
+    }
+    public void setResType(String resType) {
+        this.resType = resType;
     }
 }

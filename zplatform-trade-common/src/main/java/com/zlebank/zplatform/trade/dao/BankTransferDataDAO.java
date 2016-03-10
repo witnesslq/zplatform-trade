@@ -45,4 +45,12 @@ public interface BankTransferDataDAO  extends BasePagedQueryDAO<PojoBankTransfer
      * @return
      */
     public List<PojoBankTransferData> findTransDataByBatchNoAndAccstatus(String batchNo);
+    
+    /**
+     * 根据划拨流水ID取出转账ID
+     * @param id
+     * @return
+     */
+    public List<PojoBankTransferData> getByTranDataId(Long id);
+
 }

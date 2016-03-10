@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.1.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+
+	<!-- 使用annotation 自动注册com.zlebank.zplatform.acc包下面的bean, 并保证@Required、@Autowired的属性被注入 -->
+	<context:component-scan base-package="com.zlebank.zplatform">
+	</context:component-scan>
+<bean id="springContext" class="com.zlebank.zplatform.trade.utils.SpringContext"></bean>
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="accDataSource" />
+		<property name="packagesToScan">
+			<list>
+				<value>com.zlebank.zplatform.trade.model</value>
+				<value>com.zlebank.zplatform.acc.pojo</value>
+				<value>com.zlebank.zplatform.sms.pojo</value>
+				<value>com.zlebank.zplatform.commons.dao.pojo</value>
+				<value>com.zlebank.zplatform.member.pojo</value>
+				<value>com.zlebank.zplatform.specification.pojo</value>
+			</list>
+		</property>
+<!-- 		<property name="annotatedClasses"> -->
+<!-- 			<list> -->
+<!-- 				<value>com.zlebank.zplatform.acc.pojo.PojoAbstractSubject</value> -->
+<!-- 				<value>com.zlebank.zplatform.acc.pojo.PojoSubject</value> -->
+<!-- 				<value>com.zlebank.zplatform.acc.pojo.PojoAccount</value> -->
+<!-- 				<value>com.zlebank.zplatform.acc.pojo.PojoAccFrozenTask</value> -->
+<!-- 				<value>com.zlebank.zplatform.acc.pojo.PojoBusiAcct</value> -->
+<!-- 				<value>com.zlebank.zplatform.acc.pojo.PojoBusiAcctSubjectMapping -->
+<!-- 				</value> -->
+<!-- 				<value>com.zlebank.zplatform.acc.pojo.PojoSubjectRuleConfigure -->
+<!-- 				</value> -->
+<!-- 				<value>com.zlebank.zplatform.acc.pojo.PojoAccEntry</value> -->
+<!-- 				<value>com.zlebank.zplatform.acc.pojo.PojoBusiness</value>		 -->
+<!-- 				<value>com.zlebank.zplatform.acc.pojo.PojoTxnsSplitAccount</value>	 -->
+<!-- 				<value>com.zlebank.zplatform.commons.dao.pojo.PojoChannel</value>	 -->
+<!-- 				</list> -->
+<!-- 		</property> -->
+		<property name="hibernateProperties">
+			<props>
+				<prop key="dialect">org.hibernate.dialect.Oracle9Dialect</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.hbm2ddl.auto">none</prop>
+				<prop key="hibernate.id.new_generator_mappings">true</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="accDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass" value="oracle.jdbc.OracleDriver" />
+		<property name="jdbcUrl" value="jdbc:oracle:thin:@192.168.101.178:1521:oradb" />
+		<property name="user" value="payservice" />
+		<property name="password" value="payservice" />
+		<property name="maxPoolSize" value="40" />
+		<property name="minPoolSize" value="1" />
+		<property name="initialPoolSize" value="1" />
+		<property name="maxIdleTime" value="20" />
+
+	</bean>
+
+
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<tx:annotation-driven />
+	<!-- <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean"> 
+		<property name="jndiName" value="java:comp/env/jdbc/yhzjDs" /> </bean> -->
+
+	<bean id="propertyFileConfig"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>job-setting.properties</value>
+				<value>acc.config.properties</value>
+				<value>zlrt.properties</value>
+			</list>
+		</property>
+	</bean>
+	
+
+</beans>

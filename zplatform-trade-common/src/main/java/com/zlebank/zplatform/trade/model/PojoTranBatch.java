@@ -9,7 +9,7 @@
  * 
  */
 package com.zlebank.zplatform.trade.model;
-
+import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -37,15 +37,15 @@ public class PojoTranBatch {
     /**总笔数**/
     private Long totalCount;
     /**总金额**/
-    private Long totalAmt;
+    private BigDecimal totalAmt;
     /**成功笔数**/
     private Long approveCount;
     /**成功金额**/
-    private Long approveAmt;
+    private BigDecimal approveAmt;
     /**失败笔数**/
     private Long unapproveCount;
     /**失败金额**/
-    private Long unapproveAmt;
+    private BigDecimal unapproveAmt;
     /**"""状态（01：未审核02：部分审核通过03：全部审核通过**/
     private String status;
     /**"申请时间"**/
@@ -64,11 +64,15 @@ public class PojoTranBatch {
     private Long waitApproveCount;
     /**待审核金额**/
     private Long waitApproveAmt;
+    /**银行转账批次号**/
+    private String tranBatchSeqNo;
+   
+    
     @GenericGenerator(name = "id_gen", strategy = "enhanced-table", parameters = {
             @Parameter(name = "table_name", value = "T_C_PRIMAY_KEY"),
             @Parameter(name = "value_column_name", value = "NEXT_ID"),
             @Parameter(name = "segment_column_name", value = "KEY_NAME"),
-            @Parameter(name = "segment_value", value = "T_TRANSFER_DATA_ID"),
+            @Parameter(name = "segment_value", value = "T_TRANSFER_BATCH_ID"),
             @Parameter(name = "increment_size", value = "1"),
             @Parameter(name = "optimizer", value = "pooled-lo") })
     @Id
@@ -88,10 +92,10 @@ public class PojoTranBatch {
         this.totalCount = totalCount;
     }
     @Column(name = "TOTAL_AMT")
-    public Long getTotalAmt() {
+    public BigDecimal getTotalAmt() {
         return totalAmt;
     }
-    public void setTotalAmt(Long totalAmt) {
+    public void setTotalAmt(BigDecimal totalAmt) {
         this.totalAmt = totalAmt;
     }
     @Column(name = "APPROVE_COUNT")
@@ -102,10 +106,10 @@ public class PojoTranBatch {
         this.approveCount = approveCount;
     }
     @Column(name = "APPROVE_AMT")
-    public Long getApproveAmt() {
+    public BigDecimal getApproveAmt() {
         return approveAmt;
     }
-    public void setApproveAmt(Long approveAmt) {
+    public void setApproveAmt(BigDecimal approveAmt) {
         this.approveAmt = approveAmt;
     }
     @Column(name = "UNAPPROVE_COUNT")
@@ -116,10 +120,10 @@ public class PojoTranBatch {
         this.unapproveCount = unapproveCount;
     }
     @Column(name = "UNAPPROVE_AMT")
-    public Long getUnapproveAmt() {
+    public BigDecimal getUnapproveAmt() {
         return unapproveAmt;
     }
-    public void setUnapproveAmt(Long unapproveAmt) {
+    public void setUnapproveAmt(BigDecimal unapproveAmt) {
         this.unapproveAmt = unapproveAmt;
     }
     @Column(name = "STATUS")
@@ -185,5 +189,12 @@ public class PojoTranBatch {
     public void setWaitApproveAmt(Long waitApproveAmt) {
         this.waitApproveAmt = waitApproveAmt;
     }
-    
+    @Column(name = "TRAN_BATCH_SEQ_NO")
+    public String getTranBatchSeqNo() {
+        return tranBatchSeqNo;
+    }
+    public void setTranBatchSeqNo(String tranBatchSeqNo) {
+        this.tranBatchSeqNo = tranBatchSeqNo;
+    }
+   
 }

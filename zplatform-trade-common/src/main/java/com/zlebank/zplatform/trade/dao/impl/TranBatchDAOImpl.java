@@ -19,15 +19,15 @@ import com.zlebank.zplatform.commons.bean.TransferBatchQuery;
 import com.zlebank.zplatform.commons.dao.impl.AbstractPagedQueryDAOImpl;
 import com.zlebank.zplatform.commons.dao.pojo.AccStatusEnum;
 import com.zlebank.zplatform.commons.utils.StringUtil;
-import com.zlebank.zplatform.trade.dao.BankTransferBatchDAO;
-import com.zlebank.zplatform.trade.model.PojoBankTransferBatch;
+import com.zlebank.zplatform.trade.dao.TranBatchDAO;
+import com.zlebank.zplatform.trade.model.PojoTranBatch;
 
-@Repository("transferBatchDAO")
-public class BankTransferBatchDAOImpl extends
-		AbstractPagedQueryDAOImpl<PojoBankTransferBatch, TransferBatchQuery>
-		implements BankTransferBatchDAO {
+@Repository
+public class TranBatchDAOImpl extends
+		AbstractPagedQueryDAOImpl<PojoTranBatch, TransferBatchQuery>
+		implements TranBatchDAO {
 	private static final Log log = LogFactory
-			.getLog(BankTransferBatchDAOImpl.class);
+			.getLog(TranBatchDAOImpl.class);
 
 	/**
 	 * 通过批次号查找批次信息
@@ -37,13 +37,13 @@ public class BankTransferBatchDAOImpl extends
 	 */
 	@Override
 	@Transactional
-	public PojoBankTransferBatch getByBatchNo(String batchno) {
-		String queryString = "from PojoBankTransferBatch where batchno = ? ";
+	public PojoTranBatch getByBatchNo(String batchno) {
+		String queryString = "from PojoTranBatch where batchno = ? ";
 		try {
 			log.info("queryString:" + queryString);
 			Query query = getSession().createQuery(queryString);
 			query.setParameter(0, batchno);
-			return (PojoBankTransferBatch) query.uniqueResult();
+			return (PojoTranBatch) query.uniqueResult();
 
 		} catch (HibernateException e) {
 			// TODO Auto-generated catch block
@@ -54,17 +54,17 @@ public class BankTransferBatchDAOImpl extends
 
 	@Override
 	@Transactional
-	public void updateBatchToTransfer(PojoBankTransferBatch transferBatch) {
+	public void updateBatchToTransfer(PojoTranBatch transferBatch) {
 		// TODO Auto-generated method stub
 		try {
-			String hql = "update PojoBankTransferBatch set status = ?,transfertime = ?,requestfilename = ?,responsefilename = ? where batchno= ? ";
+			String hql = "update PojoTranBatch set status = ?,transfertime = ?,requestfilename = ?,responsefilename = ? where batchno= ? ";
 			Session session = getSession();
 			Query query = session.createQuery(hql);
-			query.setParameter(0, transferBatch.getStatus());
-			/*query.setParameter(1, transferBatch.getTransfertime());
-			query.setParameter(2, transferBatch.getRequestfilename());
-			query.setParameter(3, transferBatch.getResponsefilename());
-			query.setParameter(4, transferBatch.getBatchno());*/
+//			query.setParameter(0, transferBatch.getStatus());
+//			query.setParameter(1, transferBatch.getTransfertime());
+//			query.setParameter(2, transferBatch.getRequestfilename());
+//			query.setParameter(3, transferBatch.getResponsefilename());
+//			query.setParameter(4, transferBatch.getBatchno());
 			query.executeUpdate();
 		} catch (HibernateException e) {
 			// TODO Auto-generated catch block
@@ -75,9 +75,9 @@ public class BankTransferBatchDAOImpl extends
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public PojoBankTransferBatch getByReqestFileName(String fileName) {
-		List<PojoBankTransferBatch> result = null;
-		String queryString = "from PojoBankTransferBatch where requestfilename = ? ";
+	public PojoTranBatch getByReqestFileName(String fileName) {
+		List<PojoTranBatch> result = null;
+		String queryString = "from PojoTranBatch where requestfilename = ? ";
 		try {
 			log.info("queryString:" + queryString);
 			Query query = getSession().createQuery(queryString);
@@ -99,7 +99,7 @@ public class BankTransferBatchDAOImpl extends
 	 */
 	@Override
 	@Transactional
-	public void updateTransferBatch(PojoBankTransferBatch transferBatch) {
+	public void updateTransferBatch(PojoTranBatch transferBatch) {
 		try {
 			getSession().update(transferBatch);
 		} catch (Exception e) {
@@ -115,9 +115,9 @@ public class BankTransferBatchDAOImpl extends
 	@SuppressWarnings("unchecked")
 	@Override
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public List<PojoBankTransferBatch> findWaitAccountingTransferBatch() {
+	public List<PojoTranBatch> findWaitAccountingTransferBatch() {
 		try {
-			String hql = "from PojoBankTransferBatch where accstatus = ? ";
+			String hql = "from PojoTranBatch where accstatus = ? ";
 			Query query = getSession().createQuery(hql);
 			query.setString(0, "01");
 			return query.list();
@@ -132,7 +132,7 @@ public class BankTransferBatchDAOImpl extends
 	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Throwable.class)
 	public int validateBatchResult(String insteadpaybatchno) {
 		try {
-			String hql = "from PojoBankTransferBatch where status <> ? and insteadpaybatchno = ? ";
+			String hql = "from PojoTranBatch where status <> ? and insteadpaybatchno = ? ";
 			Query query = getSession().createQuery(hql);
 			query.setString(0, "00");
 			query.setString(1, insteadpaybatchno);
@@ -148,7 +148,7 @@ public class BankTransferBatchDAOImpl extends
 	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Throwable.class)
 	public void updateAccountingResult(String batchno, AccStatusEnum accStatus) {
 		try {
-			String hql = "update PojoBankTransferBatch set accstatus = ? where batchno = ? ";
+			String hql = "update PojoTranBatch set accstatus = ? where batchno = ? ";
 			Session session = getSession();
 			Query query = session.createQuery(hql);
 			query.setParameter(0, accStatus.getCode());
@@ -164,10 +164,10 @@ public class BankTransferBatchDAOImpl extends
 	@SuppressWarnings("unchecked")
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Throwable.class)
-	public List<PojoBankTransferBatch> findByInsteadpaybatchno(
+	public List<PojoTranBatch> findByInsteadpaybatchno(
 			String insteadpaybatchno) {
 		try {
-			String hql = "from PojoBankTransferBatch where insteadpaybatchno = ? ";
+			String hql = "from PojoTranBatch where insteadpaybatchno = ? ";
 			Query query = getSession().createQuery(hql);
 			query.setString(0, insteadpaybatchno);
 			return query.list();
@@ -186,7 +186,7 @@ public class BankTransferBatchDAOImpl extends
 	@Override
 	protected Criteria buildCriteria(TransferBatchQuery e) {
 		Criteria crite = this.getSession().createCriteria(
-				PojoBankTransferBatch.class);
+				PojoTranBatch.class);
 		if (e != null) {
 			if (StringUtil.isNotEmpty(e.getAccstatus())) {
 				crite.add(Restrictions.eq("accstatus", e.getAccstatus()));
@@ -208,9 +208,9 @@ public class BankTransferBatchDAOImpl extends
 
 	@SuppressWarnings("unchecked")
 	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Throwable.class)
-	public PojoBankTransferBatch getByResponseFileName(String fileName) {
-		List<PojoBankTransferBatch> result = null;
-		String queryString = "from PojoBankTransferBatch where responsefilename = ? ";
+	public PojoTranBatch getByResponseFileName(String fileName) {
+		List<PojoTranBatch> result = null;
+		String queryString = "from PojoTranBatch where responsefilename = ? ";
 		try {
 			log.info("queryString:" + queryString);
 			Query query = getSession().createQuery(queryString);
@@ -226,20 +226,4 @@ public class BankTransferBatchDAOImpl extends
 		}
 		return null;
 	}
-	
-	/**
-     * 通过渠道返回相应的批次号
-     * @param channelCode 渠道号
-     * @return
-     */
-    @Override
-    public PojoBankTransferBatch getByChannelCode(String channelCode) {
-        Criteria crite= this.getSession().createCriteria(PojoBankTransferBatch.class);
-        crite.add(Restrictions.eq("channel", channelCode));
-        crite.addOrder(Order.asc("tid"));
-        crite.setFirstResult(0);
-        crite.setMaxResults(1);
-        return (PojoBankTransferBatch) crite.uniqueResult();
-
-    }
 }

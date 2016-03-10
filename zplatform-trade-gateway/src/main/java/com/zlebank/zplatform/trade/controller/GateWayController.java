@@ -325,7 +325,7 @@ public class GateWayController {
             model.put("busitype", txnsLog.getBusitype());
             model.put("orderId", txnsLog.getAccordno());
             model.put("subMerName",
-            		merch != null ? merch.getMerchname() : "");
+            		merch != null ? merch.getAccname() : "");
             model.put("txnTime",
                     DateUtil.formatDateTime(DateUtil.parse(
                             DateUtil.DEFAULT_DATE_FROMAT,

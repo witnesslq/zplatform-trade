@@ -5,47 +5,47 @@ import java.util.List;
 import com.zlebank.zplatform.commons.bean.TransferBatchQuery;
 import com.zlebank.zplatform.commons.dao.BasePagedQueryDAO;
 import com.zlebank.zplatform.commons.dao.pojo.AccStatusEnum;
-import com.zlebank.zplatform.trade.model.PojoBankTransferBatch;
+import com.zlebank.zplatform.trade.model.PojoTranBatch;
 
-public interface BankTransferBatchDAO extends BasePagedQueryDAO<PojoBankTransferBatch,TransferBatchQuery>{
+public interface TranBatchDAO extends BasePagedQueryDAO<PojoTranBatch,TransferBatchQuery>{
 
     /**
      * 通过批次号查找批次信息
      * @param batchno
      * @return
      */
-    public PojoBankTransferBatch getByBatchNo(String batchno);
+    public PojoTranBatch getByBatchNo(String batchno);
     
     /**
      * 更新批次信息
      * @param transferBatch
      */
-    public void updateBatchToTransfer(PojoBankTransferBatch transferBatch);
+    public void updateBatchToTransfer(PojoTranBatch transferBatch);
     
     /**
      * 通过上传文件名称取得批次信息
      * @param fileName
      * @return
      */
-    public PojoBankTransferBatch getByReqestFileName(String fileName);
+    public PojoTranBatch getByReqestFileName(String fileName);
     
     /**
      * 通过回盘文件名称取得批次信息
      * @param fileName
      * @return
      */
-    public PojoBankTransferBatch getByResponseFileName(String fileName);
+    public PojoTranBatch getByResponseFileName(String fileName);
     /**
      * 更新批次数据
      * @param transferBatch
      */
-    public void updateTransferBatch(PojoBankTransferBatch transferBatch);
+    public void updateTransferBatch(PojoTranBatch transferBatch);
     
     /**
      * 获取待账务处理的批次数据
      * @return
      */
-    public List<PojoBankTransferBatch> findWaitAccountingTransferBatch();
+    public List<PojoTranBatch> findWaitAccountingTransferBatch();
     
     /**
      * 校验代付批次中的划拨批次是否都已完成
@@ -65,13 +65,5 @@ public interface BankTransferBatchDAO extends BasePagedQueryDAO<PojoBankTransfer
      * @param insteadpaybatchno
      * @return
      */
-    public List<PojoBankTransferBatch> findByInsteadpaybatchno(String insteadpaybatchno);
-    
-    /**
-     * 通过渠道返回相应的批次号
-     * @param channelCode 渠道号
-     * @return
-     */
-    PojoBankTransferBatch getByChannelCode(String channelCode);
+    public List<PojoTranBatch> findByInsteadpaybatchno(String insteadpaybatchno);
 }
-

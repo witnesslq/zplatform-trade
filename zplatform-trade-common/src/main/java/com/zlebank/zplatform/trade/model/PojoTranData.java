@@ -218,5 +218,4 @@ public class PojoTranData implements Serializable{
 	public void setTxnseqno(String txnseqno) {
 		this.txnseqno = txnseqno;
 	}
-
 }

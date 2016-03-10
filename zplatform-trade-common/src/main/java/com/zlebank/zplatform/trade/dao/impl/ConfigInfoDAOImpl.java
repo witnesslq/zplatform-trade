@@ -12,7 +12,9 @@ package com.zlebank.zplatform.trade.dao.impl;
 
 
 import org.hibernate.Criteria;
+import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.type.StandardBasicTypes;
 import org.springframework.stereotype.Repository;
 
 import com.zlebank.zplatform.commons.dao.impl.HibernateBaseDAOImpl;
@@ -41,4 +43,11 @@ public class ConfigInfoDAOImpl extends HibernateBaseDAOImpl<ConfigInfoModel> imp
         crite.add(Restrictions.eq("paraname", paraName));
         return (ConfigInfoModel) crite.uniqueResult();
     }
+    
+    public long getSequence(String sequences){
+        String sql = " SELECT "+sequences+".NEXTVAL nextvalue FROM DUAL";
+        SQLQuery query = this.getSession().createSQLQuery(sql);
+        long maxId = (long)(query.addScalar("nextvalue", StandardBasicTypes.LONG) ).uniqueResult();
+         return  maxId;
+       }
 }
