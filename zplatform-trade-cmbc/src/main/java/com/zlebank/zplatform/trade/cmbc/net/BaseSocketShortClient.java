@@ -17,8 +17,8 @@ public class BaseSocketShortClient extends BaseClient implements Client {
 	private InetSocketAddress hostAddress;
 	private int timeout;
 	private ReceiveProcessor receiveProcessor;
-//	private ThreadPoolExecutor executor;
-	private static final String ENCODING = "UTF-8";
+	//	private ThreadPoolExecutor executor;
+	//private static final String ENCODING = "UTF-8";
 	private static final Log logger = LogFactory.getLog(BaseSocketShortClient.class);
 
 	public BaseSocketShortClient(String host,int port,int timeout) {

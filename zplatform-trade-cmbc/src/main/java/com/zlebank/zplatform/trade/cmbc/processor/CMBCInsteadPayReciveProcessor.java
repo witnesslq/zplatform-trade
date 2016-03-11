@@ -106,6 +106,8 @@ public class CMBCInsteadPayReciveProcessor implements ReceiveProcessor{
                     RealTimeQueryResultBean realTimeQueryResultBean = (RealTimeQueryResultBean) xstream.fromXML(xml);
                     log.info("recive response insteadpay message:"+JSON.toJSONString(realTimeQueryResultBean));
                     break;
+				default:
+					break;
             }
             
         } catch (UnsupportedEncodingException e) {

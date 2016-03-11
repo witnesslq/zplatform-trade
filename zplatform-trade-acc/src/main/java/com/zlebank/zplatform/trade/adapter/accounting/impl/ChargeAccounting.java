@@ -24,7 +24,6 @@ import com.zlebank.zplatform.acc.exception.AccBussinessException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.commons.dao.pojo.AccStatusEnum;
 import com.zlebank.zplatform.commons.utils.StringUtil;
-import com.zlebank.zplatform.member.service.MemberService;
 import com.zlebank.zplatform.trade.adapter.accounting.IAccounting;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.exception.TradeException;
@@ -44,7 +43,6 @@ public class ChargeAccounting implements IAccounting{
     private static final Log log = LogFactory.getLog(ChargeAccounting.class);
     private ITxnsLogService txnsLogService;
     private AccEntryService accEntryService;
-    private MemberService memberService;
     /**
      *
      * @param txnseqno
@@ -149,7 +147,6 @@ public class ChargeAccounting implements IAccounting{
     public ChargeAccounting() {
         txnsLogService = (ITxnsLogService) SpringContext.getContext().getBean("txnsLogService");
         accEntryService = (AccEntryService) SpringContext.getContext().getBean("accEntryServiceImpl");
-        memberService = (MemberService) SpringContext.getContext().getBean("memberServiceImpl");
     }
     @Override
     public ResultBean accountedForInsteadPay(String batchno) {

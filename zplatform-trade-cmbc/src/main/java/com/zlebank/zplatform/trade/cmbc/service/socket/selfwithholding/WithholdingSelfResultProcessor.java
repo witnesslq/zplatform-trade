@@ -153,6 +153,8 @@ public class WithholdingSelfResultProcessor implements ReceiveProcessor{
                         }
                     }
                     break;
+			default:
+				break;
             }
             
             

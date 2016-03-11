@@ -104,7 +104,7 @@ public class PojoBankTransferBatch {
         this.bankTranBatchNo = bankTranBatchNo;
     }
     
-    @ManyToOne
+//    @ManyToOne
     @Column(name = "CHANNEL")
     public PojoBankTransferChannel getChannel() {
         return channel;

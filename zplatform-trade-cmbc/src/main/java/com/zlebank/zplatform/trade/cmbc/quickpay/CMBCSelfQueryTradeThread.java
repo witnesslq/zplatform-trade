@@ -29,7 +29,7 @@ public class CMBCSelfQueryTradeThread implements Runnable{
    
     public void queryTrade(String tranDate,String serialno,String txnseqno){
         try {
-            Thread.currentThread().sleep(10*1000);
+            Thread.sleep(10*1000);
             TxnsWithholdingModel withholding = new TxnsWithholdingModel(tranDate, serialno, txnseqno,ChannelEnmu.CMBCSELFWITHHOLDING);
             withholding.setSerialno(generateSerialDateNumber("SEQ_CMBC_REALNAME_NO"));
             txnsWithholdingService.saveWithholdingLog(withholding);
@@ -55,7 +55,8 @@ public class CMBCSelfQueryTradeThread implements Runnable{
         this.txnseqno = txnseqno;
     }
     
-    public String generateSerialDateNumber(String sequences){
+    @SuppressWarnings("unchecked")
+	public String generateSerialDateNumber(String sequences){
         List<Map<String,Object>> resultList = (List<Map<String, Object>>) txnsLogService.queryBySQL("select "+sequences+".NEXTVAL seq from dual", new Object[]{});
         DecimalFormat df = new DecimalFormat("00000000");
         String seqNo = df.format( resultList.get(0).get("SEQ"));

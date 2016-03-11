@@ -222,7 +222,7 @@ public class TxnsWithholdingModel implements java.io.Serializable {
                 this.certtype = CertifTypeEnmu.fromValue("01").getCmbcCode();
                 this.certno = trade.getCertId();
                 this.phone = trade.getMobile();
-                this.payerbankinscode = trade.getBankCode().length()==8?trade.getBankCode():trade.getBankCode()+"0000";
+                this.payerbankinscode = trade.getBankCode().trim().length()==8?trade.getBankCode().trim():trade.getBankCode()+"0000";
                 this.provno = "";
                 this.memberid = trade.getMerchId();
                 this.orderno = trade.getOrderId();

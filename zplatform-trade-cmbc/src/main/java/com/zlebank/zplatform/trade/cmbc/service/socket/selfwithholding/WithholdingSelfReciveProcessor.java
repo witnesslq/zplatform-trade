@@ -113,7 +113,6 @@ public class WithholdingSelfReciveProcessor implements ReceiveProcessor{
             XStream xstream = new XStream(new DomDriver(null,new XmlFriendlyNameCoder("_-", "_")));
             boolean verifyFlag=false;
             switch (msgType) {
-                
                 case REQUEST_WITHHOLDING_SELF:
                     xstream.processAnnotations(RealTimeSelfWithholdingResultBean.class);
                     xstream.autodetectAnnotations(true);
@@ -171,6 +170,8 @@ public class WithholdingSelfReciveProcessor implements ReceiveProcessor{
                         txnsWithholdingService.updateWhithholding(withholding);
                     }
                     break;
+			default:
+				break;
             }
             
             

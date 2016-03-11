@@ -1,49 +1,65 @@
 package com.zlebank.zplatform.trade.dao;
 
 import java.util.List;
+import java.util.Map;
 
-import com.zlebank.zplatform.commons.bean.TransferDataQuery;
-import com.zlebank.zplatform.commons.dao.BasePagedQueryDAO;
-import com.zlebank.zplatform.trade.bean.enums.InsteadPayTypeEnum;
-import com.zlebank.zplatform.trade.model.PojoTransferData;
+import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
+import com.zlebank.zplatform.acc.exception.AccBussinessException;
+import com.zlebank.zplatform.commons.dao.BaseDAO;
+import com.zlebank.zplatform.trade.bean.enums.BusinessEnum;
+import com.zlebank.zplatform.trade.bean.page.QueryTransferBean;
+import com.zlebank.zplatform.trade.model.PojoTranBatch;
+import com.zlebank.zplatform.trade.model.PojoTranData;
 
-public interface TransferDataDAO extends BasePagedQueryDAO<PojoTransferData, TransferDataQuery>{
-    /**
-     * 通过批次号查找划拨数据
-     * @param batchNo
-     * @return
-     */
-    public List<PojoTransferData> findTransDataByBatchNo(String batchNo);
-    /**
-     * 通过批次号更新划拨数据
-     * @param batchNo
-     * @param payType
-     */
-    public void updateTransDataStatusByBatchNo(String batchNo,InsteadPayTypeEnum payType);
     
-    /**
-     * 批量更新划拨数据
-     * @param transferDataList
-     */
-    public void batchUpdateTransData(List<PojoTransferData> transferDataList);
-    /**
-     * 批量更新划拨数据-账务处理信息
-     * @param transferDataList
-     */
-    public void batchUpdateTransDataAccStatus(List<PojoTransferData> transferDataList);
-    /**
-     * 通过Id得到划拨信息
-     * @param id
-     * @return
-     */
-    public PojoTransferData  getTransferDataByTranId(String tranid,String status);
-    
-    
+public interface TransferDataDAO extends BaseDAO<PojoTranData>{
     /**
      * 通过批次号和账务状态获取批次明细数据
      * @param batchNo
      * @return
      */
-    public List<PojoTransferData> findTransDataByBatchNoAndAccstatus(String batchNo);
+    public List<PojoTranData> findTransDataByBatchNoAndAccstatus(String batchNo);
     
+    
+    /**
+     * 划拨明细查询（分页）
+     * @param queryTransferBean
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    public Map<String, Object> queryTranfersDetaByPage(QueryTransferBean queryTransferBean,int page,int pageSize);
+    
+    /**
+     * 审核驳回业务退款
+     * @param transferData
+     * @param businessEnum
+     * @throws AccBussinessException
+     * @throws AbstractBusiAcctException
+     * @throws NumberFormatException
+     */
+    public void businessRefund(PojoTranData transferData,BusinessEnum businessEnum) throws AccBussinessException, AbstractBusiAcctException,NumberFormatException;
+
+    /**
+     * 
+     * @param tid
+     * @param status
+     * @throws NumberFormatException 
+     * @throws AbstractBusiAcctException 
+     * @throws AccBussinessException 
+     */
+    public void singleTrailTransfer(Long tid,String status) throws AccBussinessException, AbstractBusiAcctException, NumberFormatException;
+    
+    /**
+     * 
+     * @param tid
+     * @return
+     */
+    public PojoTranData queryTransferData(Long tid);
+    
+    /**
+     * 
+     * @param transferBatch
+     */
+    public void updateBatchTransferSingle(PojoTranBatch transferBatch);
 }

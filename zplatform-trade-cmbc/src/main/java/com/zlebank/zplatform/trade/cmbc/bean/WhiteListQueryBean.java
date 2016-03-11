@@ -32,7 +32,11 @@ import com.zlebank.zplatform.trade.utils.OrderNumber;
  */
 @XStreamAlias("Req")
 public class WhiteListQueryBean implements Serializable{
-    public static final String XMLHEAD = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+    /**
+	 * serialVersionUID
+	 */
+	private static final long serialVersionUID = -3022313794727746603L;
+	public static final String XMLHEAD = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
     @XStreamAlias("Version")
     private String version;//版本号 
     @XStreamAlias("TransDate")

@@ -70,7 +70,6 @@ public class InsteadBatchServiceImpl extends AbstractBasePageService<InsteadPayB
       List<InsteadPayBatchBean> li=new ArrayList<InsteadPayBatchBean>();
       for(PojoInsteadPayBatch pojoinstead:insteadBatch){
           InsteadPayBatchBean insteadBean= BeanCopyUtil.copyBean(InsteadPayBatchBean.class, pojoinstead);
-          
           li.add(insteadBean);
       }
           return li;

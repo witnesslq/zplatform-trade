@@ -104,6 +104,8 @@ public class ConsUtil {
 			cons.setCmbc_insteadpay_ftp_pwd(prop.getProperty("cmbc_insteadpay_ftp_pwd"));
 			cons.setCmbc_insteadpay_ftp_user(prop.getProperty("cmbc_insteadpay_ftp_user"));
 			cons.setCmbc_insteadpay_ftp_port(Integer.valueOf(prop.getProperty("cmbc_insteadpay_ftp_port")));
+			cons.setCmbc_insteadpay_sign_md5(prop.getProperty("cmbc_insteadpay_sign_md5"));
+			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

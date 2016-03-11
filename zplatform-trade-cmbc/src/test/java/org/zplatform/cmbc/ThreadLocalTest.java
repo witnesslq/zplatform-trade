@@ -20,8 +20,8 @@ package org.zplatform.cmbc;
  */
 public class ThreadLocalTest {
 
-    @SuppressWarnings("rawtypes")
+    
     public static void main(String[] args) {
-        ThreadLocal ftpClients = new ThreadLocal();
+        //ThreadLocal ftpClients = new ThreadLocal();
     }
 }

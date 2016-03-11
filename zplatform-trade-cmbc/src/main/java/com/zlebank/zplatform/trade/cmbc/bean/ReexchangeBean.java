@@ -21,7 +21,11 @@ import java.io.Serializable;
  * @since 
  */
 public class ReexchangeBean implements Serializable{
-    /** 报盘日期*/
+    /**
+	 * serialVersionUID
+	 */
+	private static final long serialVersionUID = 6975751455720554929L;
+	/** 报盘日期*/
     private String  reexDate;
     /** 报盘批次*/
     private String  batchNo;

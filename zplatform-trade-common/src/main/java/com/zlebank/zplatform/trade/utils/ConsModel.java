@@ -76,7 +76,8 @@ public class ConsModel {
 	private String cmbc_insteadpay_ftp_user="";
 	private String cmbc_insteadpay_ftp_pwd="";
 	private int cmbc_insteadpay_ftp_port=22;
-	
+	private String cmbc_insteadpay_sign_md5="";
+	private String cmbc_insteadpay_ip = "";
 	public String getZlrt_url() {
 		return zlrt_url;
 	}
@@ -866,6 +867,22 @@ public class ConsModel {
     public void setCmbc_insteadpay_ftp_port(int cmbc_insteadpay_ftp_port) {
         this.cmbc_insteadpay_ftp_port = cmbc_insteadpay_ftp_port;
     }
+
+	public String getCmbc_insteadpay_sign_md5() {
+		return cmbc_insteadpay_sign_md5;
+	}
+
+	public void setCmbc_insteadpay_sign_md5(String cmbc_insteadpay_sign_md5) {
+		this.cmbc_insteadpay_sign_md5 = cmbc_insteadpay_sign_md5;
+	}
+
+	public String getCmbc_insteadpay_ip() {
+		return cmbc_insteadpay_ip;
+	}
+
+	public void setCmbc_insteadpay_ip(String cmbc_insteadpay_ip) {
+		this.cmbc_insteadpay_ip = cmbc_insteadpay_ip;
+	}
 	
 	
 }

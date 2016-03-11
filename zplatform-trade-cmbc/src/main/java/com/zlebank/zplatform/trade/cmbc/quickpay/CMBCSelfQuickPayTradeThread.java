@@ -1,7 +1,5 @@
 package com.zlebank.zplatform.trade.cmbc.quickpay;
 
-import java.util.Date;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -20,12 +18,10 @@ import com.zlebank.zplatform.trade.cmbc.service.ICMBCTransferService;
 import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.model.PojoRealnameAuth;
-import com.zlebank.zplatform.trade.model.TxnsSmsModel;
 import com.zlebank.zplatform.trade.model.TxnsWithholdingModel;
 import com.zlebank.zplatform.trade.service.IQuickpayCustService;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
 import com.zlebank.zplatform.trade.service.ITxnsQuickpayService;
-import com.zlebank.zplatform.trade.service.ITxnsSMSService;
 import com.zlebank.zplatform.trade.utils.ConsUtil;
 import com.zlebank.zplatform.trade.utils.SMSThreadPool;
 import com.zlebank.zplatform.trade.utils.SMSUtil;
@@ -238,12 +234,4 @@ public class CMBCSelfQuickPayTradeThread implements IQuickPayTrade{
        this.tradeBean = tradeBean;
    }
 
-   private String getVerifyCode(){
-       String verifyCode = "";
-       for(int i=0;i<6;i++){
-           int x=1+(int)(Math.random()*9);
-           verifyCode+=x;
-       }
-       return verifyCode;
-   }
 }

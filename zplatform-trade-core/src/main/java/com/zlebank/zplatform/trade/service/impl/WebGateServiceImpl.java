@@ -30,8 +30,12 @@ import com.zlebank.zplatform.acc.pojo.Money;
 import com.zlebank.zplatform.acc.service.AccountQueryService;
 import com.zlebank.zplatform.commons.utils.Md5;
 import com.zlebank.zplatform.commons.utils.StringUtil;
+import com.zlebank.zplatform.member.bean.QuickpayCustBean;
 import com.zlebank.zplatform.member.dao.PersonDAO;
+import com.zlebank.zplatform.member.dao.QuickpayCustDAO;
 import com.zlebank.zplatform.member.pojo.PojoPersonDeta;
+import com.zlebank.zplatform.member.pojo.PojoQuickpayCust;
+import com.zlebank.zplatform.member.service.MemberBankCardService;
 import com.zlebank.zplatform.member.service.MerchMKService;
 import com.zlebank.zplatform.trade.adapter.quickpay.IQuickPayTrade;
 import com.zlebank.zplatform.trade.bean.AccountTradeBean;
@@ -44,15 +48,12 @@ import com.zlebank.zplatform.trade.bean.gateway.OrderRespBean;
 import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.factory.TradeAdapterFactory;
-import com.zlebank.zplatform.trade.model.QuickpayCustModel;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.model.TxnsOrderinfoModel;
 import com.zlebank.zplatform.trade.service.IAccountPayService;
 import com.zlebank.zplatform.trade.service.ICashBankService;
 import com.zlebank.zplatform.trade.service.IGateWayService;
-import com.zlebank.zplatform.trade.service.IMemberService;
 import com.zlebank.zplatform.trade.service.IProdCaseService;
-import com.zlebank.zplatform.trade.service.IQuickpayCustService;
 import com.zlebank.zplatform.trade.service.IRouteConfigService;
 import com.zlebank.zplatform.trade.service.ITxncodeDefService;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
@@ -86,16 +87,16 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
     private ITxnsOrderinfoDAO txnsOrderinfoDAO;
     @Autowired
     private IRouteConfigService routeConfigService;
-    @Autowired
-    private IMemberService memberService;
+    //@Autowired
+    //private IMemberService memberService;
     @Autowired
     private MerchMKService merchMKService;
     @Autowired
     private ITxncodeDefService txncodeDefService;
     @Autowired
     private ITxnsSplitAccountService txnsSplitAccountService;
-    @Autowired
-    private IQuickpayCustService quickpayCustService;
+    /*@Autowired
+    private IQuickpayCustService quickpayCustService;*/
     @Autowired 
     private ITxnsQuickpayService txnsQuickpayService;
     @Autowired
@@ -114,8 +115,10 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
     private PersonDAO personDAO;
     @Autowired
     private IGateWayService gateWayService;
-    
-    
+    @Autowired
+    private MemberBankCardService memberBankCardService;
+    @Autowired
+    private QuickpayCustDAO quickpayCustDAO;
     @Transactional
     public TxnsOrderinfoModel getOrderinfoByOrderNoAndMemberId(String orderNo,String memberId) {
         return super.getUniqueByHQL("from TxnsOrderinfoModel where orderno = ? and  firmemberno = ?", new Object[]{orderNo,memberId});
@@ -164,7 +167,7 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         if(!orderinfo.getOrderamt().toString().equals(tradeBean.getAmount())){
             throw new TradeException("T033");
         }
-        QuickpayCustModel card = quickpayCustService.get(tradeBean.getCardId());//quickpayCustService.getCardByBindId(tradeBean.getBindCardId());
+        PojoQuickpayCust card = quickpayCustDAO.getById(Long.valueOf(tradeBean.getCardId()));//quickpayCustService.getCardByBindId(tradeBean.getBindCardId());
         ResultBean routResultBean = routeConfigService.getWapTransRout(DateUtil.getCurrentDateTime(), orderinfo.getOrderamt()+"",  StringUtil.isNotEmpty(tradeBean.getMerchId())?tradeBean.getMerchId():tradeBean.getSubMerchId(), txnsLog.getBusicode(), tradeBean.getCardNo());
         String routId = routResultBean.getResultObj().toString();
         IQuickPayTrade quickPayTrade = null;
@@ -182,7 +185,7 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         }
         txnsLogService.initretMsg(txnsLog.getTxnseqno());
         //交易风控
-        //txnsLogService.tradeRiskControl(txnsLog.getTxnseqno(),txnsLog.getAccfirmerno(),txnsLog.getAccsecmerno(),txnsLog.getAccmemberid(),txnsLog.getBusicode(),txnsLog.getAmount()+"",card.getCardtype(),card.getCardno());
+        txnsLogService.tradeRiskControl(txnsLog.getTxnseqno(),txnsLog.getAccfirmerno(),txnsLog.getAccsecmerno(),txnsLog.getAccmemberid(),txnsLog.getBusicode(),txnsLog.getAmount()+"",card.getCardtype(),card.getCardno());
         updateOrderToStartPay(orderinfo.getOrderno(),orderinfo.getFirmemberno());
         quickPayTrade.setTradeType(TradeTypeEnum.SUBMITPAY);
         quickPayTrade.setTradeBean(tradeBean);
@@ -194,6 +197,7 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
      * @param trade
      * @throws TradeException
      */
+    @Transactional
     public void bankCardSign(TradeBean trade) throws TradeException{
         if (log.isDebugEnabled()) {
             log.debug("银行卡签约：开始");
@@ -238,7 +242,24 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
                 e.printStackTrace();
             }
             trade.setPayinstiId(routId);
-            Long Id=quickpayCustService.saveQuickpayCust(trade);
+            QuickpayCustBean bean = new QuickpayCustBean();
+            bean.setBindcardid(trade.getBindCardId());
+            Map<String, Object> cardMap = routeConfigService.getCardInfo(trade.getCardNo());
+            bean.setBankcode(cardMap.get("BANKCODE").toString());
+            bean.setCardtype(cardMap.get("TYPE").toString());
+            bean.setBankname(cardMap.get("BANKNAME")+"");
+            bean.setCustomerno(trade.getMerchId());
+            bean.setCardno(trade.getCardNo());
+            bean.setCardtype(trade.getCardType());
+            bean.setAccname(trade.getAcctName());
+            bean.setPhone(trade.getMobile());
+            bean.setIdtype("01"); 
+            bean.setIdnum(trade.getCertId());
+            bean.setCvv2(trade.getCvv2());
+            bean.setValidtime(StringUtil.isEmpty(trade.getValidthru())?trade.getMonth()+trade.getYear():trade.getValidthru());
+            bean.setStatus("01"); 
+            bean.setRelatememberno(trade.getMerUserId());
+            Long Id = memberBankCardService.saveQuickPayCust(bean);
             //trade.setBindCardId(Id+"");
             trade.setCardId(Id);
             trade.setReaPayOrderNo(OrderNumber.getInstance().generateReaPayOrderId());
@@ -252,10 +273,10 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
                 if(routId.equals("93000002")||routId.equals("93000003")){
                     
                 }else{
-                    ReaPayResultBean bean = (ReaPayResultBean) resultBean
+                    ReaPayResultBean payResultBean = (ReaPayResultBean) resultBean
                             .getResultObj();
-                    if (!"0000".equals(bean.getResult_code())) {
-                        throw new TradeException("T000",bean.getResult_msg());
+                    if (!"0000".equals(payResultBean.getResult_code())) {
+                        throw new TradeException("T000",payResultBean.getResult_msg());
                     }
                 }
                 
@@ -271,7 +292,7 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
     public void bindPay(TradeBean trade) throws TradeException{
         String bindCardId = trade.getBindCardId();
         // 直接获取短信验证码
-        QuickpayCustModel custCard = quickpayCustService.get(Long.valueOf(trade.getBindCardId()));
+        PojoQuickpayCust custCard = quickpayCustDAO.getById(Long.valueOf(trade.getBindCardId()));
         ResultBean routResultBean = routeConfigService.getWapTransRout(DateUtil.getCurrentDateTime(), trade.getAmount()+"", StringUtil.isNotEmpty(trade.getMerchId())?trade.getMerchId():trade.getSubMerchId(), trade.getBusicode(), trade.getCardNo());
         String routId = routResultBean.getResultObj().toString();
         trade.setReaPayOrderNo(OrderNumber.getInstance()

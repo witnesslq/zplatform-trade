@@ -12,15 +12,12 @@ package com.zlebank.zplatform.trade.cmbc.service.impl;
 
 import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.cmbc.bean.CMBCBillFileRequestBean;
 import com.zlebank.zplatform.trade.cmbc.bean.CMBCRealTimeWithholdingBean;
@@ -84,14 +81,14 @@ public class WithholdingServiceImpl implements IWithholdingService {
     public ResultBean realNameAuthentication(String json)
             throws CMBCTradeException {
         // TODO Auto-generated method stub
-        CardMessageBean card = null;
+       /* CardMessageBean card = null;
         try {
             card = JSON.parseObject(json, CardMessageBean.class);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             throw new CMBCTradeException("");
-        }
-        RealNameAuthBean realNameAuthBean = new RealNameAuthBean(card);
+        }*/
+        //RealNameAuthBean realNameAuthBean = new RealNameAuthBean(card);
 
         return null;
     }
@@ -209,20 +206,7 @@ public class WithholdingServiceImpl implements IWithholdingService {
         return byte_3;  
     }  
     
-    /**
-     * 拼接byte[]
-     * @param arrays
-     * @return
-     */
-    private  Byte[] conbinbyte(List<byte[]> arrays){
-        List<Byte> ret = new ArrayList<Byte>();
-        for(byte[] array:arrays){
-            for(byte b:array){
-                ret.add(b);
-            }
-        }
-        return ret.toArray(new Byte[0]);
-    }
+    
     /**
      *
      * @param withholdingMsg

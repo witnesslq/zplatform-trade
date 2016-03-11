@@ -137,5 +137,13 @@ public interface IGateWayService extends IBaseService<TxnsOrderinfoModel, Long>{
      * @return
      */
     public long queryOrderInfoCount(String memberId,String beginDate,String endDate);
+    
+    /**
+     * 检查资金账户状态
+     * @param merchNo 商户号
+     * @param memberId 会员号
+     * @throws TradeException
+     */
+    public void checkBusiAcct(String merchNo,String memberId) throws TradeException;
 
 }

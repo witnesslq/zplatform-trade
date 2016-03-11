@@ -20,7 +20,7 @@ String path = request.getContextPath();
 	<script type="text/javascript" src="<%=basePath %>js/jscroller-0.4.js"></script>
 	<style type="text/css">
 	.fastPaybank{
-		width: 200px;
+		width: 195px;
 	    line-height: 28px;
 		cursor: pointer;
 		background-color: #fff;
@@ -62,7 +62,6 @@ String path = request.getContextPath();
         <tr>
           <th field="name1" width="50">订单号</th>
           <th field="name2" width="50">商户名称</th>
-          <th field="name3" width="50">子商户名称</th>
           <th field="name4" width="50">交易时间</th>
           <th field="name5" width="50">金额（元）</th>
           <th field="name6" width="50">备注</th>
@@ -72,7 +71,6 @@ String path = request.getContextPath();
         <tr>
 			<td>${orderId }</td>
 			<td>${merchName }</td>
-			<td>${subMerName }</td>
 			<td>${txnTime }</td>
 			<td class="red f14b">${amount_y }</td>
 			<td>${orderDesc}</td>
@@ -278,7 +276,7 @@ String path = request.getContextPath();
 							<input type="hidden" value="${merchId }" name="merchId"/>
 							<input type="hidden" value="ZXC00001" name="cashCode"/>
 							<input type="hidden" value="${busicode }" name="busicode"/>
-							<input type="hidden" value="${merchName }" name="merchName">
+							<input type="hidden" value="${merchName }" name="merchName"/>
 							<input type="hidden" value="${subMerName }" name="subMerName" />
 							<input type="hidden" value="${busitype }" name="busitype" />
 							<input type="hidden" value="${memberIP }" name="memberIP" />
@@ -338,7 +336,6 @@ String path = request.getContextPath();
 							<input type="hidden" value="${subMerName }" name="subMerName" />
 							<input type="hidden" value="${memberId }" name="merUserId" />
 							<input type="hidden" value="${busitype }" name="busitype" />
-							<input type="hidden" name="bankCode" id="rad_bankCode" value=""/>
 							<input type="hidden" value="${memberIP }" name="memberIP" />
 							<input type="hidden" value="${tn }" name="tn" />
 											
@@ -346,21 +343,23 @@ String path = request.getContextPath();
 							<div class="select-banklist per">		
 								<ul style="height:60px;" id="default_bank">
 									<c:if test="${bindFlag=='1' }">
-										<li>
+								      	<li>
+										    <label for="communications_radio" class="fastPaybank" title="">
 										    <input type="radio" name="bankCode" value="0102"  checked="checked" id="def_bank"/>
-										    <label for="communications_radio" class="fastPaybank" title="中国工商银行"><span title="" class="" id="bank_lab" style=""></span>
-										    <span class="bank-name"></span>
-										    <span class="card-number">**${memberCard.miniCardNo}</span>
-										    <input type="hidden" name="cardNo" id="" value="${memberCard.cardno}"/>
-										    <input type="hidden" name="cardId" id="" value="${memberCard.id}"/>
-										    <input type="hidden" name="bindCardId" id="" value="${memberCard.bindcardid}"/>
-										    <input type="hidden" name="acctName" id="" value="${memberCard.accname}"/>
-										    <input type="hidden" name="certId" id="" value="${memberCard.idnum}"/>
-										    <input type="hidden" name="mobile" id="" value="${memberCard.phone}"/>
-										    <input type="hidden" id="default_bank_code" value="${memberCard.bankcode}"/>
+											    <span title="" class="" id="bank_lab" style=""></span>
+											    <span class="bank-name"></span>
+											    <span class="card-number">**${fn:substring(memberCard.cardno,fn:length(memberCard.cardno)-4, fn:length(memberCard.cardno))}</span>
+											    <input type="hidden" name="cardNo" id="" value="${memberCard.cardno}"/>
+											    <input type="hidden" name="cardId" id="" value="${memberCard.id}"/>
+											    <input type="hidden" name="bindCardId" id="" value="${memberCard.id}"/>
+											    <input type="hidden" name="acctName" id="" value="${memberCard.accname}"/>
+											    <input type="hidden" name="certId" id="" value="${memberCard.idnum}"/>
+											    <input type="hidden" name="mobile" id="" value="${memberCard.phone}"/>
+											    <input type="hidden" id="default_bank_code" value="${memberCard.bankcode}"/>
 										    
 										    </label>
 								      	</li>
+								      	
 									</c:if>
 								
 									<c:forEach var="card" items="${cardList }" varStatus="i" >

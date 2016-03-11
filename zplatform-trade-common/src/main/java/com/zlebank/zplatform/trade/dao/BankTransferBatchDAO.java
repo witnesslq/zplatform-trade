@@ -1,31 +1,88 @@
-/* 
- * BankTransferBatchDAO.java  
- * 
- * version TODO
- *
- * 2016年3月7日 
- * 
- * Copyright (c) 2016,zlebank.All rights reserved.
- * 
- */
 package com.zlebank.zplatform.trade.dao;
 
-import com.zlebank.zplatform.commons.dao.BaseDAO;
+import java.util.List;
+import java.util.Map;
+
+import com.zlebank.zplatform.commons.bean.TransferBatchQuery;
+import com.zlebank.zplatform.commons.dao.BasePagedQueryDAO;
+import com.zlebank.zplatform.commons.dao.pojo.AccStatusEnum;
+import com.zlebank.zplatform.trade.bean.page.QueryTransferBean;
 import com.zlebank.zplatform.trade.model.PojoBankTransferBatch;
 
-/**
- * 银行转账批次DAO
- *
- * @author Luxiaoshuai
- * @version
- * @date 2016年3月7日 下午2:20:36
- * @since 
- */
-public interface BankTransferBatchDAO  extends BaseDAO<PojoBankTransferBatch>{
+public interface BankTransferBatchDAO extends BasePagedQueryDAO<PojoBankTransferBatch,TransferBatchQuery>{
+
+    /**
+     * 通过批次号查找批次信息
+     * @param batchno
+     * @return
+     */
+    public PojoBankTransferBatch getByBatchNo(String batchno);
+    
+    /**
+     * 更新批次信息
+     * @param transferBatch
+     */
+    public void updateBatchToTransfer(PojoBankTransferBatch transferBatch);
+    
+    /**
+     * 通过上传文件名称取得批次信息
+     * @param fileName
+     * @return
+     */
+    public PojoBankTransferBatch getByReqestFileName(String fileName);
+    
+    /**
+     * 通过回盘文件名称取得批次信息
+     * @param fileName
+     * @return
+     */
+    public PojoBankTransferBatch getByResponseFileName(String fileName);
+    /**
+     * 更新批次数据
+     * @param transferBatch
+     */
+    public void updateTransferBatch(PojoBankTransferBatch transferBatch);
+    
+    /**
+     * 获取待账务处理的批次数据
+     * @return
+     */
+    public List<PojoBankTransferBatch> findWaitAccountingTransferBatch();
+    
+    /**
+     * 校验代付批次中的划拨批次是否都已完成
+     * @param insteadpaybatchno
+     * @return 0-划拨完成，其他划拨未完成
+     */
+    public int validateBatchResult(String insteadpaybatchno);
+    /**
+     * 更新批次账务状态
+     * @param batchno 批次号
+     * @param accStatus 账务状态
+     */
+    public void updateAccountingResult(String batchno,AccStatusEnum accStatus);
+    
+    /**
+     * 通过代付批次号查找批次数据
+     * @param insteadpaybatchno
+     * @return
+     */
+    public List<PojoBankTransferBatch> findByInsteadpaybatchno(String insteadpaybatchno);
+    
     /**
      * 通过渠道返回相应的批次号
      * @param channelCode 渠道号
      * @return
      */
-    PojoBankTransferBatch getByChannelCode(String channelCode);
+    public PojoBankTransferBatch getByChannelCode(String channelCode);
+    
+    /**
+     * 分页查询转账批次数据
+     * @param queryTransferBean
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    public Map<String, Object> queryBankTransferByPage(QueryTransferBean queryTransferBean,int page,int pageSize);
 }
+

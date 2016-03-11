@@ -37,8 +37,8 @@ import com.zlebank.zplatform.trade.dao.ITxnsLogDAO;
 import com.zlebank.zplatform.trade.dao.RspmsgDAO;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.model.MemberBaseModel;
+import com.zlebank.zplatform.trade.model.PojoBankTransferData;
 import com.zlebank.zplatform.trade.model.PojoRspmsg;
-import com.zlebank.zplatform.trade.model.PojoTransferData;
 import com.zlebank.zplatform.trade.model.RiskTradeLogModel;
 import com.zlebank.zplatform.trade.model.TxncodeDefModel;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
@@ -487,10 +487,10 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 
     @Override
     @Transactional(propagation=Propagation.REQUIRES_NEW)
-    public void saveTransferLogs(List<PojoTransferData> transferDataList) {
+    public void saveTransferLogs(List<PojoBankTransferData> transferDataList) {
         List<TxnsLogModel> logList = new ArrayList<TxnsLogModel>();
-        for(PojoTransferData data : transferDataList){
-            TxnsLogModel txnsLog = getTxnsLogByTxnseqno(data.getTxnseqno());
+        for(PojoBankTransferData data : transferDataList){
+        	/* TxnsLogModel txnsLog = getTxnsLogByTxnseqno(data.getTxnseqno());
             if(txnsLog!=null){
                 continue;
             }
@@ -524,8 +524,8 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
             Map<String, Object> cardMap = getCardInfo(data.getAccno());
             txnsLog.setCardtype(cardMap.get("TYPE").toString());
             txnsLog.setCardinstino(cardMap.get("BANKCODE").toString());
-            txnsLog.setTxnfee(data.getTxnfee().longValue());
-            super.save(txnsLog);
+            txnsLog.setTxnfee(data.getTxnfee().longValue());*/
+            //super.save(txnsLog);
         }
         
     }

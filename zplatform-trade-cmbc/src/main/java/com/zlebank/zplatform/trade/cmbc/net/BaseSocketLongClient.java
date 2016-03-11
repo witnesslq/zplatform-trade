@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -16,7 +15,6 @@ import com.zlebank.zplatform.trade.cmbc.net.socket.BaseClient;
 import com.zlebank.zplatform.trade.utils.LogUtil;
 
 public class BaseSocketLongClient extends BaseClient implements Client {
-	private InetSocketAddress hostAddress;
 	private int timeout;
 	private ReceiveProcessor receiveProcessor;
 	private static final Log log = LogFactory.getLog(BaseSocketLongClient.class);
@@ -28,7 +26,6 @@ public class BaseSocketLongClient extends BaseClient implements Client {
     private int port;  
     private static BaseSocketLongClient longClient;
 	public BaseSocketLongClient(String host,int port,int timeout) {
-		this.hostAddress = new InetSocketAddress(host, port);
 		this.timeout = timeout;
 		this.serverIp = host;
 		this.port = port;

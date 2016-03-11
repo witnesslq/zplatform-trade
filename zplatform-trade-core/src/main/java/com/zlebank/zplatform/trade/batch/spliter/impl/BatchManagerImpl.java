@@ -180,12 +180,12 @@ public class BatchManagerImpl implements BatchManager {
         data.setApplyTime(new Date());
         data.setAccType(transferData.getAccType());
         data.setTxnseqno(OrderNumber.getInstance().generateTxnseqno(BusinessCodeEnum.TRAN_DATA_NO.getBusiCode()));
-         CardBin card = cardBinDao.getCard(transferData.getAccNo());
-         if (card != null && StringUtil.isNotEmpty(card.getBankCode()) && card.getBankCode().startsWith("0305")) {
-             data.setTransferType("01");
-         } else {
-             data.setTransferType("02");
-         }
+        CardBin card = cardBinDao.getCard(transferData.getAccNo());
+	     if (card != null && StringUtil.isNotEmpty(card.getBankCode()) && card.getBankCode().startsWith("0305")) {
+	         data.setTransferType("01");
+	     } else {
+	         data.setTransferType("02");
+	     }
         return data;
     }
 

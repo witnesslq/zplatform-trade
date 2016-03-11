@@ -26,7 +26,6 @@ import com.zlebank.zplatform.trade.adapter.accounting.IAccounting;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
-import com.zlebank.zplatform.trade.service.ITxnsSplitAccountService;
 import com.zlebank.zplatform.trade.utils.SpringContext;
 
 /**
@@ -41,7 +40,6 @@ public class ConsumeAccounting implements IAccounting{
     private static final Log log = LogFactory.getLog(ConsumeAccounting.class);
     private ITxnsLogService txnsLogService;
     private AccEntryService accEntryService;
-    private ITxnsSplitAccountService txnsSplitAccountService;
     
     /**
      *
@@ -146,7 +144,6 @@ public class ConsumeAccounting implements IAccounting{
     public ConsumeAccounting(){
         txnsLogService = (ITxnsLogService) SpringContext.getContext().getBean("txnsLogService");
         accEntryService = (AccEntryService) SpringContext.getContext().getBean("accEntryServiceImpl");
-        txnsSplitAccountService =  (ITxnsSplitAccountService) SpringContext.getContext().getBean("txnsSplitAccountService");
     }
 
     @Override

@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.SocketException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -190,6 +189,10 @@ public class FTPCMBCService implements IFTPCMBCService {
                             fileNameList.add(path+"/"+ftpFiles[i].getName());
                         }
                         break;
+					case UNKNOW:
+						break;
+					default:
+						break;
                 }
             }
             return fileNameList;

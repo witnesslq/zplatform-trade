@@ -16,7 +16,11 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("TRAN_RESP")
 public class RealTimeSelfWithholdingQueryResultBean implements Serializable {
 
-    @XStreamAlias("RESP_TYPE")
+    /**
+	 * serialVersionUID
+	 */
+	private static final long serialVersionUID = 2285631423424550349L;
+	@XStreamAlias("RESP_TYPE")
     private String respType;// 应答码类型
     @XStreamAlias("RESP_CODE")
     private String respCode;// 应答码

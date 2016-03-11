@@ -37,15 +37,21 @@ import com.zlebank.zplatform.acc.bean.BusiAcctQuery;
 import com.zlebank.zplatform.acc.bean.enums.Usage;
 import com.zlebank.zplatform.acc.pojo.Money;
 import com.zlebank.zplatform.acc.service.AccountQueryService;
+import com.zlebank.zplatform.commons.bean.PagedResult;
 import com.zlebank.zplatform.commons.utils.StringUtil;
+import com.zlebank.zplatform.member.bean.CoopInsti;
+import com.zlebank.zplatform.member.bean.QuickpayCustBean;
 import com.zlebank.zplatform.member.dao.PersonDAO;
+import com.zlebank.zplatform.member.pojo.PojoMerchDeta;
 import com.zlebank.zplatform.member.pojo.PojoPersonDeta;
+import com.zlebank.zplatform.member.service.CoopInstiService;
+import com.zlebank.zplatform.member.service.MemberBankCardService;
 import com.zlebank.zplatform.member.service.MemberService;
+import com.zlebank.zplatform.member.service.MerchService;
 import com.zlebank.zplatform.trade.adapter.accounting.IAccounting;
 import com.zlebank.zplatform.trade.adapter.quickpay.IQuickPayTrade;
 import com.zlebank.zplatform.trade.analyzer.GateWayTradeAnalyzer;
 import com.zlebank.zplatform.trade.analyzer.ReaPayTradeAnalyzer;
-import com.zlebank.zplatform.trade.bean.AccountTradeBean;
 import com.zlebank.zplatform.trade.bean.AppPartyBean;
 import com.zlebank.zplatform.trade.bean.PayPartyBean;
 import com.zlebank.zplatform.trade.bean.ReaPayResultBean;
@@ -60,15 +66,20 @@ import com.zlebank.zplatform.trade.bean.gateway.OrderRespBean;
 import com.zlebank.zplatform.trade.bean.gateway.QueryBean;
 import com.zlebank.zplatform.trade.bean.gateway.QueryResultBean;
 import com.zlebank.zplatform.trade.bean.gateway.RiskRateInfoBean;
+import com.zlebank.zplatform.trade.cmbc.bean.gateway.CardMessageBean;
+import com.zlebank.zplatform.trade.cmbc.bean.gateway.InsteadPayMessageBean;
+import com.zlebank.zplatform.trade.cmbc.bean.gateway.WithholdingMessageBean;
+import com.zlebank.zplatform.trade.cmbc.exception.CMBCTradeException;
 import com.zlebank.zplatform.trade.cmbc.service.ICMBCTransferService;
 import com.zlebank.zplatform.trade.cmbc.service.IWithholdingService;
+import com.zlebank.zplatform.trade.cmbc.service.impl.InsteadPayServiceImpl;
+import com.zlebank.zplatform.trade.cmbc.service.impl.WithholdingServiceImpl;
 import com.zlebank.zplatform.trade.dao.RspmsgDAO;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.factory.AccountingAdapterFactory;
 import com.zlebank.zplatform.trade.factory.TradeAdapterFactory;
-import com.zlebank.zplatform.trade.model.MemberBaseModel;
+import com.zlebank.zplatform.trade.model.PojoRealnameAuth;
 import com.zlebank.zplatform.trade.model.PojoRspmsg;
-import com.zlebank.zplatform.trade.model.QuickpayCustModel;
 import com.zlebank.zplatform.trade.model.TxncodeDefModel;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.model.TxnsNotifyTaskModel;
@@ -80,9 +91,7 @@ import com.zlebank.zplatform.trade.security.reapay.AES;
 import com.zlebank.zplatform.trade.security.reapay.RSA;
 import com.zlebank.zplatform.trade.service.IAccountPayService;
 import com.zlebank.zplatform.trade.service.IGateWayService;
-import com.zlebank.zplatform.trade.service.IMemberService;
 import com.zlebank.zplatform.trade.service.IProdCaseService;
-import com.zlebank.zplatform.trade.service.IQuickpayCustService;
 import com.zlebank.zplatform.trade.service.IRouteConfigService;
 import com.zlebank.zplatform.trade.service.IRouteProcessService;
 import com.zlebank.zplatform.trade.service.ITxncodeDefService;
@@ -92,7 +101,6 @@ import com.zlebank.zplatform.trade.service.ITxnsQuickpayService;
 import com.zlebank.zplatform.trade.service.ITxnsWithdrawService;
 import com.zlebank.zplatform.trade.service.ITxnsWithholdingService;
 import com.zlebank.zplatform.trade.service.IWebGateWayService;
-import com.zlebank.zplatform.trade.service.IZlTradeService;
 import com.zlebank.zplatform.trade.utils.AmountUtil;
 import com.zlebank.zplatform.trade.utils.BankCardUtil;
 import com.zlebank.zplatform.trade.utils.ConsUtil;
@@ -119,14 +127,15 @@ public class GateWayController {
     private IGateWayService gateWayService;
     @Autowired
     private IWebGateWayService webGateWayService;
-    private IZlTradeService zlTradeService;
+    //private IZlTradeService zlTradeService;
     @Autowired
     private ITxnsQuickpayService txnsQuickpayService;
     @Autowired
-    private ITxnsLogService txnsLogService;
+    private MemberBankCardService memberBankCardService;
     @Autowired
-    private IMemberService memberService;
-
+    private ITxnsLogService txnsLogService;
+    //@Autowired
+    //private IMemberService memberService;
     @Autowired
     private IRouteConfigService routeConfigService;
     @Autowired
@@ -140,8 +149,8 @@ public class GateWayController {
     private MemberService memberService2;
     @Autowired
     private AccountQueryService accountQueryService;
-    @Autowired
-    private IQuickpayCustService quickpayCustService;
+    //@Autowired
+    //private IQuickpayCustService quickpayCustService;
     @Autowired
     private IAccountPayService accountPayService;
     @Autowired
@@ -158,6 +167,11 @@ public class GateWayController {
     private ITxnsWithholdingService txnsWithholdingService;
     @Autowired
     private RspmsgDAO rspmsgDAO;
+    @Autowired
+    private MerchService merchService;
+    @Autowired
+    private CoopInstiService coopInstiService;
+    
     
     @RequestMapping("/coporder.htm")
     public ModelAndView pay(OrderBean order,HttpSession httpSession,HttpServletRequest request) {
@@ -235,7 +249,7 @@ public class GateWayController {
 
         // 检验一级商户和二级商户有效性
         if (StringUtil.isNotEmpty(order.getMerId())) {
-            MemberBaseModel subMember = memberService.getMemberByMemberId(order.getMerId());
+            PojoMerchDeta subMember = merchService.getMerchBymemberId(order.getMerId());
             if (subMember == null) {
             	PojoRspmsg msg = rspmsgDAO.get("GW05");
             	model.put("errMsg", msg.getRspinfo());
@@ -243,10 +257,8 @@ public class GateWayController {
                 return false;
             }
             if (order.getMerId().startsWith("2")) {// 对于商户会员需要进行检查
-                ResultBean memberResultBean = memberService.verifySubMerch(
-                        order.getCoopInstiId(), order.getMerId());
-                if (!memberResultBean.isResultBool()) {
-                	PojoRspmsg msg = rspmsgDAO.get(memberResultBean.getErrCode());
+                if (!order.getCoopInstiId().equals(subMember.getParent())) {
+                	PojoRspmsg msg = rspmsgDAO.get("GW07");
                 	model.put("errMsg", msg.getRspinfo());
                     model.put("errCode", msg.getWebrspcode());
                     return false;
@@ -267,6 +279,16 @@ public class GateWayController {
             model.put("errCode", msg.getWebrspcode());
             return false;
         }
+        
+        try {
+			gateWayService.checkBusiAcct(order.getMerId(), ((RiskRateInfoBean)riskResultBean.getResultObj()).getMerUserId());
+		} catch (TradeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			PojoRspmsg msg = rspmsgDAO.get(e.getCode());
+        	model.put("errMsg", msg.getRspinfo());
+            model.put("errCode", msg.getWebrspcode());
+		}
         return true;
     }
 
@@ -280,11 +302,10 @@ public class GateWayController {
             }
             TxnsLogModel txnsLog = txnsLogService
                     .getTxnsLogByTxnseqno(txnseqno);
-            MemberBaseModel member = memberService
-                    .getMemberByMemberId(txnsLog.getAccfirmerno());
-            MemberBaseModel subMember = null;
+            CoopInsti coopInsti = coopInstiService.getInstiByInstiCode(txnsLog.getAccfirmerno());
+            PojoMerchDeta merch = null;
             if (StringUtil.isNotEmpty(txnsLog.getAccsecmerno())) {
-                subMember = memberService.get(txnsLog.getAccsecmerno());
+            	merch = merchService.getMerchBymemberId(txnsLog.getAccsecmerno());
             }
             TxnsOrderinfoModel orderInfo = gateWayService
                     .getOrderinfoByOrderNoAndMemberId(txnsLog.getAccordno(),
@@ -295,7 +316,7 @@ public class GateWayController {
                 return new ModelAndView("/erro_gw", model);
             }
             model.put("cashier", "");
-            model.put("merchName", member.getMerchname());
+            model.put("merchName", coopInsti.getInstiName());
             model.put("merchId", txnsLog.getAccfirmerno());
             model.put("goodsName", orderInfo.getGoodsname());
             model.put("txnseqno", txnseqno);
@@ -304,7 +325,7 @@ public class GateWayController {
             model.put("busitype", txnsLog.getBusitype());
             model.put("orderId", txnsLog.getAccordno());
             model.put("subMerName",
-                    subMember != null ? subMember.getMerchname() : "");
+            		merch != null ? merch.getAccname() : "");
             model.put("txnTime",
                     DateUtil.formatDateTime(DateUtil.parse(
                             DateUtil.DEFAULT_DATE_FROMAT,
@@ -312,15 +333,13 @@ public class GateWayController {
             model.put("txnAmt", txnsLog.getAmount());
             model.put("orderDesc", orderInfo.getOrderdesc());
             model.put("tn", orderInfo.getTn());
-            model.put("cashver", member.getCashver());
             model.put("amount_y", AmountUtil.numberFormat(txnsLog.getAmount()));
 
             if (!"999999999999999".equals(txnsLog.getAccmemberid())) {
                 // 获取会员已绑定的银行卡
-                List<QuickpayCustModel> bindCardList = quickpayCustService
-                        .querBankCardByMemberId(txnsLog.getAccmemberid(), "");
-                model.put("bindCardList", bindCardList);
-                QuickpayCustModel quickpayCust = null;
+                PagedResult<QuickpayCustBean> bindCardList =  memberBankCardService.queryMemberBankCard(txnsLog.getAccmemberid(), "0", 0, 10);
+                model.put("bindCardList", bindCardList.getPagedResult());
+                QuickpayCustBean quickpayCust = null;
                 // 处理银行卡验证信息及身份信息，取得卡信息
                 try {
                     if (StringUtil.isNotEmpty(orderInfo.getCustomerInfo())) {
@@ -342,7 +361,7 @@ public class GateWayController {
                 // log.info(member2.getMembername());
                 String cardType = "";
                 if ("1000".equals(txnsLog.getBusitype())) {// 消费交易
-
+                	cardType = "0";
                 } else if ("2000".equals(txnsLog.getBusitype())) {// 充值交易只能是借记
                     cardType = "1";
                 } else if ("2000".equals(txnsLog.getBusitype())) {// 保障金交易 借记卡
@@ -351,30 +370,26 @@ public class GateWayController {
                     cardType = "1";
                 }
                 // 显示会员已绑定的银行卡
-                List<QuickpayCustModel> cardList = quickpayCustService
-                        .querBankCardByMemberId(
-                                txnsLog.getAccmemberid(), cardType);
-                if (quickpayCust != null) {
-                    for (QuickpayCustModel cust : cardList) {
-                        // 判断依据卡号相同，账户名称相同，身份证号相同
-                        if (cust.getAccname().equals(quickpayCust.getAccname())
-                                && cust.getCardno().equals(
-                                        quickpayCust.getCardno())
-                                && cust.getIdnum().equals(
-                                        quickpayCust.getIdnum())) {
-                            // 此时卡已绑定，移除出原有集合，赋值到默认第一支付卡中
-                            cardList.remove(cust);
-                            quickpayCust = cust;
-                            model.put("bindFlag", "1");
-                            break;
-                        }
+                PagedResult<QuickpayCustBean> cardPageList = memberBankCardService.queryMemberBankCard(txnsLog.getAccmemberid(), cardType, 0, 10);
+                List<QuickpayCustBean> cardList = cardPageList.getPagedResult();
+                for (QuickpayCustBean cust : cardList) {
+                    // 判断依据卡号相同，账户名称相同，身份证号相同
+                    if (cust.getAccname().equals(cust.getAccname())
+                            && cust.getCardno().equals(
+                            		cust.getCardno())
+                            && cust.getIdnum().equals(
+                            		cust.getIdnum())) {
+                        // 此时卡已绑定，移除出原有集合，赋值到默认第一支付卡中
+                        cardList.remove(cust);
+                        quickpayCust = cust;
+                        model.put("bindFlag", "1");
+                        break;
                     }
                 }
+                
 
                 model.put("cardList", cardList);
                 model.put("memberCard", quickpayCust);
-                
-                
                 //获取请求方IP
                 model.put("memberIP", orderInfo.getPayerip());
             }
@@ -458,6 +473,7 @@ public class GateWayController {
         }
         BusiAcctQuery memberAcct = accountQueryService
                 .getMemberQueryByID(fundAcct.getBusiAcctCode());
+       
         // 会员资金账户余额
         return memberAcct.getBalance().compareTo(
                 Money.valueOf(new BigDecimal(amt)));
@@ -1029,9 +1045,6 @@ public class GateWayController {
             if (routResultBean.isResultBool()) {
                 String routId = routResultBean.getResultObj().toString();
                 ChannelEnmu channel = ChannelEnmu.fromValue(routId);
-                if (StringUtil.isNotEmpty(trade.getBindCardId())) {
-                    QuickpayCustModel card = quickpayCustService.getCardByBindId(trade.getBindCardId());
-                }
                 trade.setPayinstiId(channel.getChnlcode());
                 webGateWayService.submitPay(trade);
                 model.put("trade", trade);
@@ -1728,10 +1741,10 @@ public class GateWayController {
             }
             TxnsWithdrawModel withdraw = new TxnsWithdrawModel(tradeBean);
             if (StringUtil.isNotEmpty(tradeBean.getBindCardId())) {
-                QuickpayCustModel card = quickpayCustService
+                /*QuickpayCustModel card = memberBankCardService.
                         .getCardByBindId(tradeBean.getBindCardId());
                 withdraw.setAcctname(card.getAccname());
-                withdraw.setAcctno(card.getCardno());
+                withdraw.setAcctno(card.getCardno());*/
             }
             txnsWithdrawService.saveWithdraw(withdraw);
             gateWayService.updateOrderToStartPay(tradeBean.getOrderId());
@@ -1754,7 +1767,14 @@ public class GateWayController {
         model.put("errMsg", "提现申请成功");
         return new ModelAndView("/fastpay/success", model);
     }
-    
+    @RequestMapping("/testcmbcinsteadpay")
+    @ResponseBody
+    public Object testCMBCpay(){
+        InsteadPayServiceImpl service = new InsteadPayServiceImpl();
+        InsteadPayMessageBean bean = new InsteadPayMessageBean("test");
+        service.realTimePay(bean);
+        return "";
+    }
     private String getIpAddr(HttpServletRequest request) {
         String ip = request.getHeader("x-forwarded-for");
         if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
@@ -1767,5 +1787,41 @@ public class GateWayController {
             ip = request.getRemoteAddr();
         }
         return ip;
+    }
+    
+    @RequestMapping("/testcmbcrealNameAuth")
+    @ResponseBody
+    public Object testCMBC(){
+        CardMessageBean card = new CardMessageBean("123");
+        try {
+            PojoRealnameAuth realnameAuth = new PojoRealnameAuth(true);
+            System.out.println(JSON.toJSONString(cmbcTransferService.realNameAuth(realnameAuth)));
+            withholdingService.realNameAuthentication(card);
+        } catch (CMBCTradeException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (TradeException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return "";
+    }
+    
+    @RequestMapping("/testwithholding")
+    @ResponseBody
+    public Object testwithholding(){
+       WithholdingServiceImpl service = new WithholdingServiceImpl();
+       WithholdingMessageBean messageBean = new WithholdingMessageBean("test");
+       TxnsWithholdingModel txnsWithholdingModel = new TxnsWithholdingModel();
+       txnsWithholdingModel.setTransdate(DateUtil.getCurrentDate());
+       txnsWithholdingModel.setTranstime(DateUtil.getCurrentTime());
+       txnsWithholdingModel.setSerialno(OrderNumber.getInstance().generateRealNameOrderNo());
+       messageBean.setWithholding(txnsWithholdingModel);
+        try {
+            withholdingService.realTimeWitholding(messageBean);
+        } catch (CMBCTradeException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }

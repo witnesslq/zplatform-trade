@@ -25,7 +25,11 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("TRAN_RESP")
 public class CMBCRealTimeWithholdingResultBean implements Serializable{
     
-    @XStreamAlias("RESP_TYPE")
+    /**
+	 * serialVersionUID
+	 */
+	private static final long serialVersionUID = 5659904399644588808L;
+	@XStreamAlias("RESP_TYPE")
     private String resp_type;//   应答码类型
     @XStreamAlias("RESP_CODE")
     private String resp_code ;//   应答码

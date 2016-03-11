@@ -69,7 +69,6 @@ public class PojoTranBatch {
     private Long waitApproveAmt;
     /**银行转账批次号**/
     private List<PojoBankTransferBatch> bankTransferBatchs;
-   
     @GenericGenerator(name = "id_gen", strategy = "enhanced-table", parameters = {
             @Parameter(name = "table_name", value = "T_C_PRIMAY_KEY"),
             @Parameter(name = "value_column_name", value = "NEXT_ID"),

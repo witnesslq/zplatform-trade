@@ -157,18 +157,19 @@ public class CMBCWithholdingReciveProcessor implements ReceiveProcessor{
                             txnsWithholdingService.updateRealNameResult(withholding);
                             if(realNameAuthResultBean.getExectype().equalsIgnoreCase("S")){
                                 PojoRealnameAuth realnameAuth = new PojoRealnameAuth();
-                                if(realNameAuthResultBean.getValidatestatus().equals("00")){
-                                    realnameAuth.setStatus("00");
-                                }else{
-                                    realnameAuth.setStatus("01");
-                                }
                                 realnameAuth.setCardType(CMBCCardTypeEnum.fromValue(withholding.getCardtype()).getCardType());
                                 realnameAuth.setCardNo(withholding.getAccno());
                                 realnameAuth.setCertifTp(CertifTypeEnmu.fromCmbcCode(withholding.getCerttype()).getCode());
                                 realnameAuth.setCertifId(withholding.getCertno());
                                 realnameAuth.setPhoneNo(Long.valueOf(withholding.getPhone()));
                                 realnameAuth.setCustomerNm(withholding.getAccname());
-                                realnameAuthDAO.saveRealNameAuth(realnameAuth);
+                                if(realNameAuthResultBean.getValidatestatus().equals("00")){
+                                    realnameAuth.setStatus("00");
+                                    realnameAuthDAO.saveRealNameAuth(realnameAuth);
+                                }else{
+                                    realnameAuth.setStatus("01");
+                                }
+                                
                                 if(realNameAuthResultBean.getValidatestatus().equals("00")){
                                     //白名单采集
                                     cmbcTransferService.whiteListCollection(withholding.getAccno(), withholding.getAccname(), withholding.getCertno(), withholding.getPhone(),withholding.getCerttype());
@@ -278,6 +279,8 @@ public class CMBCWithholdingReciveProcessor implements ReceiveProcessor{
                         
                     }
                     break;
+			default:
+				break;
             }
             
             

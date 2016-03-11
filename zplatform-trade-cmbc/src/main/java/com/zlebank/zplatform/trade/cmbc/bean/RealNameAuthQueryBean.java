@@ -170,7 +170,6 @@ public class RealNameAuthQueryBean implements Serializable{
         this.merid = ConsUtil.getInstance().cons.getCmbc_merid();
         this.oritransdate = oritransdate;
         this.orireqserialno = orireqserialno;
-        this.resv = resv;
     }
     /**
      * 
