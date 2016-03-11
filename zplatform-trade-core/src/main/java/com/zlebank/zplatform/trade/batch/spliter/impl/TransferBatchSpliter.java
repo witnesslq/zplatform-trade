@@ -72,7 +72,11 @@ public class TransferBatchSpliter implements BatchSpliter{
             transferData.setChannelCode(channel);
             TransferDataResult result = batchManager.insertDetailBatch(transferData);
             // 更新划拨流水信息
+
             //data.setBankTranDataId(result.getBankTranDetaId());
+
+            //data.setBankTranData(result.getBankTranDeta());
+
             //更新划拨状态
             data.setStatus("00");
             tranDataDAO.merge(data);

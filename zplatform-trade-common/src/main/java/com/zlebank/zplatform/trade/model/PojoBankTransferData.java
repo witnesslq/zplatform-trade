@@ -10,8 +10,10 @@
  */
 package com.zlebank.zplatform.trade.model;
 
+
 import java.io.Serializable;
 import java.math.BigDecimal;
+
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -44,10 +46,9 @@ public class PojoBankTransferData implements Serializable{
     /**"银行转账批次号"**/
     private long bankTranBatchId;
     /**"划拨流水号"**/
-    //private PojoTranData tranData;
     private String tranDataId;
     /**"转账金额"**/
-    private BigDecimal tranAmt;
+    private Long tranAmt;
     /**"账户号"**/
     private String accNo;
     /**"账户名"**/
@@ -94,27 +95,12 @@ public class PojoBankTransferData implements Serializable{
     public void setBankTranDataSeqNo(String bankTranDataSeqNo) {
         this.bankTranDataSeqNo = bankTranDataSeqNo;
     } 
-   /* @ManyToOne
-    @JoinColumn(name="BANK_TRAN_BATCH_ID")
-    public PojoBankTransferBatch getBankTranBatch() {
-        return bankTranBatch;
-    }
-    public void setBankTranBatch(PojoBankTransferBatch bankTranBatch) {
-        this.bankTranBatch = bankTranBatch;
-    }
-    @OneToOne
-    @JoinColumn(name = "TRAN_DATA_ID")
-    public PojoTranData getTranDataId() {
-        return tranData;
-    }
-    public void setTranDataId(PojoTranData tranData) {
-        this.tranData = tranData;
-    }*/
+
     @Column(name = "TRAN_AMT")
-    public BigDecimal getTranAmt() {
+    public Long getTranAmt() {
         return tranAmt;
     }
-    public void setTranAmt(BigDecimal tranAmt) {
+    public void setTranAmt(Long tranAmt) {
         this.tranAmt = tranAmt;
     }
     @Column(name = "ACC_NO")

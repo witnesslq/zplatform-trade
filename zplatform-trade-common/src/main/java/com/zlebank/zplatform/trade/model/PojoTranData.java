@@ -49,7 +49,8 @@ public class PojoTranData implements Serializable{
     //private PojoTranBatch tranBatch;
     /**"业务类型"**/
     private String busyType;
-    
+    /**"业务流水号"**/
+    private String busiDataId;
     /**"账户类型(0:对私账户1：对公账户)"**/
     private String accType;
     /**"账户号"**/
@@ -61,7 +62,7 @@ public class PojoTranData implements Serializable{
     /**"银行名称"**/
     private String bankName;
     /**"划拨金额"**/
-    private BigDecimal tranAmt;
+    private Long tranAmt;
     /**"备注"**/
     private String remark;
     /**"状态(01:未审核00：审核通过09：审核拒绝)"**/
@@ -75,7 +76,7 @@ public class PojoTranData implements Serializable{
     /**"交易手续费"**/
     private BigDecimal tranFee;
     /**转账流水数据**/
-   // private PojoBankTransferData bankTranData;
+
     /**会员号/付款方的会员号**/
     private String memberId;
     /**交易序列号**/
@@ -103,22 +104,24 @@ public class PojoTranData implements Serializable{
     public void setTranDataSeqNo(String tranDataSeqNo) {
         this.tranDataSeqNo = tranDataSeqNo;
     }
-    /*@ManyToOne
-    @JoinColumn(name="TRAN_BATCH_ID")
-    public PojoTranBatch getTranBatch() {
-        return tranBatch;
-    }
-    public void setTranBatch(PojoTranBatch tranBatch) {
-        this.tranBatch = tranBatch;
-    }*/
+
     @Column(name = "BUSI_TYPE") 
     public String getBusyType() {
         return busyType;
+
     }
+    
     public void setBusyType(String busyType) {
         this.busyType = busyType;
     }
-   
+    @Column(name = "BUSI_DATA_ID")
+    public String getBusiDataId() {
+        return busiDataId;
+    }
+    public void setBusiDataId(String busiDataId) {
+        this.busiDataId = busiDataId;
+    }
+    
     @Column(name = "ACC_TYPE")
     public String getAccType() {
         return accType;
@@ -155,10 +158,10 @@ public class PojoTranData implements Serializable{
         this.bankName = bankName;
     }
     @Column(name = "TRAN_AMT")
-    public BigDecimal getTranAmt() {
+    public Long getTranAmt() {
         return tranAmt;
     }
-    public void setTranAmt(BigDecimal tranAmt) {
+    public void setTranAmt(Long tranAmt) {
         this.tranAmt = tranAmt;
     }
     @Column(name = "REMARK")
@@ -203,13 +206,6 @@ public class PojoTranData implements Serializable{
     public void setTranFee(BigDecimal tranFee) {
         this.tranFee = tranFee;
     }
-   /* @Column(name = "BANK_TRAN_DATA_ID")
-    public PojoBankTransferData getBankTranData() {
-        return bankTranData;
-    }
-    public void setBankTranData(PojoBankTransferData bankTranData) {
-        this.bankTranData = bankTranData;
-    }*/
     @Column(name = "MEMBER_ID")
 	public String getMemberId() {
 		return memberId;

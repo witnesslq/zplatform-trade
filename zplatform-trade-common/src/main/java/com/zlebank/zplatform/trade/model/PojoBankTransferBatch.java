@@ -10,7 +10,6 @@
  */
 package com.zlebank.zplatform.trade.model;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -50,15 +49,15 @@ public class PojoBankTransferBatch {
     /**"总笔数"**/
     private Long totalCount;
     /**"总金额"**/
-    private BigDecimal totalAmt;
+    private Long totalAmt;
     /**"成功笔数"**/
     private Long successCount;
     /**"成功金额"**/
-    private BigDecimal successAmt;
+    private Long successAmt;
     /**"失败笔数"**/
     private Long failCount;
     /**"失败金额"**/
-    private BigDecimal failAmt;
+    private Long failAmt;
     /**"""状态（01：未审核02：审核通过03：审核拒绝）"""**/
     private String status;
     /**"开放状态（0:开放1：关闭）"**/
@@ -105,15 +104,7 @@ public class PojoBankTransferBatch {
         this.bankTranBatchNo = bankTranBatchNo;
     }
     
-    /*@ManyToOne
-    @Column(name = "CHANNEL")
-    public PojoBankTransferChannel getChannel() {
-        return channel;
-    }
-    public void setChannel(PojoBankTransferChannel channel) {
-        this.channel = channel;
-    }
-    */
+
     @Column(name = "TOTAL_COUNT")
     public Long getTotalCount() {
         return totalCount;
@@ -122,10 +113,10 @@ public class PojoBankTransferBatch {
         this.totalCount = totalCount;
     }
     @Column(name = "TOTAL_AMT")
-    public BigDecimal getTotalAmt() {
+    public Long getTotalAmt() {
         return totalAmt;
     }
-    public void setTotalAmt(BigDecimal totalAmt) {
+    public void setTotalAmt(Long totalAmt) {
         this.totalAmt = totalAmt;
     }
     @Column(name = "SUCCESS_COUNT")
@@ -136,10 +127,10 @@ public class PojoBankTransferBatch {
         this.successCount = successCount;
     }
     @Column(name = "SUCCESS_AMT")
-    public BigDecimal getSuccessAmt() {
+    public Long getSuccessAmt() {
         return successAmt;
     }
-    public void setSuccessAmt(BigDecimal successAmt) {
+    public void setSuccessAmt(Long successAmt) {
         this.successAmt = successAmt;
     }
     @Column(name = "FAIL_COUNT")
@@ -150,10 +141,10 @@ public class PojoBankTransferBatch {
         this.failCount = failCount;
     }
     @Column(name = "FAIL_AMT")
-    public BigDecimal getFailAmt() {
+    public Long getFailAmt() {
         return failAmt;
     }
-    public void setFailAmt(BigDecimal failAmt) {
+    public void setFailAmt(Long failAmt) {
         this.failAmt = failAmt;
     }
     @Column(name = "STATUS")
@@ -226,21 +217,4 @@ public class PojoBankTransferBatch {
     public void setRemark(String remark) {
         this.remark = remark;
     }
-   /* @ManyToMany
-    @JoinTable
-    public List<PojoTranBatch> getTranBatchs() {
-        return tranBatchs;
-    }
-    public void setTranBatchs(List<PojoTranBatch> tranBatchs) {
-        this.tranBatchs = tranBatchs;
-    }
-    @OneToMany(mappedBy="BANK_TRAN_BATCH_ID",fetch=FetchType.LAZY)
-    public List<PojoBankTransferData> getBnakTranDatas() {
-        return bnakTranDatas;
-    }
-    public void setBnakTranDatas(List<PojoBankTransferData> bnakTranDatas) {
-        this.bnakTranDatas = bnakTranDatas;
-    }
-    */
-    
 }

@@ -42,7 +42,7 @@ public class PojoTranBatch {
     /**总笔数**/
     private Long totalCount;
     /**总金额**/
-    private BigDecimal totalAmt;
+    private Long totalAmt;
     /**审核通过笔数**/
     private Long approveCount;
     /**审核通过金额**/
@@ -68,8 +68,7 @@ public class PojoTranBatch {
     /**待审核金额**/
     private Long waitApproveAmt;
     /**银行转账批次号**/
-   // private List<PojoBankTransferBatch> bankTransferBatchs;
-   
+
     @GenericGenerator(name = "id_gen", strategy = "enhanced-table", parameters = {
             @Parameter(name = "table_name", value = "T_C_PRIMAY_KEY"),
             @Parameter(name = "value_column_name", value = "NEXT_ID"),
@@ -101,10 +100,10 @@ public class PojoTranBatch {
         this.totalCount = totalCount;
     }
     @Column(name = "TOTAL_AMT")
-    public BigDecimal getTotalAmt() {
+    public Long getTotalAmt() {
         return totalAmt;
     }
-    public void setTotalAmt(BigDecimal totalAmt) {
+    public void setTotalAmt(Long totalAmt) {
         this.totalAmt = totalAmt;
     }
     @Column(name = "APPROVE_COUNT")
@@ -191,12 +190,5 @@ public class PojoTranBatch {
     public void setWaitApproveAmt(Long waitApproveAmt) {
         this.waitApproveAmt = waitApproveAmt;
     }
-    /*@ManyToMany
-    @JoinTable(name="")
-    public List<PojoBankTransferBatch> getBankTransferBatchs() {
-        return bankTransferBatchs;
-    }
-    public void setBankTransferBatchs(List<PojoBankTransferBatch> bankTransferBatchs) {
-        this.bankTransferBatchs = bankTransferBatchs;
-    }*/
+
 }

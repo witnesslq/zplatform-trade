@@ -87,7 +87,11 @@ public class TransferDataDAOImpl  extends HibernateBaseDAOImpl<PojoTranData> imp
 		long unApproveCount = 0L;
 		long unApproveAmount = 0L;
 		//判断划拨明细数据状态
+
     	PojoTranBatch transferBatch = transferBatchDAO.getByBatchNo(transferData.getTranBatchId()+"");
+
+    	//PojoTranBatch transferBatch = transferBatchDAO.getByBatchNo(transferData.getTranBatch().getTid()+"");
+
     	if("00".equals(status)){//审核通过的执行分批算法
     		PojoTranData[] pojoTransferDatas = new PojoTranData[]{transferData};
     		//
@@ -127,7 +131,7 @@ public class TransferDataDAOImpl  extends HibernateBaseDAOImpl<PojoTranData> imp
     @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void businessRefund(PojoTranData transferData,BusinessEnum businessEnum) throws AccBussinessException, AbstractBusiAcctException,NumberFormatException {
         TradeInfo tradeInfo = new TradeInfo();
-        tradeInfo.setAmount(transferData.getTranAmt());
+        tradeInfo.setAmount(new BigDecimal(transferData.getTranAmt()));
         tradeInfo.setBusiCode(businessEnum.getBusiCode());
         tradeInfo.setPayMemberId(transferData.getMemberId());
         tradeInfo.setTxnseqno(transferData.getTxnseqno());

@@ -75,13 +75,13 @@ public class BatchManagerImpl implements BatchManager {
         PojoBankTransferChannel channelPojo = bankTransferChannelDAO.getByChannelCode(channel);
         PojoBankTransferBatch newBatch = new PojoBankTransferBatch();
         newBatch.setBankTranBatchNo(seqNoService.getBatchNo(SeqNoEnum.BANK_TRAN_BATCH_NO));
-       
+        //newBatch.setChannel(channelPojo);
         newBatch.setTotalCount(0L);
-        newBatch.setTotalAmt(BigDecimal.ZERO);
+        newBatch.setTotalAmt(0L);
         newBatch.setSuccessCount(0L);
-        newBatch.setSuccessAmt(BigDecimal.ZERO);
+        newBatch.setSuccessAmt(0L);
         newBatch.setFailCount(0L);
-        newBatch.setFailAmt(BigDecimal.ZERO);
+        newBatch.setFailAmt(0L);
         newBatch.setStatus(BankTransferBatchStatusEnum.INIT.getCode());
         newBatch.setTranStatus(BankTransferBatchTranStatusEnum.WAIT_TRAN.getCode());
         Date current = new Date();
@@ -132,18 +132,20 @@ public class BatchManagerImpl implements BatchManager {
         // Bean -> Pojo
         PojoBankTransferData detail = convertToPojo(transferData);
         //detail.setBankTranBatchId(batch.getTid());
+        //detail.setBankTranBatch(batch);
+
         // 保存转账流水
         detail = bankTransferDetaDAO.merge(detail);
         // 保存转账批次
         batch.setTotalCount(batch.getTotalCount() + 1);
-        batch.setTotalAmt(batch.getTotalAmt().add(detail.getTranAmt()));
+        batch.setTotalAmt(batch.getTotalAmt() + detail.getTranAmt());
         batch = bankTransferBatchDAO.merge(batch);
         // 是否要关闭当前转账批次
         if (isCloseBatch(batch)) {
             closeBatch(batch);
         }
-        result.setBankTranBatchId(batch.getTid());
-        result.setBankTranDetaId(detail.getTid());
+        result.setBankTranBatch(batch);
+        result.setBankTranDeta(detail);
         return result;
     }
 
@@ -154,7 +156,11 @@ public class BatchManagerImpl implements BatchManager {
      */
     private boolean isCloseBatch(PojoBankTransferBatch batch) {
         // 取出当前渠道的配置信息
+
         /*PojoBankTransferChannel channelPojo = bankTransferChannelDAO.getByChannelCode(batch.getBankTranChannelId());
+=======
+        PojoBankTransferChannel channelPojo = bankTransferChannelDAO.getByChannelCode(batch.getChannel().getBankChannelCode());
+>>>>>>> branch 'develop' of root@192.168.101.11:zplatform-trade
         // 超过渠道定义的最大笔数的话，就关闭这个批次。
         if (channelPojo.getDetaCount() <= batch.getTotalCount() ) {
             return true;
@@ -170,7 +176,9 @@ public class BatchManagerImpl implements BatchManager {
     private PojoBankTransferData convertToPojo(TransferData transferData) {
         PojoBankTransferData data = new PojoBankTransferData();
         data.setBankTranDataSeqNo(seqNoService.getBatchNo(SeqNoEnum.BANK_TRAN_DATA_NO));
-        //data.setTranDataId(transferData.getTid());
+
+        //data.setTranDataId(transferData);
+
         data.setTranAmt(transferData.getTranAmt());
         data.setAccNo(transferData.getAccNo());
         data.setAccName(transferData.getAccName());

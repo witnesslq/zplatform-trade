@@ -11,9 +11,7 @@
 package com.zlebank.zplatform.trade.bean;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import com.zlebank.zplatform.commons.bean.Bean;
 
@@ -28,8 +26,6 @@ import com.zlebank.zplatform.commons.bean.Bean;
 public class InsteadPayBatchBean implements Bean{
     /**标识**/
     private Long id;
-    /**提交的日期**/
-    private String submitDate;
     /**批次号**/
     private Long batchNo;
     /**商户号**/
@@ -52,19 +48,31 @@ public class InsteadPayBatchBean implements Bean{
     private Date uptime;
     /**备注**/
     private String notes;
-    /**批次明细**/
-    private List<InsteadPayDetailBean> details = new ArrayList<InsteadPayDetailBean>();
+    /**接入类型（01：文件导入00：接口）**/
+    private String type;
+    /**通过笔数**/
+    private Long approveCount;
+    /**通过金额**/
+    private BigDecimal approveAmt;
+    /**未审核笔数**/
+    private Long unapproveCount;
+    /**未审核金额**/
+    private BigDecimal unapproveAmt;
+    /**拒绝笔数**/
+    private Long refuseCount;
+    /**拒绝金额**/
+    private BigDecimal refuseAmt;
+    /**申请时间**/
+    private Date applyTime;
+    /**审核完成时间**/
+    private Date approveFinishTime;
+    /**转账完成时间**/
+    private Date finishTime;
     public Long getId() {
         return id;
     }
     public void setId(Long id) {
         this.id = id;
-    }
-    public String getSubmitDate() {
-        return submitDate;
-    }
-    public void setSubmitDate(String submitDate) {
-        this.submitDate = submitDate;
     }
     public Long getBatchNo() {
         return batchNo;
@@ -132,14 +140,64 @@ public class InsteadPayBatchBean implements Bean{
     public void setNotes(String notes) {
         this.notes = notes;
     }
-    public List<InsteadPayDetailBean> getDetails() {
-        return details;
+    public String getType() {
+        return type;
     }
-    public void setDetails(List<InsteadPayDetailBean> details) {
-        this.details = details;
+    public void setType(String type) {
+        this.type = type;
     }
-    
-    
-    
-
+    public Long getApproveCount() {
+        return approveCount;
+    }
+    public void setApproveCount(Long approveCount) {
+        this.approveCount = approveCount;
+    }
+    public BigDecimal getApproveAmt() {
+        return approveAmt;
+    }
+    public void setApproveAmt(BigDecimal approveAmt) {
+        this.approveAmt = approveAmt;
+    }
+    public Long getUnapproveCount() {
+        return unapproveCount;
+    }
+    public void setUnapproveCount(Long unapproveCount) {
+        this.unapproveCount = unapproveCount;
+    }
+    public BigDecimal getUnapproveAmt() {
+        return unapproveAmt;
+    }
+    public void setUnapproveAmt(BigDecimal unapproveAmt) {
+        this.unapproveAmt = unapproveAmt;
+    }
+    public Long getRefuseCount() {
+        return refuseCount;
+    }
+    public void setRefuseCount(Long refuseCount) {
+        this.refuseCount = refuseCount;
+    }
+    public BigDecimal getRefuseAmt() {
+        return refuseAmt;
+    }
+    public void setRefuseAmt(BigDecimal refuseAmt) {
+        this.refuseAmt = refuseAmt;
+    }
+    public Date getApplyTime() {
+        return applyTime;
+    }
+    public void setApplyTime(Date applyTime) {
+        this.applyTime = applyTime;
+    }
+    public Date getApproveFinishTime() {
+        return approveFinishTime;
+    }
+    public void setApproveFinishTime(Date approveFinishTime) {
+        this.approveFinishTime = approveFinishTime;
+    }
+    public Date getFinishTime() {
+        return finishTime;
+    }
+    public void setFinishTime(Date finishTime) {
+        this.finishTime = finishTime;
+    }
 }
