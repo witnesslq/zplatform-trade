@@ -10,6 +10,9 @@
  */
 package com.zlebank.zplatform.trade.batch.spliter;
 
+import com.zlebank.zplatform.trade.model.PojoBankTransferBatch;
+import com.zlebank.zplatform.trade.model.PojoBankTransferData;
+
 /**
  * 返回结果
  *
@@ -20,20 +23,22 @@ package com.zlebank.zplatform.trade.batch.spliter;
  */
 public class TransferDataResult {
     /**转账批次*/
-    private Long bankTranBatchId;
+    private PojoBankTransferBatch bankTranBatch;
     /**转账明细*/
-    private Long bankTranDetaId;
+    private PojoBankTransferData bankTranDeta;
+    
 
-    public Long getBankTranBatchId() {
-        return bankTranBatchId;
+    public PojoBankTransferBatch getBankTranBatch() {
+        return bankTranBatch;
     }
-    public void setBankTranBatchId(Long bankTranBatchId) {
-        this.bankTranBatchId = bankTranBatchId;
+    public void setBankTranBatch(PojoBankTransferBatch bankTranBatch) {
+        this.bankTranBatch = bankTranBatch;
     }
-    public Long getBankTranDetaId() {
-        return bankTranDetaId;
+    public PojoBankTransferData getBankTranDeta() {
+        return bankTranDeta;
     }
-    public void setBankTranDetaId(Long bankTranDetaId) {
-        this.bankTranDetaId = bankTranDetaId;
+    public void setBankTranDeta(PojoBankTransferData bankTranDeta) {
+        this.bankTranDeta = bankTranDeta;
     }
+
 }

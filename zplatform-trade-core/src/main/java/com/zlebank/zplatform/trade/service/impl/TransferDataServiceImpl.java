@@ -58,10 +58,10 @@ public class TransferDataServiceImpl implements TransferDataService{
         PojoTranBatch batch = new PojoTranBatch();
         // 保存划拨流水信息
         batch.setApplyTime(new Date());
-        batch.setBusitype(type.getCode());
-        batch.setBusiBatchNo(busiBatchNo);
+        batch.setBusiType(type.getCode());
+        batch.setBusiBatchId(busiBatchNo);
         batch.setStatus(TransferBatchStatusEnum.INIT.getCode());
-        batch.setTranBatchSeqNo(seqNoService.getBatchNo(SeqNoEnum.TRAN_BATCH_NO));
+        batch.setTranBatchNo(seqNoService.getBatchNo(SeqNoEnum.TRAN_BATCH_NO));
         batch = tranBatchDAO.merge(batch);
         // 循环数据
         for (PojoTranData data : datas) {
@@ -76,8 +76,8 @@ public class TransferDataServiceImpl implements TransferDataService{
             // 保存划拨批次统计数据
             batch.setTotalCount(addOne(batch.getTotalCount()));
             batch.setTotalAmt(addAmount(batch.getTotalAmt(), data.getTranAmt()));
-            batch.setUnapproveCount(addOne(batch.getUnapproveCount()));
-            batch.setUnapproveAmt(addAmount(batch.getUnapproveAmt(), data.getTranAmt()));
+            batch.setWaitApproveCount(addOne(batch.getWaitApproveCount()));
+            batch.setWaitApproveAmt(addAmount(batch.getWaitApproveAmt(), data.getTranAmt()));
         }
         // 保存划拨批次
         batch = tranBatchDAO.merge(batch);
@@ -91,8 +91,8 @@ public class TransferDataServiceImpl implements TransferDataService{
      * @param tranAmt 被添加的金额
      * @return
      */
-    private BigDecimal addAmount(BigDecimal totalAmt, BigDecimal tranAmt) {
-        return totalAmt == null ? BigDecimal.ONE : totalAmt.add(tranAmt);
+    private Long addAmount(Long totalAmt, Long tranAmt) {
+        return totalAmt == null ? 1L : totalAmt + tranAmt;
     }
 
     /**
@@ -111,7 +111,7 @@ public class TransferDataServiceImpl implements TransferDataService{
      */
     private void checkDetails(PojoTranData data) throws RecordsAlreadyExistsException {
         // 重复检查
-        int count = tranDataDAO.getCountByInsteadDataId(data.getInsteadDataId());
+        int count = tranDataDAO.getCountByInsteadDataId(data.getBusiDataId());
         if (count > 0)
             throw new RecordsAlreadyExistsException();
     }

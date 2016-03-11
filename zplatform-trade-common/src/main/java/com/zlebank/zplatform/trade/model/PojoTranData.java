@@ -10,6 +10,7 @@
  */
 package com.zlebank.zplatform.trade.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -17,6 +18,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
@@ -28,19 +31,25 @@ import org.hibernate.annotations.Parameter;
  * @author Luxiaoshuai
  * @version
  * @date 2016年3月8日 下午3:23:08
- * @since 
+ * @since 1.3.0
  */
 @Entity
 @Table(name = "T_TRAN_DATA")
-public class PojoTranData {
-    /**标示**/
+public class PojoTranData implements Serializable{
+    /**
+	 * serialVersionUID
+	 */
+	private static final long serialVersionUID = -7284460033718598602L;
+	/**标示**/
     private Long tid;
     /**"划拨流水序列号"**/
     private String tranDataSeqNo;
     /**"划拨批次序列号"**/
-    private String tranBatchId;
-    /**"代付流水号"**/
-    private String insteadDataId;
+    private PojoTranBatch tranBatch;
+    /**"业务类型"**/
+    private String busyType;
+    /**"业务流水号"**/
+    private String busiDataId;
     /**"账户类型(0:对私账户1：对公账户)"**/
     private String accType;
     /**"账户号"**/
@@ -52,7 +61,7 @@ public class PojoTranData {
     /**"银行名称"**/
     private String bankName;
     /**"划拨金额"**/
-    private BigDecimal tranAmt;
+    private Long tranAmt;
     /**"备注"**/
     private String remark;
     /**"状态(01:未审核00：审核通过09：审核拒绝)"**/
@@ -66,13 +75,16 @@ public class PojoTranData {
     /**"交易手续费"**/
     private BigDecimal tranFee;
     /**转账流水数据**/
-    private Long bankTranDataId;
-    
+    private PojoBankTransferData bankTranData;
+    /**会员号/付款方的会员号**/
+    private String memberId;
+    /**交易序列号**/
+    private String txnseqno;
     @GenericGenerator(name = "id_gen", strategy = "enhanced-table", parameters = {
             @Parameter(name = "table_name", value = "T_C_PRIMAY_KEY"),
             @Parameter(name = "value_column_name", value = "NEXT_ID"),
             @Parameter(name = "segment_column_name", value = "KEY_NAME"),
-            @Parameter(name = "segment_value", value = "T_TRANSFER_DATA_ID"),
+            @Parameter(name = "segment_value", value = "T_TRANSFER_BATCH_ID"),
             @Parameter(name = "increment_size", value = "1"),
             @Parameter(name = "optimizer", value = "pooled-lo")})
     @Id
@@ -91,19 +103,27 @@ public class PojoTranData {
     public void setTranDataSeqNo(String tranDataSeqNo) {
         this.tranDataSeqNo = tranDataSeqNo;
     }
-    @Column(name = "TRAN_BATCH_ID")
-    public String getTranBatchId() {
-        return tranBatchId;
+    @ManyToOne
+    @JoinColumn(name="TRAN_BATCH_ID")
+    public PojoTranBatch getTranBatch() {
+        return tranBatch;
     }
-    public void setTranBatchId(String tranBatchId) {
-        this.tranBatchId = tranBatchId;
+    public void setTranBatch(PojoTranBatch tranBatch) {
+        this.tranBatch = tranBatch;
     }
-    @Column(name = "INSTEAD_DATA_ID")
-    public String getInsteadDataId() {
-        return insteadDataId;
+    @Column(name = "BUSI_TYPE") 
+    public String getBusyType() {
+        return busyType;
     }
-    public void setInsteadDataId(String insteadDataId) {
-        this.insteadDataId = insteadDataId;
+    public void setBusyType(String busyType) {
+        this.busyType = busyType;
+    }
+    @Column(name = "BUSI_DATA_ID")
+    public String getBusiDataId() {
+        return busiDataId;
+    }
+    public void setBusiDataId(String busiDataId) {
+        this.busiDataId = busiDataId;
     }
     @Column(name = "ACC_TYPE")
     public String getAccType() {
@@ -141,10 +161,10 @@ public class PojoTranData {
         this.bankName = bankName;
     }
     @Column(name = "TRAN_AMT")
-    public BigDecimal getTranAmt() {
+    public Long getTranAmt() {
         return tranAmt;
     }
-    public void setTranAmt(BigDecimal tranAmt) {
+    public void setTranAmt(Long tranAmt) {
         this.tranAmt = tranAmt;
     }
     @Column(name = "REMARK")
@@ -190,11 +210,24 @@ public class PojoTranData {
         this.tranFee = tranFee;
     }
     @Column(name = "BANK_TRAN_DATA_ID")
-    public Long getBankTranDataId() {
-        return bankTranDataId;
+    public PojoBankTransferData getBankTranData() {
+        return bankTranData;
     }
-    public void setBankTranDataId(Long bankTranDataId) {
-        this.bankTranDataId = bankTranDataId;
+    public void setBankTranData(PojoBankTransferData bankTranData) {
+        this.bankTranData = bankTranData;
     }
-
+    @Column(name = "MEMBER_ID")
+	public String getMemberId() {
+		return memberId;
+	}
+	public void setMemberId(String memberId) {
+		this.memberId = memberId;
+	}
+	@Column(name = "TXNSEQNO")
+	public String getTxnseqno() {
+		return txnseqno;
+	}
+	public void setTxnseqno(String txnseqno) {
+		this.txnseqno = txnseqno;
+	}
 }

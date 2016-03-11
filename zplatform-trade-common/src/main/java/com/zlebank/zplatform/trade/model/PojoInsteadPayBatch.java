@@ -40,8 +40,6 @@ public class PojoInsteadPayBatch {
 
     /**标识**/
     private Long id;
-    /**提交的日期**/
-    private String submitDate;
     /**批次号**/
     private Long batchNo;
     /**商户号**/
@@ -64,8 +62,29 @@ public class PojoInsteadPayBatch {
     private Date uptime;
     /**备注**/
     private String notes;
+    /**接入类型（01：文件导入00：接口）**/
+    private String type;
+    /**通过笔数**/
+    private Long approveCount;
+    /**通过金额**/
+    private BigDecimal approveAmt;
+    /**未审核笔数**/
+    private Long unapproveCount;
+    /**未审核金额**/
+    private BigDecimal unapproveAmt;
+    /**拒绝笔数**/
+    private Long refuseCount;
+    /**拒绝金额**/
+    private BigDecimal refuseAmt;
+    /**申请时间**/
+    private Date applyTime;
+    /**审核完成时间**/
+    private Date approveFinishTime;
+    /**转账完成时间**/
+    private Date finishTime;
     /**批次明细**/
     private List<PojoInsteadPayDetail> details = new ArrayList<PojoInsteadPayDetail>();
+    
 
     @OneToMany(mappedBy="insteadPayBatch",fetch=FetchType.EAGER)
     public List<PojoInsteadPayDetail> getDetails() {
@@ -89,13 +108,6 @@ public class PojoInsteadPayBatch {
     }
     public void setId(Long id) {
         this.id = id;
-    }
-    @Column(name = "SUBMIT_DATE")
-    public String getSubmitDate() {
-        return submitDate;
-    }
-    public void setSubmitDate(String submitDate) {
-        this.submitDate = submitDate;
     }
     @Column(name = "BATCH_NO")
     public Long getBatchNo() {
@@ -173,6 +185,76 @@ public class PojoInsteadPayBatch {
     }
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+    @Column(name = "TYPE")
+    public String getType() {
+        return type;
+    }
+    public void setType(String type) {
+        this.type = type;
+    }
+    @Column(name = "APPROVE_COUNT")
+    public Long getApproveCount() {
+        return approveCount;
+    }
+    public void setApproveCount(Long approveCount) {
+        this.approveCount = approveCount;
+    }
+    @Column(name = "APPROVE_AMT")
+    public BigDecimal getApproveAmt() {
+        return approveAmt;
+    }
+    public void setApproveAmt(BigDecimal approveAmt) {
+        this.approveAmt = approveAmt;
+    }
+    @Column(name = "UNAPPROVE_COUNT")
+    public Long getUnapproveCount() {
+        return unapproveCount;
+    }
+    public void setUnapproveCount(Long unapproveCount) {
+        this.unapproveCount = unapproveCount;
+    }
+    @Column(name = "UNAPPROVE_AMT")
+    public BigDecimal getUnapproveAmt() {
+        return unapproveAmt;
+    }
+    public void setUnapproveAmt(BigDecimal unapproveAmt) {
+        this.unapproveAmt = unapproveAmt;
+    }
+    @Column(name = "REFUSE_COUNT")
+    public Long getRefuseCount() {
+        return refuseCount;
+    }
+    public void setRefuseCount(Long refuseCount) {
+        this.refuseCount = refuseCount;
+    }
+    @Column(name = "REFUSE_AMT")
+    public BigDecimal getRefuseAmt() {
+        return refuseAmt;
+    }
+    public void setRefuseAmt(BigDecimal refuseAmt) {
+        this.refuseAmt = refuseAmt;
+    }
+    @Column(name = "APPLY_TIME")
+    public Date getApplyTime() {
+        return applyTime;
+    }
+    public void setApplyTime(Date applyTime) {
+        this.applyTime = applyTime;
+    }
+    @Column(name = "APPROVE_FINISH_TIME")
+    public Date getApproveFinishTime() {
+        return approveFinishTime;
+    }
+    public void setApproveFinishTime(Date approveFinishTime) {
+        this.approveFinishTime = approveFinishTime;
+    }
+    @Column(name = "FINISH_TIME")
+    public Date getFinishTime() {
+        return finishTime;
+    }
+    public void setFinishTime(Date finishTime) {
+        this.finishTime = finishTime;
     }
 
 }

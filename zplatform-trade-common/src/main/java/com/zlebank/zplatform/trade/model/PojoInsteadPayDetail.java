@@ -109,6 +109,10 @@ public class PojoInsteadPayDetail {
     private String  txnseqno;
     /**手续费**/
     private BigDecimal  txnfee;
+    /**代付流水号**/
+    private String tranDataSeqNo;
+    /**申请时间**/
+    private Date applyTime;
 
     private  PojoInsteadPayBatch insteadPayBatch;
 
@@ -377,6 +381,19 @@ public class PojoInsteadPayDetail {
     public void setTxnfee(BigDecimal txnfee) {
         this.txnfee = txnfee;
     }
-    
+    @Column(name = "TRAN_DATA_SEQ_NO")
+    public String getTranDataSeqNo() {
+        return tranDataSeqNo;
+    }
+    public void setTranDataSeqNo(String tranDataSeqNo) {
+        this.tranDataSeqNo = tranDataSeqNo;
+    }
+    @Column(name = "APPLY_TIME")
+    public Date getApplyTime() {
+        return applyTime;
+    }
+    public void setApplyTime(Date applyTime) {
+        this.applyTime = applyTime;
+    }
     
 }

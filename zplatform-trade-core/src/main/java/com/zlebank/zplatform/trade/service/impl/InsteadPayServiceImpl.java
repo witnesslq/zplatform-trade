@@ -333,7 +333,6 @@ public class InsteadPayServiceImpl
      */
     private PojoInsteadPayBatch convertToPojoInsteadPayBatch(InsteadPay_Request request,Long userId) {
         PojoInsteadPayBatch batch = new PojoInsteadPayBatch();
-        batch.setSubmitDate(DateUtil.getCurrentDate());// 提交的日期
         batch.setBatchNo(Long.parseLong(request.getBatchNo()));// 批次号
         batch.setMerId(request.getMerId());// 商户号
         batch.setTxnTime(request.getTxnTime());// 订单发送时间(yyyyMMddhhmmss)
@@ -349,6 +348,10 @@ public class InsteadPayServiceImpl
         batch.setUpuser(0L);// 修改人
         batch.setUptime(new Date());// 修改时间
         batch.setNotes("");// 备注
+        batch.setType("00");// 接入类型（01：文件导入00：接口）
+        batch.setUnapproveCount(batch.getTotalQty());// 未审核笔数
+        batch.setUnapproveAmt(batch.getTotalAmt());// 未审核金额
+        batch.setApplyTime(new Date());// 申请时间
         return batch;
     }
     /**

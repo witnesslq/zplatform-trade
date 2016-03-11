@@ -17,6 +17,9 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
@@ -28,7 +31,7 @@ import org.hibernate.annotations.Parameter;
  * @author Luxiaoshuai
  * @version
  * @date 2016年3月7日 上午11:40:30
- * @since 
+ * @since 1.3.0
  */
 @Entity
 @Table(name="T_BANK_TRAN_DATA")
@@ -36,13 +39,13 @@ public class PojoBankTransferData {
     /**"表标识"**/
     private Long tid;
     /**"银行转账流水序列号"**/
-    private String bankTranDataSeqNo;
+    private String bankTranDataSeqNo; 
     /**"银行转账批次号"**/
-    private Long bankTranBatchId;
+    private PojoBankTransferBatch bankTranBatch;
     /**"划拨流水号"**/
-    private Long tranDataId;
+    private PojoTranData tranData;
     /**"转账金额"**/
-    private BigDecimal tranAmt;
+    private Long tranAmt;
     /**"账户号"**/
     private String accNo;
     /**"账户名"**/
@@ -51,7 +54,7 @@ public class PojoBankTransferData {
     private String accBankNo;
     /**"银行名称"**/
     private String accBankName;
-    /**"""状态（01：未审核02：等待转账03：正在转账**/
+    /**"""状态（01：未审核02：等待转账03：正在转账04:转账完成)**/
     private String status;
     /**"响应码"**/
     private String resCode;
@@ -90,26 +93,28 @@ public class PojoBankTransferData {
     }
     public void setBankTranDataSeqNo(String bankTranDataSeqNo) {
         this.bankTranDataSeqNo = bankTranDataSeqNo;
+    } 
+    @ManyToOne
+    @JoinColumn(name="BANK_TRAN_BATCH_ID")
+    public PojoBankTransferBatch getBankTranBatch() {
+        return bankTranBatch;
     }
-    @Column(name = "BANK_TRAN_BATCH_ID")
-    public Long getBankTranBatchId() {
-        return bankTranBatchId;
+    public void setBankTranBatch(PojoBankTransferBatch bankTranBatch) {
+        this.bankTranBatch = bankTranBatch;
     }
-    public void setBankTranBatchId(Long bankTranBatchId) {
-        this.bankTranBatchId = bankTranBatchId;
+    @OneToOne
+    @JoinColumn(name = "TRAN_DATA_ID")
+    public PojoTranData getTranDataId() {
+        return tranData;
     }
-    @Column(name = "TRAN_DATA_ID")
-    public Long getTranDataId() {
-        return tranDataId;
-    }
-    public void setTranDataId(Long tranDataId) {
-        this.tranDataId = tranDataId;
+    public void setTranDataId(PojoTranData tranData) {
+        this.tranData = tranData;
     }
     @Column(name = "TRAN_AMT")
-    public BigDecimal getTranAmt() {
+    public Long getTranAmt() {
         return tranAmt;
     }
-    public void setTranAmt(BigDecimal tranAmt) {
+    public void setTranAmt(Long tranAmt) {
         this.tranAmt = tranAmt;
     }
     @Column(name = "ACC_NO")
