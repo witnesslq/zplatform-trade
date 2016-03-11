@@ -127,8 +127,8 @@ public class TransferBatchDAOImpl extends HibernateBaseDAOImpl<PojoTranBatch> im
 	
 	@Override
 	@Transactional(readOnly=true)
-	public List<PojoTranData> queryBatchTransfer(String batchNo,String status){
-		StringBuffer sqlBuffer = new StringBuffer("from PojoTranData where 1=1 and tid = ? and status = ?");
+	public List<PojoTranData> queryWaitTrialTranData(String batchNo){
+		StringBuffer sqlBuffer = new StringBuffer("from PojoTranData where 1=1 and tranBatchId = ? and status = ?");
     	Query query = getSession().createQuery(sqlBuffer.toString());
     	query.setParameter(0, batchNo);
     	query.setParameter(1, "01");
@@ -148,11 +148,11 @@ public class TransferBatchDAOImpl extends HibernateBaseDAOImpl<PojoTranBatch> im
 	
 	
 	public PojoTranBatch getByBatchNo(String batchno) {
-		String queryString = "from PojoTranBatch where tranBatchId = ? ";
+		String queryString = "from PojoTranBatch where tid = ? ";
 		try {
 			log.info("queryString:" + queryString);
 			Query query = getSession().createQuery(queryString);
-			query.setParameter(0, batchno);
+			query.setParameter(0, Long.valueOf(batchno));
 			return (PojoTranBatch) query.uniqueResult();
 		} catch (HibernateException e) {
 			e.printStackTrace();

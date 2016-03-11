@@ -18,6 +18,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
@@ -29,7 +31,7 @@ import org.hibernate.annotations.Parameter;
  * @author Luxiaoshuai
  * @version
  * @date 2016年3月8日 下午3:23:08
- * @since 
+ * @since 1.3.0
  */
 @Entity
 @Table(name = "T_TRAN_DATA")
@@ -43,9 +45,11 @@ public class PojoTranData implements Serializable{
     /**"划拨流水序列号"**/
     private String tranDataSeqNo;
     /**"划拨批次序列号"**/
-    private String tranBatchId;
-    /**"代付流水号"**/
-    private String insteadDataId;
+    private Long tranBatchId;
+    //private PojoTranBatch tranBatch;
+    /**"业务类型"**/
+    private String busyType;
+    
     /**"账户类型(0:对私账户1：对公账户)"**/
     private String accType;
     /**"账户号"**/
@@ -71,7 +75,7 @@ public class PojoTranData implements Serializable{
     /**"交易手续费"**/
     private BigDecimal tranFee;
     /**转账流水数据**/
-    private Long bankTranDataId;
+   // private PojoBankTransferData bankTranData;
     /**会员号/付款方的会员号**/
     private String memberId;
     /**交易序列号**/
@@ -99,20 +103,22 @@ public class PojoTranData implements Serializable{
     public void setTranDataSeqNo(String tranDataSeqNo) {
         this.tranDataSeqNo = tranDataSeqNo;
     }
-    @Column(name = "TRAN_BATCH_ID")
-    public String getTranBatchId() {
-        return tranBatchId;
+    /*@ManyToOne
+    @JoinColumn(name="TRAN_BATCH_ID")
+    public PojoTranBatch getTranBatch() {
+        return tranBatch;
     }
-    public void setTranBatchId(String tranBatchId) {
-        this.tranBatchId = tranBatchId;
+    public void setTranBatch(PojoTranBatch tranBatch) {
+        this.tranBatch = tranBatch;
+    }*/
+    @Column(name = "BUSI_TYPE") 
+    public String getBusyType() {
+        return busyType;
     }
-    @Column(name = "INSTEAD_DATA_ID")
-    public String getInsteadDataId() {
-        return insteadDataId;
+    public void setBusyType(String busyType) {
+        this.busyType = busyType;
     }
-    public void setInsteadDataId(String insteadDataId) {
-        this.insteadDataId = insteadDataId;
-    }
+   
     @Column(name = "ACC_TYPE")
     public String getAccType() {
         return accType;
@@ -197,13 +203,13 @@ public class PojoTranData implements Serializable{
     public void setTranFee(BigDecimal tranFee) {
         this.tranFee = tranFee;
     }
-    @Column(name = "BANK_TRAN_DATA_ID")
-    public Long getBankTranDataId() {
-        return bankTranDataId;
+   /* @Column(name = "BANK_TRAN_DATA_ID")
+    public PojoBankTransferData getBankTranData() {
+        return bankTranData;
     }
-    public void setBankTranDataId(Long bankTranDataId) {
-        this.bankTranDataId = bankTranDataId;
-    }
+    public void setBankTranData(PojoBankTransferData bankTranData) {
+        this.bankTranData = bankTranData;
+    }*/
     @Column(name = "MEMBER_ID")
 	public String getMemberId() {
 		return memberId;
@@ -218,4 +224,12 @@ public class PojoTranData implements Serializable{
 	public void setTxnseqno(String txnseqno) {
 		this.txnseqno = txnseqno;
 	}
+	@Column(name = "TRAN_BATCH_ID")
+	public Long getTranBatchId() {
+		return tranBatchId;
+	}
+	public void setTranBatchId(Long tranBatchId) {
+		this.tranBatchId = tranBatchId;
+	}
+	
 }

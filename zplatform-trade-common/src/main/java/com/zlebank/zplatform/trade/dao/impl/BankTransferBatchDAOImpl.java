@@ -14,6 +14,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.type.TrueFalseType;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -251,9 +252,10 @@ public class BankTransferBatchDAOImpl extends
 	@Transactional(readOnly=true)
 	public Map<String, Object> queryBankTransferByPage(
 			QueryTransferBean queryTransferBean, int page, int pageSize) {
-		StringBuffer sqlBuffer = new StringBuffer("from PojoBankTransferBatch where 1=1 ");
-		StringBuffer sqlCountBuffer = new StringBuffer("select count(*) from PojoBankTransferBatch where 1=1 ");
+		StringBuffer sqlBuffer = new StringBuffer("from PojoBankTransferBatch where openStatus=? ");
+		StringBuffer sqlCountBuffer = new StringBuffer("select count(*) from PojoBankTransferBatch where openStatus=? ");
 		List<String> parameterList = new ArrayList<String>();
+		parameterList.add("1");
 		if(queryTransferBean!=null){
 			if(StringUtil.isNotEmpty(queryTransferBean.getBatchNo())){
 				sqlBuffer.append(" and bankTranBatchNo = ? ");
@@ -280,5 +282,21 @@ public class BankTransferBatchDAOImpl extends
 		resultMap.put("total", ((Long) countQuery.uniqueResult()).longValue());
 		resultMap.put("rows", query.list());
 		return resultMap;
+	}
+
+	@Override
+	@Transactional(readOnly=true)
+	public PojoBankTransferBatch getByBankTranBatchNo(Long tid) {
+		String queryString = "from PojoBankTransferBatch where tid = ? ";
+		try {
+			log.info("queryString:" + queryString);
+			Query query = getSession().createQuery(queryString);
+			query.setParameter(0, tid);
+			return (PojoBankTransferBatch) query.uniqueResult();
+		} catch (HibernateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new CMMException("M001");
+		}
 	}
 }

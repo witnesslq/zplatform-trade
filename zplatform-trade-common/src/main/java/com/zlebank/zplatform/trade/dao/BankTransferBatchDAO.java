@@ -84,5 +84,13 @@ public interface BankTransferBatchDAO extends BasePagedQueryDAO<PojoBankTransfer
      * @return
      */
     public Map<String, Object> queryBankTransferByPage(QueryTransferBean queryTransferBean,int page,int pageSize);
+    
+    
+    /**
+     * 根据转账批次号获取批次数据
+     * @param bankTranBatchNo
+     * @return
+     */
+    public PojoBankTransferBatch getByBankTranBatchNo(Long tid);
 }
 

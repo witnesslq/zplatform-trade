@@ -75,7 +75,7 @@ public class BatchManagerImpl implements BatchManager {
         PojoBankTransferChannel channelPojo = bankTransferChannelDAO.getByChannelCode(channel);
         PojoBankTransferBatch newBatch = new PojoBankTransferBatch();
         newBatch.setBankTranBatchNo(seqNoService.getBatchNo(SeqNoEnum.BANK_TRAN_BATCH_NO));
-        newBatch.setChannel(channel);
+       
         newBatch.setTotalCount(0L);
         newBatch.setTotalAmt(BigDecimal.ZERO);
         newBatch.setSuccessCount(0L);
@@ -131,7 +131,7 @@ public class BatchManagerImpl implements BatchManager {
         PojoBankTransferBatch batch = getBatchNoByChannel(channelCode);
         // Bean -> Pojo
         PojoBankTransferData detail = convertToPojo(transferData);
-        detail.setBankTranBatchId(batch.getTid());
+        //detail.setBankTranBatchId(batch.getTid());
         // 保存转账流水
         detail = bankTransferDetaDAO.merge(detail);
         // 保存转账批次
@@ -154,11 +154,11 @@ public class BatchManagerImpl implements BatchManager {
      */
     private boolean isCloseBatch(PojoBankTransferBatch batch) {
         // 取出当前渠道的配置信息
-        PojoBankTransferChannel channelPojo = bankTransferChannelDAO.getByChannelCode(batch.getChannel());
+        /*PojoBankTransferChannel channelPojo = bankTransferChannelDAO.getByChannelCode(batch.getBankTranChannelId());
         // 超过渠道定义的最大笔数的话，就关闭这个批次。
         if (channelPojo.getDetaCount() <= batch.getTotalCount() ) {
             return true;
-        }
+        }*/
         return false;
     }
 
@@ -170,7 +170,7 @@ public class BatchManagerImpl implements BatchManager {
     private PojoBankTransferData convertToPojo(TransferData transferData) {
         PojoBankTransferData data = new PojoBankTransferData();
         data.setBankTranDataSeqNo(seqNoService.getBatchNo(SeqNoEnum.BANK_TRAN_DATA_NO));
-        data.setTranDataId(transferData.getTid());
+        //data.setTranDataId(transferData.getTid());
         data.setTranAmt(transferData.getTranAmt());
         data.setAccNo(transferData.getAccNo());
         data.setAccName(transferData.getAccName());
@@ -179,7 +179,7 @@ public class BatchManagerImpl implements BatchManager {
         data.setStatus(BankTransferDataStatusEnum.INIT.getCode());
         data.setApplyTime(new Date());
         data.setAccType(transferData.getAccType());
-        data.setTxnseqno(OrderNumber.getInstance().generateTxnseqno(BusinessCodeEnum.TRAN_DATA_NO.getBusiCode()));
+        //data.setTxnseqno(OrderNumber.getInstance().generateTxnseqno(BusinessCodeEnum.TRAN_DATA_NO.getBusiCode()));
         CardBin card = cardBinDao.getCard(transferData.getAccNo());
 	     if (card != null && StringUtil.isNotEmpty(card.getBankCode()) && card.getBankCode().startsWith("0305")) {
 	         data.setTransferType("01");

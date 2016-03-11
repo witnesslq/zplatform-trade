@@ -73,8 +73,8 @@ public class SplitTest {
     private PojoTranData createTranData() {
         PojoTranData pojo = new PojoTranData();
         pojo.setTranDataSeqNo(seqNoService.getBatchNo(SeqNoEnum.TRAN_DATA_NO));// "划拨流水序列号"
-        pojo.setTranBatchId("3");// "划拨批次序列号"
-        pojo.setInsteadDataId("1003");// "代付流水号"
+        //pojo.setTranBatchId("3");// "划拨批次序列号"
+        //pojo.setInsteadDataId("1003");// "代付流水号"
         pojo.setAccType("0");// "账户类型(0:对私账户1：对公账户)"
         pojo.setAccNo("6225010100010001");// "账户号"
         pojo.setAccName("习远平");// "账户名"

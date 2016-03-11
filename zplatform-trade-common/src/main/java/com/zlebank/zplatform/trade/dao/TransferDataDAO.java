@@ -10,9 +10,10 @@ import com.zlebank.zplatform.trade.bean.enums.BusinessEnum;
 import com.zlebank.zplatform.trade.bean.page.QueryTransferBean;
 import com.zlebank.zplatform.trade.model.PojoTranBatch;
 import com.zlebank.zplatform.trade.model.PojoTranData;
+import com.zlebank.zplatform.trade.model.TTranDataModel;
 
-public interface TransferDataDAO extends BaseDAO<PojoTranData>{
     
+public interface TransferDataDAO extends BaseDAO<PojoTranData>{
     /**
      * 通过批次号和账务状态获取批次明细数据
      * @param batchNo
@@ -42,24 +43,39 @@ public interface TransferDataDAO extends BaseDAO<PojoTranData>{
 
     /**
      * 
-     * @param tranDataSeqNo
+     * @param tid
      * @param status
      * @throws NumberFormatException 
      * @throws AbstractBusiAcctException 
      * @throws AccBussinessException 
      */
-    public void singleTrailTransfer(String tranDataSeqNo,String status) throws AccBussinessException, AbstractBusiAcctException, NumberFormatException;
+    public void singleTrailTransfer(Long tid,String status) throws AccBussinessException, AbstractBusiAcctException, NumberFormatException;
     
     /**
      * 
-     * @param tranDataSeqNo
+     * @param tid
      * @return
      */
-    public PojoTranData queryTransferData(String tranDataSeqNo);
+    public PojoTranData queryTransferData(Long tid);
     
     /**
      * 
      * @param transferBatch
      */
     public void updateBatchTransferSingle(PojoTranBatch transferBatch);
+    
+    
+    /**
+     * 更新划拨数据状态
+     * @param tid
+     * @param status
+     */
+    public void updateTransferDataStatus(Long tid, String status);
+    
+    /**
+     * 获取等待转账结果的划拨数据数量
+     * @param tranBatchId
+     * @return
+     */
+    public Long queryWaritTransferCount(Long tranBatchId);
 }

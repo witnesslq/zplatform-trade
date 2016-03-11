@@ -44,12 +44,12 @@ HibernateBaseDAOImpl<PojoBankTransferData>
     @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public List<PojoBankTransferData> findTransDataByBatchNo(String batchNo) {
         List<PojoBankTransferData> result = null;
-        String queryString = " from PojoBankTransferData where batchno = ? and status = ?";
+        String queryString = " from PojoBankTransferData where bankTranBatchId = ? and status = ?";
         try {
             log.info("queryString:" + queryString);
             Query query = getSession().createQuery(queryString);
-            query.setString(0, batchNo);
-            query.setString(1, "01");
+            query.setLong(0, Long.valueOf(batchNo));
+            query.setString(1, "03");
             result = query.list();
         } catch (HibernateException e) {
             // TODO Auto-generated catch block
@@ -98,7 +98,6 @@ HibernateBaseDAOImpl<PojoBankTransferData>
         return result;
     }
 
-    @Override
     @Transactional(propagation=Propagation.REQUIRES_NEW)
     public void batchUpdateTransData(List<PojoBankTransferData> transferDataList) {
         /*StringBuffer hqlBuffer = new StringBuffer();
@@ -148,7 +147,6 @@ HibernateBaseDAOImpl<PojoBankTransferData>
 */
     }
 
-    @Override
     @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void batchUpdateTransDataAccStatus(List<PojoBankTransferData> transferDataList) {
         // TODO Auto-generated method stub
@@ -291,10 +289,36 @@ HibernateBaseDAOImpl<PojoBankTransferData>
 		query.setFirstResult((pageSize)*((page==0?1:page)-1));
     	query.setMaxResults(pageSize);
 		Map<String, Object> resultMap = new HashMap<String, Object>();
-		System.out.println(JSON.toJSONString(countQuery.list()));
+		//System.out.println(JSON.toJSONString(countQuery.list()));
 		resultMap.put("total", countQuery.uniqueResult());
 		resultMap.put("rows", query.list());
 		return resultMap;
+	}
+
+	@Override
+	public List<PojoBankTransferData> findBankTransferDataByBankTranBatchId(
+			Long bankTranBatchId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+	public void updateWaitBankTransferStatus(String bankTranBatchId,
+			String status) {
+		
+		 try {
+	            String hql = "update PojoBankTransferData set status = ? where tid = ? and status = ?";
+	            Session session = getSession();
+	            Query query = session.createQuery(hql);
+	            query.setParameter(0, status);
+	            query.setParameter(1, Long.valueOf(bankTranBatchId));
+	            query.setParameter(2, "01");
+	            query.executeUpdate();
+	        } catch (HibernateException e) {
+	            // TODO Auto-generated catch block
+	            e.printStackTrace();
+	        }
 	}
 	
 	

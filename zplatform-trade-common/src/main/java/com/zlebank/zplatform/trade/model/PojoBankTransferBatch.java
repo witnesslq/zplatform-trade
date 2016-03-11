@@ -12,11 +12,17 @@ package com.zlebank.zplatform.trade.model;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
@@ -28,7 +34,7 @@ import org.hibernate.annotations.Parameter;
  * @author Luxiaoshuai
  * @version
  * @date 2016年3月7日 上午11:40:42
- * @since 
+ * @since 1.3.0
  */
 @Entity
 @Table(name="T_BANK_TRAN_BATCH")
@@ -38,7 +44,9 @@ public class PojoBankTransferBatch {
     /**"银行转账批次序列号"**/
     private String bankTranBatchNo;
     /**"转账渠道"**/
-    private String channel;
+    //private PojoBankTransferChannel channel;
+    /**"关联划拨批次渠道"**/
+    //private List<PojoTranBatch> tranBatchs;
     /**"总笔数"**/
     private Long totalCount;
     /**"总金额"**/
@@ -51,11 +59,11 @@ public class PojoBankTransferBatch {
     private Long failCount;
     /**"失败金额"**/
     private BigDecimal failAmt;
-    /**"""状态（01：未审核02：全部审核通过00：全部转账成功）"""**/
+    /**"""状态（01：未审核02：审核通过03：审核拒绝）"""**/
     private String status;
     /**"开放状态（0:开放1：关闭）"**/
     private String openStatus;
-    /**"""转账状态(01:等待转账02：部分转账成功03：全部转账成功**/
+    /**"""转账状态(01:等待转账02：部分转账成功03：全部转账成功 04：全部失败**/
     private String tranStatus;
     /**"申请时间**/
     private Date applyTime;
@@ -65,12 +73,14 @@ public class PojoBankTransferBatch {
     private Date latestCloseTime;
     /**"关闭时间"**/
     private Date closeTime;
-    /**"""触发关闭动作（00：笔数到达上限01：到达每日最后关闭时间02：到达关闭间隔）"""**/
+    /**"""触发关闭动作（00：笔数到达上限01：到达每日最后关闭时间02：到达关闭间隔 03：手工关闭）"""**/
     private String closeEvent;
     /**"转账审核人"**/
     private Long tranUser;
+    
     /**备注**/
     private String remark;
+    private List<PojoBankTransferData> bnakTranDatas;
     @GenericGenerator(name = "id_gen", strategy = "enhanced-table", parameters = {
             @Parameter(name = "table_name", value = "T_C_PRIMAY_KEY"),
             @Parameter(name = "value_column_name", value = "NEXT_ID"),
@@ -94,13 +104,16 @@ public class PojoBankTransferBatch {
     public void setBankTranBatchNo(String bankTranBatchNo) {
         this.bankTranBatchNo = bankTranBatchNo;
     }
+    
+    /*@ManyToOne
     @Column(name = "CHANNEL")
-    public String getChannel() {
+    public PojoBankTransferChannel getChannel() {
         return channel;
     }
-    public void setChannel(String channel) {
+    public void setChannel(PojoBankTransferChannel channel) {
         this.channel = channel;
     }
+    */
     @Column(name = "TOTAL_COUNT")
     public Long getTotalCount() {
         return totalCount;
@@ -213,5 +226,21 @@ public class PojoBankTransferBatch {
     public void setRemark(String remark) {
         this.remark = remark;
     }
-
+   /* @ManyToMany
+    @JoinTable
+    public List<PojoTranBatch> getTranBatchs() {
+        return tranBatchs;
+    }
+    public void setTranBatchs(List<PojoTranBatch> tranBatchs) {
+        this.tranBatchs = tranBatchs;
+    }
+    @OneToMany(mappedBy="BANK_TRAN_BATCH_ID",fetch=FetchType.LAZY)
+    public List<PojoBankTransferData> getBnakTranDatas() {
+        return bnakTranDatas;
+    }
+    public void setBnakTranDatas(List<PojoBankTransferData> bnakTranDatas) {
+        this.bnakTranDatas = bnakTranDatas;
+    }
+    */
+    
 }

@@ -64,5 +64,18 @@ public interface BankTransferDataDAO  extends BaseDAO<PojoBankTransferData>{
      * @return
      */
     public Map<String, Object> queryBankTransferDataByPage(QueryTransferBean queryTransferBean,int page,int pageSize);
-
+    
+    /**
+     * 根据转账批次号好回去转账信息
+     * @param bankTranBatchId
+     * @return
+     */
+    public List<PojoBankTransferData> findBankTransferDataByBankTranBatchId(Long bankTranBatchId);
+    
+    /**
+     * 更新待审核批次数据的状态
+     * @param bankTranBatchId
+     * @param status
+     */
+    public void updateWaitBankTransferStatus(String bankTranBatchId,String status);
 }

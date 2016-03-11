@@ -10,6 +10,7 @@
  */
 package com.zlebank.zplatform.trade.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -17,6 +18,9 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
@@ -28,19 +32,20 @@ import org.hibernate.annotations.Parameter;
  * @author Luxiaoshuai
  * @version
  * @date 2016年3月7日 上午11:40:30
- * @since 
+ * @since 1.3.0
  */
 @Entity
 @Table(name="T_BANK_TRAN_DATA")
-public class PojoBankTransferData {
+public class PojoBankTransferData implements Serializable{
     /**"表标识"**/
     private Long tid;
     /**"银行转账流水序列号"**/
-    private String bankTranDataSeqNo;
+    private String bankTranDataSeqNo; 
     /**"银行转账批次号"**/
-    private Long bankTranBatchId;
+    private long bankTranBatchId;
     /**"划拨流水号"**/
-    private Long tranDataId;
+    //private PojoTranData tranData;
+    private String tranDataId;
     /**"转账金额"**/
     private BigDecimal tranAmt;
     /**"账户号"**/
@@ -51,7 +56,7 @@ public class PojoBankTransferData {
     private String accBankNo;
     /**"银行名称"**/
     private String accBankName;
-    /**"""状态（01：未审核02：等待转账03：正在转账**/
+    /**"""状态（01：未审核02：等待转账03：正在转账04:转账完成)**/
     private String status;
     /**"响应码"**/
     private String resCode;
@@ -61,8 +66,6 @@ public class PojoBankTransferData {
     private Date applyTime;
     /**"账户类型(0:对私账户1：对公账户)"**/
     private String accType;
-    /**交易序列号**/
-    private String txnseqno;
     /**划拨类型，01-行内02-跨行**/
     private String transferType;
     /**付款结果**/
@@ -90,21 +93,23 @@ public class PojoBankTransferData {
     }
     public void setBankTranDataSeqNo(String bankTranDataSeqNo) {
         this.bankTranDataSeqNo = bankTranDataSeqNo;
+    } 
+   /* @ManyToOne
+    @JoinColumn(name="BANK_TRAN_BATCH_ID")
+    public PojoBankTransferBatch getBankTranBatch() {
+        return bankTranBatch;
     }
-    @Column(name = "BANK_TRAN_BATCH_ID")
-    public Long getBankTranBatchId() {
-        return bankTranBatchId;
+    public void setBankTranBatch(PojoBankTransferBatch bankTranBatch) {
+        this.bankTranBatch = bankTranBatch;
     }
-    public void setBankTranBatchId(Long bankTranBatchId) {
-        this.bankTranBatchId = bankTranBatchId;
+    @OneToOne
+    @JoinColumn(name = "TRAN_DATA_ID")
+    public PojoTranData getTranDataId() {
+        return tranData;
     }
-    @Column(name = "TRAN_DATA_ID")
-    public Long getTranDataId() {
-        return tranDataId;
-    }
-    public void setTranDataId(Long tranDataId) {
-        this.tranDataId = tranDataId;
-    }
+    public void setTranDataId(PojoTranData tranData) {
+        this.tranData = tranData;
+    }*/
     @Column(name = "TRAN_AMT")
     public BigDecimal getTranAmt() {
         return tranAmt;
@@ -175,13 +180,6 @@ public class PojoBankTransferData {
     public void setAccType(String accType) {
         this.accType = accType;
     }
-    @Column(name = "TXNSEQNO")
-    public String getTxnseqno() {
-        return txnseqno;
-    }
-    public void setTxnseqno(String txnseqno) {
-        this.txnseqno = txnseqno;
-    }
     @Column(name = "TRANSFER_TYPE")
     public String getTransferType() {
         return transferType;
@@ -196,4 +194,27 @@ public class PojoBankTransferData {
     public void setResType(String resType) {
         this.resType = resType;
     }
+    @Column(name = "BANK_TRAN_BATCH_ID")
+	public long getBankTranBatchId() {
+		return bankTranBatchId;
+	}
+	public void setBankTranBatchId(long bankTranBatchId) {
+		this.bankTranBatchId = bankTranBatchId;
+	}
+	@Column(name = "TRAN_DATA_ID")
+	public String getTranDataId() {
+		return tranDataId;
+	}
+	public void setTranDataId(String tranDataId) {
+		this.tranDataId = tranDataId;
+	}
+	/*@ManyToOne
+    @JoinColumn(name="BANK_TRAN_BATCH_ID")
+    public PojoBankTransferBatch getBankTranBatch() {
+        return bankTranBatch;
+    }
+    public void setBankTranBatch(PojoBankTransferBatch bankTranBatch) {
+        this.bankTranBatch = bankTranBatch;
+    }*/
+    
 }
