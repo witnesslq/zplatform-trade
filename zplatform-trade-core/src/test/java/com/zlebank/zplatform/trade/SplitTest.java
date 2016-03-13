@@ -10,19 +10,16 @@
  */
 package com.zlebank.zplatform.trade;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.trade.batch.spliter.BatchSpliter;
 import com.zlebank.zplatform.trade.bean.enums.SeqNoEnum;
 import com.zlebank.zplatform.trade.dao.TranDataDAO;
 import com.zlebank.zplatform.trade.exception.RecordsAlreadyExistsException;
-import com.zlebank.zplatform.trade.model.PojoTranBatch;
 import com.zlebank.zplatform.trade.model.PojoTranData;
 import com.zlebank.zplatform.trade.service.SeqNoService;
 

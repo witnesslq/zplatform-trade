@@ -16,6 +16,10 @@ import com.zlebank.zplatform.trade.bean.enums.CertifTypeEnmu;
 @Table(name = "T_TXNS_WHITE_LIST")
 public class TxnsWhiteListModel implements java.io.Serializable {
 
+    /**
+     * serialVersionUID
+     */
+    private static final long serialVersionUID = 1170598895865056112L;
     private long tid;
     private String bankinscode;
     private String bankname;

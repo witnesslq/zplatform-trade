@@ -14,7 +14,11 @@ public class TxnsGatewaypayModel implements java.io.Serializable {
 
 	// Fields
 
-	private Long id;
+	/**
+     * serialVersionUID
+     */
+    private static final long serialVersionUID = 5136085938296304922L;
+    private Long id;
 	private String institution;
 	private String payorderno;
 	private Long payamt;

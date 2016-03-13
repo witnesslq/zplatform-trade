@@ -17,7 +17,11 @@ public class TxnsSplitAccountModel implements java.io.Serializable {
 
 	// Fields
 
-	private Long tid;
+	/**
+     * serialVersionUID
+     */
+    private static final long serialVersionUID = -2260616046518563950L;
+    private Long tid;
 	private String memberid;
 	private Long amount;
 	private Long commamt;

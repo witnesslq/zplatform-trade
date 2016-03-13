@@ -10,7 +10,6 @@
  */
 package com.zlebank.zplatform.trade.batch.spliter.impl;
 
-import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.Date;
 
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import com.zlebank.zplatform.commons.bean.CardBin;
 import com.zlebank.zplatform.commons.dao.CardBinDao;
-import com.zlebank.zplatform.commons.enums.BusinessCodeEnum;
 import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.batch.spliter.BatchManager;
@@ -38,7 +36,6 @@ import com.zlebank.zplatform.trade.model.PojoBankTransferBatch;
 import com.zlebank.zplatform.trade.model.PojoBankTransferChannel;
 import com.zlebank.zplatform.trade.model.PojoBankTransferData;
 import com.zlebank.zplatform.trade.service.SeqNoService;
-import com.zlebank.zplatform.trade.utils.OrderNumber;
 
 
 /**

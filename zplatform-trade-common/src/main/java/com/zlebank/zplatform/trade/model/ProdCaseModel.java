@@ -18,7 +18,11 @@ public class ProdCaseModel implements java.io.Serializable {
 
 	// Fields
 
-	private Long caseid;
+	/**
+     * serialVersionUID
+     */
+    private static final long serialVersionUID = -3692222731872281016L;
+    private Long caseid;
 	private String prdtver;
 	private String busicode;
 	private String businame;

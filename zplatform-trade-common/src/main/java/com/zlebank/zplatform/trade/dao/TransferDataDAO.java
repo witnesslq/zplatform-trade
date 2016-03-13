@@ -10,7 +10,6 @@ import com.zlebank.zplatform.trade.bean.enums.BusinessEnum;
 import com.zlebank.zplatform.trade.bean.page.QueryTransferBean;
 import com.zlebank.zplatform.trade.model.PojoTranBatch;
 import com.zlebank.zplatform.trade.model.PojoTranData;
-import com.zlebank.zplatform.trade.model.TTranDataModel;
 
     
 public interface TransferDataDAO extends BaseDAO<PojoTranData>{

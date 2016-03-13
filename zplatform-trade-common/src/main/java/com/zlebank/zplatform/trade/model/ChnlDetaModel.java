@@ -14,7 +14,11 @@ public class ChnlDetaModel implements java.io.Serializable {
 
 	// Fields
 
-	private Long chnlid;
+	/**
+     * serialVersionUID
+     */
+    private static final long serialVersionUID = 4499784198716910441L;
+    private Long chnlid;
 	private String chnlcode;
 	private String chnlname;
 	private String insticode;

@@ -14,6 +14,10 @@ public class MerchMkModel implements java.io.Serializable {
 
  // Fields
 
+    /**
+     * serialVersionUID
+     */
+    private static final long serialVersionUID = -408182992724615740L;
     private String memberid;
     private String safeseq;
     private String safetype;

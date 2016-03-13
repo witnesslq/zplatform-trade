@@ -122,7 +122,7 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
             bodyMsg.append("\r\n");
             sumAmt += bean.getTranAmt().longValue();
             sumItem++;
-            PojoTranData tranData = transferDataDAO.queryTransferData(Long.valueOf(bean.getTranDataId()));
+            PojoTranData tranData = transferDataDAO.queryTransferData(bean.getTranData().getTid());
             TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(tranData.getTxnseqno());
             //风控
             txnsLogService.tradeRiskControl(txnsLog.getTxnseqno(),txnsLog.getAccfirmerno(),txnsLog.getAccsecmerno(),txnsLog.getAccmemberid(),txnsLog.getBusicode(),txnsLog.getAmount()+"",bean.getAccType(),bean.getAccNo());
@@ -270,7 +270,7 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
             bodyMsg.append("\r\n");
             sumAmt += bean.getTranAmt().longValue();
             sumItem++;
-            PojoTranData tranData = transferDataDAO.queryTransferData(Long.valueOf(bean.getTranDataId()));
+            PojoTranData tranData = transferDataDAO.queryTransferData(bean.getTranData().getTid());
             TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(tranData.getTxnseqno());
             //风控
             txnsLogService.tradeRiskControl(txnsLog.getTxnseqno(),txnsLog.getAccfirmerno(),txnsLog.getAccsecmerno(),txnsLog.getAccmemberid(),txnsLog.getBusicode(),txnsLog.getAmount()+"",bean.getAccType(),bean.getAccNo());

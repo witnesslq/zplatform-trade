@@ -3,9 +3,7 @@ package com.zlebank.zplatform.trade.dao;
 import java.util.List;
 import java.util.Map;
 
-import com.zlebank.zplatform.commons.bean.TransferDataQuery;
 import com.zlebank.zplatform.commons.dao.BaseDAO;
-import com.zlebank.zplatform.commons.dao.BasePagedQueryDAO;
 import com.zlebank.zplatform.trade.bean.enums.InsteadPayTypeEnum;
 import com.zlebank.zplatform.trade.bean.page.QueryTransferBean;
 import com.zlebank.zplatform.trade.model.PojoBankTransferData;

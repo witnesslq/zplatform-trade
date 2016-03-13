@@ -13,6 +13,10 @@ import javax.persistence.Table;
 @Table(name = "T_WITHDRAW_BATCH")
 public class WithdrawBatchModel implements java.io.Serializable {
 
+    /**
+     * serialVersionUID
+     */
+    private static final long serialVersionUID = -4970709929346361569L;
     private long id;
     private String batchno;
     private Long sumitem;

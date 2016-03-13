@@ -13,6 +13,10 @@ import javax.persistence.Table;
 @Table(name = "T_TXNS_NOTIFY_TASK")
 public class TxnsNotifyTaskModel implements java.io.Serializable {
 
+    /**
+     * serialVersionUID
+     */
+    private static final long serialVersionUID = 1112312515568183790L;
     private long id;
     private String memberId;
     private String txnseqno;

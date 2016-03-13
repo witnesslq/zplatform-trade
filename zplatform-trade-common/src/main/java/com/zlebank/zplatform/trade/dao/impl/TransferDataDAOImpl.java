@@ -29,6 +29,7 @@ import com.zlebank.zplatform.trade.model.PojoTranBatch;
 import com.zlebank.zplatform.trade.model.PojoTranData;
 @Repository("transferDataDAO")
 public class TransferDataDAOImpl  extends HibernateBaseDAOImpl<PojoTranData> implements TransferDataDAO {
+    @SuppressWarnings("unused")
     private static final Log log = LogFactory.getLog(TransferDataDAOImpl.class);
 
     @Autowired
@@ -88,12 +89,12 @@ public class TransferDataDAOImpl  extends HibernateBaseDAOImpl<PojoTranData> imp
 		long unApproveAmount = 0L;
 		//判断划拨明细数据状态
 
-    	PojoTranBatch transferBatch = transferBatchDAO.getByBatchNo(transferData.getTranBatchId()+"");
+    	PojoTranBatch transferBatch = transferBatchDAO.getByBatchNo(transferData.getTranBatch().getTid()+"");
 
     	//PojoTranBatch transferBatch = transferBatchDAO.getByBatchNo(transferData.getTranBatch().getTid()+"");
 
     	if("00".equals(status)){//审核通过的执行分批算法
-    		PojoTranData[] pojoTransferDatas = new PojoTranData[]{transferData};
+    		//PojoTranData[] pojoTransferDatas = new PojoTranData[]{transferData};
     		//
 			if("00".equals(transferData.getStatus())){
 				approveCount++;
@@ -137,7 +138,7 @@ public class TransferDataDAOImpl  extends HibernateBaseDAOImpl<PojoTranData> imp
         tradeInfo.setTxnseqno(transferData.getTxnseqno());
         //tradeInfo.setTxnseqno(pojoinstead.getOrderId());
         tradeInfo.setCommission(new BigDecimal(0));
-        tradeInfo.setCharge(transferData.getTranFee());
+        tradeInfo.setCharge(new BigDecimal(transferData.getTranFee()));
         accEntryService.accEntryProcess(tradeInfo);
     }
     

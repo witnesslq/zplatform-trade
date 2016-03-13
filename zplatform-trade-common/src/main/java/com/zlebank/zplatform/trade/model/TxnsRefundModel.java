@@ -18,7 +18,11 @@ public class TxnsRefundModel implements java.io.Serializable {
 
 	// Fields
 
-	private Long id;
+	/**
+     * serialVersionUID
+     */
+    private static final long serialVersionUID = 4768281398006737392L;
+    private Long id;
 	private String refundorderno;
 	private String oldorderno;
 	private String oldtxnseqno;

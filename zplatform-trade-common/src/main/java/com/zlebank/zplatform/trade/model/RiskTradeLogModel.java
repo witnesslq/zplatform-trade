@@ -17,6 +17,10 @@ import javax.persistence.Table;
 @Table(name = "T_RISK_TRADE_LOG")
 public class RiskTradeLogModel implements java.io.Serializable {
 
+    /**
+     * serialVersionUID
+     */
+    private static final long serialVersionUID = 6539994898165412971L;
     private long tid;
     private Integer riskTradeType;
     private String txnseqno;

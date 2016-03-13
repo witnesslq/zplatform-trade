@@ -11,15 +11,17 @@
 package com.zlebank.zplatform.trade.model;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
@@ -35,51 +37,50 @@ import org.hibernate.annotations.Parameter;
  */
 @Entity
 @Table(name = "T_TRAN_DATA")
-public class PojoTranData implements Serializable{
+public class PojoTranData implements Serializable {
     /**
-	 * serialVersionUID
-	 */
-	private static final long serialVersionUID = -7284460033718598602L;
-	/**标示**/
+     * serialVersionUID
+     */
+    private static final long serialVersionUID = -7284460033718598602L;
+    /** 标示 **/
     private Long tid;
-    /**"划拨流水序列号"**/
+    /** "划拨流水序列号" **/
     private String tranDataSeqNo;
-    /**"划拨批次序列号"**/
-    private Long tranBatchId;
-    //private PojoTranBatch tranBatch;
-    /**"业务类型"**/
+    /** "划拨批次序列号" **/
+    private PojoTranBatch tranBatch;
+    /** "业务类型" **/
     private String busyType;
-    /**"业务流水号"**/
+    /** "业务流水号" **/
     private String busiDataId;
-    /**"账户类型(0:对私账户1：对公账户)"**/
+    /** "账户类型(0:对私账户1：对公账户)" **/
+    /** "账户号" **/
     private String accType;
-    /**"账户号"**/
     private String accNo;
-    /**"账户名"**/
+    /** "账户名" **/
     private String accName;
-    /**"银行代码"**/
+    /** "银行代码" **/
     private String bankNo;
-    /**"银行名称"**/
+    /** "银行名称" **/
     private String bankName;
-    /**"划拨金额"**/
+    /** "划拨金额" **/
     private Long tranAmt;
-    /**"备注"**/
+    /** "备注" **/
     private String remark;
-    /**"状态(01:未审核00：审核通过09：审核拒绝)"**/
+    /** "状态(01:未审核00：审核通过09：审核拒绝)" **/
     private String status;
-    /**"申请时间"**/
+    /** "申请时间" **/
     private Date applyTime;
-    /**"通过时间"**/
+    /** "通过时间" **/
     private Date approveTime;
-    /**"通过用户"**/
+    /** "通过用户" **/
     private Long approveUser;
-    /**"交易手续费"**/
-    private BigDecimal tranFee;
-    /**转账流水数据**/
-
-    /**会员号/付款方的会员号**/
+    /** "交易手续费" **/
+    private Long tranFee;
+    /** 转账流水数据 **/
+    private PojoBankTransferData bankTranData;
+    /** 会员号/付款方的会员号 **/
     private String memberId;
-    /**交易序列号**/
+    /** 交易序列号 **/
     private String txnseqno;
     @GenericGenerator(name = "id_gen", strategy = "enhanced-table", parameters = {
             @Parameter(name = "table_name", value = "T_C_PRIMAY_KEY"),
@@ -105,12 +106,12 @@ public class PojoTranData implements Serializable{
         this.tranDataSeqNo = tranDataSeqNo;
     }
 
-    @Column(name = "BUSI_TYPE") 
+    @Column(name = "BUSI_TYPE")
     public String getBusyType() {
         return busyType;
 
     }
-    
+
     public void setBusyType(String busyType) {
         this.busyType = busyType;
     }
@@ -121,7 +122,7 @@ public class PojoTranData implements Serializable{
     public void setBusiDataId(String busiDataId) {
         this.busiDataId = busiDataId;
     }
-    
+
     @Column(name = "ACC_TYPE")
     public String getAccType() {
         return accType;
@@ -200,32 +201,40 @@ public class PojoTranData implements Serializable{
         this.approveUser = approveUser;
     }
     @Column(name = "TRAN_FEE")
-    public BigDecimal getTranFee() {
+    public Long getTranFee() {
         return tranFee;
     }
-    public void setTranFee(BigDecimal tranFee) {
+    public void setTranFee(Long tranFee) {
         this.tranFee = tranFee;
     }
     @Column(name = "MEMBER_ID")
-	public String getMemberId() {
-		return memberId;
-	}
-	public void setMemberId(String memberId) {
-		this.memberId = memberId;
-	}
-	@Column(name = "TXNSEQNO")
-	public String getTxnseqno() {
-		return txnseqno;
-	}
-	public void setTxnseqno(String txnseqno) {
-		this.txnseqno = txnseqno;
-	}
-	@Column(name = "TRAN_BATCH_ID")
-	public Long getTranBatchId() {
-		return tranBatchId;
-	}
-	public void setTranBatchId(Long tranBatchId) {
-		this.tranBatchId = tranBatchId;
-	}
-	
+    public String getMemberId() {
+        return memberId;
+    }
+    public void setMemberId(String memberId) {
+        this.memberId = memberId;
+    }
+    @Column(name = "TXNSEQNO")
+    public String getTxnseqno() {
+        return txnseqno;
+    }
+    public void setTxnseqno(String txnseqno) {
+        this.txnseqno = txnseqno;
+    } 
+    @ManyToOne(cascade=CascadeType.PERSIST,fetch=FetchType.LAZY)
+    @JoinColumn(name = "TRAN_BATCH_ID")
+    public PojoTranBatch getTranBatch() {
+        return tranBatch;
+    }
+    public void setTranBatch(PojoTranBatch tranBatch) {
+        this.tranBatch = tranBatch;
+    }
+    @OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name = "BANK_TRAN_DATA_ID")
+    public PojoBankTransferData getBankTranData() {
+        return bankTranData;
+    }
+    public void setBankTranData(PojoBankTransferData bankTranData) {
+        this.bankTranData = bankTranData;
+    }
 }

@@ -18,7 +18,11 @@ public class ConfigInfoModel implements java.io.Serializable {
 
 	// Fields
 
-	private Long id;
+	/**
+     * serialVersionUID
+     */
+    private static final long serialVersionUID = -6214615116334705954L;
+    private Long id;
 	private String paraname;
 	private String para;
 	private String busicode;

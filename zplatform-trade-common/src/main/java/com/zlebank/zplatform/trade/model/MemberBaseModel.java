@@ -12,6 +12,10 @@ import javax.persistence.Table;
 @Table(name = "T_MEMBER_BASE")
 public class MemberBaseModel implements java.io.Serializable {
 
+    /**
+     * serialVersionUID
+     */
+    private static final long serialVersionUID = -2938471201057517436L;
     private String memberid;
     private String merchname;
     private Byte merchtype;

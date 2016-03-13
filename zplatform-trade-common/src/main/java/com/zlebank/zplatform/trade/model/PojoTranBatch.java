@@ -15,12 +15,17 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
@@ -68,7 +73,10 @@ public class PojoTranBatch {
     /**待审核金额**/
     private Long waitApproveAmt;
     /**银行转账批次号**/
-
+    private List<PojoBankTransferBatch> bankTransferBatchs;
+    /**银行转账流水**/
+    private List<PojoTranData> tranDatas;
+   
     @GenericGenerator(name = "id_gen", strategy = "enhanced-table", parameters = {
             @Parameter(name = "table_name", value = "T_C_PRIMAY_KEY"),
             @Parameter(name = "value_column_name", value = "NEXT_ID"),
@@ -190,5 +198,33 @@ public class PojoTranBatch {
     public void setWaitApproveAmt(Long waitApproveAmt) {
         this.waitApproveAmt = waitApproveAmt;
     }
-
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "RELA_TB_BTB", joinColumns = {@JoinColumn(name = "TRAN_BATCH_ID", referencedColumnName = "TID")}, inverseJoinColumns = {@JoinColumn(name = "BANK_TRAN_BATCH_ID", referencedColumnName = "TID")})
+    @Cascade(value = CascadeType.SAVE_UPDATE)
+    public List<PojoBankTransferBatch> getBankTransferBatchs() {
+        return bankTransferBatchs;
+    }
+    public void setBankTransferBatchs(List<PojoBankTransferBatch> bankTransferBatchs) {
+        this.bankTransferBatchs = bankTransferBatchs;
+    }
+    @OneToMany(mappedBy="tranBatch")
+    @Cascade(value = CascadeType.SAVE_UPDATE)
+    public List<PojoTranData> getTranDatas() {
+        return tranDatas;
+    }
+    public void setTranDatas(List<PojoTranData> tranDatas) {
+        this.tranDatas = tranDatas;
+    }
+    
+    public void addTranDatas(List<PojoTranData> tranDatas){
+        for(PojoTranData tranData:tranDatas){
+            tranData.setTranBatch(this);
+        }
+        if(this.tranDatas==null){
+            this.tranDatas = tranDatas;
+        }else{
+            this.tranDatas.addAll(tranDatas);
+        }
+        
+    }
 }
