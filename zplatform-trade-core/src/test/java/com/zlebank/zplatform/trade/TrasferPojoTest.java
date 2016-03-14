@@ -100,7 +100,7 @@ public class TrasferPojoTest {
             tranData.setAccType(RandomArugment.randomBoolean() ? "0" : "1");
             tranData.setBankNo("313653020010");
             tranData.setBusiDataId("11111111");
-            tranData.setBusyType("00");
+            tranData.setBusiType("00");
             tranData.setMemberId("200000000000593");
             long tranAmt = Long.parseLong(RandomArugment.randomNumber(4));
             totalAmt += tranAmt;
