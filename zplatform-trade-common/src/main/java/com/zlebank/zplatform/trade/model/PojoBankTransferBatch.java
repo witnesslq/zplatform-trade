@@ -31,7 +31,6 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
 import com.alibaba.fastjson.annotation.JSONField;
-
 /**
  * 转账批次
  *
