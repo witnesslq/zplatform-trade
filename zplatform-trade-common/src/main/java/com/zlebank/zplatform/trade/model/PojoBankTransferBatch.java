@@ -30,6 +30,8 @@ import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 /**
  * 转账批次
  *
@@ -46,8 +48,10 @@ public class PojoBankTransferBatch {
     /** "银行转账批次序列号" **/
     private String bankTranBatchNo;
     /** "转账渠道" **/
+    @JSONField(serialize=false)
     private PojoBankTransferChannel channel;
     /** "关联划拨批次渠道" **/
+    @JSONField(serialize=false)
     private List<PojoTranBatch> tranBatchs;
     /** "总笔数" **/
     private Long totalCount;
@@ -68,12 +72,16 @@ public class PojoBankTransferBatch {
     /** """转账状态(01:等待转账02：部分转账成功03：全部转账成功 04：全部失败 **/
     private String tranStatus;
     /** "申请时间 **/
+    @JSONField (format="yyyy-MM-dd HH:mm:ss") 
     private Date applyTime;
     /** "默认关闭时间" **/
+    @JSONField (format="yyyy-MM-dd HH:mm:ss") 
     private Date defaultCloseTime;
     /** "最后关闭时间（每日）" **/
+    @JSONField (format="yyyy-MM-dd HH:mm:ss") 
     private Date latestCloseTime;
     /** "关闭时间" **/
+    @JSONField (format="yyyy-MM-dd HH:mm:ss") 
     private Date closeTime;
     /** """触发关闭动作（00：笔数到达上限01：到达每日最后关闭时间02：到达关闭间隔 03：手工关闭）""" **/
     private String closeEvent;
@@ -82,6 +90,7 @@ public class PojoBankTransferBatch {
     /** 备注 **/
     private String remark;
     /** 关联银行转账流水 **/
+    @JSONField (serialize=false) 
     private List<PojoBankTransferData> bankTranDatas;
     @GenericGenerator(name = "id_gen", strategy = "enhanced-table", parameters = {
             @Parameter(name = "table_name", value = "T_C_PRIMAY_KEY"),

@@ -130,7 +130,7 @@ public class TransferBatchDAOImpl extends HibernateBaseDAOImpl<PojoTranBatch> im
 	public List<PojoTranData> queryWaitTrialTranData(String batchNo){
 		StringBuffer sqlBuffer = new StringBuffer("from PojoTranData where 1=1 and tranBatchId = ? and status = ?");
     	Query query = getSession().createQuery(sqlBuffer.toString());
-    	query.setParameter(0, batchNo);
+    	query.setParameter(0, Long.valueOf(batchNo));
     	query.setParameter(1, "01");
     	return query.list();
 	}

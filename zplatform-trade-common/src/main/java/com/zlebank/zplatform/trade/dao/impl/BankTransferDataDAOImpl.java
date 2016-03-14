@@ -255,7 +255,7 @@ HibernateBaseDAOImpl<PojoBankTransferData>
     @Override
     public List<PojoBankTransferData> getByTranDataId(Long id) {
         Criteria crite= this.getSession().createCriteria(PojoBankTransferData.class);
-        crite.add(Restrictions.eq("tranDataId", id));
+        crite.add(Restrictions.eq("tranData.id", id));
         return crite.list();
     }
 
@@ -308,7 +308,7 @@ HibernateBaseDAOImpl<PojoBankTransferData>
 			String status) {
 		
 		 try {
-	            String hql = "update PojoBankTransferData set status = ? where tid = ? and status = ?";
+	            String hql = "update PojoBankTransferData set status = ? where bankTranBatchId = ? and status = ?";
 	            Session session = getSession();
 	            Query query = session.createQuery(hql);
 	            query.setParameter(0, status);

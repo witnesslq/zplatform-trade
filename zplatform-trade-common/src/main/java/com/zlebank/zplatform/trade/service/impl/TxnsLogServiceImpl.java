@@ -502,13 +502,13 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
             txnsLog.setTxnseqno(data.getTxnseqno());
             txnsLog.setTxndate(DateUtil.getCurrentDate());
             txnsLog.setTxntime(DateUtil.getCurrentTime());
-            if("00".equals(data.getBusyType())){//代付
+            if("00".equals(data.getBusiType())){//代付
             	txnsLog.setBusicode(BusiTypeEnum.insteadPay.getCode());
                 txnsLog.setBusitype(BusinessEnum.INSTEADPAY.getBusiCode());
-            }else if("01".equals(data.getBusyType())){
+            }else if("01".equals(data.getBusiType())){
             	txnsLog.setBusicode(BusiTypeEnum.withdrawal.getCode());
                 txnsLog.setBusitype(BusinessEnum.WITHDRAWALS.getBusiCode());
-            }else if("02".equals(data.getBusyType())){
+            }else if("02".equals(data.getBusiType())){
             	txnsLog.setBusicode(BusiTypeEnum.refund.getCode());
                 txnsLog.setBusitype(BusinessEnum.REFUND.getBusiCode());
             }

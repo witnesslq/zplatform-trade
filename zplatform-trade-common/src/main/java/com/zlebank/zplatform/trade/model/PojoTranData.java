@@ -27,6 +27,8 @@ import javax.persistence.Table;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 /**
  * 划拨流水
  *
@@ -47,9 +49,11 @@ public class PojoTranData implements Serializable {
     /** "划拨流水序列号" **/
     private String tranDataSeqNo;
     /** "划拨批次序列号" **/
+    @JSONField(serialize = false)  
     private PojoTranBatch tranBatch;
+    private Long tranBatchId;
     /** "业务类型" **/
-    private String busyType;
+    private String busiType;
     /** "业务流水号" **/
     private String busiDataId;
     /** "账户类型(0:对私账户1：对公账户)" **/
@@ -69,14 +73,17 @@ public class PojoTranData implements Serializable {
     /** "状态(01:未审核00：审核通过09：审核拒绝)" **/
     private String status;
     /** "申请时间" **/
+    @JSONField (format="yyyy-MM-dd HH:mm:ss") 
     private Date applyTime;
     /** "通过时间" **/
+    @JSONField (format="yyyy-MM-dd HH:mm:ss") 
     private Date approveTime;
     /** "通过用户" **/
     private Long approveUser;
     /** "交易手续费" **/
     private Long tranFee;
     /** 转账流水数据 **/
+    @JSONField(serialize = false)  
     private PojoBankTransferData bankTranData;
     /** 会员号/付款方的会员号 **/
     private String memberId;
@@ -105,15 +112,12 @@ public class PojoTranData implements Serializable {
     public void setTranDataSeqNo(String tranDataSeqNo) {
         this.tranDataSeqNo = tranDataSeqNo;
     }
-
     @Column(name = "BUSI_TYPE")
-    public String getBusyType() {
-        return busyType;
-
+    public String getBusiType() {	
+        return busiType;
     }
-
-    public void setBusyType(String busyType) {
-        this.busyType = busyType;
+    public void setBusiType(String busiType) {
+        this.busiType = busiType;
     }
     @Column(name = "BUSI_DATA_ID")
     public String getBusiDataId() {
@@ -237,4 +241,14 @@ public class PojoTranData implements Serializable {
     public void setBankTranData(PojoBankTransferData bankTranData) {
         this.bankTranData = bankTranData;
     }
+    @Column(name = "TRAN_BATCH_ID",insertable=false,updatable=false)
+	public Long getTranBatchId() {
+		return tranBatchId;
+	}
+	public void setTranBatchId(Long tranBatchId) {
+		this.tranBatchId = tranBatchId;
+	}
+    
+    
+    
 }

@@ -28,6 +28,8 @@ import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 /**
  * 转账流水
  *
@@ -48,8 +50,11 @@ public class PojoBankTransferData implements Serializable{
     /**"银行转账流水序列号"**/
     private String bankTranDataSeqNo; 
     /**"银行转账批次号"**/
+    @JSONField (serialize=false) 
     private PojoBankTransferBatch bankTranBatch;
+    private Long bankTranBatchId;
     /**"划拨流水号"**/
+    @JSONField (serialize=false) 
     private PojoTranData tranData;
     /**"转账金额"**/
     private Long tranAmt;
@@ -68,11 +73,10 @@ public class PojoBankTransferData implements Serializable{
     /**响应信息**/
     private String resInfo;
     /**"申请时间"**/
+    @JSONField (format="yyyy-MM-dd HH:mm:ss") 
     private Date applyTime;
     /**"账户类型(0:对私账户1：对公账户)"**/
     private String accType;
-    /**交易序列号**/
-    private String txnseqno;
     /**划拨类型，01-行内02-跨行**/
     private String transferType;
     /**付款结果**/
@@ -188,13 +192,7 @@ public class PojoBankTransferData implements Serializable{
     public void setAccType(String accType) {
         this.accType = accType;
     }
-    @Column(name = "TXNSEQNO")
-    public String getTxnseqno() {
-        return txnseqno;
-    }
-    public void setTxnseqno(String txnseqno) {
-        this.txnseqno = txnseqno;
-    }
+   
     @Column(name = "TRANSFER_TYPE")
     public String getTransferType() {
         return transferType;
@@ -209,4 +207,13 @@ public class PojoBankTransferData implements Serializable{
     public void setResType(String resType) {
         this.resType = resType;
     }
+    @Column(name = "BANK_TRAN_BATCH_ID",insertable=false,updatable=false)
+	public Long getBankTranBatchId() {
+		return bankTranBatchId;
+	}
+	public void setBankTranBatchId(Long bankTranBatchId) {
+		this.bankTranBatchId = bankTranBatchId;
+	}
+    
+    
 }

@@ -9,6 +9,7 @@
  * 
  */
 package com.zlebank.zplatform.trade.model;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -29,6 +30,8 @@ import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 /**
  * 划拨批次
  *
@@ -39,11 +42,16 @@ import org.hibernate.annotations.Parameter;
  */
 @Entity
 @Table(name = "T_TRAN_BATCH")
-public class PojoTranBatch {
-    /**标示**/
+public class PojoTranBatch implements Serializable{
+	
+    /**
+	 * serialVersionUID
+	 */
+	private static final long serialVersionUID = -8961908889138761351L;
+	/**标示**/
     private Long tid;
     /**划拨批次号**/
-     private String tranBatchNo;
+    private String tranBatchNo;
     /**总笔数**/
     private Long totalCount;
     /**总金额**/
@@ -59,22 +67,27 @@ public class PojoTranBatch {
     /**"""状态（01：未审核02：部分审核通过03：全部审核通过**/
     private String status;
     /**"申请时间"**/
+    @JSONField (format="yyyy-MM-dd HH:mm:ss") 
     private Date applyTime;
     /**"全部通过完成时间"**/
+    @JSONField (format="yyyy-MM-dd HH:mm:ss") 
     private Date approveFinishTime;
     /**"业务类型（00：代付01：提现02：退款）"**/
     private String busiType;
     /**"业务批次ID"**/
     private String busiBatchId;
     /**"银行转账完成时间"**/
+    @JSONField (format="yyyy-MM-dd HH:mm:ss") 
     private Date finishTime; 
     /**待审核笔数**/
     private Long waitApproveCount;
     /**待审核金额**/
     private Long waitApproveAmt;
     /**银行转账批次号**/
+    @JSONField(serialize = false)  
     private List<PojoBankTransferBatch> bankTransferBatchs;
     /**银行转账流水**/
+    @JSONField(serialize = false)  
     private List<PojoTranData> tranDatas;
    
     @GenericGenerator(name = "id_gen", strategy = "enhanced-table", parameters = {
