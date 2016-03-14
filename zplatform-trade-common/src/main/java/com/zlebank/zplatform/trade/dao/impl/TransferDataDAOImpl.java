@@ -37,6 +37,7 @@ public class TransferDataDAOImpl  extends HibernateBaseDAOImpl<PojoTranData> imp
     @Autowired
     private AccEntryService accEntryService;
     
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public Map<String, Object> queryTranfersDetaByPage(QueryTransferBean queryTransferBean,int page,int pageSize){
     	StringBuffer sqlBuffer = new StringBuffer("from PojoTranData where 1=1 ");
 		StringBuffer sqlCountBuffer = new StringBuffer("select count(*) from PojoTranData where 1=1 ");
@@ -124,24 +125,9 @@ public class TransferDataDAOImpl  extends HibernateBaseDAOImpl<PojoTranData> imp
     		}else if("02".equals(transferBatch.getBusiType())){
     			businessEnum = BusinessEnum.REFUND_REFUND;
     		}
-    		businessRefund(transferData,businessEnum);
     	}
     	updateBatchTransferSingle(transferBatch);
     }
-    
-    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
-    public void businessRefund(PojoTranData transferData,BusinessEnum businessEnum) throws AccBussinessException, AbstractBusiAcctException,NumberFormatException {
-        TradeInfo tradeInfo = new TradeInfo();
-        tradeInfo.setAmount(new BigDecimal(transferData.getTranAmt()));
-        tradeInfo.setBusiCode(businessEnum.getBusiCode());
-        tradeInfo.setPayMemberId(transferData.getMemberId());
-        tradeInfo.setTxnseqno(transferData.getTxnseqno());
-        //tradeInfo.setTxnseqno(pojoinstead.getOrderId());
-        tradeInfo.setCommission(new BigDecimal(0));
-        tradeInfo.setCharge(new BigDecimal(transferData.getTranFee()));
-        accEntryService.accEntryProcess(tradeInfo);
-    }
-    
     
     @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void updateBatchTransferSingle(PojoTranBatch transferBatch){
@@ -192,5 +178,14 @@ public class TransferDataDAOImpl  extends HibernateBaseDAOImpl<PojoTranData> imp
 		query.setParameter(0, tranBatchId);
 		query.setParameter(1, "02");
 		return ((Long)query.uniqueResult()).longValue();
+	}
+	@Override
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+	public List<PojoTranData> queryWaritTransferData(Long tranBatchId) {
+		String sql = "from PojoTranData  where tranBatchId = ? and status= ?";
+		Query query = getSession().createQuery(sql);
+		query.setParameter(0, tranBatchId);
+		query.setParameter(1, "02");
+		return query.list();
 	}
 }

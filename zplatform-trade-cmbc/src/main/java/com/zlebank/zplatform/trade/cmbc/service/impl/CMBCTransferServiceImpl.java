@@ -247,26 +247,26 @@ public class CMBCTransferServiceImpl implements ICMBCTransferService{
      */
     @Override
     @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
-    public ResultBean batchTransfer(String batchNo) {
+    public ResultBean batchTransfer(Long tid) {
         ResultBean resultBean = null;
         try {
             //检查批次信息是否正确
-        	PojoBankTransferBatch bankTransferBatch = bankTransferBatchDAO.getByBankTranBatchNo(Long.valueOf(batchNo));
+        	PojoBankTransferBatch bankTransferBatch = bankTransferBatchDAO.getById(tid);
            
             if(!"01".equals(bankTransferBatch.getTranStatus())){
                 return new ResultBean("", "无法划拨");
             }
             //生成交易日志
-            //List<PojoTranData> transferDataList = null;//transferDataDAO.findTransDataByBatchNo(batchNo);
+            //List<PojoTranData> transferDataList = transferDataDAO.findTransDataByBatchNo(batchNo);
             //txnsLogService.saveTransferLogs(transferDataList);
             
             TransferTypeEnmu transferType = null;//TransferTypeEnmu.fromValue(transferBatch.getTransfertype());
             switch (transferType) {
                 case INNERBANK :
-                    insteadPayService.batchInnerPay(batchNo);
+                    insteadPayService.batchInnerPay(tid+"");
                     break;
                 case OUTERBANK :
-                    insteadPayService.batchOuterPay(batchNo);
+                    insteadPayService.batchOuterPay(tid+"");
                     break;
 				default:
 					break;

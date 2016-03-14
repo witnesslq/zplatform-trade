@@ -40,7 +40,7 @@ public class CMBCTransferServiceTest {
     @Test
     public void testInnerPay(){
         init();
-        ResultBean resultBean = cmbcTransferService.batchTransfer("006");
+        ResultBean resultBean = cmbcTransferService.batchTransfer(0L);
         JSON.toJSONString(resultBean);
     }
 }

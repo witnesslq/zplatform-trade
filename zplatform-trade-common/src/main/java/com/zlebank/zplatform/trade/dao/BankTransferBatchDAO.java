@@ -92,5 +92,11 @@ public interface BankTransferBatchDAO extends BasePagedQueryDAO<PojoBankTransfer
      * @return
      */
     public PojoBankTransferBatch getByBankTranBatchNo(Long tid);
+    /**
+     * 根据转账批次标示获取批次数据
+     * @param bankTranBatchNo
+     * @return
+     */
+    public PojoBankTransferBatch getById(Long tid);
 }
 

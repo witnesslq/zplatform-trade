@@ -36,10 +36,10 @@ public interface ICMBCTransferService {
     public ResultBean realNameAuth(PojoRealnameAuth realnameAuth) throws TradeException, CMBCTradeException;
     /**
      * 批量划拨
-     * @param batchNo 批次号
+     * @param tid 转账批次标示
      * @return
      */
-    public ResultBean batchTransfer(String batchNo);
+    public ResultBean batchTransfer(Long tid);
     /**
      * 单笔划拨
      * @param withholdingMsg 单笔划拨实体bean

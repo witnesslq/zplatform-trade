@@ -7,6 +7,7 @@ public class QueryTransferBean implements Serializable{
 	 * serialVersionUID
 	 */
 	private static final long serialVersionUID = -8870101289238446680L;
+	private String tid;
 	/**划拨批次号*/
 	public String batchNo;
 	/**开始时间*/
@@ -39,6 +40,12 @@ public class QueryTransferBean implements Serializable{
 	}
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	public String getTid() {
+		return tid;
+	}
+	public void setTid(String tid) {
+		this.tid = tid;
 	}
 	
 	

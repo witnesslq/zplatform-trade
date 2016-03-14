@@ -298,4 +298,19 @@ public class BankTransferBatchDAOImpl extends
 			throw new CMMException("M001");
 		}
 	}
+	
+	@Override
+	@Transactional(readOnly=true)
+	public PojoBankTransferBatch getById(Long tid) {
+		String queryString = "from PojoBankTransferBatch where tid = ? ";
+		try {
+			log.info("queryString:" + queryString);
+			Query query = getSession().createQuery(queryString);
+			query.setParameter(0, tid);
+			return (PojoBankTransferBatch) query.uniqueResult();
+		} catch (HibernateException e) {
+			e.printStackTrace();
+			throw new CMMException("M001");
+		}
+	}
 }
