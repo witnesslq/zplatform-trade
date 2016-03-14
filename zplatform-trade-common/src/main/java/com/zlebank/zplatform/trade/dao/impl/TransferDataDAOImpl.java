@@ -42,10 +42,10 @@ public class TransferDataDAOImpl  extends HibernateBaseDAOImpl<PojoTranData> imp
 		StringBuffer sqlCountBuffer = new StringBuffer("select count(*) from PojoTranData where 1=1 ");
 		List<Object> parameterList = new ArrayList<Object>();
 		if(queryTransferBean!=null){
-			if(StringUtil.isNotEmpty(queryTransferBean.getBatchNo())){
+			if(queryTransferBean.getTid()!=0){
 				sqlBuffer.append(" and tranBatchId = ? ");
 				sqlCountBuffer.append(" and tranBatchId = ? ");
-				parameterList.add(Long.valueOf(queryTransferBean.getBatchNo()));
+				parameterList.add(queryTransferBean.getTid());
 			}
 			if(StringUtil.isNotEmpty(queryTransferBean.getEndDate())){
 				sqlBuffer.append(" and status = ? ");
@@ -89,7 +89,7 @@ public class TransferDataDAOImpl  extends HibernateBaseDAOImpl<PojoTranData> imp
 		long unApproveAmount = 0L;
 		//判断划拨明细数据状态
 
-    	PojoTranBatch transferBatch = transferBatchDAO.getByBatchNo(transferData.getTranBatch().getTid()+"");
+    	PojoTranBatch transferBatch = transferBatchDAO.getByBatchId(transferData.getTranBatch().getTid());
 
     	//PojoTranBatch transferBatch = transferBatchDAO.getByBatchNo(transferData.getTranBatch().getTid()+"");
 
@@ -103,9 +103,9 @@ public class TransferDataDAOImpl  extends HibernateBaseDAOImpl<PojoTranData> imp
 				unApproveCount++;
 				unApproveAmount+=transferData.getTranAmt().longValue();
 			}
-    		transferBatch.setApproveAmt(new BigDecimal(transferBatch.getApproveAmt().longValue()+approveAmount));
+    		transferBatch.setApproveAmt(transferBatch.getApproveAmt()+approveAmount);
     		transferBatch.setApproveCount(approveCount+transferBatch.getApproveCount());
-    		transferBatch.setRefuseAmt(new BigDecimal(transferBatch.getRefuseAmt().longValue()+unApproveAmount));
+    		transferBatch.setRefuseAmt(transferBatch.getRefuseAmt()+unApproveAmount);
     		transferBatch.setRefuseCount(unApproveCount+transferBatch.getRefuseCount());
     		
     	}else{
@@ -113,7 +113,7 @@ public class TransferDataDAOImpl  extends HibernateBaseDAOImpl<PojoTranData> imp
 			unApproveAmount+=transferData.getTranAmt().longValue();
 			transferData.setStatus(status);
 			this.update(transferData);
-    		transferBatch.setRefuseAmt(new BigDecimal(transferBatch.getRefuseAmt().longValue()+unApproveAmount));
+    		transferBatch.setRefuseAmt(transferBatch.getRefuseAmt()+unApproveAmount);
     		transferBatch.setRefuseCount(unApproveCount+transferBatch.getRefuseCount());
     		BusinessEnum businessEnum = null;
     		//00：代付01：提现02：退款

@@ -39,12 +39,12 @@ public interface TransferBatchDAO extends BaseDAO<PojoTranBatch>{
      * @param batchno
      * @return
      */
-    public PojoTranBatch getByBatchNo(String batchno);
+    public PojoTranBatch getByBatchId(long batchno);
     
     /**
      * 获取等待审核的划拨数据
-     * @param batchNo
+     * @param batchId
      * @return
      */
-    public List<PojoTranData> queryWaitTrialTranData(String batchNo);
+    public List<PojoTranData> queryWaitTrialTranData(long batchId);
 }
