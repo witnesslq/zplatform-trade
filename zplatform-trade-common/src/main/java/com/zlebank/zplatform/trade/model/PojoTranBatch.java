@@ -10,7 +10,6 @@
  */
 package com.zlebank.zplatform.trade.model;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -31,7 +30,6 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
 import com.alibaba.fastjson.annotation.JSONField;
-
 /**
  * 划拨批次
  *
@@ -59,11 +57,11 @@ public class PojoTranBatch implements Serializable{
     /**审核通过笔数**/
     private Long approveCount;
     /**审核通过金额**/
-    private BigDecimal approveAmt;
+    private Long approveAmt;
     /**审核拒绝笔数**/
     private Long refuseCount;
     /**审核拒绝金额**/
-    private BigDecimal refuseAmt;
+    private Long refuseAmt;
     /**"""状态（01：未审核02：部分审核通过03：全部审核通过**/
     private String status;
     /**"申请时间"**/
@@ -135,10 +133,10 @@ public class PojoTranBatch implements Serializable{
         this.approveCount = approveCount;
     }
     @Column(name = "APPROVE_AMT")
-    public BigDecimal getApproveAmt() {
+    public Long getApproveAmt() {
         return approveAmt;
     }
-    public void setApproveAmt(BigDecimal approveAmt) {
+    public void setApproveAmt(Long approveAmt) {
         this.approveAmt = approveAmt;
     }
     @Column(name = "REFUSE_COUNT")
@@ -149,10 +147,10 @@ public class PojoTranBatch implements Serializable{
         this.refuseCount = refuseCount;
     }
     @Column(name = "REFUSE_AMT")
-    public BigDecimal getRefuseAmt() {
+    public Long getRefuseAmt() {
         return refuseAmt;
     }
-    public void setRefuseAmt(BigDecimal refuseAmt) {
+    public void setRefuseAmt(Long refuseAmt) {
         this.refuseAmt = refuseAmt;
     }
     @Column(name = "STATUS")

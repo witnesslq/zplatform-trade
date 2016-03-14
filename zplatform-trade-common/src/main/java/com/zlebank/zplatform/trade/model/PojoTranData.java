@@ -28,7 +28,6 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
 import com.alibaba.fastjson.annotation.JSONField;
-
 /**
  * 划拨流水
  *
@@ -51,7 +50,6 @@ public class PojoTranData implements Serializable {
     /** "划拨批次序列号" **/
     @JSONField(serialize = false)  
     private PojoTranBatch tranBatch;
-    private Long tranBatchId;
     /** "业务类型" **/
     private String busiType;
     /** "业务流水号" **/
@@ -113,7 +111,7 @@ public class PojoTranData implements Serializable {
         this.tranDataSeqNo = tranDataSeqNo;
     }
     @Column(name = "BUSI_TYPE")
-    public String getBusiType() {	
+    public String getBusiType() {
         return busiType;
     }
     public void setBusiType(String busiType) {
@@ -241,14 +239,4 @@ public class PojoTranData implements Serializable {
     public void setBankTranData(PojoBankTransferData bankTranData) {
         this.bankTranData = bankTranData;
     }
-    @Column(name = "TRAN_BATCH_ID",insertable=false,updatable=false)
-	public Long getTranBatchId() {
-		return tranBatchId;
-	}
-	public void setTranBatchId(Long tranBatchId) {
-		this.tranBatchId = tranBatchId;
-	}
-    
-    
-    
 }
