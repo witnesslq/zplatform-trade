@@ -36,9 +36,8 @@ public class TransferBatchDAOTest {
 
     @Test
     public void testGetByTranBatchAndOpenStatus() {
-        bankTransferBatchDAO
-                .getByTranBatchAndOpenStatus(447,
-                        BankTransferBatchOpenStatusEnum.OPEN);
+        bankTransferBatchDAO.getByTranBatchAndOpenStatus(447,
+                BankTransferBatchOpenStatusEnum.OPEN);
 
     }
 }
