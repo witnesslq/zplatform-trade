@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +38,7 @@ import com.zlebank.zplatform.trade.service.TransferDataService;
  * @date 2016年3月9日 下午7:57:14
  * @since 
  */
+@Service
 public class TransferDataServiceImpl implements TransferDataService{
 
     @Autowired
@@ -110,7 +112,7 @@ public class TransferDataServiceImpl implements TransferDataService{
      * @return
      */
     private Long addAmount(Long totalAmt, Long tranAmt) {
-        return totalAmt == null ? 1L : totalAmt + tranAmt;
+        return totalAmt == null ? tranAmt : totalAmt + tranAmt;
     }
 
     /**

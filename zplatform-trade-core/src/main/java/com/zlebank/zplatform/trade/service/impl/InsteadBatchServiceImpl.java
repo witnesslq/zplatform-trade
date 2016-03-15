@@ -238,7 +238,7 @@ public class InsteadBatchServiceImpl extends AbstractBasePageService<InsteadPayB
      * @return
      */
     private Long addAmount(Long totalAmt, Long tranAmt) {
-        return totalAmt == null ? 1L : totalAmt + tranAmt;
+        return totalAmt == null ? tranAmt : totalAmt + tranAmt;
     }
 
     /**
