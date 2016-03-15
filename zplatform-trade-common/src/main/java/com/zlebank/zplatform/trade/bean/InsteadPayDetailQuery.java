@@ -33,12 +33,16 @@ public class InsteadPayDetailQuery implements Bean{
     private String accNo;
     /**状态**/
     private String  status;
-    /**批次号**/
-    private String batchFileNo;
+    /**商户批次号**/
+    private String batchNo;
     /** 批次ID **/
     private String batchId;
     /** 状态列表 **/
     private List<String> statusList;
+    /** 批次号 **/
+    private String insteadPayBatchSeqNo;
+    /** 导入文件名 **/
+    private List<String> imFileName;
     
     public String getStatus() {
         return status;
@@ -52,11 +56,11 @@ public class InsteadPayDetailQuery implements Bean{
     public void setMerId(String merId) {
         this.merId = merId;
     }
-    public String getBatchFileNo() {
-        return batchFileNo;
+    public String getBatchNo() {
+        return batchNo;
     }
-    public void setBatchFileNo(String batchFileNo) {
-        this.batchFileNo = batchFileNo;
+    public void setBatchFileNo(String batchNo) {
+        this.batchNo = batchNo;
     }
     public String getAccType() {
         return accType;
@@ -87,5 +91,20 @@ public class InsteadPayDetailQuery implements Bean{
     }
     public void setStatusList(List<String> statusList) {
         this.statusList = statusList;
+    }
+    public String getInsteadPayBatchSeqNo() {
+        return insteadPayBatchSeqNo;
+    }
+    public void setInsteadPayBatchSeqNo(String insteadPayBatchSeqNo) {
+        this.insteadPayBatchSeqNo = insteadPayBatchSeqNo;
+    }
+    public void setBatchNo(String batchNo) {
+        this.batchNo = batchNo;
+    }
+    public List<String> getImFileName() {
+        return imFileName;
+    }
+    public void setImFileName(List<String> imFileName) {
+        this.imFileName = imFileName;
     }
 }

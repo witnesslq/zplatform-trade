@@ -36,12 +36,10 @@ import org.hibernate.annotations.Parameter;
  */
 @Entity
 @Table(name="T_INSTEAD_PAY_DETAIL")
-public class PojoInsteadPayDetail {
+public class PojoInsteadPayDetail{
 
     /**标识**/
     private Long id;
-    /**批处理的ID（注意：不是报文中的批处理号）**/
-    private Long batchId;
     /**商户代码**/
     private String merId;
     /**商户订单号**/
@@ -140,14 +138,7 @@ public class PojoInsteadPayDetail {
     }
     public void setId(Long id) {
         this.id = id;
-    }
-    @Column(name = "BATCH_ID")
-    public Long getBatchId() {
-        return batchId;
-    }
-    public void setBatchId(Long batchId) {
-        this.batchId = batchId;
-    }
+    } 
     @Column(name = "MER_ID")
     public String getMerId() {
         return merId;

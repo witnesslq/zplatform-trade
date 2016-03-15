@@ -132,7 +132,7 @@ public class InsteadBatchServiceImpl extends AbstractBasePageService<InsteadPayB
             throw new InvalidAuditDataException();
         
         // 取批次ID
-        Long batchId = details.get(0).getBatchId();
+        Long batchId = details.get(0).getInsteadPayBatch().getId();
 
         // 审核处理
         processAudit(batchId, details , pass);
