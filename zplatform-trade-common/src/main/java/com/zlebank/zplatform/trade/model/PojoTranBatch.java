@@ -9,7 +9,6 @@
  * 
  */
 package com.zlebank.zplatform.trade.model;
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -46,11 +45,11 @@ public class PojoTranBatch {
     /**审核通过笔数**/
     private Long approveCount;
     /**审核通过金额**/
-    private BigDecimal approveAmt;
+    private Long approveAmt;
     /**审核拒绝笔数**/
     private Long refuseCount;
     /**审核拒绝金额**/
-    private BigDecimal refuseAmt;
+    private Long refuseAmt;
     /**"""状态（01：未审核02：部分审核通过03：全部审核通过**/
     private String status;
     /**"申请时间"**/
@@ -60,7 +59,7 @@ public class PojoTranBatch {
     /**"业务类型（00：代付01：提现02：退款）"**/
     private String busiType;
     /**"业务批次ID"**/
-    private String busiBatchId;
+    private Long busiBatchId;
     /**"银行转账完成时间"**/
     private Date finishTime; 
     /**待审核笔数**/
@@ -114,10 +113,10 @@ public class PojoTranBatch {
         this.approveCount = approveCount;
     }
     @Column(name = "APPROVE_AMT")
-    public BigDecimal getApproveAmt() {
+    public Long getApproveAmt() {
         return approveAmt;
     }
-    public void setApproveAmt(BigDecimal approveAmt) {
+    public void setApproveAmt(Long approveAmt) {
         this.approveAmt = approveAmt;
     }
     @Column(name = "REFUSE_COUNT")
@@ -128,10 +127,10 @@ public class PojoTranBatch {
         this.refuseCount = refuseCount;
     }
     @Column(name = "REFUSE_AMT")
-    public BigDecimal getRefuseAmt() {
+    public Long getRefuseAmt() {
         return refuseAmt;
     }
-    public void setRefuseAmt(BigDecimal refuseAmt) {
+    public void setRefuseAmt(Long refuseAmt) {
         this.refuseAmt = refuseAmt;
     }
     @Column(name = "STATUS")
@@ -163,10 +162,10 @@ public class PojoTranBatch {
         this.busiType = busiType;
     }
     @Column(name = "BUSI_BATCH_ID")
-    public String getBusiBatchId() {
+    public Long getBusiBatchId() {
         return busiBatchId;
     }
-    public void setBusiBatchId(String busiBatchId) {
+    public void setBusiBatchId(Long busiBatchId) {
         this.busiBatchId = busiBatchId;
     }
     @Column(name = "FINISH_TIME")

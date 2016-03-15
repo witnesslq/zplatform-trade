@@ -9,7 +9,7 @@ import com.zlebank.zplatform.trade.model.PojoTranData;
 
 public interface TranDataDAO extends BasePagedQueryDAO<PojoTranData, TransferDataQuery>{
     
-    public int getCountByInsteadDataId(String id);
+    public int getCountByInsteadDataId(Long id);
     
     public PojoTranData get(long id);
     /**

@@ -10,6 +10,8 @@
  */
 package com.zlebank.zplatform.trade.bean;
 
+import java.util.List;
+
 import com.zlebank.zplatform.commons.bean.Bean;
 
 /**
@@ -33,9 +35,10 @@ public class InsteadPayDetailQuery implements Bean{
     private String  status;
     /**批次号**/
     private String batchFileNo;
-    
-    
-    
+    /** 批次ID **/
+    private String batchId;
+    /** 状态列表 **/
+    private List<String> statusList;
     
     public String getStatus() {
         return status;
@@ -73,12 +76,16 @@ public class InsteadPayDetailQuery implements Bean{
     public void setAccNo(String accNo) {
         this.accNo = accNo;
     }
-    
-    
-    
-    
-    
-    
-    
-    
+    public String getBatchId() {
+        return batchId;
+    }
+    public void setBatchId(String batchId) {
+        this.batchId = batchId;
+    }
+    public List<String> getStatusList() {
+        return statusList;
+    }
+    public void setStatusList(List<String> statusList) {
+        this.statusList = statusList;
+    }
 }

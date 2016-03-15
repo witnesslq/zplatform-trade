@@ -98,9 +98,9 @@ public class TransferDataDAOImpl  extends HibernateBaseDAOImpl<PojoTranData> imp
 				unApproveCount++;
 				unApproveAmount+=transferData.getTranAmt().longValue();
 			}
-    		transferBatch.setApproveAmt(new BigDecimal(transferBatch.getApproveAmt().longValue()+approveAmount));
+    		transferBatch.setApproveAmt(transferBatch.getApproveAmt()+approveAmount);
     		transferBatch.setApproveCount(approveCount+transferBatch.getApproveCount());
-    		transferBatch.setRefuseAmt(new BigDecimal(transferBatch.getRefuseAmt().longValue()+unApproveAmount));
+    		transferBatch.setRefuseAmt(transferBatch.getRefuseAmt()+unApproveAmount);
     		transferBatch.setRefuseCount(unApproveCount+transferBatch.getRefuseCount());
     		
     	}else{
@@ -108,7 +108,7 @@ public class TransferDataDAOImpl  extends HibernateBaseDAOImpl<PojoTranData> imp
 			unApproveAmount+=transferData.getTranAmt().longValue();
 			transferData.setStatus(status);
 			this.update(transferData);
-    		transferBatch.setRefuseAmt(new BigDecimal(transferBatch.getRefuseAmt().longValue()+unApproveAmount));
+    		transferBatch.setRefuseAmt(transferBatch.getRefuseAmt()+unApproveAmount);
     		transferBatch.setRefuseCount(unApproveCount+transferBatch.getRefuseCount());
     		BusinessEnum businessEnum = null;
     		//00：代付01：提现02：退款

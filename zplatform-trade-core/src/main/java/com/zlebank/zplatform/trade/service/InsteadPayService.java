@@ -13,6 +13,7 @@ package com.zlebank.zplatform.trade.service;
 import com.zlebank.zplatform.commons.service.IBasePageService;
 import com.zlebank.zplatform.trade.bean.InsteadPayDetailBean;
 import com.zlebank.zplatform.trade.bean.InsteadPayDetailQuery;
+import com.zlebank.zplatform.trade.bean.enums.InsteadPayImportTypeEnum;
 import com.zlebank.zplatform.trade.exception.BalanceNotEnoughException;
 import com.zlebank.zplatform.trade.exception.DuplicateOrderIdException;
 import com.zlebank.zplatform.trade.exception.FailToGetAccountInfoException;
@@ -47,7 +48,7 @@ public interface InsteadPayService  extends IBasePageService<InsteadPayDetailQue
      * @throws FailToInsertAccEntryException 
      * @throws MerchWhiteListCheckFailException 
      */
-    public void insteadPay(InsteadPay_Request request,Long userId) throws NotInsteadPayWorkTimeException, FailToGetAccountInfoException, BalanceNotEnoughException, DuplicateOrderIdException, InvalidCardException, FailToInsertAccEntryException, MerchWhiteListCheckFailException, FailToInsertFeeException;
+    public void insteadPay(InsteadPay_Request request,Long userId, InsteadPayImportTypeEnum type, String filePath) throws NotInsteadPayWorkTimeException, FailToGetAccountInfoException, BalanceNotEnoughException, DuplicateOrderIdException, InvalidCardException, FailToInsertAccEntryException, MerchWhiteListCheckFailException, FailToInsertFeeException;
     /**
      * 代付状态查询处理
      * @param requestBean

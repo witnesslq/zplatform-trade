@@ -38,10 +38,12 @@ import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.member.bean.MerchMK;
 import com.zlebank.zplatform.member.service.MerchMKService;
 import com.zlebank.zplatform.specification.utils.Base64Utils;
+import com.zlebank.zplatform.trade.bean.enums.InsteadPayImportTypeEnum;
 import com.zlebank.zplatform.trade.exception.BalanceNotEnoughException;
 import com.zlebank.zplatform.trade.exception.DuplicateOrderIdException;
 import com.zlebank.zplatform.trade.exception.FailToGetAccountInfoException;
 import com.zlebank.zplatform.trade.exception.FailToInsertAccEntryException;
+import com.zlebank.zplatform.trade.exception.FailToInsertFeeException;
 import com.zlebank.zplatform.trade.exception.InvalidCardException;
 import com.zlebank.zplatform.trade.exception.MerchWhiteListCheckFailException;
 import com.zlebank.zplatform.trade.exception.MessageDecryptFailException;
@@ -265,37 +267,40 @@ public class InsteadPayController {
         
         // 调用接口
         try {
-            insteadPayService.insteadPay(requestBean,null);
+            insteadPayService.insteadPay(requestBean,null, InsteadPayImportTypeEnum.API, null);
         } catch (NotInsteadPayWorkTimeException e) {
             errorMsg = "非代付工作时间";
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         } catch (FailToGetAccountInfoException e) {
             errorMsg = "获取一级商户账户信息失败";
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         } catch (BalanceNotEnoughException e) {
             errorMsg = "余额不足";
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         } catch (DuplicateOrderIdException e) {
             errorMsg = "订单号重复";
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }  catch (DataIntegrityViolationException e) {
             errorMsg = "批次号或订单号重复";
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }  catch (ConstraintViolationException e) {
             errorMsg = "批次号或订单号重复";
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         } catch (InvalidCardException e) {
             errorMsg = "无效卡信息";
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         } catch (FailToInsertAccEntryException e) {
             errorMsg = "插入分录流水时出现异常";
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         } catch (MerchWhiteListCheckFailException e) {
             errorMsg = "商户白名单检查失败"+e.getMessage();
-            e.printStackTrace();
-        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        } catch (FailToInsertFeeException e) {
+            errorMsg = "代付商户不存在";
+            log.error(e.getMessage(), e);
+        }  catch (Exception e) {
             errorMsg = "未知错误";
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
 
         if (StringUtil.isNotEmpty(errorMsg)) {
@@ -425,6 +430,9 @@ public class InsteadPayController {
             log.error(e.getMessage(), e);
         } catch (DuplicateOrderIdException e) {
             errorMsg = "请不要提交重复的订单";
+            log.error(e.getMessage(), e);
+        } catch (BalanceNotEnoughException e) {
+            errorMsg = "余额不足";
             log.error(e.getMessage(), e);
         }  catch (Exception e) {
             errorMsg = "实名认证失败";

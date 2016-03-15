@@ -19,6 +19,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
@@ -48,7 +49,7 @@ public class PojoTranData implements Serializable{
     /**"业务类型"**/
     private String busyType;
     /**"业务流水号"**/
-    private String busiDataId;
+    private Long busiDataId;
     /**"账户类型(0:对私账户1：对公账户)"**/
     private String accType;
     /**"账户号"**/
@@ -118,10 +119,10 @@ public class PojoTranData implements Serializable{
         this.busyType = busyType;
     }
     @Column(name = "BUSI_DATA_ID")
-    public String getBusiDataId() {
+    public Long getBusiDataId() {
         return busiDataId;
     }
-    public void setBusiDataId(String busiDataId) {
+    public void setBusiDataId(Long busiDataId) {
         this.busiDataId = busiDataId;
     }
     @Column(name = "ACC_TYPE")
@@ -206,9 +207,10 @@ public class PojoTranData implements Serializable{
         return tranFee;
     }
     public void setTranFee(BigDecimal tranFee) {
-        this.tranFee = tranFee;
+        this.tranFee = tranFee; 
     }
-    @Column(name = "BANK_TRAN_DATA_ID")
+    @OneToOne
+    @JoinColumn(name = "BANK_TRAN_DATA_ID")
     public PojoBankTransferData getBankTranData() {
         return bankTranData;
     }

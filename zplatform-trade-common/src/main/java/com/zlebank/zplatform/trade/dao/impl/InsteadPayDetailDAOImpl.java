@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.zlebank.zplatform.commons.dao.impl.AbstractPagedQueryDAOImpl;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.bean.InsteadPayDetailQuery;
+import com.zlebank.zplatform.trade.bean.enums.InsteadPayDetailStatusEnum;
 import com.zlebank.zplatform.trade.dao.InsteadPayDetailDAO;
 import com.zlebank.zplatform.trade.model.PojoInsteadPayDetail;
 
@@ -108,8 +109,13 @@ public class InsteadPayDetailDAOImpl
             if (StringUtil.isNotEmpty(e.getStatus())) {
                 crite.add(Restrictions.eq("status",e.getStatus()));
             }
-            
-            
+            if (StringUtil.isNotEmpty(e.getBatchId())) {
+                crite.add(Restrictions.eq("batchId", Long.parseLong(e.getBatchId())));
+            }
+            if (e.getStatusList() != null
+                    && e.getStatusList().size() != 0) {
+                crite.add(Restrictions.in("status", e.getStatusList()));
+            }
         }
         crite.addOrder(Order.desc("intime"));
         return crite;
@@ -128,6 +134,32 @@ public class InsteadPayDetailDAOImpl
         crite.add(Restrictions.eq("status", status));
         return (PojoInsteadPayDetail)crite.uniqueResult();
     }
-    
-    
-      }
+
+        /**
+         * 通过批次ID得到批次明细
+         * @param batchId
+         * @return List
+         */
+        @Override
+        public List<PojoInsteadPayDetail> getBatchDetailByBatchId(Long batchId) {
+            Criteria crite = this.getSession().createCriteria(
+                    PojoInsteadPayDetail.class);
+            crite.add(Restrictions.eq("batchId", batchId));
+            crite.add(Restrictions.eq("status", InsteadPayDetailStatusEnum.WAIT_INSTEAD_APPROVE.getCode()));
+            return crite.list();
+        }
+
+        /**
+         * 通过代付流水ID得到代付明细
+         * @param ids
+         * @return
+         */
+        @Override
+        public List<PojoInsteadPayDetail> getBatchDetailByIds(List<Long> ids) {
+            Criteria crite = this.getSession().createCriteria(
+                    PojoInsteadPayDetail.class);
+            crite.add(Restrictions.in("id", ids));
+            crite.add(Restrictions.eq("status", InsteadPayDetailStatusEnum.WAIT_INSTEAD_APPROVE.getCode()));
+            return crite.list();
+        }
+ }

@@ -18,6 +18,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
@@ -104,8 +105,8 @@ public class PojoBankTransferBatch {
         this.bankTranBatchNo = bankTranBatchNo;
     }
     
-//    @ManyToOne
-    @Column(name = "CHANNEL")
+    @ManyToOne
+    @JoinColumn(name = "CHANNEL")
     public PojoBankTransferChannel getChannel() {
         return channel;
     }
@@ -233,11 +234,11 @@ public class PojoBankTransferBatch {
     public void setTranBatchs(List<PojoTranBatch> tranBatchs) {
         this.tranBatchs = tranBatchs;
     }
-    @OneToMany(mappedBy="BANK_TRAN_BATCH_ID",fetch=FetchType.LAZY)
-    public List<PojoBankTransferData> getBnakTranDatas() {
-        return bnakTranDatas;
-    }
-    public void setBnakTranDatas(List<PojoBankTransferData> bnakTranDatas) {
-        this.bnakTranDatas = bnakTranDatas;
-    }
+//    @OneToMany(mappedBy="BANK_TRAN_BATCH_ID",fetch=FetchType.LAZY)
+//    public List<PojoBankTransferData> getBnakTranDatas() {
+//        return bnakTranDatas;
+//    }
+//    public void setBnakTranDatas(List<PojoBankTransferData> bnakTranDatas) {
+//        this.bnakTranDatas = bnakTranDatas;
+//    }
 }

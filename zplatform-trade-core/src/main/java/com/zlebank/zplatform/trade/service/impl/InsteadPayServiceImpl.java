@@ -49,6 +49,8 @@ import com.zlebank.zplatform.member.service.MerchService;
 import com.zlebank.zplatform.trade.bean.InsteadPayDetailBean;
 import com.zlebank.zplatform.trade.bean.InsteadPayDetailQuery;
 import com.zlebank.zplatform.trade.bean.enums.BusinessEnum;
+import com.zlebank.zplatform.trade.bean.enums.InsteadPayImportTypeEnum;
+import com.zlebank.zplatform.trade.bean.enums.SeqNoEnum;
 import com.zlebank.zplatform.trade.dao.ConfigInfoDAO;
 import com.zlebank.zplatform.trade.dao.InsteadPayBatchDAO;
 import com.zlebank.zplatform.trade.dao.InsteadPayDetailDAO;
@@ -73,6 +75,7 @@ import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.service.IGateWayService;
 import com.zlebank.zplatform.trade.service.InsteadPayService;
 import com.zlebank.zplatform.trade.service.MerchWhiteListService;
+import com.zlebank.zplatform.trade.service.SeqNoService;
 import com.zlebank.zplatform.trade.utils.OrderNumber;
 
 
@@ -123,6 +126,9 @@ public class InsteadPayServiceImpl
     
     @Autowired
     private MerchWhiteListService merchWhiteListService;
+    
+    @Autowired
+    private SeqNoService seqNoService;
 
     /**
      * 代付处理
@@ -140,7 +146,7 @@ public class InsteadPayServiceImpl
      */
     @Override
     @Transactional(propagation = Propagation.REQUIRED,rollbackFor=Throwable.class)
-    public void insteadPay(InsteadPay_Request request,Long userId) throws NotInsteadPayWorkTimeException, FailToGetAccountInfoException, BalanceNotEnoughException, DuplicateOrderIdException, InvalidCardException, FailToInsertAccEntryException, MerchWhiteListCheckFailException, FailToInsertFeeException {
+    public void insteadPay(InsteadPay_Request request,Long userId, InsteadPayImportTypeEnum type,String fileName) throws NotInsteadPayWorkTimeException, FailToGetAccountInfoException, BalanceNotEnoughException, DuplicateOrderIdException, InvalidCardException, FailToInsertAccEntryException, MerchWhiteListCheckFailException, FailToInsertFeeException {
 
 
         if (log.isDebugEnabled()) {
@@ -231,6 +237,9 @@ public class InsteadPayServiceImpl
 
         // 插入批次表
         PojoInsteadPayBatch batch = convertToPojoInsteadPayBatch(request,userId);
+        // 设定代付接入类型
+        batch.setType(type.getCode()); 
+        batch.setFilePath(fileName);
         batch = insteadPayBatchDAO.merge(batch);
 
         // 插入明细表
@@ -242,14 +251,14 @@ public class InsteadPayServiceImpl
             // 取手续费
             Long txnfee = getTxnFee(detail, merchPojo, request.getMerId());
             feeAmt = feeAmt.add(new BigDecimal(txnfee));
-            detail.setTxnfee(new BigDecimal(txnfee));
+            detail.setTxnfee(txnfee);
             detail = insteadPayDetailDAO.merge(detail);
             // 将资金划拨到中间账户
             TradeInfo tradeInfo = new TradeInfo();
             tradeInfo.setTxnseqno(detail.getTxnseqno());
-            tradeInfo.setAmount(detail.getAmt());
+            tradeInfo.setAmount(new BigDecimal(detail.getAmt()));
             tradeInfo.setBusiCode(BusinessCodeEnum.INSTEADPAY_APPLY.getBusiCode());
-            tradeInfo.setCharge(detail.getTxnfee());
+            tradeInfo.setCharge(new BigDecimal(detail.getTxnfee()));
             tradeInfo.setCommission(BigDecimal.ZERO);
             tradeInfo.setPayMemberId(detail.getMerId());
             tradeInfo.setPayToMemberId(detail.getMerId());
@@ -312,16 +321,16 @@ public class InsteadPayServiceImpl
         }
         txnsLog.setTxnseqno(detail.getTxnseqno());
         // 交易序列号，扣率版本，业务类型，交易金额，会员号，原交易序列号，卡类型
-        txnsLog.setFeever(merchPojo.getFeever() == null
+        txnsLog.setFeever(merchPojo.getFeeVer() == null
                 ? ""
-                : merchPojo.getFeever());
+                : merchPojo.getFeeVer());
         txnsLog.setBusicode(BusinessEnum.INSTEADPAY.getBusiCode());
         txnsLog.setAccfirmerno(merchPojo.getParent() == null ? memberId  : merchPojo.getParent());
-        CardBin card = cardBinDao.getCard(merchPojo.getAccnum());
+        CardBin card = cardBinDao.getCard(merchPojo.getAccNum());
         if (card != null) {
             txnsLog.setCardtype(card.getType());
         }
-        txnsLog.setAmount(Long.valueOf(detail.getAmt().toPlainString()));
+        txnsLog.setAmount(detail.getAmt());
         Long fee = gateWayService.getTxnFee(txnsLog );
         return fee;
     }
@@ -333,11 +342,12 @@ public class InsteadPayServiceImpl
      */
     private PojoInsteadPayBatch convertToPojoInsteadPayBatch(InsteadPay_Request request,Long userId) {
         PojoInsteadPayBatch batch = new PojoInsteadPayBatch();
+        batch.setInsteadPayBatchSeqNo(seqNoService.getBatchNo(SeqNoEnum.INSTEAD_PAY_BATCH_NO));
         batch.setBatchNo(Long.parseLong(request.getBatchNo()));// 批次号
         batch.setMerId(request.getMerId());// 商户号
         batch.setTxnTime(request.getTxnTime());// 订单发送时间(yyyyMMddhhmmss)
         batch.setTotalQty(Long.parseLong(request.getTotalQty()));// 总笔数
-        batch.setTotalAmt(new BigDecimal(request.getTotalAmt()));// 总金额
+        batch.setTotalAmt(Long.parseLong(request.getTotalAmt()));// 总金额
         batch.setStatus("01");// 状态(00:已处理01:未处理)
        if(userId==null){
         batch.setInuser(0L);// 创建人
@@ -366,11 +376,12 @@ public class InsteadPayServiceImpl
         List<InsteadPayFile> fileContent = request.getFileContent();
         for (InsteadPayFile file : fileContent) {
             PojoInsteadPayDetail detail = new PojoInsteadPayDetail();
+            detail.setInsteadPayDataSeqNo(seqNoService.getBatchNo(SeqNoEnum.INSTEAD_PAY_DATA_NO));
             detail.setBatchId(batch);
             detail.setMerId(file.getMerId());
             detail.setOrderId(file.getOrderId());
             detail.setCurrencyCode(file.getCurrencyCode());
-            detail.setAmt(new BigDecimal(file.getAmt()));
+            detail.setAmt(Long.parseLong(file.getAmt()));
             detail.setBizType(file.getBizType());
             detail.setAccType(file.getAccType());
             detail.setAccNo(file.getAccNo());
@@ -418,26 +429,26 @@ public class InsteadPayServiceImpl
         // 成功笔数
         int successQty = 0;
         // 成功金额
-        BigDecimal successAmt = BigDecimal.ZERO;
+        Long successAmt = 0L;
         // 失败笔数
         int failQty = 0;
         // 失败金额
-        BigDecimal failAmt = BigDecimal.ZERO;
+        Long failAmt = 0L;
         List<InsteadPayQueryFile> queryFiles = new ArrayList<InsteadPayQueryFile>();
         List<PojoInsteadPayDetail> detailList = batch.getDetails();
         for (PojoInsteadPayDetail detail : detailList) {
             if (detail.getStatus().equals("00")) {
                 successQty++;
-                successAmt = successAmt.add(detail.getAmt());
+                successAmt = successAmt+ detail.getAmt();
             } else {
                 failQty++;
-                failAmt = failAmt.add(detail.getAmt());
+                failAmt = failAmt+ detail.getAmt();
             }
             InsteadPayQueryFile queryFile = new InsteadPayQueryFile();
             queryFile.setMerId(detail.getMerId());
             queryFile.setOrderId(detail.getOrderId());
             queryFile.setCurrencyCode(detail.getCurrencyCode());
-            queryFile.setAmt(detail.getAmt().toPlainString());
+            queryFile.setAmt(String.valueOf(detail.getAmt()));
             queryFile.setBizType(detail.getBizType());
             queryFile.setAccType(detail.getAccType());
             queryFile.setAccNo(detail.getAccNo());
@@ -479,9 +490,9 @@ public class InsteadPayServiceImpl
         // 应答报文
         responseBean.setFileContent(queryFiles);
         responseBean.setSuccTotalQty(String.valueOf(successQty));
-        responseBean.setSuccTotalAmt(successAmt.toPlainString());
+        responseBean.setSuccTotalAmt(String.valueOf(successAmt));
         responseBean.setFailTotalQty(String.valueOf(failQty));
-        responseBean.setFailTotalAmt(failAmt.toPlainString());
+        responseBean.setFailTotalAmt(String.valueOf(failAmt));
         responseBean.setRespCode("00");
         responseBean.setRespMsg("成功！");
         if (log.isDebugEnabled()) {
