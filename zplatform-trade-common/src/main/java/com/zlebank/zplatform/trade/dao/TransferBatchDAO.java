@@ -3,9 +3,7 @@ package com.zlebank.zplatform.trade.dao;
 import java.util.List;
 import java.util.Map;
 
-import com.zlebank.zplatform.commons.bean.TransferBatchQuery;
 import com.zlebank.zplatform.commons.dao.BaseDAO;
-import com.zlebank.zplatform.commons.dao.BasePagedQueryDAO;
 import com.zlebank.zplatform.trade.bean.page.QueryTransferBean;
 import com.zlebank.zplatform.trade.model.PojoTranBatch;
 import com.zlebank.zplatform.trade.model.PojoTranData;
@@ -38,16 +36,14 @@ public interface TransferBatchDAO extends BaseDAO<PojoTranBatch>{
     
     /**
      * 获取划拨批次数据
-     * @param batchno
+     * @param batchId
      * @return
      */
-    public PojoTranBatch getByBatchNo(String batchno);
-    
+    public PojoTranBatch getByBatchId(long batchId);
     /**
-     * 
-     * @param batchNo
-     * @param status
+     * 获取等待审核的划拨数据
+     * @param batchId
      * @return
      */
-    public List<PojoTranData> queryBatchTransfer(String batchNo,String status);
+    public List<PojoTranData> queryWaitTrialTranData(long batchId);
 }

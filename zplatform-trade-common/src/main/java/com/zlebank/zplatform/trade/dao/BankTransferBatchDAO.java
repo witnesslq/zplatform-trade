@@ -6,6 +6,7 @@ import java.util.Map;
 import com.zlebank.zplatform.commons.bean.TransferBatchQuery;
 import com.zlebank.zplatform.commons.dao.BasePagedQueryDAO;
 import com.zlebank.zplatform.commons.dao.pojo.AccStatusEnum;
+import com.zlebank.zplatform.trade.bean.enums.BankTransferBatchOpenStatusEnum;
 import com.zlebank.zplatform.trade.bean.page.QueryTransferBean;
 import com.zlebank.zplatform.trade.model.PojoBankTransferBatch;
 
@@ -84,5 +85,20 @@ public interface BankTransferBatchDAO extends BasePagedQueryDAO<PojoBankTransfer
      * @return
      */
     public Map<String, Object> queryBankTransferByPage(QueryTransferBean queryTransferBean,int page,int pageSize);
+    
+    
+    /**
+     * 根据转账批次号获取批次数据
+     * @param bankTranBatchNo
+     * @return
+     */
+    public PojoBankTransferBatch getByBankTranBatchNo(Long tid);
+    
+    /**
+     * 根据划拨批次和开放状态查询转账批次列表
+     * @param bankTranBatchNo
+     * @return
+     */
+    public List<PojoBankTransferBatch> getByTranBatchAndOpenStatus(long tranBatchId,BankTransferBatchOpenStatusEnum openStatus);
 }
 

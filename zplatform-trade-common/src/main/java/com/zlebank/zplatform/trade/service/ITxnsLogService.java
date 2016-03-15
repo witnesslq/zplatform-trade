@@ -20,7 +20,7 @@ import com.zlebank.zplatform.trade.bean.ReaPayResultBean;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.gateway.QueryBean;
 import com.zlebank.zplatform.trade.exception.TradeException;
-import com.zlebank.zplatform.trade.model.PojoBankTransferData;
+import com.zlebank.zplatform.trade.model.PojoTranData;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.model.TxnsWithholdingModel;
 
@@ -84,7 +84,7 @@ public interface ITxnsLogService extends IBaseService<TxnsLogModel, String>{
      * 保存划拨交易流水交易
      * @param transferDataList
      */
-    public void saveTransferLogs(List<PojoBankTransferData> transferDataList);
+    public void saveTransferLogs(List<PojoTranData> transferDataList);
     
     /**
      * 获取风控策略

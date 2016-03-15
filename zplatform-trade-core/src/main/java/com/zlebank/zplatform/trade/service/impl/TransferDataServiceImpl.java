@@ -1,7 +1,7 @@
 /* 
  * TransferDataServiceImpl.java  
  * 
- * version TODO
+ * version v1.3
  *
  * 2016年3月9日 
  * 
@@ -10,12 +10,10 @@
  */
 package com.zlebank.zplatform.trade.service.impl;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +24,6 @@ import com.zlebank.zplatform.trade.bean.enums.TransferDataStatusEnum;
 import com.zlebank.zplatform.trade.dao.TranBatchDAO;
 import com.zlebank.zplatform.trade.dao.TranDataDAO;
 import com.zlebank.zplatform.trade.exception.RecordsAlreadyExistsException;
-import com.zlebank.zplatform.trade.model.PojoInsteadPayDetail;
 import com.zlebank.zplatform.trade.model.PojoTranBatch;
 import com.zlebank.zplatform.trade.model.PojoTranData;
 import com.zlebank.zplatform.trade.service.SeqNoService;
@@ -40,7 +37,6 @@ import com.zlebank.zplatform.trade.service.TransferDataService;
  * @date 2016年3月9日 下午7:57:14
  * @since 
  */
-@Service
 public class TransferDataServiceImpl implements TransferDataService{
 
     @Autowired
@@ -93,8 +89,13 @@ public class TransferDataServiceImpl implements TransferDataService{
             // 保存划拨批次统计数据
             batch.setTotalCount(addOne(batch.getTotalCount()));
             batch.setTotalAmt(addAmount(batch.getTotalAmt(), data.getTranAmt()));
+
+            batch.setRefuseCount(addOne(batch.getRefuseCount()));
+            //batch.setRefuseAmt(addAmount(batch.getRefuseAmt().longValue(), data.getTranAmt().longValue()));
+
             batch.setWaitApproveCount(addOne(batch.getWaitApproveCount()));
             batch.setWaitApproveAmt(addAmount(batch.getWaitApproveAmt(), data.getTranAmt()));
+
         }
         // 保存划拨批次
         batch = tranBatchDAO.merge(batch);

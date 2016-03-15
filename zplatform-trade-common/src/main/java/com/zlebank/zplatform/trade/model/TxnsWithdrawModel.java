@@ -22,6 +22,10 @@ import com.zlebank.zplatform.trade.utils.OrderNumber;
 @Table(name = "T_TXNS_WITHDRAW")
 public class TxnsWithdrawModel implements java.io.Serializable {
 
+    /**
+     * serialVersionUID
+     */
+    private static final long serialVersionUID = -5624809894940365318L;
     private long id;
     private String withdraworderno;
     private String batchno;

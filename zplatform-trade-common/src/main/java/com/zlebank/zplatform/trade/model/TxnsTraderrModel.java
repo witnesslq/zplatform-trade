@@ -18,7 +18,11 @@ public class TxnsTraderrModel implements java.io.Serializable {
 
 	// Fields
 
-	private Long id;
+	/**
+     * serialVersionUID
+     */
+    private static final long serialVersionUID = 8858835786639231935L;
+    private Long id;
 	private String traderrno;
 	private String routlvl;
 	private String status;

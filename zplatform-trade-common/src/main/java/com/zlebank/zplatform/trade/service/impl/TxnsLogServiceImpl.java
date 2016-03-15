@@ -23,12 +23,14 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
+import com.zlebank.zplatform.commons.dao.pojo.BusiTypeEnum;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.bean.AccountTradeBean;
 import com.zlebank.zplatform.trade.bean.AppPartyBean;
 import com.zlebank.zplatform.trade.bean.PayPartyBean;
 import com.zlebank.zplatform.trade.bean.ReaPayResultBean;
 import com.zlebank.zplatform.trade.bean.ResultBean;
+import com.zlebank.zplatform.trade.bean.enums.BusinessEnum;
 import com.zlebank.zplatform.trade.bean.enums.ChannelEnmu;
 import com.zlebank.zplatform.trade.bean.enums.ChnlTypeEnum;
 import com.zlebank.zplatform.trade.bean.enums.RiskLevelEnum;
@@ -37,8 +39,8 @@ import com.zlebank.zplatform.trade.dao.ITxnsLogDAO;
 import com.zlebank.zplatform.trade.dao.RspmsgDAO;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.model.MemberBaseModel;
-import com.zlebank.zplatform.trade.model.PojoBankTransferData;
 import com.zlebank.zplatform.trade.model.PojoRspmsg;
+import com.zlebank.zplatform.trade.model.PojoTranData;
 import com.zlebank.zplatform.trade.model.RiskTradeLogModel;
 import com.zlebank.zplatform.trade.model.TxncodeDefModel;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
@@ -487,45 +489,53 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 
     @Override
     @Transactional(propagation=Propagation.REQUIRES_NEW)
-    public void saveTransferLogs(List<PojoBankTransferData> transferDataList) {
-        List<TxnsLogModel> logList = new ArrayList<TxnsLogModel>();
-        for(PojoBankTransferData data : transferDataList){
-        	/* TxnsLogModel txnsLog = getTxnsLogByTxnseqno(data.getTxnseqno());
+    public void saveTransferLogs(List<PojoTranData> transferDataList) {
+        for(PojoTranData data : transferDataList){
+        	TxnsLogModel txnsLog = getTxnsLogByTxnseqno(data.getTxnseqno());
             if(txnsLog!=null){
                 continue;
             }
             txnsLog = new TxnsLogModel();
-            MemberBaseModel member = memberService.get(data.getMemberid());
+            MemberBaseModel member = memberService.get(data.getMemberId());
             txnsLog.setTxnseqno(data.getTxnseqno());
             txnsLog.setTxndate(DateUtil.getCurrentDate());
             txnsLog.setTxntime(DateUtil.getCurrentTime());
-            txnsLog.setBusicode(data.getBusicode());
-            txnsLog.setBusitype(data.getBusitype());
-            txnsLog.setAmount(data.getTransamt());
+            if("00".equals(data.getBusiType())){//代付
+            	txnsLog.setBusicode(BusiTypeEnum.insteadPay.getCode());
+                txnsLog.setBusitype(BusinessEnum.INSTEADPAY.getBusiCode());
+            }else if("01".equals(data.getBusiType())){
+            	txnsLog.setBusicode(BusiTypeEnum.withdrawal.getCode());
+                txnsLog.setBusitype(BusinessEnum.WITHDRAWALS.getBusiCode());
+            }else if("02".equals(data.getBusiType())){
+            	txnsLog.setBusicode(BusiTypeEnum.refund.getCode());
+                txnsLog.setBusitype(BusinessEnum.REFUND.getBusiCode());
+            }
+            
+            txnsLog.setAmount(data.getTranAmt().longValue());
             txnsLog.setRiskver(member.getRiskver());
             txnsLog.setSplitver(member.getSpiltver());
             txnsLog.setFeever(member.getFeever());
             txnsLog.setPrdtver(member.getPrdtver());
             txnsLog.setCheckstandver(member.getCashver());
             txnsLog.setRoutver(member.getRoutver());
-            txnsLog.setAccordno(data.getRelatedorderno());
+            //txnsLog.setAccordno(data.getRelatedorderno());
             txnsLog.setAccordinst(member.getMerchinsti());
-            txnsLog.setAccfirmerno(data.getMemberid());
+            txnsLog.setAccfirmerno(data.getMemberId());
             txnsLog.setAccordcommitime(DateUtil.getCurrentDateTime());
             txnsLog.setTradestatflag("00000000");//交易初始状态
             txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlcycle().toString())));
             txnsLog.setPaytype("04"); //支付类型（01：快捷，02：网银，03：账户）
-            txnsLog.setPayordno(data.getTranid());//支付定单号
+            txnsLog.setPayordno(data.getTranDataSeqNo());//支付定单号
             txnsLog.setPayinst(ChannelEnmu.CMBCINSTEADPAY.getChnlcode());//支付所属机构
             txnsLog.setPayfirmerno(ConsUtil.getInstance().cons.getCmbc_insteadpay_merid());//支付一级商户号
             txnsLog.setPayordcomtime(DateUtil.getCurrentDateTime());//支付定单提交时间
             //卡信息
-            txnsLog.setPan(data.getAccno());
-            Map<String, Object> cardMap = getCardInfo(data.getAccno());
+            txnsLog.setPan(data.getAccNo());
+            Map<String, Object> cardMap = getCardInfo(data.getAccNo());
             txnsLog.setCardtype(cardMap.get("TYPE").toString());
             txnsLog.setCardinstino(cardMap.get("BANKCODE").toString());
-            txnsLog.setTxnfee(data.getTxnfee().longValue());*/
-            //super.save(txnsLog);
+            txnsLog.setTxnfee(data.getTranFee().longValue());
+            super.save(txnsLog);
         }
         
     }

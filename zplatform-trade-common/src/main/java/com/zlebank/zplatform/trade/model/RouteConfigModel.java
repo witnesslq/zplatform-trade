@@ -18,6 +18,10 @@ public class RouteConfigModel implements java.io.Serializable {
 
  // Fields
 
+    /**
+     * serialVersionUID
+     */
+    private static final long serialVersionUID = 56898438589616289L;
     private Long rid;
     private String cashcode;
     private String stime;

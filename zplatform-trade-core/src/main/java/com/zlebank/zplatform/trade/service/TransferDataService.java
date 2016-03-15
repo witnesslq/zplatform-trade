@@ -14,7 +14,6 @@ import java.util.List;
 
 import com.zlebank.zplatform.trade.bean.enums.TransferBusiTypeEnum;
 import com.zlebank.zplatform.trade.exception.RecordsAlreadyExistsException;
-import com.zlebank.zplatform.trade.model.PojoInsteadPayDetail;
 import com.zlebank.zplatform.trade.model.PojoTranData;
 
 /**
@@ -28,9 +27,9 @@ import com.zlebank.zplatform.trade.model.PojoTranData;
 public interface TransferDataService {
     /**
      * 保存划拨流水
-     * @param details 划拨流水Pojo
+     * @param datas 划拨流水Pojo
      * @return long 划拨批次号
      * @throws RecordsAlreadyExistsException 
      */
-    public long saveTransferData(TransferBusiTypeEnum type, Long busiBatchId, List<PojoTranData> details) throws RecordsAlreadyExistsException;
+    public long saveTransferData(TransferBusiTypeEnum type, Long busiBatchId, List<PojoTranData> datas) throws RecordsAlreadyExistsException;
 }

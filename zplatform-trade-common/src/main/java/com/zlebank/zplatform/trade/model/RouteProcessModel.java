@@ -14,6 +14,10 @@ public class RouteProcessModel implements java.io.Serializable {
 
  // Fields
 
+    /**
+     * serialVersionUID
+     */
+    private static final long serialVersionUID = 2264447916680379662L;
     private Long rid;
     private String routver;
     private String laststep;

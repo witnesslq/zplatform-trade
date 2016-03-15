@@ -14,7 +14,11 @@ public class CashCaseModel implements java.io.Serializable {
 
 	// Fields
 
-	private Long id;
+	/**
+     * serialVersionUID
+     */
+    private static final long serialVersionUID = -240036586606309538L;
+    private Long id;
 	private String cashver;
 	private String cashcode;
 	private String cashname;

@@ -40,7 +40,7 @@ public interface TranDataDAO extends BasePagedQueryDAO<PojoTranData, TransferDat
      * @param id
      * @return
      */
-    public PojoTranData  getTransferDataByTranId(String tranid,String status);
+    public PojoTranData getTransferDataByTranId(String tranid,String status);
     
     
     /**

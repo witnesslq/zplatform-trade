@@ -14,6 +14,10 @@ public class TxnsOrderinfoModel implements java.io.Serializable {
 
  // Fields
 
+    /**
+     * serialVersionUID
+     */
+    private static final long serialVersionUID = -2364932640720308188L;
     private Long id;
     private String institution;
     private String orderno;

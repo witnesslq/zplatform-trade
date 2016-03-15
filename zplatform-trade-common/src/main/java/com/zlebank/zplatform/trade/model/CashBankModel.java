@@ -14,7 +14,11 @@ public class CashBankModel implements java.io.Serializable {
 
 	// Fields
 
-	private Long tid;
+	/**
+     * serialVersionUID
+     */
+    private static final long serialVersionUID = -2341789431526414717L;
+    private Long tid;
 	private String chnlcode;
 	private String cashcode;
 	private String bankcode;

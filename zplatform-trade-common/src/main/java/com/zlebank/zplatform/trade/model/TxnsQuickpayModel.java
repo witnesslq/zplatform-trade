@@ -29,6 +29,10 @@ public class TxnsQuickpayModel implements java.io.Serializable {
 
  // Fields
 
+    /**
+     * serialVersionUID
+     */
+    private static final long serialVersionUID = 2615255377016234602L;
     private Long id;
     private String institution;
     private String payorderno;

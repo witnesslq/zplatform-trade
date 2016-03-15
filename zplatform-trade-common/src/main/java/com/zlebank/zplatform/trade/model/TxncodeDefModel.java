@@ -14,7 +14,11 @@ public class TxncodeDefModel implements java.io.Serializable {
 
 	// Fields
 
-	private Long txnid;
+	/**
+     * serialVersionUID
+     */
+    private static final long serialVersionUID = -6912653347490462796L;
+    private Long txnid;
 	private String apptype;
 	private String txntype;
 	private String status;

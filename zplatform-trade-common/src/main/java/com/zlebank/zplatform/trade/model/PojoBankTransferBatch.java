@@ -25,9 +25,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
+import com.alibaba.fastjson.annotation.JSONField;
 /**
  * 转账批次
  *
@@ -37,57 +40,64 @@ import org.hibernate.annotations.Parameter;
  * @since 1.3.0
  */
 @Entity
-@Table(name="T_BANK_TRAN_BATCH")
+@Table(name = "T_BANK_TRAN_BATCH")
 public class PojoBankTransferBatch {
-    /**"表标识"**/
+    /** "表标识" **/
     private Long tid;
-    /**"银行转账批次序列号"**/
+    /** "银行转账批次序列号" **/
     private String bankTranBatchNo;
-    /**"转账渠道"**/
+    /** "转账渠道" **/
+    @JSONField(serialize=false)
     private PojoBankTransferChannel channel;
-    /**"关联划拨批次渠道"**/
+    /** "关联划拨批次渠道" **/
+    @JSONField(serialize=false)
     private List<PojoTranBatch> tranBatchs;
-    /**"总笔数"**/
+    /** "总笔数" **/
     private Long totalCount;
-    /**"总金额"**/
+    /** "总金额" **/
     private Long totalAmt;
-    /**"成功笔数"**/
+    /** "成功笔数" **/
     private Long successCount;
-    /**"成功金额"**/
+    /** "成功金额" **/
     private Long successAmt;
-    /**"失败笔数"**/
+    /** "失败笔数" **/
     private Long failCount;
-    /**"失败金额"**/
+    /** "失败金额" **/
     private Long failAmt;
-    /**"""状态（01：未审核02：审核通过03：审核拒绝）"""**/
+    /** """状态（01：未审核02：审核通过03：审核拒绝）""" **/
     private String status;
-    /**"开放状态（0:开放1：关闭）"**/
+    /** "开放状态（0:开放1：关闭）" **/
     private String openStatus;
-    /**"""转账状态(01:等待转账02：部分转账成功03：全部转账成功 04：全部失败**/
+    /** """转账状态(01:等待转账02：部分转账成功03：全部转账成功 04：全部失败 **/
     private String tranStatus;
-    /**"申请时间**/
+    /** "申请时间 **/
+    @JSONField (format="yyyy-MM-dd HH:mm:ss") 
     private Date applyTime;
-    /**"默认关闭时间"**/
+    /** "默认关闭时间" **/
+    @JSONField (format="yyyy-MM-dd HH:mm:ss") 
     private Date defaultCloseTime;
-    /**"最后关闭时间（每日）"**/
+    /** "最后关闭时间（每日）" **/
+    @JSONField (format="yyyy-MM-dd HH:mm:ss") 
     private Date latestCloseTime;
-    /**"关闭时间"**/
+    /** "关闭时间" **/
+    @JSONField (format="yyyy-MM-dd HH:mm:ss") 
     private Date closeTime;
-    /**"""触发关闭动作（00：笔数到达上限01：到达每日最后关闭时间02：到达关闭间隔 03：手工关闭）"""**/
+    /** """触发关闭动作（00：笔数到达上限01：到达每日最后关闭时间02：到达关闭间隔 03：手工关闭）""" **/
     private String closeEvent;
-    /**"转账审核人"**/
+    /** "转账审核人" **/
     private Long tranUser;
-    
-    /**备注**/
+    /** 备注 **/
     private String remark;
-    private List<PojoBankTransferData> bnakTranDatas;
+    /** 关联银行转账流水 **/
+    @JSONField (serialize=false) 
+    private List<PojoBankTransferData> bankTranDatas;
     @GenericGenerator(name = "id_gen", strategy = "enhanced-table", parameters = {
             @Parameter(name = "table_name", value = "T_C_PRIMAY_KEY"),
             @Parameter(name = "value_column_name", value = "NEXT_ID"),
             @Parameter(name = "segment_column_name", value = "KEY_NAME"),
             @Parameter(name = "segment_value", value = "BANK_TRAN_BATCH_ID"),
             @Parameter(name = "increment_size", value = "1"),
-            @Parameter(name = "optimizer", value = "pooled-lo") })
+            @Parameter(name = "optimizer", value = "pooled-lo")})
     @Id
     @GeneratedValue(generator = "id_gen")
     @Column(name = "TID")
@@ -104,16 +114,16 @@ public class PojoBankTransferBatch {
     public void setBankTranBatchNo(String bankTranBatchNo) {
         this.bankTranBatchNo = bankTranBatchNo;
     }
-    
-    @ManyToOne
-    @JoinColumn(name = "CHANNEL")
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "BANK_TRAN_CHANNEL_ID")
     public PojoBankTransferChannel getChannel() {
         return channel;
     }
     public void setChannel(PojoBankTransferChannel channel) {
         this.channel = channel;
     }
-    
+
     @Column(name = "TOTAL_COUNT")
     public Long getTotalCount() {
         return totalCount;
@@ -226,19 +236,20 @@ public class PojoBankTransferBatch {
     public void setRemark(String remark) {
         this.remark = remark;
     }
-    @ManyToMany
-    @JoinTable
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "RELA_TB_BTB", joinColumns = {@JoinColumn(name = "BANK_TRAN_BATCH_ID", referencedColumnName = "TID")}, inverseJoinColumns = {@JoinColumn(name = "TRAN_BATCH_ID", referencedColumnName = "TID")})
+    @Cascade(value = CascadeType.SAVE_UPDATE)
     public List<PojoTranBatch> getTranBatchs() {
         return tranBatchs;
     }
     public void setTranBatchs(List<PojoTranBatch> tranBatchs) {
         this.tranBatchs = tranBatchs;
     }
-//    @OneToMany(mappedBy="BANK_TRAN_BATCH_ID",fetch=FetchType.LAZY)
-//    public List<PojoBankTransferData> getBnakTranDatas() {
-//        return bnakTranDatas;
-//    }
-//    public void setBnakTranDatas(List<PojoBankTransferData> bnakTranDatas) {
-//        this.bnakTranDatas = bnakTranDatas;
-//    }
+    @OneToMany(mappedBy = "bankTranBatch", fetch = FetchType.LAZY)
+    public List<PojoBankTransferData> getBankTranDatas() {
+        return bankTranDatas;
+    }
+    public void setBankTranDatas(List<PojoBankTransferData> bankTranDatas) {
+        this.bankTranDatas = bankTranDatas;
+    }
 }

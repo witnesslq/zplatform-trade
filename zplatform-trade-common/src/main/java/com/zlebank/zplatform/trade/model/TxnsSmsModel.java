@@ -14,6 +14,10 @@ import javax.persistence.Table;
 @Table(name = "T_TXNS_SMS")
 public class TxnsSmsModel implements java.io.Serializable {
 
+    /**
+     * serialVersionUID
+     */
+    private static final long serialVersionUID = -6007806950155205472L;
     private long tid;
     private String tn;
     private String mobile;

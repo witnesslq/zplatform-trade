@@ -10,7 +10,6 @@
  */
 package com.zlebank.zplatform.trade.batch.spliter.impl;
 
-import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.Date;
 
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import com.zlebank.zplatform.commons.bean.CardBin;
 import com.zlebank.zplatform.commons.dao.CardBinDao;
-import com.zlebank.zplatform.commons.enums.BusinessCodeEnum;
 import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.batch.spliter.BatchManager;
@@ -38,7 +36,6 @@ import com.zlebank.zplatform.trade.model.PojoBankTransferBatch;
 import com.zlebank.zplatform.trade.model.PojoBankTransferChannel;
 import com.zlebank.zplatform.trade.model.PojoBankTransferData;
 import com.zlebank.zplatform.trade.service.SeqNoService;
-import com.zlebank.zplatform.trade.utils.OrderNumber;
 
 
 /**
@@ -75,7 +72,7 @@ public class BatchManagerImpl implements BatchManager {
         PojoBankTransferChannel channelPojo = bankTransferChannelDAO.getByChannelCode(channel);
         PojoBankTransferBatch newBatch = new PojoBankTransferBatch();
         newBatch.setBankTranBatchNo(seqNoService.getBatchNo(SeqNoEnum.BANK_TRAN_BATCH_NO));
-        newBatch.setChannel(channelPojo);
+        //newBatch.setChannel(channelPojo);
         newBatch.setTotalCount(0L);
         newBatch.setTotalAmt(0L);
         newBatch.setSuccessCount(0L);
@@ -131,7 +128,9 @@ public class BatchManagerImpl implements BatchManager {
         PojoBankTransferBatch batch = getBatchNoByChannel(channelCode);
         // Bean -> Pojo
         PojoBankTransferData detail = convertToPojo(transferData);
-        detail.setBankTranBatch(batch);
+        //detail.setBankTranBatchId(batch.getTid());
+        //detail.setBankTranBatch(batch);
+
         // 保存转账流水
         detail = bankTransferDetaDAO.merge(detail);
         // 保存转账批次
@@ -154,11 +153,15 @@ public class BatchManagerImpl implements BatchManager {
      */
     private boolean isCloseBatch(PojoBankTransferBatch batch) {
         // 取出当前渠道的配置信息
+
+        /*PojoBankTransferChannel channelPojo = bankTransferChannelDAO.getByChannelCode(batch.getBankTranChannelId());
+=======
         PojoBankTransferChannel channelPojo = bankTransferChannelDAO.getByChannelCode(batch.getChannel().getBankChannelCode());
+>>>>>>> branch 'develop' of root@192.168.101.11:zplatform-trade
         // 超过渠道定义的最大笔数的话，就关闭这个批次。
         if (channelPojo.getDetaCount() <= batch.getTotalCount() ) {
             return true;
-        }
+        }*/
         return false;
     }
 
@@ -170,7 +173,9 @@ public class BatchManagerImpl implements BatchManager {
     private PojoBankTransferData convertToPojo(TransferData transferData) {
         PojoBankTransferData data = new PojoBankTransferData();
         data.setBankTranDataSeqNo(seqNoService.getBatchNo(SeqNoEnum.BANK_TRAN_DATA_NO));
-        data.setTranDataId(transferData);
+
+        //data.setTranDataId(transferData);
+
         data.setTranAmt(transferData.getTranAmt());
         data.setAccNo(transferData.getAccNo());
         data.setAccName(transferData.getAccName());
@@ -179,7 +184,7 @@ public class BatchManagerImpl implements BatchManager {
         data.setStatus(BankTransferDataStatusEnum.INIT.getCode());
         data.setApplyTime(new Date());
         data.setAccType(transferData.getAccType());
-        data.setTxnseqno(OrderNumber.getInstance().generateTxnseqno(BusinessCodeEnum.TRAN_DATA_NO.getBusiCode()));
+        //data.setTxnseqno(OrderNumber.getInstance().generateTxnseqno(BusinessCodeEnum.TRAN_DATA_NO.getBusiCode()));
         CardBin card = cardBinDao.getCard(transferData.getAccNo());
 	     if (card != null && StringUtil.isNotEmpty(card.getBankCode()) && card.getBankCode().startsWith("0305")) {
 	         data.setTransferType("01");

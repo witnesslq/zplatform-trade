@@ -62,4 +62,19 @@ public interface TransferDataDAO extends BaseDAO<PojoTranData>{
      * @param transferBatch
      */
     public void updateBatchTransferSingle(PojoTranBatch transferBatch);
+    
+    
+    /**
+     * 更新划拨数据状态
+     * @param tid
+     * @param status
+     */
+    public void updateTransferDataStatus(Long tid, String status);
+    
+    /**
+     * 获取等待转账结果的划拨数据数量
+     * @param tranBatchId
+     * @return
+     */
+    public Long queryWaritTransferCount(Long tranBatchId);
 }

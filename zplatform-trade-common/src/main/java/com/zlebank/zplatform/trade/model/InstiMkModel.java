@@ -14,7 +14,11 @@ public class InstiMkModel implements java.io.Serializable {
 
 	// Fields
 
-	private String instiid;
+	/**
+     * serialVersionUID
+     */
+    private static final long serialVersionUID = -7980128203828750430L;
+    private String instiid;
 	private String safeseq;
 	private String safetype;
 	private String pubkey;

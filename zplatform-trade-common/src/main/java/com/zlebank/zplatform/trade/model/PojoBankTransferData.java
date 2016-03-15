@@ -10,10 +10,12 @@
  */
 package com.zlebank.zplatform.trade.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -21,9 +23,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
+import com.alibaba.fastjson.annotation.JSONField;
 /**
  * 转账流水
  *
@@ -34,14 +39,20 @@ import org.hibernate.annotations.Parameter;
  */
 @Entity
 @Table(name="T_BANK_TRAN_DATA")
-public class PojoBankTransferData {
+public class PojoBankTransferData implements Serializable{
+    /**
+     * serialVersionUID
+     */
+    private static final long serialVersionUID = 1216450255077674134L;
     /**"表标识"**/
     private Long tid;
     /**"银行转账流水序列号"**/
     private String bankTranDataSeqNo; 
     /**"银行转账批次号"**/
+    @JSONField (serialize=false) 
     private PojoBankTransferBatch bankTranBatch;
     /**"划拨流水号"**/
+    @JSONField (serialize=false) 
     private PojoTranData tranData;
     /**"转账金额"**/
     private Long tranAmt;
@@ -60,6 +71,7 @@ public class PojoBankTransferData {
     /**响应信息**/
     private String resInfo;
     /**"申请时间"**/
+    @JSONField (format="yyyy-MM-dd HH:mm:ss") 
     private Date applyTime;
     /**"账户类型(0:对私账户1：对公账户)"**/
     private String accType;
@@ -93,20 +105,21 @@ public class PojoBankTransferData {
     public void setBankTranDataSeqNo(String bankTranDataSeqNo) {
         this.bankTranDataSeqNo = bankTranDataSeqNo;
     } 
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="BANK_TRAN_BATCH_ID")
+    @Cascade(value=CascadeType.SAVE_UPDATE)
     public PojoBankTransferBatch getBankTranBatch() {
         return bankTranBatch;
     }
     public void setBankTranBatch(PojoBankTransferBatch bankTranBatch) {
         this.bankTranBatch = bankTranBatch;
     }
-    @OneToOne
+    @OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "TRAN_DATA_ID")
-    public PojoTranData getTranDataId() {
+    public PojoTranData getTranData() {
         return tranData;
     }
-    public void setTranDataId(PojoTranData tranData) {
+    public void setTranData(PojoTranData tranData) {
         this.tranData = tranData;
     }
     @Column(name = "TRAN_AMT")

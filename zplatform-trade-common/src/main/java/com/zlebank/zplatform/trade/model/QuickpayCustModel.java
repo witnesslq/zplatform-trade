@@ -21,6 +21,10 @@ public class QuickpayCustModel implements java.io.Serializable {
 
     // Fields
 
+    /**
+     * serialVersionUID
+     */
+    private static final long serialVersionUID = -6161730384326071922L;
     private Long id;
     private String bindcardid;
     private String institution;

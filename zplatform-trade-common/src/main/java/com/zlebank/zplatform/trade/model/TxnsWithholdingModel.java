@@ -29,6 +29,10 @@ import com.zlebank.zplatform.trade.utils.OrderNumber;
 @Table(name = "T_TXNS_WITHHOLDING")
 public class TxnsWithholdingModel implements java.io.Serializable {
 
+    /**
+     * serialVersionUID
+     */
+    private static final long serialVersionUID = 6447847854696620489L;
     private long tid;
     private String serialno;
     private String merid;
