@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.commons.utils.StringUtil;
+import com.zlebank.zplatform.trade.bean.UpdateData;
 import com.zlebank.zplatform.trade.bean.enums.InsteadPayTypeEnum;
 import com.zlebank.zplatform.trade.cmbc.bean.InsteadPayBean;
 import com.zlebank.zplatform.trade.cmbc.bean.RealTimePayBean;
@@ -56,6 +57,7 @@ import com.zlebank.zplatform.trade.model.PojoTranData;
 import com.zlebank.zplatform.trade.model.PojoTxnsInsteadPay;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
+import com.zlebank.zplatform.trade.service.UpdateSubject;
 import com.zlebank.zplatform.trade.utils.ConsUtil;
 import com.zlebank.zplatform.trade.utils.OrderNumber;
 
@@ -88,7 +90,8 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
     @Autowired
     private ITxnsInsteadPayDAO txnsInsteadPayDAO;
     
-    
+    @Autowired
+    private UpdateSubject updateSubject;
     /**
      * 批量代付(跨行)
      * 
@@ -428,7 +431,7 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
             //更新转账明细数据
             bankTransferDataDAO.batchUpdateTransData(resultList);
             //更新对应业务的数据，调用业务处理接口
-            
+            dealWithBusiData(resultList);
             PojoTxnsInsteadPay txnsInsteadPay = txnsInsteadPayDAO.getByResponseFileName(fileName);
             //更新转账批次数据
             PojoBankTransferBatch transferBatch = bankTransferBatchDAO.getByBankTranBatchNo(Long.valueOf(txnsInsteadPay.getInsteadPayNo()));
@@ -459,8 +462,12 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
     public void dealWithBusiData(List<PojoBankTransferData> transferDataList){
     	for (PojoBankTransferData data : transferDataList) {
             PojoBankTransferData transferData = bankTransferDataDAO.getTransferDataByTranId(data.getBankTranDataSeqNo());
-            
-            
+            UpdateData updateData = new UpdateData();
+            updateData.setTxnSeqNo(transferData.getTranData().getTxnseqno());
+            updateData.setResultCode("S".equalsIgnoreCase(data.getResType())? "00": "03");
+            updateData.setResultMessage("S".equalsIgnoreCase(data.getResType())? "交易成功": transferData.getResInfo());
+            updateData.setChannelCode(transferData.getBankTranBatch().getChannel().getBankChannelCode());
+            updateSubject.update(updateData);
     	}
     }
     
