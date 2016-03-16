@@ -248,7 +248,7 @@ public class InsteadPayServiceImpl
 
         // 插入明细表
         List<PojoInsteadPayDetail> pojoInsteadPayDetails = convertToPojoInsteadPayDetail(
-                request, batch.getId());
+                request, batch);
         for (PojoInsteadPayDetail detail : pojoInsteadPayDetails) {
             // 插入交易流水号
             detail.setTxnseqno(OrderNumber.getInstance().generateTxnseqno(BusinessCodeEnum.INSTEADPAY_APPLY.getBusiCode()));
@@ -375,13 +375,13 @@ public class InsteadPayServiceImpl
      * @return
      */
     private List<PojoInsteadPayDetail> convertToPojoInsteadPayDetail(InsteadPay_Request request,
-            Long batch) {
+            PojoInsteadPayBatch batch) {
         List<PojoInsteadPayDetail> result = new ArrayList<PojoInsteadPayDetail>();
         List<InsteadPayFile> fileContent = request.getFileContent();
         for (InsteadPayFile file : fileContent) {
             PojoInsteadPayDetail detail = new PojoInsteadPayDetail();
             detail.setInsteadPayDataSeqNo(seqNoService.getBatchNo(SeqNoEnum.INSTEAD_PAY_DATA_NO));
-            detail.setBatchId(batch);
+            detail.setInsteadPayBatch(batch);
             detail.setMerId(file.getMerId());
             detail.setOrderId(file.getOrderId());
             detail.setCurrencyCode(file.getCurrencyCode());

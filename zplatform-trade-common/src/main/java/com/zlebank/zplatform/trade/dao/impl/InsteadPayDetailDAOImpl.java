@@ -50,6 +50,7 @@ public class InsteadPayDetailDAOImpl
      * @param batchNo
      * @return
      */
+    @SuppressWarnings("unchecked")
     @Override
     public List<PojoInsteadPayDetail> getByBatchDetail(String batchNo) {
         Criteria crite = this.getSession().createCriteria(
@@ -103,14 +104,20 @@ public class InsteadPayDetailDAOImpl
             if (StringUtil.isNotEmpty(e.getOrderId())) {
                 crite.add(Restrictions.eq("orderId", e.getOrderId()));
             }
-            if (StringUtil.isNotEmpty(e.getBatchFileNo())) {
-                crite.add(Restrictions.eq("batchId",   Long.valueOf(e.getBatchFileNo())));
+            if (StringUtil.isNotEmpty(e.getBatchNo())) {
+                crite.add(Restrictions.eq("batchNo",   Long.valueOf(e.getBatchNo())));
+            }
+            if (StringUtil.isNotEmpty(e.getInsteadPayBatchSeqNo())) {
+                crite.add(Restrictions.eq("insteadPayBatch.insteadPayBatchSeqNo",  e.getInsteadPayBatchSeqNo()));
             }
             if (StringUtil.isNotEmpty(e.getStatus())) {
                 crite.add(Restrictions.eq("status",e.getStatus()));
             }
             if (StringUtil.isNotEmpty(e.getBatchId())) {
-                crite.add(Restrictions.eq("batchId", Long.parseLong(e.getBatchId())));
+                crite.add(Restrictions.eq("insteadPayBatch.id", Long.parseLong(e.getBatchId())));
+            }
+            if (StringUtil.isNotEmpty(e.getBatchId())) {
+                crite.add(Restrictions.eq("insteadPayBatch.imFileName", e.getImFileName()));
             }
             if (e.getStatusList() != null
                     && e.getStatusList().size() != 0) {
@@ -140,6 +147,7 @@ public class InsteadPayDetailDAOImpl
          * @param batchId
          * @return List
          */
+        @SuppressWarnings("unchecked")
         @Override
         public List<PojoInsteadPayDetail> getBatchDetailByBatchId(Long batchId) {
             Criteria crite = this.getSession().createCriteria(
@@ -154,6 +162,7 @@ public class InsteadPayDetailDAOImpl
          * @param ids
          * @return
          */
+        @SuppressWarnings("unchecked")
         @Override
         public List<PojoInsteadPayDetail> getBatchDetailByIds(List<Long> ids) {
             Criteria crite = this.getSession().createCriteria(
