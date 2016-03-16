@@ -15,6 +15,7 @@ import org.springframework.context.ApplicationContext;
 
 import com.zlebank.zplatform.trade.batch.spliter.BatchSpliter;
 import com.zlebank.zplatform.trade.bean.UpdateData;
+import com.zlebank.zplatform.trade.service.UpdateInsteadService;
 import com.zlebank.zplatform.trade.service.UpdateSubject;
 
 /**
@@ -31,7 +32,7 @@ public class UpdateSubjectTest {
     static UpdateSubject insteadBatchService = null;
     static {
         context = ApplicationContextUtil.get();
-        insteadBatchService =  (UpdateSubject) context.getBean("insteadBatchServiceImpl");
+        insteadBatchService =  (UpdateSubject) context.getBean("updateInsteadServiceImpl");
     }
 
 //    @Test   

@@ -11,10 +11,13 @@
 package com.zlebank.zplatform.trade.service.impl;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +29,7 @@ import com.zlebank.zplatform.trade.bean.enums.InsteadPayDetailStatusEnum;
 import com.zlebank.zplatform.trade.dao.InsteadPayBatchDAO;
 import com.zlebank.zplatform.trade.dao.InsteadPayDetailDAO;
 import com.zlebank.zplatform.trade.model.PojoInsteadPayDetail;
+import com.zlebank.zplatform.trade.service.ObserverListService;
 import com.zlebank.zplatform.trade.service.UpdateInsteadService;
 import com.zlebank.zplatform.trade.service.UpdateSubject;
 
@@ -38,7 +42,7 @@ import com.zlebank.zplatform.trade.service.UpdateSubject;
  * @since 
  */
 @Service
-public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSubject{
+public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSubject ,ApplicationListener<ContextRefreshedEvent> {
     
     private static final Log log = LogFactory.getLog(UpdateInsteadServiceImpl.class);
     
@@ -51,7 +55,6 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
     @Autowired
     private AccEntryService accEntryService;
     
-
     /**
      *  更新状态和记账
      * @param data
@@ -59,6 +62,10 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
     @Override
     @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void update(UpdateData data) {
+        List<UpdateSubject> observerList = ObserverListService.getInstance().getObserverList();
+        for (UpdateSubject subject : observerList) {
+            System.out.println(subject.getBusiCode());
+        }
         PojoInsteadPayDetail detail = insteadPayDetailDAO.getDetailByTxnseqno(data.getTxnSeqNo());
         if (detail == null) {
             log.error("没有找到需要记账的流水");
@@ -99,5 +106,15 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
     @Override
     public String getBusiCode() {
         return "00";
+    }
+
+
+    /**
+     *
+     * @param event
+     */
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        ObserverListService.getInstance().add(this);
     }
 }
