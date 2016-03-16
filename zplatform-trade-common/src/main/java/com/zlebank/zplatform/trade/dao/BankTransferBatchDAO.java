@@ -61,7 +61,7 @@ public interface BankTransferBatchDAO extends BasePagedQueryDAO<PojoBankTransfer
      * @param batchno 批次号
      * @param accStatus 账务状态
      */
-    public void updateAccountingResult(String batchno,AccStatusEnum accStatus);
+    public void updateBatchTranStatus(Long tid, String tranStatus);
     
     /**
      * 通过代付批次号查找批次数据
@@ -93,6 +93,13 @@ public interface BankTransferBatchDAO extends BasePagedQueryDAO<PojoBankTransfer
      * @return
      */
     public PojoBankTransferBatch getByBankTranBatchNo(Long tid);
+
+    /**
+     * 根据转账批次标示获取批次数据
+     * @param bankTranBatchNo
+     * @return
+     */
+    public PojoBankTransferBatch getById(Long tid);
     
     /**
      * 根据划拨批次和开放状态查询转账批次列表

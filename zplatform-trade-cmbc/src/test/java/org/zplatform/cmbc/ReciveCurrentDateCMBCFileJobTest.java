@@ -2,6 +2,7 @@ package org.zplatform.cmbc;
 
 import java.io.IOException;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -14,21 +15,21 @@ public class ReciveCurrentDateCMBCFileJobTest {
     private ApplicationContext context;
     private ReciveCurrentDateCMBCFileJob reciveCurrentDateCMBCFileJob;
     private InsteadPayAccountingJob insteadPayAccountingJob;
+    @Before
     public void init(){
         context = new ClassPathXmlApplicationContext("CmbcContextTest.xml");
         reciveCurrentDateCMBCFileJob = (ReciveCurrentDateCMBCFileJob) context.getBean("reciveCurrentDateCMBCFileJob");
-        insteadPayAccountingJob = (InsteadPayAccountingJob) context.getBean("insteadPayAccountingJob");
+       // insteadPayAccountingJob = (InsteadPayAccountingJob) context.getBean("insteadPayAccountingJob");
     }
-    
-    public void testJob() { 
-        init();
+    @Test
+    public void testJob() {
         try {
             reciveCurrentDateCMBCFileJob.execute();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    @Test
+    
     public void testAccountJob(){
         init();
         insteadPayAccountingJob.execute();

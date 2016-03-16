@@ -31,16 +31,6 @@ public interface TransferDataDAO extends BaseDAO<PojoTranData>{
     public Map<String, Object> queryTranfersDetaByPage(QueryTransferBean queryTransferBean,int page,int pageSize);
     
     /**
-     * 审核驳回业务退款
-     * @param transferData
-     * @param businessEnum
-     * @throws AccBussinessException
-     * @throws AbstractBusiAcctException
-     * @throws NumberFormatException
-     */
-    public void businessRefund(PojoTranData transferData,BusinessEnum businessEnum) throws AccBussinessException, AbstractBusiAcctException,NumberFormatException;
-
-    /**
      * 
      * @param tid
      * @param status
@@ -77,4 +67,12 @@ public interface TransferDataDAO extends BaseDAO<PojoTranData>{
      * @return
      */
     public Long queryWaritTransferCount(Long tranBatchId);
+    
+    /**
+     * 获取等待转账的转账数据
+     * @param tranBatchId
+     * @return
+     */
+    public List<PojoTranData> queryWaritTransferData(Long tranBatchId);
+    
 }

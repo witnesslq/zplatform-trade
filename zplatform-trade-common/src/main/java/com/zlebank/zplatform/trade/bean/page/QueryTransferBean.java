@@ -49,3 +49,4 @@ public class QueryTransferBean implements Serializable{
         this.status = status;
     }
 }
+

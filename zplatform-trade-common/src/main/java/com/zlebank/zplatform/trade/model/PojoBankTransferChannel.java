@@ -1,3 +1,4 @@
+
 /* 
  * PojoBankTransferChannel.java  
  * 
@@ -106,10 +107,13 @@ public class PojoBankTransferChannel {
         this.bankChannelCode = bankChannelCode;
     }
     @Column(name = "BANK_TYPE")
-    public String getBankType() {
-        return bankType;
-    }
-    public void setBankType(String bankType) {
-        this.bankType = bankType;
-    }
+	public String getBankType() {
+		return bankType;
+	}
+	public void setBankType(String bankType) {
+		this.bankType = bankType;
+	}
+    
+    
 }
+

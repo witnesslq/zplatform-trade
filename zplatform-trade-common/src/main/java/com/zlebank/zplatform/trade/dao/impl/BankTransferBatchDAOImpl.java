@@ -103,20 +103,20 @@ public class BankTransferBatchDAOImpl
         return null;
     }
 
-    /**
-     * 更新批次数据
-     */
-    @Override
-    @Transactional
-    public void updateTransferBatch(PojoBankTransferBatch transferBatch) {
-        try {
-            getSession().update(transferBatch);
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            throw new CMMException("M002");
-        }
-    }
+	/**
+	 * 更新批次数据
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void updateTransferBatch(PojoBankTransferBatch transferBatch) {
+		try {
+			getSession().update(transferBatch);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new CMMException("M002");
+		}
+	}
 
     /**
      * 
@@ -153,7 +153,24 @@ public class BankTransferBatchDAOImpl
         }
     }
 
-    @Override
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Throwable.class)
+	public void updateBatchTranStatus(Long tid, String tranStatus) {
+		try {
+			String hql = "update PojoBankTransferBatch set tranStatus = ? where tid = ? ";
+			Query query = getSession().createQuery(hql);
+			query.setParameter(0, tranStatus);
+			query.setParameter(1, tid);
+			query.executeUpdate();
+		} catch (HibernateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new CMMException("M002");
+		}
+	}
+
+    /*@Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Throwable.class)
     public void updateAccountingResult(String batchno, AccStatusEnum accStatus) {
         try {
@@ -168,7 +185,8 @@ public class BankTransferBatchDAOImpl
             e.printStackTrace();
             throw new CMMException("M002");
         }
-    }
+    }*/
+
 
     @SuppressWarnings("unchecked")
     @Override
@@ -254,60 +272,86 @@ public class BankTransferBatchDAOImpl
 
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public Map<String, Object> queryBankTransferByPage(QueryTransferBean queryTransferBean,
-            int page,
-            int pageSize) {
-        StringBuffer sqlBuffer = new StringBuffer(
-                "from PojoBankTransferBatch where openStatus=? ");
-        StringBuffer sqlCountBuffer = new StringBuffer(
-                "select count(*) from PojoBankTransferBatch where openStatus=? ");
-        List<String> parameterList = new ArrayList<String>();
-        parameterList.add("1");
-        if (queryTransferBean != null) {
-            if (StringUtil.isNotEmpty(queryTransferBean.getBatchNo())) {
-                sqlBuffer.append(" and bankTranBatchNo = ? ");
-                sqlCountBuffer.append(" and bankTranBatchNo = ? ");
-                parameterList.add(queryTransferBean.getBatchNo());
-            }
-            if (StringUtil.isNotEmpty(queryTransferBean.getEndDate())) {
-                sqlBuffer.append(" and status = ? ");
-                sqlCountBuffer.append(" and status = ? ");
-                parameterList.add(queryTransferBean.getStatus());
-            }
-        }
-        Query query = getSession().createQuery(sqlBuffer.toString());
-        Query countQuery = getSession().createQuery(sqlCountBuffer.toString());
-        int i = 0;
-        for (String parameter : parameterList) {
-            query.setParameter(i, parameter);
-            countQuery.setParameter(i, parameter);
-            i++;
-        }
-        query.setFirstResult((pageSize) * ((page == 0 ? 1 : page) - 1));
-        query.setMaxResults(pageSize);
-        Map<String, Object> resultMap = new HashMap<String, Object>();
-        resultMap.put("total", ((Long) countQuery.uniqueResult()).longValue());
-        resultMap.put("rows", query.list());
-        return resultMap;
-    }
 
-    @Override
-    @Transactional(readOnly = true)
-    public PojoBankTransferBatch getByBankTranBatchNo(Long tid) {
-        String queryString = "from PojoBankTransferBatch where tid = ? ";
-        try {
-            log.info("queryString:" + queryString);
-            Query query = getSession().createQuery(queryString);
-            query.setParameter(0, tid);
-            return (PojoBankTransferBatch) query.uniqueResult();
-        } catch (HibernateException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            throw new CMMException("M001");
-        }
-    }
+	@Override
+	@Transactional(readOnly=true)
+	public Map<String, Object> queryBankTransferByPage(
+			QueryTransferBean queryTransferBean, int page, int pageSize) {
+		StringBuffer sqlBuffer = new StringBuffer("from PojoBankTransferBatch where openStatus=? ");
+		StringBuffer sqlCountBuffer = new StringBuffer("select count(*) from PojoBankTransferBatch where openStatus=? ");
+		List<String> parameterList = new ArrayList<String>();
+		parameterList.add("1");
+		if(queryTransferBean!=null){
+			if(StringUtil.isNotEmpty(queryTransferBean.getBatchNo())){
+				sqlBuffer.append(" and bankTranBatchNo = ? ");
+				sqlCountBuffer.append(" and bankTranBatchNo = ? ");
+				parameterList.add(queryTransferBean.getBatchNo());
+			}
+			if(StringUtil.isNotEmpty(queryTransferBean.getStatus())){
+				sqlBuffer.append(" and status = ? ");
+				sqlCountBuffer.append(" and status = ? ");
+				parameterList.add(queryTransferBean.getStatus());
+			}else{
+				sqlBuffer.append(" and status = ? ");
+				sqlCountBuffer.append(" and status = ? ");
+				parameterList.add("01");
+			}
+		}else{
+			sqlBuffer.append(" and status = ? ");
+			sqlCountBuffer.append(" and status = ? ");
+			parameterList.add("01");
+		}
+		Query query = getSession().createQuery(sqlBuffer.toString());
+		Query countQuery = getSession().createQuery(sqlCountBuffer.toString());
+		int i = 0;
+		for(String parameter : parameterList){
+			query.setParameter(i, parameter);
+			countQuery.setParameter(i, parameter);
+			i++;
+		}
+		query.setFirstResult((pageSize)*((page==0?1:page)-1));
+    	query.setMaxResults(pageSize);
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		resultMap.put("total", ((Long) countQuery.uniqueResult()).longValue());
+		resultMap.put("rows", query.list());
+		return resultMap;
+	}
+
+   
+
+
+	@Override
+	@Transactional(propagation=Propagation.REQUIRED)
+	public PojoBankTransferBatch getByBankTranBatchNo(Long tid) {
+		String queryString = "from PojoBankTransferBatch where tid = ? ";
+		try {
+			log.info("queryString:" + queryString);
+			Query query = getSession().createQuery(queryString);
+			query.setParameter(0, tid);
+			return (PojoBankTransferBatch) query.uniqueResult();
+		} catch (HibernateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new CMMException("M001");
+		}
+	}
+	
+	@Override
+	@Transactional(propagation=Propagation.REQUIRED)
+	public PojoBankTransferBatch getById(Long tid) {
+		String queryString = "from PojoBankTransferBatch where tid = ? ";
+		try {
+			log.info("queryString:" + queryString);
+			Query query = getSession().createQuery(queryString);
+			query.setParameter(0, tid);
+			return (PojoBankTransferBatch) query.uniqueResult();
+		} catch (HibernateException e) {
+			e.printStackTrace();
+			throw new CMMException("M001");
+		}
+	}
+
+    
     @SuppressWarnings("unchecked")
     @Override
     @Transactional
@@ -318,4 +362,5 @@ public class BankTransferBatchDAOImpl
         criteria.createAlias("tranBatchs","tranBatchs").add(Restrictions.eq("tranBatchs.tid", tranBatchId));
         return (List<PojoBankTransferBatch>)criteria.list();
     }
+
 }

@@ -246,10 +246,23 @@ public class PojoBankTransferBatch {
         this.tranBatchs = tranBatchs;
     }
     @OneToMany(mappedBy = "bankTranBatch", fetch = FetchType.LAZY)
+    @Cascade(value = CascadeType.SAVE_UPDATE)
     public List<PojoBankTransferData> getBankTranDatas() {
         return bankTranDatas;
     }
     public void setBankTranDatas(List<PojoBankTransferData> bankTranDatas) {
         this.bankTranDatas = bankTranDatas;
+    }
+    
+    public void addBankTranDatas(List<PojoBankTransferData> tranDatas){
+        for(PojoBankTransferData tranData:tranDatas){
+            tranData.setBankTranBatch(this);
+        }
+        if(this.bankTranDatas==null){
+            this.bankTranDatas = tranDatas;
+        }else{
+            this.bankTranDatas.addAll(tranDatas);
+        }
+        
     }
 }
