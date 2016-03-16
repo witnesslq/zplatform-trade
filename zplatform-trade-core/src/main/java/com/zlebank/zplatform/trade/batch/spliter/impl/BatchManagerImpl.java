@@ -153,15 +153,12 @@ public class BatchManagerImpl implements BatchManager {
      */
     private boolean isCloseBatch(PojoBankTransferBatch batch) {
         // 取出当前渠道的配置信息
-
-        /*PojoBankTransferChannel channelPojo = bankTransferChannelDAO.getByChannelCode(batch.getBankTranChannelId());
-=======
         PojoBankTransferChannel channelPojo = bankTransferChannelDAO.getByChannelCode(batch.getChannel().getBankChannelCode());
->>>>>>> branch 'develop' of root@192.168.101.11:zplatform-trade
+
         // 超过渠道定义的最大笔数的话，就关闭这个批次。
         if (channelPojo.getDetaCount() <= batch.getTotalCount() ) {
             return true;
-        }*/
+        }
         return false;
     }
 
@@ -184,7 +181,6 @@ public class BatchManagerImpl implements BatchManager {
         data.setStatus(BankTransferDataStatusEnum.INIT.getCode());
         data.setApplyTime(new Date());
         data.setAccType(transferData.getAccType());
-        //data.setTxnseqno(OrderNumber.getInstance().generateTxnseqno(BusinessCodeEnum.TRAN_DATA_NO.getBusiCode()));
         CardBin card = cardBinDao.getCard(transferData.getAccNo());
 	     if (card != null && StringUtil.isNotEmpty(card.getBankCode()) && card.getBankCode().startsWith("0305")) {
 	         data.setTransferType("01");

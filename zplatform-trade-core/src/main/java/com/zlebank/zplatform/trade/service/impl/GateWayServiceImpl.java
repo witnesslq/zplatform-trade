@@ -375,14 +375,14 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         	
         	member =  merchService.getMerchBymemberId(order.getMerId());
         	//member = memberService2.getMbmberByMemberId(order.getMerId(),MemberType.);
-        	txnsLog.setRiskver(member.getRiskver());
-            txnsLog.setSplitver(member.getSpiltver());
-            txnsLog.setFeever(member.getFeever());
-            txnsLog.setPrdtver(member.getPrdtver());
+        	txnsLog.setRiskver(member.getRiskVer());
+            txnsLog.setSplitver(member.getSpiltVer());
+            txnsLog.setFeever(member.getFeeVer());
+            txnsLog.setPrdtver(member.getPrdtVer());
            
-            txnsLog.setRoutver(member.getRoutver());
+            txnsLog.setRoutver(member.getRoutVer());
             txnsLog.setAccordinst(member.getParent());
-            txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlcycle().toString())));
+            txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlCycle().toString())));
         }else{
         	//10-产品版本,11-扣率版本,12-分润版本,13-风控版本,20-路由版本
         	txnsLog.setRiskver(getDefaultVerInfo(order.getCoopInstiId(),busiModel.getBusicode(),13));
@@ -444,7 +444,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         orderinfo.setFirmembername(coopInstiService.getInstiByInstiCode(order.getCoopInstiId()).getInstiName());
         if(StringUtil.isNotEmpty(order.getMerId())){
         	orderinfo.setSecmemberno(order.getMerId());
-            orderinfo.setSecmembername(StringUtil.isNotEmpty(order.getMerName())?order.getMerName():member.getAccname());
+            orderinfo.setSecmembername(StringUtil.isNotEmpty(order.getMerName())?order.getMerName():member.getAccName());
         }
         
         orderinfo.setSecmembershortname(order.getMerAbbr());
@@ -514,14 +514,14 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         TxnsLogModel txnsLog = new TxnsLogModel();
         if(StringUtil.isNotEmpty(order.getMerId())){
         	member = merchService.getMerchBymemberId(order.getMerId());
-        	txnsLog.setRiskver(member.getRiskver());
-            txnsLog.setSplitver(member.getSpiltver());
-            txnsLog.setFeever(member.getFeever());
-            txnsLog.setPrdtver(member.getPrdtver());
+        	txnsLog.setRiskver(member.getRiskVer());
+            txnsLog.setSplitver(member.getSpiltVer());
+            txnsLog.setFeever(member.getFeeVer());
+            txnsLog.setPrdtver(member.getPrdtVer());
             //txnsLog.setCheckstandver(member.getCashver());
-            txnsLog.setRoutver(member.getRoutver());
+            txnsLog.setRoutver(member.getRoutVer());
             txnsLog.setAccordinst(member.getParent());
-            txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlcycle().toString())));
+            txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlCycle().toString())));
         }else{//商户为空时，取默认的各个版本信息
         	txnsLog.setRiskver(getDefaultVerInfo(order.getCoopInstiId(),busiModel.getBusicode(),13));
             txnsLog.setSplitver(getDefaultVerInfo(order.getCoopInstiId(),busiModel.getBusicode(),12));
@@ -582,7 +582,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         orderinfo.setFirmembername(coopInstiService.getInstiByInstiCode(order.getCoopInstiId()).getInstiName());
         if(StringUtil.isNotEmpty(order.getMerId())){
         	orderinfo.setSecmemberno(order.getMerId());
-            orderinfo.setSecmembername(StringUtil.isNotEmpty(order.getMerName())?order.getMerName():member.getAccname());
+            orderinfo.setSecmembername(StringUtil.isNotEmpty(order.getMerName())?order.getMerName():member.getAccName());
         }
         orderinfo.setSecmembershortname(order.getMerAbbr());
         orderinfo.setPayerip(order.getCustomerIp());
@@ -635,14 +635,14 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             TxnsLogModel txnsLog = new TxnsLogModel();
             if(StringUtil.isNotEmpty(order.getMerId())){//商户为空时，取商户的各个版本信息
             	member = merchService.getMerchBymemberId(order.getMerId());
-            	txnsLog.setRiskver(member.getRiskver());
-                txnsLog.setSplitver(member.getSpiltver());
-                txnsLog.setFeever(member.getFeever());
-                txnsLog.setPrdtver(member.getPrdtver());
+            	txnsLog.setRiskver(member.getRiskVer());
+                txnsLog.setSplitver(member.getSpiltVer());
+                txnsLog.setFeever(member.getFeeVer());
+                txnsLog.setPrdtver(member.getPrdtVer());
                // txnsLog.setCheckstandver(member.getCashver());
-                txnsLog.setRoutver(member.getRoutver());
+                txnsLog.setRoutver(member.getRoutVer());
                 txnsLog.setAccordinst(member.getParent());
-                txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlcycle().toString())));
+                txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlCycle().toString())));
             }else{
             	txnsLog.setRiskver(getDefaultVerInfo(order.getCoopInstiId(),busiModel.getBusicode(),13));
                 txnsLog.setSplitver(getDefaultVerInfo(order.getCoopInstiId(),busiModel.getBusicode(),12));
@@ -703,7 +703,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             orderinfo.setFirmembername(coopInstiService.getInstiByInstiCode(order.getCoopInstiId()).getInstiName());
             if(StringUtil.isNotEmpty(order.getMerId())){
             	orderinfo.setSecmemberno(order.getMerId());
-                orderinfo.setSecmembername(StringUtil.isNotEmpty(order.getMerName())?order.getMerName():member.getAccname());
+                orderinfo.setSecmembername(StringUtil.isNotEmpty(order.getMerName())?order.getMerName():member.getAccName());
             }
             orderinfo.setSecmembershortname(order.getMerAbbr());
             orderinfo.setPayerip(order.getCustomerIp());
@@ -789,14 +789,14 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             txnsLog = new TxnsLogModel();
             if(StringUtil.isNotEmpty(refundBean.getMerId())){//商户为空时，取商户的各个版本信息
             	member = merchService.getMerchBymemberId(refundBean.getMerId());
-            	txnsLog.setRiskver(member.getRiskver());
-                txnsLog.setSplitver(member.getSpiltver());
-                txnsLog.setFeever(member.getFeever());
-                txnsLog.setPrdtver(member.getPrdtver());
+            	txnsLog.setRiskver(member.getRiskVer());
+                txnsLog.setSplitver(member.getSpiltVer());
+                txnsLog.setFeever(member.getFeeVer());
+                txnsLog.setPrdtver(member.getPrdtVer());
                 //txnsLog.setCheckstandver(member.getCashver());
-                txnsLog.setRoutver(member.getRoutver());
+                txnsLog.setRoutver(member.getRoutVer());
                 txnsLog.setAccordinst(member.getParent()+"");
-                txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlcycle().toString())));
+                txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlCycle().toString())));
             }else{
             	txnsLog.setRiskver(getDefaultVerInfo(refundBean.getCoopInstiId(),busiModel.getBusicode(),13));
                 txnsLog.setSplitver(getDefaultVerInfo(refundBean.getCoopInstiId(),busiModel.getBusicode(),12));
@@ -820,7 +820,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             txnsLog.setTxnseqnoOg(old_txnsLog.getTxnseqno());
             txnsLog.setAccordcommitime(refundBean.getTxnTime());
             txnsLog.setTradestatflag("00000000");//交易初始状态
-            txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlcycle().toString())));
+            txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlCycle().toString())));
             txnsLog.setAccmemberid(refundBean.getMemberId());
             txnsLogService.save(txnsLog);
         } catch (NumberFormatException e) {
@@ -842,7 +842,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             orderinfo.setFirmemberno(refundBean.getCoopInstiId());
             orderinfo.setFirmembername(coopInstiService.getInstiByInstiCode(refundBean.getCoopInstiId()).getInstiName());
             orderinfo.setSecmemberno(refundBean.getMerId());
-            orderinfo.setSecmembername(member==null?"":member.getAccname());
+            orderinfo.setSecmembername(member==null?"":member.getAccName());
             orderinfo.setBackurl(refundBean.getBackUrl());
             orderinfo.setTxntype(refundBean.getTxnType());
             orderinfo.setTxnsubtype(refundBean.getTxnSubType());
@@ -917,14 +917,14 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
                 txnsLog = new TxnsLogModel();
                 if(StringUtil.isNotEmpty(withdrawBean.getMerId())){//商户为空时，取商户的各个版本信息
                 	member = merchService.getMerchBymemberId(withdrawBean.getMerId());
-                	txnsLog.setRiskver(member.getRiskver());
-                    txnsLog.setSplitver(member.getSpiltver());
-                    txnsLog.setFeever(member.getFeever());
-                    txnsLog.setPrdtver(member.getPrdtver());
+                	txnsLog.setRiskver(member.getRiskVer());
+                    txnsLog.setSplitver(member.getSpiltVer());
+                    txnsLog.setFeever(member.getFeeVer());
+                    txnsLog.setPrdtver(member.getPrdtVer());
                     //txnsLog.setCheckstandver(member.getCashver());
-                    txnsLog.setRoutver(member.getRoutver());
+                    txnsLog.setRoutver(member.getRoutVer());
                     txnsLog.setAccordinst(member.getParent());
-                    txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlcycle().toString())));
+                    txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlCycle().toString())));
                 }else{
                 	txnsLog.setRiskver(getDefaultVerInfo(withdrawBean.getCoopInstiId(),busiModel.getBusicode(),13));
                     txnsLog.setSplitver(getDefaultVerInfo(withdrawBean.getCoopInstiId(),busiModel.getBusicode(),12));

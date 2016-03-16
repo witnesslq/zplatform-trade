@@ -17,11 +17,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.zlebank.zplatform.commons.bean.CardBin;
+import com.zlebank.zplatform.commons.dao.CardBinDao;
 import com.zlebank.zplatform.commons.utils.BeanCopyUtil;
+import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.batch.spliter.BatchManager;
 import com.zlebank.zplatform.trade.batch.spliter.BatchSpliter;
+import com.zlebank.zplatform.trade.batch.spliter.ChannelCondition;
 import com.zlebank.zplatform.trade.batch.spliter.ChannelGenerator;
 import com.zlebank.zplatform.trade.batch.spliter.TransferDataResult;
+import com.zlebank.zplatform.trade.bean.enums.TransferDataStatusEnum;
 import com.zlebank.zplatform.trade.dao.BankTransferDataDAO;
 import com.zlebank.zplatform.trade.dao.TranDataDAO;
 import com.zlebank.zplatform.trade.exception.RecordsAlreadyExistsException;
@@ -47,6 +52,8 @@ public class TransferBatchSpliter implements BatchSpliter{
     private TranDataDAO tranDataDAO;
     @Autowired
     BankTransferDataDAO bankTransferDetaDAO;
+    @Autowired
+    CardBinDao cardBinDao ;
 
     /**
      * 针对划拨流水进行合并/拆分后，转换为转账流水并保存(N->N)
@@ -63,22 +70,19 @@ public class TransferBatchSpliter implements BatchSpliter{
             if (data == null) continue;
             // 有效性检查
             checkDetails(data);
-            // 获取渠道
-            String channel = ChannelGenerator.getInstance().getChannel(null);
             // 合并拆分
             // TODO: 暂时没有
             // 保存转账流水
             TransferData transferData = converToTransferData(data);
+            // 获取渠道
+            String channel = getChannel(transferData);
             transferData.setChannelCode(channel);
             TransferDataResult result = batchManager.insertDetailBatch(transferData);
             // 更新划拨流水信息
-
-            //data.setBankTranDataId(result.getBankTranDetaId());
-
-            //data.setBankTranData(result.getBankTranDeta());
+            data.setBankTranData(result.getBankTranDeta());
 
             //更新划拨状态
-            data.setStatus("00");
+            data.setStatus(TransferDataStatusEnum.APPROVED.getCode());
             tranDataDAO.merge(data);
         }
     }
@@ -103,5 +107,21 @@ public class TransferBatchSpliter implements BatchSpliter{
     private TransferData converToTransferData(PojoTranData data) {
         TransferData rtn = BeanCopyUtil.copyBean(TransferData.class, data);
         return rtn;
+    }
+    
+    /**
+     * 转账流水
+     * @param transferData
+     * @return
+     */
+    private String getChannel(TransferData transferData) {
+        ChannelCondition channel = new ChannelCondition();
+        CardBin card = cardBinDao.getCard(transferData.getAccNo());
+        if (card != null && StringUtil.isNotEmpty(card.getBankCode()) && card.getBankCode().startsWith("0305")) {
+            channel.setBankType("01");
+        } else {
+            channel.setBankType("02");
+        }
+        return ChannelGenerator.getInstance().getChannel(channel);
     }
 }

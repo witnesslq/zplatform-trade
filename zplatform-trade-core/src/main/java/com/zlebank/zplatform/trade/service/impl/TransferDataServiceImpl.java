@@ -1,7 +1,7 @@
 /* 
  * TransferDataServiceImpl.java  
  * 
- * version TODO
+ * version v1.3
  *
  * 2016年3月9日 
  * 
@@ -10,10 +10,13 @@
  */
 package com.zlebank.zplatform.trade.service.impl;
 
-import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.zlebank.zplatform.trade.bean.enums.SeqNoEnum;
 import com.zlebank.zplatform.trade.bean.enums.TransferBatchStatusEnum;
@@ -35,6 +38,7 @@ import com.zlebank.zplatform.trade.service.TransferDataService;
  * @date 2016年3月9日 下午7:57:14
  * @since 
  */
+@Service
 public class TransferDataServiceImpl implements TransferDataService{
 
     @Autowired
@@ -51,17 +55,27 @@ public class TransferDataServiceImpl implements TransferDataService{
      * @throws RecordsAlreadyExistsException 
      */
     @Override
-    public long saveTransferData(TransferBusiTypeEnum type, String busiBatchNo, PojoTranData[] datas) throws RecordsAlreadyExistsException {
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+    public long saveTransferData(TransferBusiTypeEnum type, Long busiBatchId, List<PojoTranData> datas) throws RecordsAlreadyExistsException {
         
-        if (datas == null || datas.length ==0) return 0;
+        if (datas == null || datas.size() ==0) return 0;
         
         PojoTranBatch batch = new PojoTranBatch();
         // 保存划拨流水信息
         batch.setApplyTime(new Date());
         batch.setBusiType(type.getCode());
-        batch.setBusiBatchId(busiBatchNo);
+        batch.setBusiBatchId(busiBatchId);
         batch.setStatus(TransferBatchStatusEnum.INIT.getCode());
         batch.setTranBatchNo(seqNoService.getBatchNo(SeqNoEnum.TRAN_BATCH_NO));
+        // 保存划拨批次统计数据
+        batch.setTotalCount(0L);
+        batch.setTotalAmt(0L);
+        batch.setWaitApproveCount(0L);
+        batch.setWaitApproveAmt(0L);
+        batch.setRefuseCount(0L);
+        batch.setRefuseAmt(0L);
+        batch.setApproveCount(0L);
+        batch.setApproveAmt(0L);
         batch = tranBatchDAO.merge(batch);
         // 循环数据
         for (PojoTranData data : datas) {
@@ -72,6 +86,7 @@ public class TransferDataServiceImpl implements TransferDataService{
             data.setTranDataSeqNo(seqNoService.getBatchNo(SeqNoEnum.TRAN_DATA_NO));
             data.setApplyTime(new Date());
             data.setStatus(TransferDataStatusEnum.INIT.getCode());
+            data.setTranBatch(batch);
             data = tranDataDAO.merge(data);
             // 保存划拨批次统计数据
             batch.setTotalCount(addOne(batch.getTotalCount()));
@@ -97,7 +112,7 @@ public class TransferDataServiceImpl implements TransferDataService{
      * @return
      */
     private Long addAmount(Long totalAmt, Long tranAmt) {
-        return totalAmt == null ? 1L : totalAmt + tranAmt;
+        return totalAmt == null ? tranAmt : totalAmt + tranAmt;
     }
 
     /**
@@ -116,13 +131,9 @@ public class TransferDataServiceImpl implements TransferDataService{
      */
     private void checkDetails(PojoTranData data) throws RecordsAlreadyExistsException {
         // 重复检查
-
-        /*int count = tranDataDAO.getCountByInsteadDataId(data.getInsteadDataId());
-=======
         int count = tranDataDAO.getCountByInsteadDataId(data.getBusiDataId());
->>>>>>> branch 'develop' of root@192.168.101.11:zplatform-trade
         if (count > 0)
-            throw new RecordsAlreadyExistsException();*/
+            throw new RecordsAlreadyExistsException();
     }
     
 }

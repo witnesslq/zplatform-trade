@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.zlebank.zplatform.commons.dao.impl.AbstractPagedQueryDAOImpl;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.bean.InsteadPayDetailQuery;
+import com.zlebank.zplatform.trade.bean.enums.InsteadPayDetailStatusEnum;
 import com.zlebank.zplatform.trade.dao.InsteadPayDetailDAO;
 import com.zlebank.zplatform.trade.model.PojoInsteadPayDetail;
 
@@ -49,6 +50,7 @@ public class InsteadPayDetailDAOImpl
      * @param batchNo
      * @return
      */
+    @SuppressWarnings("unchecked")
     @Override
     public List<PojoInsteadPayDetail> getByBatchDetail(String batchNo) {
         Criteria crite = this.getSession().createCriteria(
@@ -102,14 +104,25 @@ public class InsteadPayDetailDAOImpl
             if (StringUtil.isNotEmpty(e.getOrderId())) {
                 crite.add(Restrictions.eq("orderId", e.getOrderId()));
             }
-            if (StringUtil.isNotEmpty(e.getBatchFileNo())) {
-                crite.add(Restrictions.eq("batchId",   Long.valueOf(e.getBatchFileNo())));
+            if (StringUtil.isNotEmpty(e.getBatchNo())) {
+                crite.add(Restrictions.eq("batchNo",   Long.valueOf(e.getBatchNo())));
+            }
+            if (StringUtil.isNotEmpty(e.getInsteadPayBatchSeqNo())) {
+                crite.add(Restrictions.eq("insteadPayBatch.insteadPayBatchSeqNo",  e.getInsteadPayBatchSeqNo()));
             }
             if (StringUtil.isNotEmpty(e.getStatus())) {
                 crite.add(Restrictions.eq("status",e.getStatus()));
             }
-            
-            
+            if (StringUtil.isNotEmpty(e.getBatchId())) {
+                crite.add(Restrictions.eq("insteadPayBatch.id", Long.parseLong(e.getBatchId())));
+            }
+            if (StringUtil.isNotEmpty(e.getBatchId())) {
+                crite.add(Restrictions.eq("insteadPayBatch.imFileName", e.getImFileName()));
+            }
+            if (e.getStatusList() != null
+                    && e.getStatusList().size() != 0) {
+                crite.add(Restrictions.in("status", e.getStatusList()));
+            }
         }
         crite.addOrder(Order.desc("intime"));
         return crite;
@@ -128,6 +141,34 @@ public class InsteadPayDetailDAOImpl
         crite.add(Restrictions.eq("status", status));
         return (PojoInsteadPayDetail)crite.uniqueResult();
     }
-    
-    
-      }
+
+        /**
+         * 通过批次ID得到批次明细
+         * @param batchId
+         * @return List
+         */
+        @SuppressWarnings("unchecked")
+        @Override
+        public List<PojoInsteadPayDetail> getBatchDetailByBatchId(Long batchId) {
+            Criteria crite = this.getSession().createCriteria(
+                    PojoInsteadPayDetail.class);
+            crite.add(Restrictions.eq("batchId", batchId));
+            crite.add(Restrictions.eq("status", InsteadPayDetailStatusEnum.WAIT_INSTEAD_APPROVE.getCode()));
+            return crite.list();
+        }
+
+        /**
+         * 通过代付流水ID得到代付明细
+         * @param ids
+         * @return
+         */
+        @SuppressWarnings("unchecked")
+        @Override
+        public List<PojoInsteadPayDetail> getBatchDetailByIds(List<Long> ids) {
+            Criteria crite = this.getSession().createCriteria(
+                    PojoInsteadPayDetail.class);
+            crite.add(Restrictions.in("id", ids));
+            crite.add(Restrictions.eq("status", InsteadPayDetailStatusEnum.WAIT_INSTEAD_APPROVE.getCode()));
+            return crite.list();
+        }
+ }

@@ -19,7 +19,10 @@ package com.zlebank.zplatform.trade.batch.spliter;
  * @since 
  */
 public class ChannelCondition {
+    /** 银行代码 **/
     private String bankCode;
+    /** 01：行内，02：行外 */
+    private String bankType;
 
     public String getBankCode() {
         return bankCode;
@@ -27,6 +30,14 @@ public class ChannelCondition {
 
     public void setBankCode(String bankCode) {
         this.bankCode = bankCode;
+    }
+
+    public String getBankType() {
+        return bankType;
+    }
+
+    public void setBankType(String bankType) {
+        this.bankType = bankType;
     }
     
 }

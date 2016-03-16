@@ -1,7 +1,6 @@
 package com.zlebank.zplatform.trade.utils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -11,9 +10,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.zlebank.zplatform.sms.pojo.enums.ModuleTypeEnum;
 import com.zlebank.zplatform.sms.service.ISMSService;
-import com.zlebank.zplatform.trade.model.TxnsSmsModel;
 import com.zlebank.zplatform.trade.service.ITxnsQuickpayService;
-import com.zlebank.zplatform.trade.service.ITxnsSMSService;
 
 public class SMSUtil implements Runnable{
     private static final Log log = LogFactory.getLog(SMSUtil.class);

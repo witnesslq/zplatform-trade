@@ -25,6 +25,13 @@ import com.zlebank.zplatform.trade.model.PojoInsteadPayBatch;
 public interface InsteadPayBatchDAO  extends BasePagedQueryDAO<PojoInsteadPayBatch, InsteadPayBatchQuery>{
 
     /**
+     * 通过批次ID得到批次
+     * @param batchNo
+     * @return
+     */
+    public PojoInsteadPayBatch getByBatchId(Long batchId);
+
+    /**
      * 通过批次号得到批次
      * @param batchNo
      * @return

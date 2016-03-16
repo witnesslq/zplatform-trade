@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
-import com.zlebank.zplatform.acc.bean.enums.BusiType;
 import com.zlebank.zplatform.commons.dao.pojo.BusiTypeEnum;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.bean.AccountTradeBean;
@@ -599,7 +598,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
             txnsLog.setTradestatflag("00000000");//交易初始状态
             txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlcycle().toString())));
             txnsLog.setPaytype("04"); //支付类型（01：快捷，02：网银，03：账户）
-            txnsLog.setPayordno(data.getTranData().getBusiDataId());//支付定单号
+            txnsLog.setPayordno(data.getTranData().getBusiDataId()+"");//支付定单号
             txnsLog.setPayinst(ChannelEnmu.CMBCINSTEADPAY.getChnlcode());//支付所属机构
             txnsLog.setPayfirmerno(ConsUtil.getInstance().cons.getCmbc_insteadpay_merid());//支付一级商户号
             txnsLog.setPayordcomtime(DateUtil.getCurrentDateTime());//支付定单提交时间

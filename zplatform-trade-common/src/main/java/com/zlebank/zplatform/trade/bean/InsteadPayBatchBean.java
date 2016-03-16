@@ -10,7 +10,6 @@
  */
 package com.zlebank.zplatform.trade.bean;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 import com.zlebank.zplatform.commons.bean.Bean;
@@ -35,7 +34,7 @@ public class InsteadPayBatchBean implements Bean{
     /**总笔数**/
     private Long totalQty;
     /**总金额**/
-    private BigDecimal totalAmt;
+    private Long totalAmt;
     /**状态(00:已处理01:未处理)**/
     private String status;
     /**创建人**/
@@ -53,21 +52,24 @@ public class InsteadPayBatchBean implements Bean{
     /**通过笔数**/
     private Long approveCount;
     /**通过金额**/
-    private BigDecimal approveAmt;
+    private Long approveAmt;
     /**未审核笔数**/
     private Long unapproveCount;
     /**未审核金额**/
-    private BigDecimal unapproveAmt;
+    private Long unapproveAmt;
     /**拒绝笔数**/
     private Long refuseCount;
     /**拒绝金额**/
-    private BigDecimal refuseAmt;
+    private Long refuseAmt;
     /**申请时间**/
     private Date applyTime;
     /**审核完成时间**/
     private Date approveFinishTime;
     /**转账完成时间**/
     private Date finishTime;
+    /**代付批次序列号**/
+    private String insteadPayBatchSeqNo;
+    
     public Long getId() {
         return id;
     }
@@ -98,10 +100,10 @@ public class InsteadPayBatchBean implements Bean{
     public void setTotalQty(Long totalQty) {
         this.totalQty = totalQty;
     }
-    public BigDecimal getTotalAmt() {
+    public Long getTotalAmt() {
         return totalAmt;
     }
-    public void setTotalAmt(BigDecimal totalAmt) {
+    public void setTotalAmt(Long totalAmt) {
         this.totalAmt = totalAmt;
     }
     public String getStatus() {
@@ -152,10 +154,10 @@ public class InsteadPayBatchBean implements Bean{
     public void setApproveCount(Long approveCount) {
         this.approveCount = approveCount;
     }
-    public BigDecimal getApproveAmt() {
+    public Long getApproveAmt() {
         return approveAmt;
     }
-    public void setApproveAmt(BigDecimal approveAmt) {
+    public void setApproveAmt(Long approveAmt) {
         this.approveAmt = approveAmt;
     }
     public Long getUnapproveCount() {
@@ -164,10 +166,10 @@ public class InsteadPayBatchBean implements Bean{
     public void setUnapproveCount(Long unapproveCount) {
         this.unapproveCount = unapproveCount;
     }
-    public BigDecimal getUnapproveAmt() {
+    public Long getUnapproveAmt() {
         return unapproveAmt;
     }
-    public void setUnapproveAmt(BigDecimal unapproveAmt) {
+    public void setUnapproveAmt(Long unapproveAmt) {
         this.unapproveAmt = unapproveAmt;
     }
     public Long getRefuseCount() {
@@ -176,10 +178,10 @@ public class InsteadPayBatchBean implements Bean{
     public void setRefuseCount(Long refuseCount) {
         this.refuseCount = refuseCount;
     }
-    public BigDecimal getRefuseAmt() {
+    public Long getRefuseAmt() {
         return refuseAmt;
     }
-    public void setRefuseAmt(BigDecimal refuseAmt) {
+    public void setRefuseAmt(Long refuseAmt) {
         this.refuseAmt = refuseAmt;
     }
     public Date getApplyTime() {
@@ -199,5 +201,11 @@ public class InsteadPayBatchBean implements Bean{
     }
     public void setFinishTime(Date finishTime) {
         this.finishTime = finishTime;
+    }
+    public String getInsteadPayBatchSeqNo() {
+        return insteadPayBatchSeqNo;
+    }
+    public void setInsteadPayBatchSeqNo(String insteadPayBatchSeqNo) {
+        this.insteadPayBatchSeqNo = insteadPayBatchSeqNo;
     }
 }
