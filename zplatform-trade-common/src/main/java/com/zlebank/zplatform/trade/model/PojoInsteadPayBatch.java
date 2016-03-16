@@ -84,6 +84,9 @@ public class PojoInsteadPayBatch {
     private String insteadPayBatchSeqNo;
     /**文件路径**/
     private String filePath;
+    /**原文件名**/
+    private String originalFileName;
+    
     /**批次明细**/
     private List<PojoInsteadPayDetail> details = new ArrayList<PojoInsteadPayDetail>();
     
@@ -271,5 +274,12 @@ public class PojoInsteadPayBatch {
     }
     public void setFilePath(String filePath) {
         this.filePath = filePath;
+    }
+    @Column(name = "ORIGINAL_FILE_NAME")
+    public String getOriginalFileName() {
+        return originalFileName;
+    }
+    public void setOriginalFileName(String originalFileName) {
+        this.originalFileName = originalFileName;
     }
 }

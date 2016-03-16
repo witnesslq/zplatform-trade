@@ -267,7 +267,7 @@ public class InsteadPayController {
         
         // 调用接口
         try {
-            insteadPayService.insteadPay(requestBean,null, InsteadPayImportTypeEnum.API, null);
+            insteadPayService.insteadPay(requestBean, InsteadPayImportTypeEnum.API, null);
         } catch (NotInsteadPayWorkTimeException e) {
             errorMsg = "非代付工作时间";
             log.error(e.getMessage(), e);

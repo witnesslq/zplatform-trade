@@ -48,6 +48,7 @@ import com.zlebank.zplatform.member.service.MemberService;
 import com.zlebank.zplatform.member.service.MerchService;
 import com.zlebank.zplatform.trade.bean.InsteadPayDetailBean;
 import com.zlebank.zplatform.trade.bean.InsteadPayDetailQuery;
+import com.zlebank.zplatform.trade.bean.InsteadPayInterfaceParamBean;
 import com.zlebank.zplatform.trade.bean.enums.BusinessEnum;
 import com.zlebank.zplatform.trade.bean.enums.InsteadPayImportTypeEnum;
 import com.zlebank.zplatform.trade.bean.enums.SeqNoEnum;
@@ -146,7 +147,7 @@ public class InsteadPayServiceImpl
      */
     @Override
     @Transactional(propagation = Propagation.REQUIRED,rollbackFor=Throwable.class)
-    public void insteadPay(InsteadPay_Request request,Long userId, InsteadPayImportTypeEnum type,String fileName) throws NotInsteadPayWorkTimeException, FailToGetAccountInfoException, BalanceNotEnoughException, DuplicateOrderIdException, InvalidCardException, FailToInsertAccEntryException, MerchWhiteListCheckFailException, FailToInsertFeeException {
+    public void insteadPay(InsteadPay_Request request, InsteadPayImportTypeEnum type,InsteadPayInterfaceParamBean param) throws NotInsteadPayWorkTimeException, FailToGetAccountInfoException, BalanceNotEnoughException, DuplicateOrderIdException, InvalidCardException, FailToInsertAccEntryException, MerchWhiteListCheckFailException, FailToInsertFeeException {
 
 
         if (log.isDebugEnabled()) {
@@ -236,10 +237,13 @@ public class InsteadPayServiceImpl
         BigDecimal feeAmt= BigDecimal.ZERO; 
 
         // 插入批次表
-        PojoInsteadPayBatch batch = convertToPojoInsteadPayBatch(request,userId);
+        PojoInsteadPayBatch batch = convertToPojoInsteadPayBatch(request, param);
         // 设定代付接入类型
         batch.setType(type.getCode()); 
-        batch.setFilePath(fileName);
+        if (type == InsteadPayImportTypeEnum.FILE) {
+            batch.setFilePath(param.getFtpFileName());
+            batch.setOriginalFileName(param.getOriginalFileName());    
+        }
         batch = insteadPayBatchDAO.merge(batch);
 
         // 插入明细表
@@ -340,7 +344,7 @@ public class InsteadPayServiceImpl
      * @param request
      * @return
      */
-    private PojoInsteadPayBatch convertToPojoInsteadPayBatch(InsteadPay_Request request,Long userId) {
+    private PojoInsteadPayBatch convertToPojoInsteadPayBatch(InsteadPay_Request request,InsteadPayInterfaceParamBean param) {
         PojoInsteadPayBatch batch = new PojoInsteadPayBatch();
         batch.setInsteadPayBatchSeqNo(seqNoService.getBatchNo(SeqNoEnum.INSTEAD_PAY_BATCH_NO));
         batch.setBatchNo(Long.parseLong(request.getBatchNo()));// 批次号
@@ -349,10 +353,10 @@ public class InsteadPayServiceImpl
         batch.setTotalQty(Long.parseLong(request.getTotalQty()));// 总笔数
         batch.setTotalAmt(Long.parseLong(request.getTotalAmt()));// 总金额
         batch.setStatus("01");// 状态(00:已处理01:未处理)
-       if(userId==null){
+       if(param==null){
         batch.setInuser(0L);// 创建人
        }else{
-           batch.setInuser(userId);// 创建人 
+           batch.setInuser(param.getUserId());// 创建人 
        }
         batch.setIntime(new Date());// 创建时间
         batch.setUpuser(0L);// 修改人
