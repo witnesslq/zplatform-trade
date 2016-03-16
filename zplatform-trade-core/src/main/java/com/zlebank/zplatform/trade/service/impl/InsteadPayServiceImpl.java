@@ -365,6 +365,10 @@ public class InsteadPayServiceImpl
         batch.setType("00");// 接入类型（01：文件导入00：接口）
         batch.setUnapproveCount(batch.getTotalQty());// 未审核笔数
         batch.setUnapproveAmt(batch.getTotalAmt());// 未审核金额
+        batch.setRefuseCount(0L);
+        batch.setRefuseAmt(0L);
+        batch.setApproveCount(0L);
+        batch.setApproveAmt(0L);
         batch.setApplyTime(new Date());// 申请时间
         return batch;
     }

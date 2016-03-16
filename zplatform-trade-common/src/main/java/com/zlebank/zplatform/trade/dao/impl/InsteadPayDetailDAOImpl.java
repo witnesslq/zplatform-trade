@@ -117,7 +117,7 @@ public class InsteadPayDetailDAOImpl
                 crite.add(Restrictions.eq("insteadPayBatch.id", Long.parseLong(e.getBatchId())));
             }
             if (StringUtil.isNotEmpty(e.getBatchId())) {
-                crite.add(Restrictions.eq("insteadPayBatch.imFileName", e.getImFileName()));
+                crite.add(Restrictions.eq("insteadPayBatch.originalFileName", e.getImFileName()));
             }
             if (e.getStatusList() != null
                     && e.getStatusList().size() != 0) {

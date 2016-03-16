@@ -115,8 +115,8 @@ public class PojoInsteadPayDetail{
 
     private  PojoInsteadPayBatch insteadPayBatch;
 
-    @ManyToOne(cascade=CascadeType.ALL)
-    @JoinColumn(name = "BATCH_ID", insertable=false, updatable=false, nullable=false)
+    @ManyToOne
+    @JoinColumn(name = "BATCH_ID")
     public PojoInsteadPayBatch getInsteadPayBatch() {
         return insteadPayBatch;
     }

@@ -468,7 +468,8 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
             updateData.setResultCode("S".equalsIgnoreCase(data.getResType())? "00": "03");
             updateData.setResultMessage("S".equalsIgnoreCase(data.getResType())? "交易成功": transferData.getResInfo());
             updateData.setChannelCode(transferData.getBankTranBatch().getChannel().getBankChannelCode());
-            ObserverListService.getInstance().notify(updateData, data.getTranData().getBusiType());
+            ObserverListService service  = ObserverListService.getInstance();
+            service.notify(updateData, transferData.getTranData().getBusiType());
     	}
     }
     
