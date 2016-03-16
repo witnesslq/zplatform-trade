@@ -293,4 +293,13 @@ public class InsteadBatchServiceImpl extends AbstractBasePageService<InsteadPayB
 //            throw new FailToInsertAccEntryException();
         }
     }
+
+
+    /**
+     * 得到业务代码
+     */
+    @Override
+    public String getBusiCode() {
+        return "00";
+    }
 }
