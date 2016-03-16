@@ -27,6 +27,7 @@ import com.zlebank.zplatform.commons.service.impl.AbstractBasePageService;
 import com.zlebank.zplatform.commons.utils.BeanCopyUtil;
 import com.zlebank.zplatform.trade.bean.InsteadPayBatchBean;
 import com.zlebank.zplatform.trade.bean.InsteadPayBatchQuery;
+import com.zlebank.zplatform.trade.bean.UpdateData;
 import com.zlebank.zplatform.trade.bean.enums.InsteadPayBatchStatusEnum;
 import com.zlebank.zplatform.trade.bean.enums.InsteadPayDetailStatusEnum;
 import com.zlebank.zplatform.trade.bean.enums.TransferBusiTypeEnum;
@@ -40,6 +41,7 @@ import com.zlebank.zplatform.trade.model.PojoInsteadPayDetail;
 import com.zlebank.zplatform.trade.model.PojoTranData;
 import com.zlebank.zplatform.trade.service.InsteadBatchService;
 import com.zlebank.zplatform.trade.service.TransferDataService;
+import com.zlebank.zplatform.trade.service.UpdateSubject;
 
 /**
  * 代付业务
@@ -50,7 +52,7 @@ import com.zlebank.zplatform.trade.service.TransferDataService;
  * @since 
  */
 @Service
-public class InsteadBatchServiceImpl extends AbstractBasePageService<InsteadPayBatchQuery, InsteadPayBatchBean> implements InsteadBatchService{
+public class InsteadBatchServiceImpl extends AbstractBasePageService<InsteadPayBatchQuery, InsteadPayBatchBean> implements InsteadBatchService, UpdateSubject{
     
     private static final Log log = LogFactory.getLog(InsteadBatchServiceImpl.class);
   
@@ -248,5 +250,47 @@ public class InsteadBatchServiceImpl extends AbstractBasePageService<InsteadPayB
      */
     private long addOne(Long data) {
         return data == null ? 1 : data.longValue() + 1;
+    }
+
+
+    /**
+     *  更新状态和记账
+     * @param data
+     */
+    @Override
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+    public void update(UpdateData data) {
+        PojoInsteadPayDetail detail = insteadPayDetailDAO.getDetailByTxnseqno(data.getTxnSeqNo());
+        if (detail == null) {
+            log.error("没有找到需要记账的流水");
+            return;
+        }
+        if ("00".equals(data.getResultCode())) {
+            detail.setStatus(InsteadPayDetailStatusEnum.TRAN_FINISH.getCode());
+        } else {
+            detail.setStatus(InsteadPayDetailStatusEnum.TRAN_FAILED.getCode());
+        }
+        detail.setRespCode(data.getResultCode());
+        detail.setRespMsg(data.getResultMessage());
+        insteadPayDetailDAO.merge(detail);
+        
+        TradeInfo tradeInfo = new TradeInfo();
+        tradeInfo.setPayMemberId(detail.getMerId());
+        tradeInfo.setAmount(new BigDecimal(detail.getAmt()));
+        tradeInfo.setCharge(new BigDecimal(detail.getTxnfee()));
+        tradeInfo.setTxnseqno(detail.getTxnseqno());
+        if ("00".equals(data.getResultCode())) {
+            tradeInfo.setBusiCode("70000002");
+            tradeInfo.setChannelId(data.getChannelCode());
+        } else {
+            tradeInfo.setBusiCode("70000003");
+        }
+        
+        try {
+            accEntryService.accEntryProcess(tradeInfo );
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+//            throw new FailToInsertAccEntryException();
+        }
     }
 }

@@ -141,6 +141,18 @@ public class InsteadPayDetailDAOImpl
         crite.add(Restrictions.eq("status", status));
         return (PojoInsteadPayDetail)crite.uniqueResult();
     }
+    /**
+     *
+     * @param orderId
+     * @return
+     */
+    @Override
+    public PojoInsteadPayDetail getDetailByTxnseqno(String txnseqno) {
+        Criteria crite = this.getSession().createCriteria(
+                PojoInsteadPayDetail.class);
+        crite.add(Restrictions.eq("txnseqno", txnseqno));
+        return (PojoInsteadPayDetail)crite.uniqueResult();
+    }
 
         /**
          * 通过批次ID得到批次明细

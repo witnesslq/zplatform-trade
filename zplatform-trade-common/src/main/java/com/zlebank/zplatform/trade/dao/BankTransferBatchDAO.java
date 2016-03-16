@@ -72,10 +72,10 @@ public interface BankTransferBatchDAO extends BasePagedQueryDAO<PojoBankTransfer
     
     /**
      * 通过渠道返回相应的批次号
-     * @param channelCode 渠道号
+     * @param long1 渠道号
      * @return
      */
-    public PojoBankTransferBatch getByChannelCode(String channelCode);
+    public PojoBankTransferBatch getByChannelId(Long long1);
     
     /**
      * 分页查询转账批次数据
