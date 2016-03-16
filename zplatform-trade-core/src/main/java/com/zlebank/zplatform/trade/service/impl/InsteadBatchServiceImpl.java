@@ -261,6 +261,10 @@ public class InsteadBatchServiceImpl extends AbstractBasePageService<InsteadPayB
     @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void update(UpdateData data) {
         PojoInsteadPayDetail detail = insteadPayDetailDAO.getDetailByTxnseqno(data.getTxnSeqNo());
+        if (detail == null) {
+            log.error("没有找到需要记账的流水");
+            return;
+        }
         if ("00".equals(data.getResultCode())) {
             detail.setStatus(InsteadPayDetailStatusEnum.TRAN_FINISH.getCode());
         } else {
@@ -275,12 +279,27 @@ public class InsteadBatchServiceImpl extends AbstractBasePageService<InsteadPayB
         tradeInfo.setAmount(new BigDecimal(detail.getAmt()));
         tradeInfo.setCharge(new BigDecimal(detail.getTxnfee()));
         tradeInfo.setTxnseqno(detail.getTxnseqno());
-        tradeInfo.setBusiCode("70000003");
+        if ("00".equals(data.getResultCode())) {
+            tradeInfo.setBusiCode("70000002");
+            tradeInfo.setChannelId(data.getChannelCode());
+        } else {
+            tradeInfo.setBusiCode("70000003");
+        }
+        
         try {
             accEntryService.accEntryProcess(tradeInfo );
         } catch (Exception e) {
             log.error(e.getMessage(), e);
 //            throw new FailToInsertAccEntryException();
         }
+    }
+
+
+    /**
+     * 得到业务代码
+     */
+    @Override
+    public String getBusiCode() {
+        return "00";
     }
 }

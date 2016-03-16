@@ -19,9 +19,10 @@ package com.zlebank.zplatform.trade.bean;
  * @since 
  */
 public class UpdateData {
-    public String txnSeqNo;
-    public String resultCode;
-    public String resultMessage;
+    private String txnSeqNo;
+    private String resultCode;
+    private String resultMessage;
+    private String channelCode;
 
     public String getTxnSeqNo() {
         return txnSeqNo;
@@ -40,5 +41,11 @@ public class UpdateData {
     }
     public void setResultMessage(String resultMessage) {
         this.resultMessage = resultMessage;
+    }
+    public String getChannelCode() {
+        return channelCode;
+    }
+    public void setChannelCode(String channelCode) {
+        this.channelCode = channelCode;
     }
 }

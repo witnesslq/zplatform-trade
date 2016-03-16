@@ -21,5 +21,13 @@ import com.zlebank.zplatform.trade.bean.UpdateData;
  * @since 
  */
 public interface UpdateSubject {
+    /**
+     * 根据更新数据里的txnSeqNo找到相应的记录，进行记账和状态更新
+     * @param data
+     */
     public void update(UpdateData data);
+    /**
+     * 得到业务代码（例：00：代付 01：提现 02：退款）
+     */
+    public String getBusiCode();
 }
