@@ -52,7 +52,7 @@ import com.zlebank.zplatform.trade.service.UpdateSubject;
  * @since 
  */
 @Service
-public class InsteadBatchServiceImpl extends AbstractBasePageService<InsteadPayBatchQuery, InsteadPayBatchBean> implements InsteadBatchService, UpdateSubject{
+public class InsteadBatchServiceImpl extends AbstractBasePageService<InsteadPayBatchQuery, InsteadPayBatchBean> implements InsteadBatchService{
     
     private static final Log log = LogFactory.getLog(InsteadBatchServiceImpl.class);
   
@@ -253,53 +253,5 @@ public class InsteadBatchServiceImpl extends AbstractBasePageService<InsteadPayB
     }
 
 
-    /**
-     *  更新状态和记账
-     * @param data
-     */
-    @Override
-    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
-    public void update(UpdateData data) {
-        PojoInsteadPayDetail detail = insteadPayDetailDAO.getDetailByTxnseqno(data.getTxnSeqNo());
-        if (detail == null) {
-            log.error("没有找到需要记账的流水");
-            return;
-        }
-        if ("00".equals(data.getResultCode())) {
-            detail.setStatus(InsteadPayDetailStatusEnum.TRAN_FINISH.getCode());
-        } else {
-            detail.setStatus(InsteadPayDetailStatusEnum.TRAN_FAILED.getCode());
-        }
-        detail.setRespCode(data.getResultCode());
-        detail.setRespMsg(data.getResultMessage());
-        insteadPayDetailDAO.merge(detail);
-        
-        TradeInfo tradeInfo = new TradeInfo();
-        tradeInfo.setPayMemberId(detail.getMerId());
-        tradeInfo.setAmount(new BigDecimal(detail.getAmt()));
-        tradeInfo.setCharge(new BigDecimal(detail.getTxnfee()));
-        tradeInfo.setTxnseqno(detail.getTxnseqno());
-        if ("00".equals(data.getResultCode())) {
-            tradeInfo.setBusiCode("70000002");
-            tradeInfo.setChannelId(data.getChannelCode());
-        } else {
-            tradeInfo.setBusiCode("70000003");
-        }
-        
-        try {
-            accEntryService.accEntryProcess(tradeInfo );
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-//            throw new FailToInsertAccEntryException();
-        }
-    }
-
-
-    /**
-     * 得到业务代码
-     */
-    @Override
-    public String getBusiCode() {
-        return "00";
-    }
+ 
 }
