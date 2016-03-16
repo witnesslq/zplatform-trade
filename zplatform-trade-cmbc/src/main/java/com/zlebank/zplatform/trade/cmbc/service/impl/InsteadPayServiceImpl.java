@@ -88,6 +88,7 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
     @Autowired
     private ITxnsInsteadPayDAO txnsInsteadPayDAO;
     
+    
     /**
      * 批量代付(跨行)
      * 
@@ -426,6 +427,8 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
             //数据没有问题,批量更新划拨明细数据
             //更新转账明细数据
             bankTransferDataDAO.batchUpdateTransData(resultList);
+            //更新对应业务的数据，调用业务处理接口
+            
             PojoTxnsInsteadPay txnsInsteadPay = txnsInsteadPayDAO.getByResponseFileName(fileName);
             //更新转账批次数据
             PojoBankTransferBatch transferBatch = bankTransferBatchDAO.getByBankTranBatchNo(Long.valueOf(txnsInsteadPay.getInsteadPayNo()));
@@ -451,6 +454,16 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
             
         }
     }
+    
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+    public void dealWithBusiData(List<PojoBankTransferData> transferDataList){
+    	for (PojoBankTransferData data : transferDataList) {
+            PojoBankTransferData transferData = bankTransferDataDAO.getTransferDataByTranId(data.getBankTranDataSeqNo());
+            
+            
+    	}
+    }
+    
     
     private void analyzeReexchangeFile(File file) throws NumberFormatException, IOException{
         if (file.isFile() && file.exists()) { // 判断文件是否存在

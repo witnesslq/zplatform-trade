@@ -117,8 +117,8 @@ HibernateBaseDAOImpl<PojoBankTransferData>
         hqlBuffer.append("where bankTranDataSeqNo = ? ");
         Session session = getSession();
         for (PojoBankTransferData data : transferDataList) {
-            PojoBankTransferData data_old = getTransferDataByTranId(data.getBankTranDataSeqNo());
             Query query = session.createQuery(hqlBuffer.toString());
+            PojoBankTransferData data_old = getTransferDataByTranId(data.getBankTranDataSeqNo());
             query.setParameter(0, data.getBankTranResNo());
             query.setParameter(1, data.getResType());
             query.setParameter(2, data.getResCode());
@@ -150,8 +150,6 @@ HibernateBaseDAOImpl<PojoBankTransferData>
             PojoTranData tranData = data_old.getTranData();
             tranData.setStatus("S".equalsIgnoreCase(data.getResType())? "02": "03");
             tranDataDAO.update(tranData);
-            //更新对应业务的数据，调用业务处理接口
-            
             //更新划拨批次信息
             tranBatchDAO.updateBankTransferResult(data_old.getTranData().getTranBatch().getTid());
         }
@@ -246,10 +244,10 @@ HibernateBaseDAOImpl<PojoBankTransferData>
        return  (PojoBankTransferData) crite.uniqueResult();
     }
 
-    public PojoBankTransferData getTransferDataByTranId(String tranid) {
+    public PojoBankTransferData getTransferDataByTranId(String bankTranDataSeqNo) {
         Criteria crite = this.getSession().createCriteria(
                 PojoBankTransferData.class);
-        crite.add(Restrictions.eq("bankTranDataSeqNo", tranid));
+        crite.add(Restrictions.eq("bankTranDataSeqNo", bankTranDataSeqNo));
        return  (PojoBankTransferData) crite.uniqueResult();
     }
     

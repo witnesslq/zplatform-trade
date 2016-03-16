@@ -76,4 +76,11 @@ public interface BankTransferDataDAO  extends BaseDAO<PojoBankTransferData>{
      * @param status
      */
     public void updateWaitBankTransferStatus(String bankTranBatchId,String status);
+    
+    /**
+     * 
+     * @param bankTranDataSeqNo
+     * @return
+     */
+    public PojoBankTransferData getTransferDataByTranId(String bankTranDataSeqNo);
 }
