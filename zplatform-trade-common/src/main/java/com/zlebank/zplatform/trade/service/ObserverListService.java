@@ -27,7 +27,7 @@ import com.zlebank.zplatform.trade.bean.UpdateData;
  * @date 2016年3月16日 下午4:42:35
  * @since 
  */
-@Service
+
 public class ObserverListService {
     private static ObserverListService instance = new ObserverListService();
     List<UpdateSubject> observerList; 
