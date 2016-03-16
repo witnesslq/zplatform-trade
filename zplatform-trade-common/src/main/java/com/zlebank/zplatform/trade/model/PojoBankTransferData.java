@@ -75,8 +75,6 @@ public class PojoBankTransferData implements Serializable{
     private Date applyTime;
     /**"账户类型(0:对私账户1：对公账户)"**/
     private String accType;
-    /**交易序列号**/
-    private String txnseqno;
     /**划拨类型，01-行内02-跨行**/
     private String transferType;
     /**付款结果**/
@@ -191,13 +189,6 @@ public class PojoBankTransferData implements Serializable{
     }
     public void setAccType(String accType) {
         this.accType = accType;
-    }
-    @Column(name = "TXNSEQNO")
-    public String getTxnseqno() {
-        return txnseqno;
-    }
-    public void setTxnseqno(String txnseqno) {
-        this.txnseqno = txnseqno;
     }
     @Column(name = "TRANSFER_TYPE")
     public String getTransferType() {

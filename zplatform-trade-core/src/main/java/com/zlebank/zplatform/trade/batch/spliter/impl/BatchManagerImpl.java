@@ -72,7 +72,7 @@ public class BatchManagerImpl implements BatchManager {
         PojoBankTransferChannel channelPojo = bankTransferChannelDAO.getByChannelCode(channel);
         PojoBankTransferBatch newBatch = new PojoBankTransferBatch();
         newBatch.setBankTranBatchNo(seqNoService.getBatchNo(SeqNoEnum.BANK_TRAN_BATCH_NO));
-        //newBatch.setChannel(channelPojo);
+        newBatch.setChannel(channelPojo);
         newBatch.setTotalCount(0L);
         newBatch.setTotalAmt(0L);
         newBatch.setSuccessCount(0L);
@@ -128,8 +128,7 @@ public class BatchManagerImpl implements BatchManager {
         PojoBankTransferBatch batch = getBatchNoByChannel(channelCode);
         // Bean -> Pojo
         PojoBankTransferData detail = convertToPojo(transferData);
-        //detail.setBankTranBatchId(batch.getTid());
-        //detail.setBankTranBatch(batch);
+        detail.setBankTranBatch(batch);
 
         // 保存转账流水
         detail = bankTransferDetaDAO.merge(detail);
@@ -153,7 +152,7 @@ public class BatchManagerImpl implements BatchManager {
      */
     private boolean isCloseBatch(PojoBankTransferBatch batch) {
         // 取出当前渠道的配置信息
-        PojoBankTransferChannel channelPojo = bankTransferChannelDAO.getByChannelCode(batch.getChannel().getBankChannelCode());
+        PojoBankTransferChannel channelPojo = bankTransferChannelDAO.getByChannelCode(batch.getChannel().getChannelCode());
 
         // 超过渠道定义的最大笔数的话，就关闭这个批次。
         if (channelPojo.getDetaCount() <= batch.getTotalCount() ) {
@@ -170,9 +169,7 @@ public class BatchManagerImpl implements BatchManager {
     private PojoBankTransferData convertToPojo(TransferData transferData) {
         PojoBankTransferData data = new PojoBankTransferData();
         data.setBankTranDataSeqNo(seqNoService.getBatchNo(SeqNoEnum.BANK_TRAN_DATA_NO));
-
-        //data.setTranDataId(transferData);
-
+        data.setTranData(transferData);
         data.setTranAmt(transferData.getTranAmt());
         data.setAccNo(transferData.getAccNo());
         data.setAccName(transferData.getAccName());
@@ -198,8 +195,10 @@ public class BatchManagerImpl implements BatchManager {
      */
     @Override
     public PojoBankTransferBatch getBatchNoByChannel(String channel) {
+        // 取渠道
+        PojoBankTransferChannel channelPojo = bankTransferChannelDAO.getByChannelCode(channel);
         // 判断是否有可用的批次（根据渠道）
-        PojoBankTransferBatch batch = bankTransferBatchDAO.getByChannelCode(channel);
+        PojoBankTransferBatch batch = bankTransferBatchDAO.getByChannelId(channelPojo.getId());
         if (batch == null || BankTransferBatchOpenStatusEnum.CLOSE.getCode().equals(batch.getOpenStatus())) {
             // 如果该通道没有批次或者最新的批次已经关闭，则新建一个批次
             batch = createBatch(channel);

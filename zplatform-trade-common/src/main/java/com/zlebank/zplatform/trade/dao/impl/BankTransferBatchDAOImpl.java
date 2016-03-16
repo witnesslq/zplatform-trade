@@ -243,11 +243,11 @@ public class BankTransferBatchDAOImpl
      * @return
      */
     @Override
-    public PojoBankTransferBatch getByChannelCode(String channelCode) {
+    public PojoBankTransferBatch getByChannelId(Long channelCode) {
         Criteria crite = this.getSession().createCriteria(
                 PojoBankTransferBatch.class);
-        crite.add(Restrictions.eq("channel", channelCode));
-        crite.addOrder(Order.asc("tid"));
+        crite.add(Restrictions.eq("channel.id", channelCode));
+        crite.addOrder(Order.desc("tid"));
         crite.setFirstResult(0);
         crite.setMaxResults(1);
         return (PojoBankTransferBatch) crite.uniqueResult();
