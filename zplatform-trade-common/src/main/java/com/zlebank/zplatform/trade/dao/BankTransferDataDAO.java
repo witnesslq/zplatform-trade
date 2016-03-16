@@ -14,13 +14,13 @@ public interface BankTransferDataDAO  extends BaseDAO<PojoBankTransferData>{
      * @param batchNo
      * @return
      */
-    public List<PojoBankTransferData> findTransDataByBatchNo(String batchNo);
+    public List<PojoBankTransferData> findTransDataByBatchNo(Long tid);
     /**
      * 通过批次号更新划拨数据
-     * @param batchNo
+     * @param tid
      * @param payType
      */
-    public void updateTransDataStatusByBatchNo(String batchNo,InsteadPayTypeEnum payType);
+    public void updateTransDataStatusByBatchNo(Long tid,InsteadPayTypeEnum payType);
     
     /**
      * 批量更新划拨数据

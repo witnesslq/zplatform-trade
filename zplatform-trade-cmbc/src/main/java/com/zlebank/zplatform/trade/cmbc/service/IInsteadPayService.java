@@ -33,12 +33,12 @@ public interface IInsteadPayService {
      * 批量代付（跨行）
      * @param batchNo 批次号
      */
-    public void batchOuterPay(String batchNo)  throws CMBCTradeException, IOException, TradeException;
+    public void batchOuterPay(Long tid)  throws CMBCTradeException, IOException, TradeException;
     /**
      * 批量代付（跨行）
      * @param batchNo 批次号
      */
-    public void batchInnerPay(String batchNo)  throws CMBCTradeException,IOException, TradeException;
+    public void batchInnerPay(Long tid)  throws CMBCTradeException,IOException, TradeException;
     /**
      * 单笔代付
      * @param insteadPayBean 单笔代付类

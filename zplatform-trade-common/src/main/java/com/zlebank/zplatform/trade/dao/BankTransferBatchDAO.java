@@ -60,7 +60,7 @@ public interface BankTransferBatchDAO extends BasePagedQueryDAO<PojoBankTransfer
      * @param batchno 批次号
      * @param accStatus 账务状态
      */
-    public void updateAccountingResult(String batchno,AccStatusEnum accStatus);
+    public void updateBatchTranStatus(Long tid, String tranStatus);
     
     /**
      * 通过代付批次号查找批次数据

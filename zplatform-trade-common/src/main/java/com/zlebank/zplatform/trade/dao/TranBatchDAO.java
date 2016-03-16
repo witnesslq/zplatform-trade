@@ -14,7 +14,7 @@ public interface TranBatchDAO extends BasePagedQueryDAO<PojoTranBatch,TransferBa
      * @param batchno
      * @return
      */
-    public PojoTranBatch getByBatchNo(String batchno);
+    public PojoTranBatch getByBatchNo(Long tid) ;
     
     /**
      * 更新批次信息
@@ -66,4 +66,10 @@ public interface TranBatchDAO extends BasePagedQueryDAO<PojoTranBatch,TransferBa
      * @return
      */
     public List<PojoTranBatch> findByInsteadpaybatchno(String insteadpaybatchno);
+    
+    /**
+     * 获取回盘文件后，更新划拨批次数据
+     * @param tid
+     */
+    public void updateBankTransferResult(Long tid);
 }

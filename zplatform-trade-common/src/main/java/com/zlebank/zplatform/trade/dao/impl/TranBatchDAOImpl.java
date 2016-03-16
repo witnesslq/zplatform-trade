@@ -1,6 +1,7 @@
 package com.zlebank.zplatform.trade.dao.impl;
 
 import java.awt.color.CMMException;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -37,12 +38,12 @@ public class TranBatchDAOImpl extends
 	 */
 	@Override
 	@Transactional
-	public PojoTranBatch getByBatchNo(String batchno) {
-		String queryString = "from PojoTranBatch where batchno = ? ";
+	public PojoTranBatch getByBatchNo(Long tid) {
+		String queryString = "from PojoTranBatch where tid = ? ";
 		try {
 			log.info("queryString:" + queryString);
 			Query query = getSession().createQuery(queryString);
-			query.setParameter(0, batchno);
+			query.setParameter(0, tid);
 			return (PojoTranBatch) query.uniqueResult();
 
 		} catch (HibernateException e) {
@@ -225,5 +226,28 @@ public class TranBatchDAOImpl extends
 			throw new CMMException("M001");
 		}
 		return null;
+	}
+	
+	public Long getPayingTransferCount(Long tid){
+		String queryString = "select count(*) from PojoTranData where tranBatch.tid = ? and status = ?";
+		Query query = getSession().createQuery(queryString);
+		query.setParameter(0, tid);
+		query.setParameter(1, "00");
+		return (Long) query.uniqueResult();
+	}
+
+	@Override
+	@Transactional(propagation=Propagation.REQUIRED)
+	public void updateBankTransferResult(Long tid) {
+		Long count = getPayingTransferCount(tid);
+		if(count==0){//没有审核完成的划拨数据时
+			PojoTranBatch tranBatch =	getByBatchNo(tid);
+			tranBatch.setStatus("00");
+			tranBatch.setFinishTime(new Date());
+			update(tranBatch);
+		}
+		
+		
+		
 	}
 }

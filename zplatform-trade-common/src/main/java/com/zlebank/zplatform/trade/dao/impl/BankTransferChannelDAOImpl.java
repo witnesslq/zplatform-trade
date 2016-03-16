@@ -13,6 +13,8 @@ package com.zlebank.zplatform.trade.dao.impl;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.zlebank.zplatform.commons.dao.impl.HibernateBaseDAOImpl;
 import com.zlebank.zplatform.trade.dao.BankTransferChannelDAO;
@@ -35,6 +37,7 @@ public class BankTransferChannelDAOImpl  extends HibernateBaseDAOImpl<PojoBankTr
      * @return
      */
     @Override
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public PojoBankTransferChannel getByChannelCode(String channelCode) {
         Criteria crite= this.getSession().createCriteria(PojoBankTransferChannel.class);
         crite.add(Restrictions.eq("channelCode", channelCode));

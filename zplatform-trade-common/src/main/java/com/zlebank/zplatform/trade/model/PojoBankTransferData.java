@@ -47,7 +47,9 @@ public class PojoBankTransferData implements Serializable{
     /**"表标识"**/
     private Long tid;
     /**"银行转账流水序列号"**/
-    private String bankTranDataSeqNo; 
+    private String bankTranDataSeqNo;
+    /**"银行转账应答流水序列号"**/
+    private String bankTranResNo;
     /**"银行转账批次号"**/
     @JSONField (serialize=false) 
     private PojoBankTransferBatch bankTranBatch;
@@ -75,8 +77,6 @@ public class PojoBankTransferData implements Serializable{
     private Date applyTime;
     /**"账户类型(0:对私账户1：对公账户)"**/
     private String accType;
-    /**交易序列号**/
-    private String txnseqno;
     /**划拨类型，01-行内02-跨行**/
     private String transferType;
     /**付款结果**/
@@ -192,13 +192,6 @@ public class PojoBankTransferData implements Serializable{
     public void setAccType(String accType) {
         this.accType = accType;
     }
-    @Column(name = "TXNSEQNO")
-    public String getTxnseqno() {
-        return txnseqno;
-    }
-    public void setTxnseqno(String txnseqno) {
-        this.txnseqno = txnseqno;
-    }
     @Column(name = "TRANSFER_TYPE")
     public String getTransferType() {
         return transferType;
@@ -212,5 +205,27 @@ public class PojoBankTransferData implements Serializable{
     }
     public void setResType(String resType) {
         this.resType = resType;
+    }
+    @Column(name = "BANK_TRAN_RES_NO")
+    public String getBankTranResNo() {
+		return bankTranResNo;
+	}
+	public void setBankTranResNo(String bankTranResNo) {
+		this.bankTranResNo = bankTranResNo;
+	}
+	public PojoBankTransferData() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	public PojoBankTransferData(String[] body) {
+       
+        this.bankTranDataSeqNo = body[0];
+        this.bankTranResNo = body[1];
+        this.accNo = body[2];
+        this.accName = body[3];
+        this.tranAmt = Long.valueOf(body[4]);
+        this.resType = body[5];
+        this.resCode = body[6];
+        this.resInfo = body[7];
     }
 }

@@ -34,6 +34,7 @@ import com.zlebank.zplatform.trade.cmbc.service.ICMBCTransferService;
 import com.zlebank.zplatform.trade.cmbc.service.IInsteadPayService;
 import com.zlebank.zplatform.trade.cmbc.service.IWithholdingService;
 import com.zlebank.zplatform.trade.dao.BankTransferBatchDAO;
+import com.zlebank.zplatform.trade.dao.BankTransferChannelDAO;
 import com.zlebank.zplatform.trade.dao.BankTransferDataDAO;
 import com.zlebank.zplatform.trade.dao.RealnameAuthDAO;
 import com.zlebank.zplatform.trade.dao.TransferBatchDAO;
@@ -86,7 +87,8 @@ public class CMBCTransferServiceImpl implements ICMBCTransferService{
     private BankTransferBatchDAO bankTransferBatchDAO;
     @Autowired
     private BankTransferDataDAO bankTransferDataDAO;
-    
+    @Autowired
+    private BankTransferChannelDAO bankTransferChannelDAO;
     /**
      * 实名认证
      * @param card
@@ -246,7 +248,7 @@ public class CMBCTransferServiceImpl implements ICMBCTransferService{
      * @return
      */
     @Override
-    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public ResultBean batchTransfer(Long tid) {
         ResultBean resultBean = null;
         try {
@@ -257,16 +259,15 @@ public class CMBCTransferServiceImpl implements ICMBCTransferService{
                 return new ResultBean("", "无法划拨");
             }
             //生成交易日志
-            //List<PojoTranData> transferDataList = transferDataDAO.findTransDataByBatchNo(batchNo);
-            //txnsLogService.saveTransferLogs(transferDataList);
-            
-            TransferTypeEnmu transferType = null;//TransferTypeEnmu.fromValue(transferBatch.getTransfertype());
+            List<PojoBankTransferData> transferDataList = bankTransferDataDAO.findTransDataByBatchNo(tid);
+            txnsLogService.saveBankTransferLogs(transferDataList);
+            TransferTypeEnmu transferType = TransferTypeEnmu.fromValue(bankTransferBatch.getChannel().getBankType());
             switch (transferType) {
                 case INNERBANK :
-                    insteadPayService.batchInnerPay(tid+"");
+                    insteadPayService.batchInnerPay(tid);
                     break;
                 case OUTERBANK :
-                    insteadPayService.batchOuterPay(tid+"");
+                    insteadPayService.batchOuterPay(tid);
                     break;
 				default:
 					break;

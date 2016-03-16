@@ -136,7 +136,7 @@ public class TransferBatchDAOImpl extends HibernateBaseDAOImpl<PojoTranBatch>
     @Transactional(readOnly = true)
     public List<PojoTranData> queryWaitTrialTranData(long tranBatchId) {
         StringBuffer sqlBuffer = new StringBuffer(
-                "from PojoTranData where 1=1 and tranBatchId = ? and status = ?");
+                "from PojoTranData where 1=1 and tranBatch.tid = ? and status = ?");
         Query query = getSession().createQuery(sqlBuffer.toString());
         query.setParameter(0, tranBatchId);
         query.setParameter(1, "01");

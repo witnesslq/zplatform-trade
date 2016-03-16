@@ -44,8 +44,8 @@ public class TransferDataDAOImpl  extends HibernateBaseDAOImpl<PojoTranData> imp
 		List<Object> parameterList = new ArrayList<Object>();
 		if(queryTransferBean!=null){
 			if(queryTransferBean.getTid()!=0){
-				sqlBuffer.append(" and tranBatchId = ? ");
-				sqlCountBuffer.append(" and tranBatchId = ? ");
+				sqlBuffer.append(" and tranBatch.tid = ? ");
+				sqlCountBuffer.append(" and tranBatch.tid = ? ");
 				parameterList.add(queryTransferBean.getTid());
 			}
 			if(StringUtil.isNotEmpty(queryTransferBean.getEndDate())){
@@ -72,10 +72,9 @@ public class TransferDataDAOImpl  extends HibernateBaseDAOImpl<PojoTranData> imp
     
     @Transactional(readOnly=true)
     public PojoTranData queryTransferData(Long tid){
-    	StringBuffer sqlBuffer = new StringBuffer("from PojoTranData where 1=1 and tid = ? and status = ?");
+    	StringBuffer sqlBuffer = new StringBuffer("from PojoTranData where 1=1 and tid = ?");
     	Query query = getSession().createQuery(sqlBuffer.toString());
     	query.setParameter(0, tid);
-    	query.setParameter(1, "01");
     	return (PojoTranData) query.uniqueResult();
     }
     
@@ -131,19 +130,19 @@ public class TransferDataDAOImpl  extends HibernateBaseDAOImpl<PojoTranData> imp
     
     @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void updateBatchTransferSingle(PojoTranBatch transferBatch){
-    	StringBuffer sqlBuffer = new StringBuffer("select count(*) from PojoTranData where 1=1 and tranBatchId = ? and status = ?");
+    	StringBuffer sqlBuffer = new StringBuffer("select count(*) from PojoTranData where 1=1 and tranBatch.tid = ? and status = ?");
     	Query query = getSession().createQuery(sqlBuffer.toString());
     	query.setParameter(0, transferBatch.getTid());
     	query.setParameter(1, "01");
     	Long count = ((Long) query.uniqueResult()).longValue();
     	if(count==0){
+    		transferBatch.setStatus("03");
     		transferBatch.setWaitApproveCount(0L);
     		transferBatch.setWaitApproveAmt(0L);
-    		transferBatch.setStatus("03");
     		transferBatch.setApproveFinishTime(new Date());
     	}else{
     		//查询未审核的总金额
-    		sqlBuffer = new StringBuffer("select sum(tranAmt) from PojoTranData where 1=1 and tranBatchId = ? and status = ?");
+    		sqlBuffer = new StringBuffer("select sum(tranAmt) from PojoTranData where 1=1 and tranBatch.tid = ? and status = ?");
     		query = getSession().createQuery(sqlBuffer.toString());
     		query.setParameter(0, transferBatch.getTid());
         	query.setParameter(1, "01");
@@ -166,14 +165,14 @@ public class TransferDataDAOImpl  extends HibernateBaseDAOImpl<PojoTranData> imp
 		// TODO Auto-generated method stub
 		String sql = "update PojoTranData set status= ? where tid = ?";
 		Query query = getSession().createQuery(sql);
-		query.setParameter(0, tid);
-		query.setParameter(1, status);
+		query.setParameter(0, status);
+		query.setParameter(1, tid);
 		query.executeUpdate();
 	}
 
 	@Override
 	public Long queryWaritTransferCount(Long tranBatchId) {
-		String sql = "select count(*) from PojoTranData  where tranBatchId = ? and status= ?";
+		String sql = "select count(*) from PojoTranData  where tranBatch.tid = ? and status= ?";
 		Query query = getSession().createQuery(sql);
 		query.setParameter(0, tranBatchId);
 		query.setParameter(1, "02");

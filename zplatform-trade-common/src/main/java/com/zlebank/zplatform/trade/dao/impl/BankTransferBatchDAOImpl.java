@@ -102,7 +102,7 @@ public class BankTransferBatchDAOImpl extends
 	 * 更新批次数据
 	 */
 	@Override
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRED)
 	public void updateTransferBatch(PojoBankTransferBatch transferBatch) {
 		try {
 			getSession().update(transferBatch);
@@ -150,13 +150,12 @@ public class BankTransferBatchDAOImpl extends
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Throwable.class)
-	public void updateAccountingResult(String batchno, AccStatusEnum accStatus) {
+	public void updateBatchTranStatus(Long tid, String tranStatus) {
 		try {
-			String hql = "update PojoBankTransferBatch set accstatus = ? where batchno = ? ";
-			Session session = getSession();
-			Query query = session.createQuery(hql);
-			query.setParameter(0, accStatus.getCode());
-			query.setParameter(1, batchno);
+			String hql = "update PojoBankTransferBatch set tranStatus = ? where tid = ? ";
+			Query query = getSession().createQuery(hql);
+			query.setParameter(0, tranStatus);
+			query.setParameter(1, tid);
 			query.executeUpdate();
 		} catch (HibernateException e) {
 			// TODO Auto-generated catch block
@@ -261,11 +260,19 @@ public class BankTransferBatchDAOImpl extends
 				sqlCountBuffer.append(" and bankTranBatchNo = ? ");
 				parameterList.add(queryTransferBean.getBatchNo());
 			}
-			if(StringUtil.isNotEmpty(queryTransferBean.getEndDate())){
+			if(StringUtil.isNotEmpty(queryTransferBean.getStatus())){
 				sqlBuffer.append(" and status = ? ");
 				sqlCountBuffer.append(" and status = ? ");
 				parameterList.add(queryTransferBean.getStatus());
+			}else{
+				sqlBuffer.append(" and status = ? ");
+				sqlCountBuffer.append(" and status = ? ");
+				parameterList.add("01");
 			}
+		}else{
+			sqlBuffer.append(" and status = ? ");
+			sqlCountBuffer.append(" and status = ? ");
+			parameterList.add("01");
 		}
 		Query query = getSession().createQuery(sqlBuffer.toString());
 		Query countQuery = getSession().createQuery(sqlCountBuffer.toString());
@@ -284,7 +291,7 @@ public class BankTransferBatchDAOImpl extends
 	}
 
 	@Override
-	@Transactional(readOnly=true)
+	@Transactional(propagation=Propagation.REQUIRED)
 	public PojoBankTransferBatch getByBankTranBatchNo(Long tid) {
 		String queryString = "from PojoBankTransferBatch where tid = ? ";
 		try {
@@ -300,7 +307,7 @@ public class BankTransferBatchDAOImpl extends
 	}
 	
 	@Override
-	@Transactional(readOnly=true)
+	@Transactional(propagation=Propagation.REQUIRED)
 	public PojoBankTransferBatch getById(Long tid) {
 		String queryString = "from PojoBankTransferBatch where tid = ? ";
 		try {

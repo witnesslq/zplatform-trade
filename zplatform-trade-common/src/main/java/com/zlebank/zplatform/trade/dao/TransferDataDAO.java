@@ -74,4 +74,5 @@ public interface TransferDataDAO extends BaseDAO<PojoTranData>{
      * @return
      */
     public List<PojoTranData> queryWaritTransferData(Long tranBatchId);
+    
 }

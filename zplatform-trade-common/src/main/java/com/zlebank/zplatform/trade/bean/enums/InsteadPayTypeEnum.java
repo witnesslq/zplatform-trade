@@ -2,9 +2,10 @@ package com.zlebank.zplatform.trade.bean.enums;
 
 public enum InsteadPayTypeEnum {
     INITI("01"),
-    Paying("02"),
+    WaritPaying("02"),
+    Paying("03"),
     finish("00"),
-    fail("03"),
+    fail("04"),
     UNKNOW("99");
    private String code;
     
@@ -14,7 +15,7 @@ public enum InsteadPayTypeEnum {
     
     public static InsteadPayTypeEnum fromValue(String value) {
         for(InsteadPayTypeEnum status:values()){
-            if(status.code==value){
+            if(value.equals(status.code)){
                 return status;
             }
         }
