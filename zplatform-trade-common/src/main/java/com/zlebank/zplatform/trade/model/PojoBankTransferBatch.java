@@ -10,6 +10,7 @@
  */
 package com.zlebank.zplatform.trade.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -264,5 +265,17 @@ public class PojoBankTransferBatch {
             this.bankTranDatas.addAll(tranDatas);
         }
         
+    }
+    
+    public void addTranBatch(PojoTranBatch batch){
+        if(tranBatchs==null){
+            tranBatchs = new ArrayList<PojoTranBatch>();
+        }
+        for(PojoTranBatch relatedTranBatch:tranBatchs){
+            if(relatedTranBatch.getTid()==batch.getTid()){
+                return;
+            }
+        }
+        tranBatchs.add(batch);
     }
 }
