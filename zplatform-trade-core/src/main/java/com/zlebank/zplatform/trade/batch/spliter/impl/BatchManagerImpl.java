@@ -129,13 +129,14 @@ public class BatchManagerImpl implements BatchManager {
         // Bean -> Pojo
         PojoBankTransferData detail = convertToPojo(transferData);
         detail.setBankTranBatch(batch);
-
+        
         // 保存转账流水
         detail = bankTransferDetaDAO.merge(detail);
         // 保存转账批次
         batch.setTotalCount(batch.getTotalCount() + 1);
         batch.setTotalAmt(batch.getTotalAmt() + detail.getTranAmt());
         batch = bankTransferBatchDAO.merge(batch);
+        batch.addTranBatch(transferData.getTranBatch());
         // 是否要关闭当前转账批次
         if (isCloseBatch(batch)) {
             closeBatch(batch);

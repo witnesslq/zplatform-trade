@@ -118,7 +118,7 @@ public class InsteadPayDetailDAOImpl
             if (StringUtil.isNotEmpty(e.getBatchId())) {
                 crite.add(Restrictions.eq("insteadPayBatch.id", Long.parseLong(e.getBatchId())));
             }
-            if (StringUtil.isNotEmpty(e.getBatchId())) {
+            if (StringUtil.isNotEmpty(e.getImFileName())) {
                 crite.add(Restrictions.eq("insteadPayBatch.originalFileName", e.getImFileName()));
             }
             if (e.getStatusList() != null
@@ -169,7 +169,7 @@ public class InsteadPayDetailDAOImpl
         public List<PojoInsteadPayDetail> getBatchDetailByBatchId(Long batchId) {
             Criteria crite = this.getSession().createCriteria(
                     PojoInsteadPayDetail.class);
-            crite.add(Restrictions.eq("batchId", batchId));
+            crite.add(Restrictions.eq("insteadPayBatch.id", batchId));
             crite.add(Restrictions.eq("status", InsteadPayDetailStatusEnum.WAIT_INSTEAD_APPROVE.getCode()));
             return crite.list();
         }

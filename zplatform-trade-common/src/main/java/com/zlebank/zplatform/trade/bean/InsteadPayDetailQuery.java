@@ -42,7 +42,7 @@ public class InsteadPayDetailQuery implements Bean{
     /** 批次号 **/
     private String insteadPayBatchSeqNo;
     /** 导入文件名 **/
-    private List<String> imFileName;
+    private String imFileName;
     /** 代付流水号 **/
     private String insteadPayDataSeqNo;
     
@@ -103,10 +103,10 @@ public class InsteadPayDetailQuery implements Bean{
     public void setBatchNo(String batchNo) {
         this.batchNo = batchNo;
     }
-    public List<String> getImFileName() {
+    public String getImFileName() {
         return imFileName;
     }
-    public void setImFileName(List<String> imFileName) {
+    public void setImFileName(String imFileName) {
         this.imFileName = imFileName;
     }
     public String getInsteadPayDataSeqNo() {

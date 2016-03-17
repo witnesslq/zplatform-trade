@@ -92,12 +92,8 @@ public class TransferDataServiceImpl implements TransferDataService{
             batch.setTotalCount(addOne(batch.getTotalCount()));
             batch.setTotalAmt(addAmount(batch.getTotalAmt(), data.getTranAmt()));
 
-            batch.setRefuseCount(addOne(batch.getRefuseCount()));
-            //batch.setRefuseAmt(addAmount(batch.getRefuseAmt().longValue(), data.getTranAmt().longValue()));
-
             batch.setWaitApproveCount(addOne(batch.getWaitApproveCount()));
             batch.setWaitApproveAmt(addAmount(batch.getWaitApproveAmt(), data.getTranAmt()));
-
         }
         // 保存划拨批次
         batch = tranBatchDAO.merge(batch);

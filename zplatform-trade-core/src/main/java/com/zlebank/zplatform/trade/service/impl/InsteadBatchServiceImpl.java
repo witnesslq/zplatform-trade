@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.service.AccEntryService;
+import com.zlebank.zplatform.commons.dao.pojo.BusiTypeEnum;
 import com.zlebank.zplatform.commons.service.impl.AbstractBasePageService;
 import com.zlebank.zplatform.commons.utils.BeanCopyUtil;
 import com.zlebank.zplatform.trade.bean.InsteadPayBatchBean;
@@ -174,6 +175,11 @@ public class InsteadBatchServiceImpl extends AbstractBasePageService<InsteadPayB
                 PojoTranData tmp = BeanCopyUtil.copyBean(PojoTranData.class, detail);
                 tmp.setTranAmt(detail.getAmt());
                 tmp.setBusiDataId(detail.getId());
+                tmp.setMemberId(detail.getMerId());
+                tmp.setTranFee(detail.getTxnfee());
+                tmp.setBusiType(TransferBusiTypeEnum.INSTEAD.getCode());
+                tmp.setBankNo(detail.getBankCode());
+                tmp.setBankName(detail.getIssInsName());
                 tranDatas.add(tmp);
                 insteadPayDetailDAO.merge(detail);
             }
