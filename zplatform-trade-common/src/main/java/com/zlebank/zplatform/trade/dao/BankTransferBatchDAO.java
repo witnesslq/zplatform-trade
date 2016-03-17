@@ -1,5 +1,6 @@
 package com.zlebank.zplatform.trade.dao;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -83,8 +84,9 @@ public interface BankTransferBatchDAO extends BasePagedQueryDAO<PojoBankTransfer
      * @param page
      * @param pageSize
      * @return
+     * @throws ParseException 
      */
-    public Map<String, Object> queryBankTransferByPage(QueryTransferBean queryTransferBean,int page,int pageSize);
+    public Map<String, Object> queryBankTransferByPage(QueryTransferBean queryTransferBean,int page,int pageSize) throws ParseException;
     
     
     /**

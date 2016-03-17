@@ -48,10 +48,17 @@ public class TransferDataDAOImpl  extends HibernateBaseDAOImpl<PojoTranData> imp
 				sqlCountBuffer.append(" and tranBatch.tid = ? ");
 				parameterList.add(queryTransferBean.getTid());
 			}
-			if(StringUtil.isNotEmpty(queryTransferBean.getEndDate())){
-				sqlBuffer.append(" and status = ? ");
-				sqlCountBuffer.append(" and status = ? ");
-				parameterList.add(queryTransferBean.getStatus());
+			if(StringUtil.isNotEmpty(queryTransferBean.getStatus())){
+				if("02".equals(queryTransferBean.getStatus())){
+					sqlBuffer.append(" and (status = ? or status = ?) ");
+					sqlCountBuffer.append(" and (status = ? or status = ?) ");
+					parameterList.add("00");
+					parameterList.add("09");
+				}else{
+					sqlBuffer.append(" and status = ? ");
+					sqlCountBuffer.append(" and status = ? ");
+					parameterList.add(queryTransferBean.getStatus());
+				}
 			}
 		}
 		Query query = getSession().createQuery(sqlBuffer.toString());

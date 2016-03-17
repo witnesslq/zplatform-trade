@@ -53,12 +53,11 @@ HibernateBaseDAOImpl<PojoBankTransferData>
     @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public List<PojoBankTransferData> findTransDataByBatchNo(Long tid) {
         List<PojoBankTransferData> result = null;
-        String queryString = " from PojoBankTransferData where bankTranBatch.tid = ? and status = ?";
+        String queryString = " from PojoBankTransferData where bankTranBatch.tid = ?";
         try {
             log.info("queryString:" + queryString);
             Query query = getSession().createQuery(queryString);
             query.setLong(0, tid);
-            query.setString(1, "02");//等待转账
             result = query.list();
         } catch (HibernateException e) {
             // TODO Auto-generated catch block

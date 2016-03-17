@@ -1,6 +1,7 @@
 package com.zlebank.zplatform.trade.dao.impl;
 
 import java.awt.color.CMMException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.zlebank.zplatform.commons.bean.TransferBatchQuery;
 import com.zlebank.zplatform.commons.dao.impl.AbstractPagedQueryDAOImpl;
 import com.zlebank.zplatform.commons.dao.pojo.AccStatusEnum;
+import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.bean.enums.BankTransferBatchOpenStatusEnum;
 import com.zlebank.zplatform.trade.bean.page.QueryTransferBean;
@@ -276,10 +278,10 @@ public class BankTransferBatchDAOImpl
 	@Override
 	@Transactional(readOnly=true)
 	public Map<String, Object> queryBankTransferByPage(
-			QueryTransferBean queryTransferBean, int page, int pageSize) {
+			QueryTransferBean queryTransferBean, int page, int pageSize) throws ParseException {
 		StringBuffer sqlBuffer = new StringBuffer("from PojoBankTransferBatch where openStatus=? ");
 		StringBuffer sqlCountBuffer = new StringBuffer("select count(*) from PojoBankTransferBatch where openStatus=? ");
-		List<String> parameterList = new ArrayList<String>();
+		List<Object> parameterList = new ArrayList<Object>();
 		parameterList.add("1");
 		if(queryTransferBean!=null){
 			if(StringUtil.isNotEmpty(queryTransferBean.getBatchNo())){
@@ -296,6 +298,16 @@ public class BankTransferBatchDAOImpl
 				sqlCountBuffer.append(" and status = ? ");
 				parameterList.add("01");
 			}
+			if (StringUtil.isNotEmpty(queryTransferBean.getBeginDate())) {
+                sqlBuffer.append(" and applyTime >= ? ");
+                sqlCountBuffer.append(" and applyTime >= ? ");
+                parameterList.add(DateUtil.convertToDate(queryTransferBean.getBeginDate(), "yyyy-MM-dd"));
+            }
+            if (StringUtil.isNotEmpty(queryTransferBean.getEndDate())) {
+                sqlBuffer.append(" and applyTime <= ? ");
+                sqlCountBuffer.append(" and applyTime <= ? ");
+                parameterList.add(DateUtil.convertToDate(queryTransferBean.getEndDate(), "yyyy-MM-dd"));
+            }
 		}else{
 			sqlBuffer.append(" and status = ? ");
 			sqlCountBuffer.append(" and status = ? ");
@@ -304,7 +316,7 @@ public class BankTransferBatchDAOImpl
 		Query query = getSession().createQuery(sqlBuffer.toString());
 		Query countQuery = getSession().createQuery(sqlCountBuffer.toString());
 		int i = 0;
-		for(String parameter : parameterList){
+		for(Object parameter : parameterList){
 			query.setParameter(i, parameter);
 			countQuery.setParameter(i, parameter);
 			i++;
