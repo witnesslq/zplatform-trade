@@ -13,6 +13,7 @@ package com.zlebank.zplatform.trade.dao.impl;
 import java.util.List;
 
 import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -91,6 +92,7 @@ public class InsteadPayDetailDAOImpl
     protected Criteria buildCriteria(InsteadPayDetailQuery e) {
         Criteria crite = this.getSession().createCriteria(
                 PojoInsteadPayDetail.class);
+        crite.setFetchMode("insteadPayBatch", FetchMode.JOIN);
         if (e != null) {
             if (StringUtil.isNotEmpty(e.getAccNo())) {
                 crite.add(Restrictions.eq("accNo", e.getAccNo()));
@@ -122,6 +124,9 @@ public class InsteadPayDetailDAOImpl
             if (e.getStatusList() != null
                     && e.getStatusList().size() != 0) {
                 crite.add(Restrictions.in("status", e.getStatusList()));
+            }
+            if (StringUtil.isNotEmpty(e.getInsteadPayDataSeqNo())) {
+                crite.add(Restrictions.eq("insteadPayDataSeqNo", e.getInsteadPayDataSeqNo()));
             }
         }
         crite.addOrder(Order.desc("intime"));

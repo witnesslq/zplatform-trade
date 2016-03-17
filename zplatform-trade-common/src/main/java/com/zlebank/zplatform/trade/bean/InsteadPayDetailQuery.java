@@ -43,6 +43,8 @@ public class InsteadPayDetailQuery implements Bean{
     private String insteadPayBatchSeqNo;
     /** 导入文件名 **/
     private List<String> imFileName;
+    /** 代付流水号 **/
+    private String insteadPayDataSeqNo;
     
     public String getStatus() {
         return status;
@@ -106,5 +108,11 @@ public class InsteadPayDetailQuery implements Bean{
     }
     public void setImFileName(List<String> imFileName) {
         this.imFileName = imFileName;
+    }
+    public String getInsteadPayDataSeqNo() {
+        return insteadPayDataSeqNo;
+    }
+    public void setInsteadPayDataSeqNo(String insteadPayDataSeqNo) {
+        this.insteadPayDataSeqNo = insteadPayDataSeqNo;
     }
 }
