@@ -293,10 +293,6 @@ public class BankTransferBatchDAOImpl
 				sqlBuffer.append(" and status = ? ");
 				sqlCountBuffer.append(" and status = ? ");
 				parameterList.add(queryTransferBean.getStatus());
-			}else{
-				sqlBuffer.append(" and status = ? ");
-				sqlCountBuffer.append(" and status = ? ");
-				parameterList.add("01");
 			}
 			if (StringUtil.isNotEmpty(queryTransferBean.getBeginDate())) {
                 sqlBuffer.append(" and applyTime >= ? ");
@@ -308,10 +304,6 @@ public class BankTransferBatchDAOImpl
                 sqlCountBuffer.append(" and applyTime <= ? ");
                 parameterList.add(DateUtil.convertToDate(queryTransferBean.getEndDate(), "yyyy-MM-dd"));
             }
-		}else{
-			sqlBuffer.append(" and status = ? ");
-			sqlCountBuffer.append(" and status = ? ");
-			parameterList.add("01");
 		}
 		Query query = getSession().createQuery(sqlBuffer.toString());
 		Query countQuery = getSession().createQuery(sqlCountBuffer.toString());
