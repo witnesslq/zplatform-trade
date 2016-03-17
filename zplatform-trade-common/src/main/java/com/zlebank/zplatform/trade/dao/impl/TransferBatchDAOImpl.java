@@ -40,10 +40,12 @@ public class TransferBatchDAOImpl extends HibernateBaseDAOImpl<PojoTranBatch>
             int page,
             int pageSize) throws ParseException {
         StringBuffer sqlBuffer = new StringBuffer(
-                "from PojoTranBatch where 1=1 ");
+                "from PojoTranBatch where  (status = ? or status = ?)");
         StringBuffer sqlCountBuffer = new StringBuffer(
-                "select count(*) from PojoTranBatch  where 1=1 ");
+                "select count(*) from PojoTranBatch  where (status = ? or status = ?)");
         List<Object> parameterList = new ArrayList<Object>();
+        parameterList.add("01");
+        parameterList.add("02");
         if (queryTransferBean != null) {
             if (StringUtil.isNotEmpty(queryTransferBean.getBatchNo())) {
                 sqlBuffer.append(" and tranBatchNo = ? ");
@@ -60,22 +62,11 @@ public class TransferBatchDAOImpl extends HibernateBaseDAOImpl<PojoTranBatch>
                 sqlCountBuffer.append(" and applyTime <= ? ");
                 parameterList.add(DateUtil.convertToDate(queryTransferBean.getEndDate(), "yyyy-MM-dd"));
             }
-            if (StringUtil.isNotEmpty(queryTransferBean.getStatus())) {
-                sqlBuffer.append(" and status = ? ");
-                sqlCountBuffer.append(" and status = ? ");
-                parameterList.add(queryTransferBean.getStatus());
-            }
             if(StringUtil.isNotEmpty(queryTransferBean.getBusiType())){
             	sqlBuffer.append(" and busiType = ? ");
                 sqlCountBuffer.append(" and busiType = ? ");
                 parameterList.add(queryTransferBean.getBusiType());
             }
-        }else{
-            sqlBuffer.append(" and (status = ? or status = ?)");
-            sqlCountBuffer.append(" and (status = ? or status = ?) ");
-            parameterList.add("01");
-            parameterList.add("02");
-            
         }
         Query query = getSession().createQuery(sqlBuffer.toString());
         Query countQuery =
