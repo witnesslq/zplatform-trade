@@ -42,7 +42,7 @@ public class InsteadPayDetailBean implements Bean{
     private String accType;
     /**账号**/
     private String accNo;
-    /**户名**/
+    /**户名**/    
     private String accName;
     /**开户行代码帐号类型取值为“02”时不能为空**/
     private String bankCode;
