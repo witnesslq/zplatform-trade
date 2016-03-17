@@ -16,5 +16,10 @@
 <br/>
 <input type="submit" id="button" name="button" value="报文提交">
 </form>
+<form name="test" action="/zplatform-trade/mock/21.htm" method="post" target="_blank">
+<br/>
+<input type="submit" value="随即生成代付报文"/> 
+</form>
+
 </body>
 </html>
