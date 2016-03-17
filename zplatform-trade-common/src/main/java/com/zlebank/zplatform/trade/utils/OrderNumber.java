@@ -124,7 +124,7 @@ public class OrderNumber {
     }
     public String generateWithdrawOrderNo(){
         String seqNo=generateSerialNumber("SEQ_WITHDRAW_NO");
-        return seqNo.substring(0,6)+"93"+seqNo.substring(6);
+        return seqNo.substring(0,6)+"91"+seqNo.substring(6);
     }
     public String generateCMBCQuickOrderNo(){
         String seqNo=generateSerialNumber("SEQ_CMBC_QUICK_NO");
