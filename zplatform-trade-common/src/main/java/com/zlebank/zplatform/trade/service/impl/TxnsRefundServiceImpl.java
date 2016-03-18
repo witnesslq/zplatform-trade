@@ -49,9 +49,16 @@ public class TxnsRefundServiceImpl extends BaseServiceImpl<TxnsRefundModel,Long>
     }
     
     public TxnsRefundModel getRefundByRefundorderNo(String refundorderno,String merchno) {
-        String hql = " from TxnsRefundModel refundorderno=? and merchno=?";
+        String hql = " from TxnsRefundModel where refundorderno=? and merchno=?";
         return super.getUniqueByHQL(hql, new Object[]{refundorderno,merchno});
     }
+    
+    public TxnsRefundModel getRefundByRefundor(String refundorderno) {
+        String hql = " from TxnsRefundModel where refundorderno=? ";
+        return super.getUniqueByHQL(hql, new Object[]{refundorderno});
+    }
+    
+   
 
     @Override
     @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
@@ -60,4 +67,11 @@ public class TxnsRefundServiceImpl extends BaseServiceImpl<TxnsRefundModel,Long>
         String hql = "update TxnsWithdrawModel set finishtime = ?,status = ?,retcode = ?,retinfo = ? where refundorderno = ? and memberid = ? ";
         super.updateByHQL(hql, new Object[]{refundOrder.getFinishtime(),refundOrder.getStatus(),refundOrder.getRetcode(),refundOrder.getRetinfo(),refundOrder.getRefundorderno(),refundOrder.getMemberid()});
     }
+    
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+    public void updateRefund(TxnsRefundModel refundOrder) {
+        txnsRefundDAO.updateRefund(refundOrder);
+        // TODO Auto-generated method stub
+    }
+    
 }

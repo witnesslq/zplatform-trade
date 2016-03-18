@@ -2,8 +2,13 @@ package com.zlebank.zplatform.trade.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
 
 import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.trade.bean.wap.WapRefundBean;
@@ -42,8 +47,10 @@ public class TxnsRefundModel implements java.io.Serializable {
 	private String retinfo;
 	private String notes;
 	private String remarks;
-
-	// Constructors
+	private String stexaopt;
+	  /**通过还是拒绝*/
+   private String flag; 
+	 //Constructors
 
 	/** default constructor */
 	public TxnsRefundModel() {
@@ -109,7 +116,15 @@ public class TxnsRefundModel implements java.io.Serializable {
 	}
 
 	// Property accessors
-	@Id
+	@GenericGenerator(name = "id_gen", strategy = "enhanced-table", parameters = {
+            @Parameter(name = "table_name", value = "T_C_PRIMAY_KEY"),
+            @Parameter(name = "value_column_name", value = "NEXT_ID"),
+            @Parameter(name = "segment_column_name", value = "KEY_NAME"),
+            @Parameter(name = "segment_value", value = "T_TXNS_REFUSE_ID"),
+            @Parameter(name = "increment_size", value = "1"),
+            @Parameter(name = "optimizer", value = "pooled-lo") })
+    @Id
+    @GeneratedValue(generator = "id_gen")
 	@Column(name = "ID", unique = true, nullable = false, precision = 12, scale = 0)
 	public Long getId() {
 		return this.id;
@@ -289,5 +304,22 @@ public class TxnsRefundModel implements java.io.Serializable {
 	public void setRemarks(String remarks) {
 		this.remarks = remarks;
 	}
+	@Column(name = "STEXAOPT", length = 256)
+    public String getStexaopt() {
+        return stexaopt;
+    }
+
+    public void setStexaopt(String stexaopt) {
+        this.stexaopt = stexaopt;
+    }
+    @Transient
+    public String getFlag() {
+        return flag;
+    }
+
+    public void setFlag(String flag) {
+        this.flag = flag;
+    }
+	
 
 }

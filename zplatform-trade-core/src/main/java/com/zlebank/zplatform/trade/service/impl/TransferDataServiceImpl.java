@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.zlebank.zplatform.trade.bean.enums.SeqNoEnum;
 import com.zlebank.zplatform.trade.bean.enums.TransferBatchStatusEnum;
@@ -35,6 +36,7 @@ import com.zlebank.zplatform.trade.service.TransferDataService;
  * @date 2016年3月9日 下午7:57:14
  * @since 
  */
+@Service("transferDataService")
 public class TransferDataServiceImpl implements TransferDataService{
 
     @Autowired
