@@ -1,6 +1,7 @@
 package com.zlebank.zplatform.trade.bean.page;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class QueryTransferBean implements Serializable{
     /**
@@ -17,7 +18,8 @@ public class QueryTransferBean implements Serializable{
     public String endDate;
     /*** 划拨状态*/
     public String status;
-    
+    /**业务类型**/
+    private String busiType;
     public long getTid() {
         return tid;
     }
@@ -48,4 +50,12 @@ public class QueryTransferBean implements Serializable{
     public void setStatus(String status) {
         this.status = status;
     }
+	public String getBusiType() {
+		return busiType;
+	}
+	public void setBusiType(String busiType) {
+		this.busiType = busiType;
+	}
+    
 }
+

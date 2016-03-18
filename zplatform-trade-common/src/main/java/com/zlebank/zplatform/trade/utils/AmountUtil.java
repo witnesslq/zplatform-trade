@@ -1,7 +1,6 @@
 package com.zlebank.zplatform.trade.utils;
 
 import java.math.BigDecimal;
-
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.regex.Matcher;

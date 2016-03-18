@@ -10,14 +10,12 @@
  */
 package com.zlebank.zplatform.trade.model;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -49,7 +47,7 @@ public class PojoInsteadPayBatch {
     /**总笔数**/
     private Long totalQty;
     /**总金额**/
-    private BigDecimal totalAmt;
+    private Long totalAmt;
     /**状态(00:已处理01:未处理)**/
     private String status;
     /**创建人**/
@@ -67,26 +65,33 @@ public class PojoInsteadPayBatch {
     /**通过笔数**/
     private Long approveCount;
     /**通过金额**/
-    private BigDecimal approveAmt;
+    private Long approveAmt;
     /**未审核笔数**/
     private Long unapproveCount;
     /**未审核金额**/
-    private BigDecimal unapproveAmt;
+    private Long unapproveAmt;
     /**拒绝笔数**/
     private Long refuseCount;
     /**拒绝金额**/
-    private BigDecimal refuseAmt;
+    private Long refuseAmt;
     /**申请时间**/
     private Date applyTime;
     /**审核完成时间**/
     private Date approveFinishTime;
     /**转账完成时间**/
     private Date finishTime;
+    /**代付批次序列号**/
+    private String insteadPayBatchSeqNo;
+    /**文件路径**/
+    private String filePath;
+    /**原文件名**/
+    private String originalFileName;
+    
     /**批次明细**/
     private List<PojoInsteadPayDetail> details = new ArrayList<PojoInsteadPayDetail>();
     
 
-    @OneToMany(mappedBy="insteadPayBatch",fetch=FetchType.EAGER)
+    @OneToMany(mappedBy="insteadPayBatch")
     public List<PojoInsteadPayDetail> getDetails() {
         return details;
     }
@@ -138,10 +143,10 @@ public class PojoInsteadPayBatch {
         this.totalQty = totalQty;
     }
     @Column(name = "TOTAL_AMT")
-    public BigDecimal getTotalAmt() {
+    public Long getTotalAmt() {
         return totalAmt;
     }
-    public void setTotalAmt(BigDecimal totalAmt) {
+    public void setTotalAmt(Long totalAmt) {
         this.totalAmt = totalAmt;
     }
     @Column(name = "STATUS")
@@ -201,10 +206,10 @@ public class PojoInsteadPayBatch {
         this.approveCount = approveCount;
     }
     @Column(name = "APPROVE_AMT")
-    public BigDecimal getApproveAmt() {
+    public Long getApproveAmt() {
         return approveAmt;
     }
-    public void setApproveAmt(BigDecimal approveAmt) {
+    public void setApproveAmt(Long approveAmt) {
         this.approveAmt = approveAmt;
     }
     @Column(name = "UNAPPROVE_COUNT")
@@ -215,10 +220,10 @@ public class PojoInsteadPayBatch {
         this.unapproveCount = unapproveCount;
     }
     @Column(name = "UNAPPROVE_AMT")
-    public BigDecimal getUnapproveAmt() {
+    public Long getUnapproveAmt() {
         return unapproveAmt;
     }
-    public void setUnapproveAmt(BigDecimal unapproveAmt) {
+    public void setUnapproveAmt(Long unapproveAmt) {
         this.unapproveAmt = unapproveAmt;
     }
     @Column(name = "REFUSE_COUNT")
@@ -229,10 +234,10 @@ public class PojoInsteadPayBatch {
         this.refuseCount = refuseCount;
     }
     @Column(name = "REFUSE_AMT")
-    public BigDecimal getRefuseAmt() {
+    public Long getRefuseAmt() {
         return refuseAmt;
     }
-    public void setRefuseAmt(BigDecimal refuseAmt) {
+    public void setRefuseAmt(Long refuseAmt) {
         this.refuseAmt = refuseAmt;
     }
     @Column(name = "APPLY_TIME")
@@ -256,5 +261,25 @@ public class PojoInsteadPayBatch {
     public void setFinishTime(Date finishTime) {
         this.finishTime = finishTime;
     }
-
+    @Column(name = "INSTEAD_PAY_BATCH_SEQ_NO")
+    public String getInsteadPayBatchSeqNo() {
+        return insteadPayBatchSeqNo;
+    }
+    public void setInsteadPayBatchSeqNo(String insteadPayBatchSeqNo) {
+        this.insteadPayBatchSeqNo = insteadPayBatchSeqNo;
+    }
+    @Column(name = "FILE_PATH")
+    public String getFilePath() {
+        return filePath;
+    }
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+    @Column(name = "ORIGINAL_FILE_NAME")
+    public String getOriginalFileName() {
+        return originalFileName;
+    }
+    public void setOriginalFileName(String originalFileName) {
+        this.originalFileName = originalFileName;
+    }
 }

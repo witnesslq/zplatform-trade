@@ -10,6 +10,9 @@
  */
 package com.zlebank.zplatform.trade.dao.impl;
 
+import java.sql.Date;
+import java.text.ParseException;
+
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -19,6 +22,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zlebank.zplatform.commons.dao.impl.AbstractPagedQueryDAOImpl;
+import com.zlebank.zplatform.commons.utils.DateUtil;
+import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.bean.InsteadPayBatchQuery;
 import com.zlebank.zplatform.trade.dao.InsteadPayBatchDAO;
 import com.zlebank.zplatform.trade.model.PojoInsteadPayBatch;
@@ -75,15 +80,41 @@ public class InsteadPayBatchDAOImpl extends AbstractPagedQueryDAOImpl<PojoInstea
 
     /**
      *
-     * @param e
+     *  代付批次查询
+     * @param query
      * @return
      */
     @Override
-    protected Criteria buildCriteria(InsteadPayBatchQuery e) {
-        // TODO Auto-generated method stub
-        return null;
+    protected Criteria buildCriteria(InsteadPayBatchQuery query) {
+        Criteria crite= this.getSession().createCriteria(PojoInsteadPayBatch.class);
+        if (query != null) {
+            if(StringUtil.isNotEmpty(query.getBatchNo())) {
+                crite.add(Restrictions.eq("insteadPayBatchSeqNo", query.getBatchNo()));
+            }
+            if(StringUtil.isNotEmpty(query.getBeginDate())) {
+                crite.add(Restrictions.ge("intime", Date.valueOf(query.getBeginDate())));
+            }
+            if(StringUtil.isNotEmpty(query.getEndDate())) {
+                crite.add(Restrictions.le("intime", Date.valueOf(query.getEndDate())));
+            }
+            if (query.getStatusList() != null
+                    && query.getStatusList().size() != 0) {
+                crite.add(Restrictions.in("status", query.getStatusList()));
+            }
+        }
+        return crite;
     }
-    
 
+    /**
+     * 通过批次ID得到批次
+     * @param batchId
+     * @return
+     */
+    @Override
+    public PojoInsteadPayBatch getByBatchId(Long batchId) {
+        Criteria crite= this.getSession().createCriteria(PojoInsteadPayBatch.class);
+        crite.add(Restrictions.eq("id", batchId));
+        return (PojoInsteadPayBatch) crite.uniqueResult();
+    }
 
 }

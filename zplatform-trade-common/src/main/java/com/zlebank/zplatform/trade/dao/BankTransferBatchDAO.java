@@ -1,11 +1,13 @@
 package com.zlebank.zplatform.trade.dao;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
 import com.zlebank.zplatform.commons.bean.TransferBatchQuery;
 import com.zlebank.zplatform.commons.dao.BasePagedQueryDAO;
 import com.zlebank.zplatform.commons.dao.pojo.AccStatusEnum;
+import com.zlebank.zplatform.trade.bean.enums.BankTransferBatchOpenStatusEnum;
 import com.zlebank.zplatform.trade.bean.page.QueryTransferBean;
 import com.zlebank.zplatform.trade.model.PojoBankTransferBatch;
 
@@ -60,7 +62,7 @@ public interface BankTransferBatchDAO extends BasePagedQueryDAO<PojoBankTransfer
      * @param batchno 批次号
      * @param accStatus 账务状态
      */
-    public void updateAccountingResult(String batchno,AccStatusEnum accStatus);
+    public void updateBatchTranStatus(Long tid, String tranStatus);
     
     /**
      * 通过代付批次号查找批次数据
@@ -71,10 +73,10 @@ public interface BankTransferBatchDAO extends BasePagedQueryDAO<PojoBankTransfer
     
     /**
      * 通过渠道返回相应的批次号
-     * @param channelCode 渠道号
+     * @param long1 渠道号
      * @return
      */
-    public PojoBankTransferBatch getByChannelCode(String channelCode);
+    public PojoBankTransferBatch getByChannelId(Long long1);
     
     /**
      * 分页查询转账批次数据
@@ -82,8 +84,9 @@ public interface BankTransferBatchDAO extends BasePagedQueryDAO<PojoBankTransfer
      * @param page
      * @param pageSize
      * @return
+     * @throws ParseException 
      */
-    public Map<String, Object> queryBankTransferByPage(QueryTransferBean queryTransferBean,int page,int pageSize);
+    public Map<String, Object> queryBankTransferByPage(QueryTransferBean queryTransferBean,int page,int pageSize) throws ParseException;
     
     
     /**
@@ -92,5 +95,19 @@ public interface BankTransferBatchDAO extends BasePagedQueryDAO<PojoBankTransfer
      * @return
      */
     public PojoBankTransferBatch getByBankTranBatchNo(Long tid);
+
+    /**
+     * 根据转账批次标示获取批次数据
+     * @param bankTranBatchNo
+     * @return
+     */
+    public PojoBankTransferBatch getById(Long tid);
+    
+    /**
+     * 根据划拨批次和开放状态查询转账批次列表
+     * @param bankTranBatchNo
+     * @return
+     */
+    public List<PojoBankTransferBatch> getByTranBatchAndOpenStatus(long tranBatchId,BankTransferBatchOpenStatusEnum openStatus);
 }
 

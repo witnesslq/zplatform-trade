@@ -37,20 +37,28 @@ public class TransferDataDAOImpl  extends HibernateBaseDAOImpl<PojoTranData> imp
     @Autowired
     private AccEntryService accEntryService;
     
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public Map<String, Object> queryTranfersDetaByPage(QueryTransferBean queryTransferBean,int page,int pageSize){
     	StringBuffer sqlBuffer = new StringBuffer("from PojoTranData where 1=1 ");
 		StringBuffer sqlCountBuffer = new StringBuffer("select count(*) from PojoTranData where 1=1 ");
 		List<Object> parameterList = new ArrayList<Object>();
 		if(queryTransferBean!=null){
 			if(queryTransferBean.getTid()!=0){
-				sqlBuffer.append(" and tranBatchId = ? ");
-				sqlCountBuffer.append(" and tranBatchId = ? ");
+				sqlBuffer.append(" and tranBatch.tid = ? ");
+				sqlCountBuffer.append(" and tranBatch.tid = ? ");
 				parameterList.add(queryTransferBean.getTid());
 			}
-			if(StringUtil.isNotEmpty(queryTransferBean.getEndDate())){
-				sqlBuffer.append(" and status = ? ");
-				sqlCountBuffer.append(" and status = ? ");
-				parameterList.add(queryTransferBean.getStatus());
+			if(StringUtil.isNotEmpty(queryTransferBean.getStatus())){
+				if("02".equals(queryTransferBean.getStatus())){
+					sqlBuffer.append(" and (status = ? or status = ?) ");
+					sqlCountBuffer.append(" and (status = ? or status = ?) ");
+					parameterList.add("00");
+					parameterList.add("09");
+				}else{
+					sqlBuffer.append(" and status = ? ");
+					sqlCountBuffer.append(" and status = ? ");
+					parameterList.add(queryTransferBean.getStatus());
+				}
 			}
 		}
 		Query query = getSession().createQuery(sqlBuffer.toString());
@@ -71,10 +79,9 @@ public class TransferDataDAOImpl  extends HibernateBaseDAOImpl<PojoTranData> imp
     
     @Transactional(readOnly=true)
     public PojoTranData queryTransferData(Long tid){
-    	StringBuffer sqlBuffer = new StringBuffer("from PojoTranData where 1=1 and tid = ? and status = ?");
+    	StringBuffer sqlBuffer = new StringBuffer("from PojoTranData where 1=1 and tid = ?");
     	Query query = getSession().createQuery(sqlBuffer.toString());
     	query.setParameter(0, tid);
-    	query.setParameter(1, "01");
     	return (PojoTranData) query.uniqueResult();
     }
     
@@ -124,40 +131,25 @@ public class TransferDataDAOImpl  extends HibernateBaseDAOImpl<PojoTranData> imp
     		}else if("02".equals(transferBatch.getBusiType())){
     			businessEnum = BusinessEnum.REFUND_REFUND;
     		}
-    		businessRefund(transferData,businessEnum);
     	}
     	updateBatchTransferSingle(transferBatch);
     }
     
     @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
-    public void businessRefund(PojoTranData transferData,BusinessEnum businessEnum) throws AccBussinessException, AbstractBusiAcctException,NumberFormatException {
-        TradeInfo tradeInfo = new TradeInfo();
-        tradeInfo.setAmount(new BigDecimal(transferData.getTranAmt()));
-        tradeInfo.setBusiCode(businessEnum.getBusiCode());
-        tradeInfo.setPayMemberId(transferData.getMemberId());
-        tradeInfo.setTxnseqno(transferData.getTxnseqno());
-        //tradeInfo.setTxnseqno(pojoinstead.getOrderId());
-        tradeInfo.setCommission(new BigDecimal(0));
-        tradeInfo.setCharge(new BigDecimal(transferData.getTranFee()));
-        accEntryService.accEntryProcess(tradeInfo);
-    }
-    
-    
-    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void updateBatchTransferSingle(PojoTranBatch transferBatch){
-    	StringBuffer sqlBuffer = new StringBuffer("select count(*) from PojoTranData where 1=1 and tranBatchId = ? and status = ?");
+    	StringBuffer sqlBuffer = new StringBuffer("select count(*) from PojoTranData where 1=1 and tranBatch.tid = ? and status = ?");
     	Query query = getSession().createQuery(sqlBuffer.toString());
     	query.setParameter(0, transferBatch.getTid());
     	query.setParameter(1, "01");
     	Long count = ((Long) query.uniqueResult()).longValue();
     	if(count==0){
+    		transferBatch.setStatus("03");
     		transferBatch.setWaitApproveCount(0L);
     		transferBatch.setWaitApproveAmt(0L);
-    		transferBatch.setStatus("03");
     		transferBatch.setApproveFinishTime(new Date());
     	}else{
     		//查询未审核的总金额
-    		sqlBuffer = new StringBuffer("select sum(tranAmt) from PojoTranData where 1=1 and tranBatchId = ? and status = ?");
+    		sqlBuffer = new StringBuffer("select sum(tranAmt) from PojoTranData where 1=1 and tranBatch.tid = ? and status = ?");
     		query = getSession().createQuery(sqlBuffer.toString());
     		query.setParameter(0, transferBatch.getTid());
         	query.setParameter(1, "01");
@@ -180,17 +172,26 @@ public class TransferDataDAOImpl  extends HibernateBaseDAOImpl<PojoTranData> imp
 		// TODO Auto-generated method stub
 		String sql = "update PojoTranData set status= ? where tid = ?";
 		Query query = getSession().createQuery(sql);
-		query.setParameter(0, tid);
-		query.setParameter(1, status);
+		query.setParameter(0, status);
+		query.setParameter(1, tid);
 		query.executeUpdate();
 	}
 
 	@Override
 	public Long queryWaritTransferCount(Long tranBatchId) {
-		String sql = "select count(*) from PojoTranData  where tranBatchId = ? and status= ?";
+		String sql = "select count(*) from PojoTranData  where tranBatch.tid = ? and status= ?";
 		Query query = getSession().createQuery(sql);
 		query.setParameter(0, tranBatchId);
 		query.setParameter(1, "02");
 		return ((Long)query.uniqueResult()).longValue();
+	}
+	@Override
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+	public List<PojoTranData> queryWaritTransferData(Long tranBatchId) {
+		String sql = "from PojoTranData  where tranBatchId = ? and status= ?";
+		Query query = getSession().createQuery(sql);
+		query.setParameter(0, tranBatchId);
+		query.setParameter(1, "02");
+		return query.list();
 	}
 }

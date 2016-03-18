@@ -1,3 +1,4 @@
+
 /* 
  * PojoBankTransferChannel.java  
  * 
@@ -44,6 +45,8 @@ public class PojoBankTransferChannel {
     private String finalDeliverTime;
     /**银行渠道号（参照T_Channel）**/
     private String bankChannelCode;
+    /**行内行外（银行代码）01-行内 02-跨行**/
+    private String bankType;
     
     @GenericGenerator(name = "id_gen", strategy = "enhanced-table", parameters = {
             @Parameter(name = "table_name", value = "T_C_PRIMAY_KEY"),
@@ -103,4 +106,14 @@ public class PojoBankTransferChannel {
     public void setBankChannelCode(String bankChannelCode) {
         this.bankChannelCode = bankChannelCode;
     }
+    @Column(name = "BANK_TYPE")
+	public String getBankType() {
+		return bankType;
+	}
+	public void setBankType(String bankType) {
+		this.bankType = bankType;
+	}
+    
+    
 }
+

@@ -17,6 +17,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +38,7 @@ import com.zlebank.zplatform.trade.utils.ConsUtil;
  * @date 2015年11月3日 下午5:49:29
  * @since
  */
+@Service("reciveCurrentDateCMBCFileJob")
 public class ReciveCurrentDateCMBCFileJob {
     private static final Log log = LogFactory.getLog(ReciveCurrentDateCMBCFileJob.class);
     private static final String TARGETPATH = ConsUtil.getInstance().cons.getCmbc_download_file_path();

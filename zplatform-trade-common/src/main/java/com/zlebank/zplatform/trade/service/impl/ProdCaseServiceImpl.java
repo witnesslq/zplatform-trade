@@ -18,9 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.zlebank.zplatform.acc.bean.enums.BusiType;
 import com.zlebank.zplatform.commons.utils.StringUtil;
-import com.zlebank.zplatform.member.bean.MerchMK;
 import com.zlebank.zplatform.member.pojo.PojoMerchDeta;
-import com.zlebank.zplatform.member.service.MerchMKService;
 import com.zlebank.zplatform.member.service.MerchService;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.gateway.OrderBean;
@@ -75,7 +73,7 @@ public class ProdCaseServiceImpl extends BaseServiceImpl<ProdCaseModel, Long> im
         TxncodeDefModel busiModel = txncodeDefService.getBusiCode(order.getTxnType(), order.getTxnSubType(), order.getBizType());
         if(StringUtil.isNotEmpty(order.getMerId())){
         	member = merchService.getMerchBymemberId(order.getMerId());//memberService.getMemberByMemberId(order.getMerId());
-        	ProdCaseModel prodCase= getMerchProd(member.getPrdtver(),busiModel.getBusicode());
+        	ProdCaseModel prodCase= getMerchProd(member.getPrdtVer(),busiModel.getBusicode());
             if(prodCase==null){
                 resultBean = new ResultBean("GW26", "商户未开通此业务");
             }else {

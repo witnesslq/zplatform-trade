@@ -21,6 +21,10 @@ import com.zlebank.zplatform.trade.model.PojoTranData;
  * @since 
  */
 public class TransferData extends PojoTranData{
+    /**
+     * serialVersionUID
+     */
+    private static final long serialVersionUID = 6938007028762712840L;
     private String channelCode;
 
     public String getChannelCode() {

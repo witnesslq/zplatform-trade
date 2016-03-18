@@ -259,9 +259,9 @@ AbstractPagedQueryDAOImpl<PojoTranData, TransferDataQuery>
      * @return
      */
     @Override
-    public int getCountByInsteadDataId(String id) {
+    public int getCountByInsteadDataId(Long id) {
         Criteria crite = this.getSession().createCriteria(PojoTranData.class);
-        crite.add(Restrictions.eq("insteadDataId", String.valueOf(id)));
+        crite.add(Restrictions.eq("busiDataId", id));
         crite.setProjection(Projections.rowCount());  
         int count = Integer.parseInt(crite.uniqueResult().toString());
        return  count;

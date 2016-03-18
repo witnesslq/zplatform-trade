@@ -1,5 +1,6 @@
 package com.zlebank.zplatform.trade.dao;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -18,8 +19,9 @@ public interface TransferBatchDAO extends BaseDAO<PojoTranBatch>{
      * @param page
      * @param pageSize
      * @return
+     * @throws ParseException 
      */
-    public Map<String, Object> queryTransferBatchByPage(QueryTransferBean queryTransferBean,int page,int pageSize);
+    public Map<String, Object> queryTransferBatchByPage(QueryTransferBean queryTransferBean,int page,int pageSize) throws ParseException;
     
     /**
      * 更新划拨批次状态
@@ -36,11 +38,10 @@ public interface TransferBatchDAO extends BaseDAO<PojoTranBatch>{
     
     /**
      * 获取划拨批次数据
-     * @param batchno
+     * @param batchId
      * @return
      */
-    public PojoTranBatch getByBatchId(long batchno);
-    
+    public PojoTranBatch getByBatchId(long batchId);
     /**
      * 获取等待审核的划拨数据
      * @param batchId

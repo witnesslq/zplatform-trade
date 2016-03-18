@@ -13,6 +13,7 @@ package com.zlebank.zplatform.trade.factory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.zlebank.zplatform.commons.utils.StringUtil;
+import com.zlebank.zplatform.trade.adapter.insteadpay.IInsteadPayTrade;
 import com.zlebank.zplatform.trade.adapter.quickpay.IQuickPayTrade;
 import com.zlebank.zplatform.trade.adapter.quickpay.impl.ReaPayTradeThreadPool;
 import com.zlebank.zplatform.trade.adapter.quickpay.impl.TestTradeThreadPool;
@@ -90,6 +91,32 @@ public class TradeAdapterFactory {
         }
         return threadPool;
     }
+    
+    
+    public IInsteadPayTrade getInsteadPayTrade(String chnlcode) throws TradeException, ClassNotFoundException, InstantiationException, IllegalAccessException{
+        ChnlDetaModel chnlDetaModel = chnlDetaService.getChannelByCode(chnlcode);
+        IInsteadPayTrade  insteadPayTrade = null;
+        if(chnlDetaModel!=null){
+            if(StringUtil.isNotEmpty(chnlDetaModel.getImpl())){
+            	insteadPayTrade =(IInsteadPayTrade) Class.forName(chnlDetaModel.getImpl()).newInstance();
+            }
+        }else{
+            throw new TradeException("");
+        }
+       /* if(chnlcode.equals("98000001")){
+            //ZLQuickPayTrade quickPayTrade=new ZLQuickPayTrade();
+            //return quickPayTrade;
+            
+        }else if (chnlcode.equals("96000001")) {
+            ReaPayQuickTrade quickPayTrade = new ReaPayQuickTrade();
+            return quickPayTrade;
+        }else if (chnlcode.equals("95000001")) {
+            TestQuickTrade quickPayTrade = new TestQuickTrade();
+            return quickPayTrade;
+        }*/
+        return insteadPayTrade;
+    }
+    
     
     public static void main(String[] args) {
         try {

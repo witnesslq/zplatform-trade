@@ -34,6 +34,7 @@ import com.zlebank.zplatform.trade.cmbc.service.ICMBCTransferService;
 import com.zlebank.zplatform.trade.cmbc.service.IInsteadPayService;
 import com.zlebank.zplatform.trade.cmbc.service.IWithholdingService;
 import com.zlebank.zplatform.trade.dao.BankTransferBatchDAO;
+import com.zlebank.zplatform.trade.dao.BankTransferChannelDAO;
 import com.zlebank.zplatform.trade.dao.BankTransferDataDAO;
 import com.zlebank.zplatform.trade.dao.RealnameAuthDAO;
 import com.zlebank.zplatform.trade.dao.TransferBatchDAO;
@@ -86,7 +87,8 @@ public class CMBCTransferServiceImpl implements ICMBCTransferService{
     private BankTransferBatchDAO bankTransferBatchDAO;
     @Autowired
     private BankTransferDataDAO bankTransferDataDAO;
-    
+    @Autowired
+    private BankTransferChannelDAO bankTransferChannelDAO;
     /**
      * 实名认证
      * @param card
@@ -246,27 +248,26 @@ public class CMBCTransferServiceImpl implements ICMBCTransferService{
      * @return
      */
     @Override
-    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
-    public ResultBean batchTransfer(String batchNo) {
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+    public ResultBean batchTransfer(Long tid) {
         ResultBean resultBean = null;
         try {
             //检查批次信息是否正确
-        	PojoBankTransferBatch bankTransferBatch = bankTransferBatchDAO.getByBankTranBatchNo(Long.valueOf(batchNo));
+        	PojoBankTransferBatch bankTransferBatch = bankTransferBatchDAO.getById(tid);
            
             if(!"01".equals(bankTransferBatch.getTranStatus())){
                 return new ResultBean("", "无法划拨");
             }
             //生成交易日志
-            //List<PojoTranData> transferDataList = null;//transferDataDAO.findTransDataByBatchNo(batchNo);
-            //txnsLogService.saveTransferLogs(transferDataList);
-            
-            TransferTypeEnmu transferType = null;//TransferTypeEnmu.fromValue(transferBatch.getTransfertype());
+            List<PojoBankTransferData> transferDataList = bankTransferDataDAO.findTransDataByBatchNo(tid);
+            txnsLogService.saveBankTransferLogs(transferDataList);
+            TransferTypeEnmu transferType = TransferTypeEnmu.fromValue(bankTransferBatch.getChannel().getBankType());
             switch (transferType) {
                 case INNERBANK :
-                    insteadPayService.batchInnerPay(batchNo);
+                    insteadPayService.batchInnerPay(tid);
                     break;
                 case OUTERBANK :
-                    insteadPayService.batchOuterPay(batchNo);
+                    insteadPayService.batchOuterPay(tid);
                     break;
 				default:
 					break;

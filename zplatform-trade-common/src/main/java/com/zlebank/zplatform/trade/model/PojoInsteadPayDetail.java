@@ -10,7 +10,6 @@
  */
 package com.zlebank.zplatform.trade.model;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.persistence.CascadeType;
@@ -37,12 +36,10 @@ import org.hibernate.annotations.Parameter;
  */
 @Entity
 @Table(name="T_INSTEAD_PAY_DETAIL")
-public class PojoInsteadPayDetail {
+public class PojoInsteadPayDetail{
 
     /**标识**/
     private Long id;
-    /**批处理的ID（注意：不是报文中的批处理号）**/
-    private Long batchId;
     /**商户代码**/
     private String merId;
     /**商户订单号**/
@@ -50,7 +47,7 @@ public class PojoInsteadPayDetail {
     /**（人民币）156**/
     private String currencyCode;
     /**单笔金额(以分为单位，最长12位)**/
-    private BigDecimal amt;
+    private Long amt;
     /**产品类型(固定：000001)**/
     private String bizType;
     /**账号类型01:银行卡;02:存折**/
@@ -108,16 +105,18 @@ public class PojoInsteadPayDetail {
     /**交易流水号**/
     private String  txnseqno;
     /**手续费**/
-    private BigDecimal  txnfee;
-    /**代付流水号**/
-    private String tranDataSeqNo;
+    private Long  txnfee;
+    /**代付明细流水号**/
+    private String insteadPayDataSeqNo;
     /**申请时间**/
     private Date applyTime;
+    /**划拨流水ID**/
+    private Long tranDataId;
 
     private  PojoInsteadPayBatch insteadPayBatch;
 
-    @ManyToOne(cascade=CascadeType.ALL)
-    @JoinColumn(name = "BATCH_ID", insertable=false, updatable=false, nullable=false)
+    @ManyToOne
+    @JoinColumn(name = "BATCH_ID")
     public PojoInsteadPayBatch getInsteadPayBatch() {
         return insteadPayBatch;
     }
@@ -139,14 +138,7 @@ public class PojoInsteadPayDetail {
     }
     public void setId(Long id) {
         this.id = id;
-    }
-    @Column(name = "BATCH_ID")
-    public Long getBatchId() {
-        return batchId;
-    }
-    public void setBatchId(Long batchId) {
-        this.batchId = batchId;
-    }
+    } 
     @Column(name = "MER_ID")
     public String getMerId() {
         return merId;
@@ -169,10 +161,10 @@ public class PojoInsteadPayDetail {
         this.currencyCode = currencyCode;
     }
     @Column(name = "AMT")
-    public BigDecimal getAmt() {
+    public Long getAmt() {
         return amt;
     }
-    public void setAmt(BigDecimal amt) {
+    public void setAmt(Long amt) {
         this.amt = amt;
     }
     @Column(name = "BIZ_TYPE")
@@ -375,18 +367,11 @@ public class PojoInsteadPayDetail {
         this.txnseqno = txnseqno;
     }
     @Column(name = "TXNFEE")
-    public BigDecimal getTxnfee() {
+    public Long getTxnfee() {
         return txnfee;
     }
-    public void setTxnfee(BigDecimal txnfee) {
+    public void setTxnfee(Long txnfee) {
         this.txnfee = txnfee;
-    }
-    @Column(name = "TRAN_DATA_SEQ_NO")
-    public String getTranDataSeqNo() {
-        return tranDataSeqNo;
-    }
-    public void setTranDataSeqNo(String tranDataSeqNo) {
-        this.tranDataSeqNo = tranDataSeqNo;
     }
     @Column(name = "APPLY_TIME")
     public Date getApplyTime() {
@@ -395,5 +380,18 @@ public class PojoInsteadPayDetail {
     public void setApplyTime(Date applyTime) {
         this.applyTime = applyTime;
     }
-    
+    @Column(name = "INSTEAD_PAY_DATA_SEQ_NO")
+    public String getInsteadPayDataSeqNo() {
+        return insteadPayDataSeqNo;
+    }
+    public void setInsteadPayDataSeqNo(String insteadPayDataSeqNo) {
+        this.insteadPayDataSeqNo = insteadPayDataSeqNo;
+    }
+    @Column(name = "TRAN_DATA_ID")
+    public Long getTranDataId() {
+        return tranDataId;
+    }
+    public void setTranDataId(Long tranDataId) {
+        this.tranDataId = tranDataId;
+    }
 }

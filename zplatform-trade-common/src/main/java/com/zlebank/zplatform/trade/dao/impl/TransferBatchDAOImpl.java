@@ -1,6 +1,7 @@
 package com.zlebank.zplatform.trade.dao.impl;
 
 import java.awt.color.CMMException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zlebank.zplatform.commons.dao.impl.HibernateBaseDAOImpl;
+import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.bean.page.QueryTransferBean;
 import com.zlebank.zplatform.trade.dao.TransferBatchDAO;
@@ -36,89 +38,56 @@ public class TransferBatchDAOImpl extends HibernateBaseDAOImpl<PojoTranBatch>
     @Transactional(readOnly = true)
     public Map<String, Object> queryTransferBatchByPage(QueryTransferBean queryTransferBean,
             int page,
-            int pageSize) {
+            int pageSize) throws ParseException {
         StringBuffer sqlBuffer = new StringBuffer(
-                "from PojoTranBatch where 1=1 ");
+                "from PojoTranBatch where  (status = ? or status = ?)");
         StringBuffer sqlCountBuffer = new StringBuffer(
-                "select count(1) as total from PojoTranBatch  where 1=1 ");
-        List<String> parameterList = new ArrayList<String>();
+                "select count(*) from PojoTranBatch  where (status = ? or status = ?)");
+        List<Object> parameterList = new ArrayList<Object>();
+        parameterList.add("01");
+        parameterList.add("02");
         if (queryTransferBean != null) {
             if (StringUtil.isNotEmpty(queryTransferBean.getBatchNo())) {
-                sqlBuffer.append(" and tid = ? ");
-                sqlCountBuffer.append(" and tid = ? ");
+                sqlBuffer.append(" and tranBatchNo = ? ");
+                sqlCountBuffer.append(" and tranBatchNo = ? ");
                 parameterList.add(queryTransferBean.getBatchNo());
             }
             if (StringUtil.isNotEmpty(queryTransferBean.getBeginDate())) {
                 sqlBuffer.append(" and applyTime >= ? ");
                 sqlCountBuffer.append(" and applyTime >= ? ");
-                parameterList.add(queryTransferBean.getBeginDate());
+                parameterList.add(DateUtil.convertToDate(queryTransferBean.getBeginDate(), "yyyy-MM-dd"));
             }
             if (StringUtil.isNotEmpty(queryTransferBean.getEndDate())) {
                 sqlBuffer.append(" and applyTime <= ? ");
                 sqlCountBuffer.append(" and applyTime <= ? ");
-                parameterList.add(queryTransferBean.getEndDate());
+                parameterList.add(DateUtil.convertToDate(queryTransferBean.getEndDate(), "yyyy-MM-dd"));
             }
-            if (StringUtil.isNotEmpty(queryTransferBean.getEndDate())) {
-                sqlBuffer.append(" and status = ? ");
-                sqlCountBuffer.append(" and status = ? ");
-                parameterList.add(queryTransferBean.getStatus());
+            if(StringUtil.isNotEmpty(queryTransferBean.getBusiType())){
+            	sqlBuffer.append(" and busiType = ? ");
+                sqlCountBuffer.append(" and busiType = ? ");
+                parameterList.add(queryTransferBean.getBusiType());
             }
         }
         Query query = getSession().createQuery(sqlBuffer.toString());
-        // Query countQuery =
-        // getSession().createQuery(sqlCountBuffer.toString());
+        Query countQuery =
+        getSession().createQuery(sqlCountBuffer.toString());
         int i = 0;
-        for (String parameter : parameterList) {
+        for (Object parameter : parameterList) {
             query.setParameter(i, parameter);
-            // countQuery.setParameter(i, parameter);
+            countQuery.setParameter(i, parameter);
             i++;
         }
         query.setFirstResult((pageSize) * ((page == 0 ? 1 : page) - 1));
         query.setMaxResults(pageSize);
 
-        // Map<String, BigDecimal> valueMap = (Map<String, BigDecimal>)
-        // query.uniqueResult();
-        // Long total = valueMap.get("TOTAL").longValue();
+         
+        
         Map<String, Object> resultMap = new HashMap<String, Object>();
-        resultMap.put("total",
-                queryTransferBatchCount(queryTransferBean, page, pageSize));
+        resultMap.put("total", countQuery.uniqueResult());
         resultMap.put("rows", query.list());
         return resultMap;
     }
-    @Transactional(readOnly = true)
-    public Long queryTransferBatchCount(QueryTransferBean queryTransferBean,
-            int page,
-            int pageSize) {
-        StringBuffer sqlCountBuffer = new StringBuffer(
-                "select count(*) from PojoTranBatch  where 1=1 ");
-        List<String> parameterList = new ArrayList<String>();
-        if (queryTransferBean != null) {
-            if (StringUtil.isNotEmpty(queryTransferBean.getBatchNo())) {
-                sqlCountBuffer.append(" and tid = ? ");
-                parameterList.add(queryTransferBean.getBatchNo());
-            }
-            if (StringUtil.isNotEmpty(queryTransferBean.getBeginDate())) {
-                sqlCountBuffer.append(" and applyTime >= ? ");
-                parameterList.add(queryTransferBean.getBeginDate());
-            }
-            if (StringUtil.isNotEmpty(queryTransferBean.getEndDate())) {
-                sqlCountBuffer.append(" and applyTime <= ? ");
-                parameterList.add(queryTransferBean.getEndDate());
-            }
-            if (StringUtil.isNotEmpty(queryTransferBean.getEndDate())) {
-                sqlCountBuffer.append(" and status = ? ");
-                parameterList.add(queryTransferBean.getStatus());
-            }
-        }
-        Query countQuery = getSession().createQuery(sqlCountBuffer.toString());
-        int i = 0;
-        for (String parameter : parameterList) {
-            countQuery.setParameter(i, parameter);
-            i++;
-        }
-        return ((Long) countQuery.uniqueResult()).longValue();
-    }
-
+   
     @Transactional
     public void updateBatchTransferFinish(PojoTranBatch transferBatch) {
         // TODO Auto-generated method stub
@@ -136,7 +105,7 @@ public class TransferBatchDAOImpl extends HibernateBaseDAOImpl<PojoTranBatch>
     @Transactional(readOnly = true)
     public List<PojoTranData> queryWaitTrialTranData(long tranBatchId) {
         StringBuffer sqlBuffer = new StringBuffer(
-                "from PojoTranData where 1=1 and tranBatchId = ? and status = ?");
+                "from PojoTranData where 1=1 and tranBatch.tid = ? and status = ?");
         Query query = getSession().createQuery(sqlBuffer.toString());
         query.setParameter(0, tranBatchId);
         query.setParameter(1, "01");

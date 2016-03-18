@@ -47,15 +47,18 @@ public class SplitTest {
     @Test   
     @Transactional
     public void testSplitTest() {
-//        PojoTranData pojo = createTranData();
-//        pojo = tranDataDAO.merge(pojo);
-        PojoTranData pojo = tranDataDAO.get(185);
-        PojoTranData pojo2 = tranDataDAO.get(186);
-        PojoTranData pojo3 = tranDataDAO.get(187);
-        PojoTranData[] datas = new PojoTranData[3];
+        // 创建划拨
+        PojoTranData cpojo = createTranData();
+        cpojo = tranDataDAO.merge(cpojo);
+        
+        // 批次算法
+        PojoTranData pojo = tranDataDAO.get(117);
+        PojoTranData pojo2 = tranDataDAO.get(118);
+//        PojoTranData pojo3 = tranDataDAO.get(1135);
+        PojoTranData[] datas = new PojoTranData[2];
         datas[0] = pojo;
         datas[1] = pojo2;
-        datas[2] = pojo3;
+//        datas[2] = pojo3;
         try {
             service.split(datas );
         } catch (Exception e) {
@@ -73,7 +76,7 @@ public class SplitTest {
         pojo.setTranDataSeqNo(seqNoService.getBatchNo(SeqNoEnum.TRAN_DATA_NO));// "划拨流水序列号"
 
         //pojo.setTranBatch(new PojoTranBatch());// "划拨批次序列号"
-        pojo.setBusiDataId("1003");// "代付流水号"
+        pojo.setBusiDataId(1003L);// "代付流水号"
 
         pojo.setAccType("0");// "账户类型(0:对私账户1：对公账户)"
         pojo.setAccNo("6225010100010001");// "账户号"

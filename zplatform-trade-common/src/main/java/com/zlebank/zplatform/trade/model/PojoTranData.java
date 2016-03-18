@@ -53,7 +53,7 @@ public class PojoTranData implements Serializable {
     /** "业务类型" **/
     private String busiType;
     /** "业务流水号" **/
-    private String busiDataId;
+    private Long busiDataId;
     /** "账户类型(0:对私账户1：对公账户)" **/
     /** "账户号" **/
     private String accType;
@@ -91,7 +91,7 @@ public class PojoTranData implements Serializable {
             @Parameter(name = "table_name", value = "T_C_PRIMAY_KEY"),
             @Parameter(name = "value_column_name", value = "NEXT_ID"),
             @Parameter(name = "segment_column_name", value = "KEY_NAME"),
-            @Parameter(name = "segment_value", value = "T_TRANSFER_BATCH_ID"),
+            @Parameter(name = "segment_value", value = "T_TRANSFER_DATA_ID"),
             @Parameter(name = "increment_size", value = "1"),
             @Parameter(name = "optimizer", value = "pooled-lo")})
     @Id
@@ -118,10 +118,10 @@ public class PojoTranData implements Serializable {
         this.busiType = busiType;
     }
     @Column(name = "BUSI_DATA_ID")
-    public String getBusiDataId() {
+    public Long getBusiDataId() {
         return busiDataId;
     }
-    public void setBusiDataId(String busiDataId) {
+    public void setBusiDataId(Long busiDataId) {
         this.busiDataId = busiDataId;
     }
 

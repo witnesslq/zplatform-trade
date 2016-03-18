@@ -73,7 +73,7 @@ public class PojoTranBatch implements Serializable{
     /**"业务类型（00：代付01：提现02：退款）"**/
     private String busiType;
     /**"业务批次ID"**/
-    private String busiBatchId;
+    private Long busiBatchId;
     /**"银行转账完成时间"**/
     @JSONField (format="yyyy-MM-dd HH:mm:ss") 
     private Date finishTime; 
@@ -182,10 +182,10 @@ public class PojoTranBatch implements Serializable{
         this.busiType = busiType;
     }
     @Column(name = "BUSI_BATCH_ID")
-    public String getBusiBatchId() {
+    public Long getBusiBatchId() {
         return busiBatchId;
     }
-    public void setBusiBatchId(String busiBatchId) {
+    public void setBusiBatchId(Long busiBatchId) {
         this.busiBatchId = busiBatchId;
     }
     @Column(name = "FINISH_TIME")

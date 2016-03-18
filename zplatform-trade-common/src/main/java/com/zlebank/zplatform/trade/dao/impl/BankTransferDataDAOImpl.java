@@ -14,17 +14,22 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zlebank.zplatform.commons.bean.TransferDataQuery;
 import com.zlebank.zplatform.commons.dao.impl.HibernateBaseDAOImpl;
+import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.bean.enums.InsteadPayTypeEnum;
 import com.zlebank.zplatform.trade.bean.page.QueryTransferBean;
 import com.zlebank.zplatform.trade.dao.BankTransferDataDAO;
+import com.zlebank.zplatform.trade.dao.TranBatchDAO;
+import com.zlebank.zplatform.trade.dao.TranDataDAO;
 import com.zlebank.zplatform.trade.model.PojoBankTransferData;
+import com.zlebank.zplatform.trade.model.PojoTranData;
 @Repository("bankTransferDataDAO")
 public class BankTransferDataDAOImpl  extends
 HibernateBaseDAOImpl<PojoBankTransferData>
@@ -32,6 +37,11 @@ HibernateBaseDAOImpl<PojoBankTransferData>
         BankTransferDataDAO {
     private static final Log log = LogFactory.getLog(BankTransferDataDAOImpl.class);
 
+    @Autowired 
+    private TranBatchDAO tranBatchDAO;
+    @Autowired
+    private TranDataDAO tranDataDAO;
+    
     /**
      * 通过批次号查找划拨数据
      * 
@@ -41,14 +51,13 @@ HibernateBaseDAOImpl<PojoBankTransferData>
     @SuppressWarnings("unchecked")
 	@Override
     @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
-    public List<PojoBankTransferData> findTransDataByBatchNo(String batchNo) {
+    public List<PojoBankTransferData> findTransDataByBatchNo(Long tid) {
         List<PojoBankTransferData> result = null;
-        String queryString = " from PojoBankTransferData where bankTranBatchId = ? and status = ?";
+        String queryString = " from PojoBankTransferData where bankTranBatch.tid = ?";
         try {
             log.info("queryString:" + queryString);
             Query query = getSession().createQuery(queryString);
-            query.setLong(0, Long.valueOf(batchNo));
-            query.setString(1, "03");
+            query.setLong(0, tid);
             result = query.list();
         } catch (HibernateException e) {
             // TODO Auto-generated catch block
@@ -59,21 +68,20 @@ HibernateBaseDAOImpl<PojoBankTransferData>
 
     /**
      * 通过批次号更新划拨数据
-     * 
      * @param batchNo
      * @param payType
      */
     @Override
     @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
-    public void updateTransDataStatusByBatchNo(String batchNo,
-            InsteadPayTypeEnum payType) {
+    public void updateTransDataStatusByBatchNo(Long tid,InsteadPayTypeEnum payType) {
         try {
-            String hql = "update PojoBankTransferData set status = ? where batchno = ?";
+            String hql = "update PojoBankTransferData set status = ? where bankTranBatch.tid = ?";
             Session session = getSession();
             Query query = session.createQuery(hql);
             query.setParameter(0, payType.getCode());
-            query.setParameter(1, batchNo);
+            query.setParameter(1, tid);
             query.executeUpdate();
+            session.clear();
         } catch (HibernateException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -99,51 +107,52 @@ HibernateBaseDAOImpl<PojoBankTransferData>
 
     @Transactional(propagation=Propagation.REQUIRES_NEW)
     public void batchUpdateTransData(List<PojoBankTransferData> transferDataList) {
-        /*StringBuffer hqlBuffer = new StringBuffer();
-        hqlBuffer.append("update PojoBankTransferData set banktranid = ?, ");
-        hqlBuffer.append("resptype = ?,");
-        hqlBuffer.append("respcode = ?,");
-        hqlBuffer.append("respmsg = ?,");
-        hqlBuffer.append("trandate = ?,");
-        hqlBuffer.append("trantime = ?, ");
-        hqlBuffer.append("status = ?, ");
-        hqlBuffer.append("accstatus = ? ");
-        hqlBuffer.append("where tranid = ? ");
+        StringBuffer hqlBuffer = new StringBuffer();
+        hqlBuffer.append("update PojoBankTransferData set bankTranResNo = ?, ");
+        hqlBuffer.append("resType = ?,");
+        hqlBuffer.append("resCode = ?,");
+        hqlBuffer.append("resInfo = ?,");
+        hqlBuffer.append("status = ? ");
+        hqlBuffer.append("where bankTranDataSeqNo = ? ");
         Session session = getSession();
         for (PojoBankTransferData data : transferDataList) {
-            PojoBankTransferData data_old = getTransferDataByTranId(data.getTranid());
             Query query = session.createQuery(hqlBuffer.toString());
-            query.setParameter(0, data.getBanktranid());
-            query.setParameter(1, data.getResptype());
-            query.setParameter(2, data.getRespcode());
-            query.setParameter(3, data.getRespmsg());
-            query.setParameter(4, data.getTrandate());
-            query.setParameter(5, data.getTrantime());
-            query.setParameter(6, "S".equalsIgnoreCase(data.getResptype())? "00": "03");
-            query.setParameter(7, "01");
-            query.setParameter(8, data.getTranid());
+            PojoBankTransferData data_old = getTransferDataByTranId(data.getBankTranDataSeqNo());
+            query.setParameter(0, data.getBankTranResNo());
+            query.setParameter(1, data.getResType());
+            query.setParameter(2, data.getResCode());
+            query.setParameter(3, data.getResInfo());
+            query.setParameter(4, "S".equalsIgnoreCase(data.getResType())? "00": "03");
+            query.setParameter(5, data.getBankTranDataSeqNo());
             query.executeUpdate();
             
             
             query = session.createQuery("update TxnsLogModel set payretcode=?,payretinfo=?,payordfintime=?,payrettsnseqno=?,retcode=?,retinfo=?, tradeseltxn=? where txnseqno=?");
-            if("S".equalsIgnoreCase(data.getResptype())){
+            if("S".equalsIgnoreCase(data.getResType())){
                 query.setParameter(0, "000000");
                 query.setParameter(1, "交易成功");
                 query.setParameter(4, "0000");
                 query.setParameter(5, "交易成功");
             }else{
-                query.setParameter(0, data.getRespcode());
-                query.setParameter(1, data.getRespmsg());
-                query.setParameter(4, data.getRespcode());
-                query.setParameter(5, data.getRespmsg());
+                query.setParameter(0, data.getResCode());
+                query.setParameter(1, data.getResInfo());
+                query.setParameter(4, data.getResCode());
+                query.setParameter(5, data.getResInfo());
             }
             query.setParameter(2, DateUtil.getCurrentDateTime());
-            query.setParameter(3, data.getBanktranid());
+            query.setParameter(3, data.getBankTranResNo());
             query.setParameter(6, UUID.randomUUID().toString().replaceAll("-", "").toUpperCase());
-            query.setParameter(7, data_old.getTxnseqno());
+            query.setParameter(7, data_old.getTranData().getTxnseqno());
             query.executeUpdate();
+            
+            //更新划拨数据
+            PojoTranData tranData = data_old.getTranData();
+            tranData.setStatus("S".equalsIgnoreCase(data.getResType())? "02": "03");
+            tranDataDAO.update(tranData);
+            //更新划拨批次信息
+            tranBatchDAO.updateBankTransferResult(data_old.getTranData().getTranBatch().getTid());
         }
-*/
+
     }
 
     @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
@@ -234,10 +243,10 @@ HibernateBaseDAOImpl<PojoBankTransferData>
        return  (PojoBankTransferData) crite.uniqueResult();
     }
 
-    public PojoBankTransferData getTransferDataByTranId(String tranid) {
+    public PojoBankTransferData getTransferDataByTranId(String bankTranDataSeqNo) {
         Criteria crite = this.getSession().createCriteria(
                 PojoBankTransferData.class);
-        crite.add(Restrictions.eq("tranid", tranid));
+        crite.add(Restrictions.eq("bankTranDataSeqNo", bankTranDataSeqNo));
        return  (PojoBankTransferData) crite.uniqueResult();
     }
     
@@ -266,10 +275,10 @@ HibernateBaseDAOImpl<PojoBankTransferData>
 		StringBuffer sqlCountBuffer = new StringBuffer("select count(*) from PojoBankTransferData where 1=1 ");
 		List<Object> parameterList = new ArrayList<Object>();
 		if(queryTransferBean!=null){
-			if(StringUtil.isNotEmpty(queryTransferBean.getBatchNo())){
-				sqlBuffer.append(" and bankTranBatchId = ? ");
-				sqlCountBuffer.append(" and bankTranBatchId = ? ");
-				parameterList.add(Long.valueOf(queryTransferBean.getBatchNo()));
+			if(queryTransferBean.getTid()!=0){
+				sqlBuffer.append(" and bankTranBatch.tid = ? ");
+				sqlCountBuffer.append(" and bankTranBatch.tid = ? ");
+				parameterList.add(queryTransferBean.getTid());
 			}
 			if(StringUtil.isNotEmpty(queryTransferBean.getStatus())){
 				sqlBuffer.append(" and status = ? ");
@@ -307,7 +316,7 @@ HibernateBaseDAOImpl<PojoBankTransferData>
 			String status) {
 		
 		 try {
-	            String hql = "update PojoBankTransferData set status = ? where bankTranBatchId = ? and status = ?";
+	            String hql = "update PojoBankTransferData set status = ? where bankTranBatch.tid = ? and status = ?";
 	            Session session = getSession();
 	            Query query = session.createQuery(hql);
 	            query.setParameter(0, status);

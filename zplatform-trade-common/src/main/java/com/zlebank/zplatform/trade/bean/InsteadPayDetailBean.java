@@ -10,6 +10,7 @@
  */
 package com.zlebank.zplatform.trade.bean;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import com.zlebank.zplatform.commons.bean.Bean;
@@ -41,7 +42,7 @@ public class InsteadPayDetailBean implements Bean{
     private String accType;
     /**账号**/
     private String accNo;
-    /**户名**/
+    /**户名**/    
     private String accName;
     /**开户行代码帐号类型取值为“02”时不能为空**/
     private String bankCode;
@@ -89,292 +90,242 @@ public class InsteadPayDetailBean implements Bean{
     private Long inuser;
     /**写入时间**/
     private Date intime;
-    /**批次Id**/
-    private Long batchNo;
-    /**交易序列号**/
-    private String txnseqno;
-    
-    public String getTxnseqno() {
-        return txnseqno;
-    }
-
-    public void setTxnseqno(String txnseqno) {
-        this.txnseqno = txnseqno;
-    }
-
+    /**交易流水号**/
+    private String  txnseqno;
+    /**手续费**/
+    private BigDecimal  txnfee;
+    /**代付明细流水号**/
+    private String insteadPayDataSeqNo;
+    /**申请时间**/
+    private Date applyTime;
+    /**划拨流水ID**/
+    private Long tranDataId;
     public Long getId() {
         return id;
     }
-
     public void setId(Long id) {
         this.id = id;
     }
-
     public Long getBatchId() {
         return batchId;
     }
-
     public void setBatchId(Long batchId) {
         this.batchId = batchId;
     }
-
     public String getMerId() {
         return merId;
     }
-
     public void setMerId(String merId) {
         this.merId = merId;
     }
-
     public String getOrderId() {
         return orderId;
     }
-
     public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
-
     public String getCurrencyCode() {
         return currencyCode;
     }
-
     public void setCurrencyCode(String currencyCode) {
         this.currencyCode = currencyCode;
     }
-
     public String getAmt() {
         return amt;
     }
-
     public void setAmt(String amt) {
         this.amt = amt;
     }
-
     public String getBizType() {
         return bizType;
     }
-
     public void setBizType(String bizType) {
         this.bizType = bizType;
     }
-
     public String getAccType() {
         return accType;
     }
-
     public void setAccType(String accType) {
         this.accType = accType;
     }
-
     public String getAccNo() {
         return accNo;
     }
-
     public void setAccNo(String accNo) {
         this.accNo = accNo;
     }
-
     public String getAccName() {
         return accName;
     }
-
     public void setAccName(String accName) {
         this.accName = accName;
     }
-
     public String getBankCode() {
         return bankCode;
     }
-
     public void setBankCode(String bankCode) {
         this.bankCode = bankCode;
     }
-
     public String getIssInsProvince() {
         return issInsProvince;
     }
-
     public void setIssInsProvince(String issInsProvince) {
         this.issInsProvince = issInsProvince;
     }
-
     public String getIssInsCity() {
         return issInsCity;
     }
-
     public void setIssInsCity(String issInsCity) {
         this.issInsCity = issInsCity;
     }
-
     public String getIssInsName() {
         return issInsName;
     }
-
     public void setIssInsName(String issInsName) {
         this.issInsName = issInsName;
     }
-
     public String getCertifTp() {
         return certifTp;
     }
-
     public void setCertifTp(String certifTp) {
         this.certifTp = certifTp;
     }
-
     public String getCertifId() {
         return certifId;
     }
-
     public void setCertifId(String certifId) {
         this.certifId = certifId;
     }
-
     public Long getPhoneNo() {
         return phoneNo;
     }
-
     public void setPhoneNo(Long phoneNo) {
         this.phoneNo = phoneNo;
     }
-
     public String getBillType() {
         return billType;
     }
-
     public void setBillType(String billType) {
         this.billType = billType;
     }
-
     public String getNotes() {
         return notes;
     }
-
     public void setNotes(String notes) {
         this.notes = notes;
     }
-
     public String getStatus() {
         return status;
     }
-
     public void setStatus(String status) {
         this.status = status;
     }
-
     public Long getStexauser() {
         return stexauser;
     }
-
     public void setStexauser(Long stexauser) {
         this.stexauser = stexauser;
     }
-
     public Date getStexatime() {
         return stexatime;
     }
-
     public void setStexatime(Date stexatime) {
         this.stexatime = stexatime;
     }
-
     public String getStexaopt() {
         return stexaopt;
     }
-
     public void setStexaopt(String stexaopt) {
         this.stexaopt = stexaopt;
     }
-
     public Long getCvlexauser() {
         return cvlexauser;
     }
-
     public void setCvlexauser(Long cvlexauser) {
         this.cvlexauser = cvlexauser;
     }
-
     public Date getCvlexatime() {
         return cvlexatime;
     }
-
     public void setCvlexatime(Date cvlexatime) {
         this.cvlexatime = cvlexatime;
     }
-
     public String getCvlexaopt() {
         return cvlexaopt;
     }
-
     public void setCvlexaopt(String cvlexaopt) {
         this.cvlexaopt = cvlexaopt;
     }
-
     public String getChannelCode() {
         return channelCode;
     }
-
     public void setChannelCode(String channelCode) {
         this.channelCode = channelCode;
     }
-
     public String getBatchFileNo() {
         return batchFileNo;
     }
-
     public void setBatchFileNo(String batchFileNo) {
         this.batchFileNo = batchFileNo;
     }
-
     public String getRespCode() {
         return respCode;
     }
-
     public void setRespCode(String respCode) {
         this.respCode = respCode;
     }
-
     public String getRespMsg() {
         return respMsg;
     }
-
     public void setRespMsg(String respMsg) {
         this.respMsg = respMsg;
     }
-
     public String getRemarks() {
         return remarks;
     }
-
     public void setRemarks(String remarks) {
         this.remarks = remarks;
     }
-
     public Long getInuser() {
         return inuser;
     }
-
     public void setInuser(Long inuser) {
         this.inuser = inuser;
     }
-
     public Date getIntime() {
         return intime;
     }
-
     public void setIntime(Date intime) {
         this.intime = intime;
     }
-
-    public Long getBatchNo() {
-        return batchNo;
+    public String getTxnseqno() {
+        return txnseqno;
     }
-
-    public void setBatchNo(Long batchNo) {
-        this.batchNo = batchNo;
+    public void setTxnseqno(String txnseqno) {
+        this.txnseqno = txnseqno;
     }
-    
-    
-    
-
+    public BigDecimal getTxnfee() {
+        return txnfee;
+    }
+    public void setTxnfee(BigDecimal txnfee) {
+        this.txnfee = txnfee;
+    }
+    public String getInsteadPayDataSeqNo() {
+        return insteadPayDataSeqNo;
+    }
+    public void setInsteadPayDataSeqNo(String insteadPayDataSeqNo) {
+        this.insteadPayDataSeqNo = insteadPayDataSeqNo;
+    }
+    public Date getApplyTime() {
+        return applyTime;
+    }
+    public void setApplyTime(Date applyTime) {
+        this.applyTime = applyTime;
+    }
+    public Long getTranDataId() {
+        return tranDataId;
+    }
+    public void setTranDataId(Long tranDataId) {
+        this.tranDataId = tranDataId;
+    }
 }

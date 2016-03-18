@@ -33,7 +33,18 @@ public class ChannelGenerator {
      * @return 渠道代码
      */
     public String getChannel(ChannelCondition channel) {
-        return defaultChannel();
+        String channelCode = null;
+        if (channel != null) {
+            if ("01".equals(channel.getBankType())) {
+                channelCode = "10000001";
+            }
+            if ("02".equals(channel.getBankType())) {
+                channelCode = "10000002";
+            }
+        } else {
+            return defaultChannel();
+        }
+        return channelCode;
     }
 
     /**

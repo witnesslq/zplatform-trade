@@ -88,6 +88,12 @@ public interface ITxnsLogService extends IBaseService<TxnsLogModel, String>{
     public void saveTransferLogs(List<PojoTranData> transferDataList);
     
     /**
+     * 保存划拨交易流水交易
+     * @param transferDataList
+     */
+    public void saveBankTransferLogs(List<PojoBankTransferData> transferDataList);
+    
+    /**
      * 获取风控策略
      * @param orders
      * @return

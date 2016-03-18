@@ -26,11 +26,24 @@ import com.zlebank.zplatform.trade.model.PojoInsteadPayDetail;
  */
 public interface InsteadPayDetailDAO extends   BasePagedQueryDAO<PojoInsteadPayDetail, InsteadPayDetailQuery>{
     /**
-     * 通过批次号得到批次明细
+     * 通过批次号得到代付明细
      * @param batchNo
      * @return
      */
     public List<PojoInsteadPayDetail> getByBatchDetail(String batchNo);
+    /**
+     * 通过批次ID得到代付明细
+     * @param batchNo
+     * @return
+     */
+    public List<PojoInsteadPayDetail> getBatchDetailByBatchId(Long batchId);
+    
+    /**
+     * 通过代付流水ID得到代付明细
+     * @param ids
+     * @return
+     */
+    public List<PojoInsteadPayDetail>  getBatchDetailByIds(List<Long> ids); 
     
     /**
      * 更新代付交易结果
@@ -38,7 +51,20 @@ public interface InsteadPayDetailDAO extends   BasePagedQueryDAO<PojoInsteadPayD
      */
     public void updateBatchDetailResult(PojoInsteadPayDetail insteadPayDetail);
     
+    /**
+     * 根据交易序列号取流水
+     * @param txnseqno
+     * @param status
+     * @return
+     */
     public PojoInsteadPayDetail getDetailByTxnseqno(String txnseqno,String status);
+    
+    /**
+     * 根据交易序列号取流水
+     * @param txnseqno
+     * @return
+     */
+    PojoInsteadPayDetail getDetailByTxnseqno(String txnseqno);
     
     
     }
