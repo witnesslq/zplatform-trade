@@ -20,7 +20,7 @@ String path = request.getContextPath();
 	<script type="text/javascript" src="<%=basePath %>js/jscroller-0.4.js"></script>
 	<style type="text/css">
 	.fastPaybank{
-		width: 195px;
+		width: 200px;
 	    line-height: 28px;
 		cursor: pointer;
 		background-color: #fff;
@@ -325,49 +325,29 @@ String path = request.getContextPath();
 						<c:if test="${bindFlag=='1'||fn:length(cardList)>0}">
 						<form method="post" action="/zplatform-trade/gateway/bindPay.htm?txnseqno_=${txnseqno }" id="bank_form">
 							<input type="hidden" value="bindingpay" name="payFlag"/>
-							<input type="hidden" value="${orderId }" name="orderId">
+							<input type="hidden" value="${orderId }" name="orderId"/>
 							<input type="hidden" value="${txnAmt }" name="amount" />
 							<input type="hidden" value="${txnseqno }" name="txnseqno"/>
 							<input type="hidden" value="${merchId }" name="merchId"/>
 							<input type="hidden" value="ZLC00001" name="cashCode"/>
 							<input type="hidden" value="${busicode }" name="busicode"/>
 							<input type="hidden" value="${goodsName }" name="goodsName"/>
-							<input type="hidden" value="${merchName }" name="merchName">
+							<input type="hidden" value="${merchName }" name="merchName"/>
 							<input type="hidden" value="${subMerName }" name="subMerName" />
 							<input type="hidden" value="${memberId }" name="merUserId" />
 							<input type="hidden" value="${busitype }" name="busitype" />
 							<input type="hidden" value="${memberIP }" name="memberIP" />
 							<input type="hidden" value="${tn }" name="tn" />
-											
+							<input type="hidden" id="rad_bankCode" name="bankCode"/>
 							<div class="payment_list per">
 							<div class="select-banklist per">		
 								<ul style="height:60px;" id="default_bank">
-									<c:if test="${bindFlag=='1' }">
-								      	<li>
-										    <label for="communications_radio" class="fastPaybank" title="">
-										    <input type="radio" name="bankCode" value="0102"  checked="checked" id="def_bank"/>
-											    <span title="" class="" id="bank_lab" style=""></span>
-											    <span class="bank-name"></span>
-											    <span class="card-number">**${fn:substring(memberCard.cardno,fn:length(memberCard.cardno)-4, fn:length(memberCard.cardno))}</span>
-											    <input type="hidden" name="cardNo" id="" value="${memberCard.cardno}"/>
-											    <input type="hidden" name="cardId" id="" value="${memberCard.id}"/>
-											    <input type="hidden" name="bindCardId" id="" value="${memberCard.id}"/>
-											    <input type="hidden" name="acctName" id="" value="${memberCard.accname}"/>
-											    <input type="hidden" name="certId" id="" value="${memberCard.idnum}"/>
-											    <input type="hidden" name="mobile" id="" value="${memberCard.phone}"/>
-											    <input type="hidden" id="default_bank_code" value="${memberCard.bankcode}"/>
-										    
-										    </label>
-								      	</li>
-								      	
-									</c:if>
-								
 									<c:forEach var="card" items="${cardList }" varStatus="i" >
 										<c:if test="${i.index==0 }">
 											
 											<li>
 												<label for="communications_radio" class="fastPaybank" title="${card.bankname }" >
-											    	<input type="radio" name="bindCardId" checked="checked" value="${card.id}" index="${i.index }" />
+											    	<input type="radio" name="bindCardId"  value="${card.id}" index="${i.index }" checked="checked" />
 											    	<span title="" class="" id="bank_lab_${i.index }" ></span>
 											    	<span class="card-number">**${fn:substring(card.cardno,fn:length(card.cardno)-4, fn:length(card.cardno))} </span>
 											    	<input type="hidden" name="bankCode_" id="radio_bank_${i.index}" value="${fn:substring(card.bankcode,0, 4)}"/>
@@ -399,21 +379,21 @@ String path = request.getContextPath();
 						
 						<form method="post" action="/zplatform-trade/gateway/toFastPay.htm?txnseqno_=${txnseqno }" id="other_bank_form">
 							<input type="hidden" value="${memberIP }" name="memberIP" />
-							<input type="hidden" value="${orderId }" name="orderId">
+							<input type="hidden" value="${orderId }" name="orderId"/>
 							<input type="hidden" value="${txnAmt }" name="amount" />
 							<input type="hidden" value="${txnseqno }" name="txnseqno"/>
 							<input type="hidden" value="${merchId }" name="merchId"/>
 							<input type="hidden" value="ZLC00001" name="cashCode"/>
 							<input type="hidden" value="${busicode }" name="busicode"/>
 							<input type="hidden" value="${goodsName }" name="goodsName"/>
-							<input type="hidden" value="${merchName }" name="merchName">
+							<input type="hidden" value="${merchName }" name="merchName"/>
 							<input type="hidden" value="${subMerName }" name="subMerName" />
 							<input type="hidden" value="${memberId }" name="merUserId" />
 							<input type="hidden" value="${busitype }" name="busitype" />
 							<input type="hidden" value=""             name="cardType" id="other_card_type"/>
 							<input type="hidden" value="${tn }" name="tn" />
 							<div id="other-bank" class="other-bank" style="display:none">
-							<input type="hidden" id="bankId" name="bankId" value="0105">						
+							<input type="hidden" id="bankId" name="bankId" value="0105"/>						
 								<div class="select-banklist per">借记卡
 								<ul>
 										<li>
