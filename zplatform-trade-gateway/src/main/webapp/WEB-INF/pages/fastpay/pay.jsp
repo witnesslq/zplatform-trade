@@ -106,7 +106,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 								<input type="button" class="btn btnA" id="cancelButton" value="取消" />
 							</li>
 						</ul>
-							<input readonly="readonly" name="bankCode"    id="bankCode"    type="hidden"  value="${trade.bankCode }" /> 
+							<input readonly="readonly" name="bankCode"    id="bankCode_"    type="hidden"  value="${trade.bankCode }" /> 
 							<input readonly="readonly" name="orderId"     id="orderId"     type="hidden"  value="${trade.orderId }" /> 
 							<input readonly="readonly" name="cardNo"      id="cardNo"      type="hidden"  value="${trade.cardNo }" /> 
 							<input readonly="readonly" name="acctName"    id="acctName"    type="hidden"  value="${trade.acctName }" /> 

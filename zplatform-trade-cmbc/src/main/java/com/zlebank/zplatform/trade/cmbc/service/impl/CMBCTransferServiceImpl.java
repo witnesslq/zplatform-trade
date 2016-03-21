@@ -25,6 +25,7 @@ import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.enums.CMBCCardTypeEnum;
+import com.zlebank.zplatform.trade.bean.enums.ChnlTypeEnum;
 import com.zlebank.zplatform.trade.cmbc.bean.enmus.TransferTypeEnmu;
 import com.zlebank.zplatform.trade.cmbc.bean.gateway.CardMessageBean;
 import com.zlebank.zplatform.trade.cmbc.bean.gateway.WhiteListMessageBean;
@@ -37,14 +38,14 @@ import com.zlebank.zplatform.trade.dao.BankTransferBatchDAO;
 import com.zlebank.zplatform.trade.dao.BankTransferChannelDAO;
 import com.zlebank.zplatform.trade.dao.BankTransferDataDAO;
 import com.zlebank.zplatform.trade.dao.RealnameAuthDAO;
+import com.zlebank.zplatform.trade.dao.RspmsgDAO;
 import com.zlebank.zplatform.trade.dao.TransferBatchDAO;
 import com.zlebank.zplatform.trade.dao.TransferDataDAO;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.model.PojoBankTransferBatch;
 import com.zlebank.zplatform.trade.model.PojoBankTransferData;
 import com.zlebank.zplatform.trade.model.PojoRealnameAuth;
-import com.zlebank.zplatform.trade.model.PojoTranBatch;
-import com.zlebank.zplatform.trade.model.PojoTranData;
+import com.zlebank.zplatform.trade.model.PojoRspmsg;
 import com.zlebank.zplatform.trade.model.TxnsWhiteListModel;
 import com.zlebank.zplatform.trade.model.TxnsWithholdingModel;
 import com.zlebank.zplatform.trade.service.IRouteConfigService;
@@ -89,6 +90,8 @@ public class CMBCTransferServiceImpl implements ICMBCTransferService{
     private BankTransferDataDAO bankTransferDataDAO;
     @Autowired
     private BankTransferChannelDAO bankTransferChannelDAO;
+    @Autowired
+    private RspmsgDAO rspmsgDAO;
     /**
      * 实名认证
      * @param card
@@ -150,8 +153,13 @@ public class CMBCTransferServiceImpl implements ICMBCTransferService{
             for (int i = 0; i < 5; i++) {
                 withholding = txnsWithholdingService.getWithholdingBySerialNo(serialno);
                 if(!StringUtil.isEmpty(withholding.getExectype())){
+                	
                     if("S".equalsIgnoreCase(withholding.getExectype())){
-                        resultBean = new ResultBean("success");
+                    	if("00".equals(withholding.getValidatestatus())){
+                    		 resultBean = new ResultBean("success");
+                    	}else{
+                    		resultBean = new ResultBean("0099","实名认证失败");
+                    	}
                         break;
                     }else if("E".equalsIgnoreCase(withholding.getExectype())){
                         resultBean = new ResultBean(withholding.getExeccode(),withholding.getExecmsg());

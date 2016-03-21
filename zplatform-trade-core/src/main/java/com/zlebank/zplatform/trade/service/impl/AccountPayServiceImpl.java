@@ -26,13 +26,11 @@ import com.zlebank.zplatform.commons.utils.Base64Utils;
 import com.zlebank.zplatform.commons.utils.RSAUtils;
 import com.zlebank.zplatform.member.bean.CoopInstiMK;
 import com.zlebank.zplatform.member.bean.MemberBean;
-import com.zlebank.zplatform.member.bean.MerchMK;
 import com.zlebank.zplatform.member.bean.enums.MemberType;
 import com.zlebank.zplatform.member.bean.enums.TerminalAccessType;
 import com.zlebank.zplatform.member.dao.CoopInstiDAO;
 import com.zlebank.zplatform.member.dao.MemberDAO;
 import com.zlebank.zplatform.member.exception.DataCheckFailedException;
-import com.zlebank.zplatform.member.pojo.PojoCoopInsti;
 import com.zlebank.zplatform.member.pojo.PojoMember;
 import com.zlebank.zplatform.member.service.CoopInstiService;
 import com.zlebank.zplatform.member.service.MemberOperationService;
@@ -149,8 +147,7 @@ public class AccountPayServiceImpl implements IAccountPayService{
 			PojoMember pojo =memberDAO.getMemberByMemberId(accountTrade.getMemberId(), MemberType.INDIVIDUAL);
 			MemberBean memberBean = new MemberBean();
 			memberBean.setLoginName(pojo.getLoginName());
-			PojoCoopInsti pojoCoopInsti = coopInstiDAO.get(pojo.getInstiId());
-			memberBean.setInstiCode(pojoCoopInsti.getInstiCode());
+			memberBean.setInstiId(pojo.getInstiId());
 			memberBean.setPaypwd(accountTrade.getPay_pwd());
 			// 校验支付密码
 			if (memberOperationServiceImpl.verifyPayPwd(MemberType.INDIVIDUAL,

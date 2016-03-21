@@ -375,7 +375,7 @@ public class GateWayController {
                 // 显示会员已绑定的银行卡
                 PagedResult<QuickpayCustBean> cardPageList = memberBankCardService.queryMemberBankCard(txnsLog.getAccmemberid(), cardType, 0, 10);
                 List<QuickpayCustBean> cardList = cardPageList.getPagedResult();
-                for (QuickpayCustBean cust : cardList) {
+                /*for (QuickpayCustBean cust : cardList) {
                     // 判断依据卡号相同，账户名称相同，身份证号相同
                     if (cust.getAccname().equals(cust.getAccname())
                             && cust.getCardno().equals(
@@ -383,16 +383,16 @@ public class GateWayController {
                             && cust.getIdnum().equals(
                             		cust.getIdnum())) {
                         // 此时卡已绑定，移除出原有集合，赋值到默认第一支付卡中
-                        cardList.remove(cust);
-                        quickpayCust = cust;
-                        model.put("bindFlag", "1");
+                        //cardList.remove(cust);
+                        //quickpayCust = cust;
+                        //model.put("bindFlag", "1");
                         break;
                     }
-                }
+                }*/
                 
 
                 model.put("cardList", cardList);
-                model.put("memberCard", quickpayCust);
+                //model.put("memberCard", quickpayCust);
                 //获取请求方IP
                 model.put("memberIP", orderInfo.getPayerip());
             }
@@ -533,91 +533,6 @@ public class GateWayController {
             model.put("txnseqno", trade.getTxnseqno());
             return new ModelAndView("/erro", model);
         }
-        
-        /*ResultBean bean = null;
-        ResultBean routResultBean = routeConfigService.getTransRout(
-                DateUtil.getCurrentDateTime(), trade.getAmount(),
-                trade.getMerchId(), trade.getBusicode(), trade.getCardNo(),
-                trade.getCashCode());
-        if (routResultBean.isResultBool()) {
-            String routId = routResultBean.getResultObj().toString();
-            if (ConsUtil.getInstance().cons.getReapay_chnl_code()
-                    .equals(routId)) {
-                trade.setReaPayOrderNo(OrderNumber.getInstance()
-                        .generateReaPayOrderId());
-                // RoutBean routBean =
-                // routeProcessService.getFirstRoutStep(routId,trade.getBusicode());
-                IQuickPayTrade quickPayTrade = null;
-                try {
-                    quickPayTrade = TradeAdapterFactory
-                            .getInstance().getQuickPayTrade(routId);
-                } catch (TradeException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (InstantiationException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                // trade.setCurrentSetp(routBean.getTxncode_current());
-                bean = quickPayTrade.marginRegister(trade);
-                // 更新核心交易表路由信息
-                txnsLogService.updateRoutInfo(trade.getTxnseqno(), routId, "",
-                        trade.getCashCode());
-                if (bean.isResultBool()) {
-                    ReaPayResultBean resultBean = (ReaPayResultBean) bean
-                            .getResultObj();
-                    if (!"0000".equals(resultBean.getResult_code())) {
-                        model.put("errMsg", resultBean.getResult_msg());
-                        model.put("errCode", resultBean.getResult_code());
-                        model.put("txnseqno", trade.getTxnseqno());
-                        return new ModelAndView("/erro", model);
-                    }
-                }
-            } else if ("95000001".equals(routId)) {
-                trade.setReaPayOrderNo(OrderNumber.getInstance()
-                        .generateReaPayOrderId());
-
-                IQuickPayTrade quickPayTrade = null;
-                try {
-                    quickPayTrade = TradeAdapterFactory
-                            .getInstance().getQuickPayTrade(routId);
-                } catch (TradeException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (InstantiationException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                bean = quickPayTrade.marginRegister(trade);
-                if (bean.isResultBool()) {
-                    ReaPayResultBean resultBean = (ReaPayResultBean) bean
-                            .getResultObj();
-                    if (!"0000".equals(resultBean.getResult_code())) {
-                        model.put("errMsg", resultBean.getResult_msg());
-                        model.put("errCode", resultBean.getResult_code());
-                        model.put("txnseqno", txnseqno_);
-                        return new ModelAndView("/erro", model);
-                    }
-                }
-            }
-        } else {
-            model.put("errMsg", routResultBean.getErrMsg());
-            model.put("errCode", routResultBean.getErrCode());
-            model.put("txnseqno", txnseqno_);
-            return new ModelAndView("/erro", model);
-        }*/
         model.put("trade", trade);
         return new ModelAndView("/fastpay/pay", model);
     }
