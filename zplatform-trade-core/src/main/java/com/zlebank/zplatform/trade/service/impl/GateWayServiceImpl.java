@@ -33,8 +33,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.zlebank.zplatform.acc.bean.BusiAcct;
 import com.zlebank.zplatform.acc.bean.BusiAcctQuery;
+import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.bean.enums.AcctStatusType;
 import com.zlebank.zplatform.acc.bean.enums.Usage;
+import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
+import com.zlebank.zplatform.acc.exception.AccBussinessException;
+import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.AccountQueryService;
 import com.zlebank.zplatform.commons.bean.PagedResult;
 import com.zlebank.zplatform.commons.utils.Base64Utils;
@@ -178,6 +182,8 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
     
     @Autowired
     private MerchService merchService;
+    @Autowired
+    private AccEntryService accEntryService;
     @Autowired
     private QuickpayCustDAO quickpayCustDAO;
     /**
@@ -823,11 +829,27 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlCycle().toString())));
             txnsLog.setAccmemberid(refundBean.getMemberId());
             txnsLogService.save(txnsLog);
+            
+            //退款账务处理
+            TradeInfo tradeInfo = new TradeInfo();
+            tradeInfo.setPayMemberId(refundBean.getMerId());
+            tradeInfo.setPayToMemberId(refundBean.getMemberId());
+            tradeInfo.setAmount(new BigDecimal(refundBean.getTxnAmt()));
+            tradeInfo.setCharge(new BigDecimal(txnsLog.getTxnfee()));
+            tradeInfo.setTxnseqno(txnsLog.getTxnseqno());
+            //记录分录流水
+            accEntryService.accEntryProcess(tradeInfo);
         } catch (NumberFormatException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
             throw new TradeException("T016");
-        }
+        } catch (AccBussinessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (AbstractBusiAcctException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         
        String tn = "";
         try {
@@ -948,6 +970,16 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
                 txnsLog.setTradestatflag("00000000");//交易初始状态
                 txnsLog.setAccmemberid(withdrawBean.getMemberId());
                 txnsLogService.save(txnsLog);
+                
+                //提现账务处理
+                TradeInfo tradeInfo = new TradeInfo();
+                tradeInfo.setPayMemberId(txnsLog.getAccmemberid());
+                tradeInfo.setPayToMemberId(txnsLog.getAccmemberid());
+                tradeInfo.setAmount(new BigDecimal(txnsLog.getAmount()));
+                tradeInfo.setCharge(new BigDecimal(txnsLog.getTxnfee()));
+                tradeInfo.setTxnseqno(txnsLog.getTxnseqno());
+                //记录分录流水
+                accEntryService.accEntryProcess(tradeInfo);
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

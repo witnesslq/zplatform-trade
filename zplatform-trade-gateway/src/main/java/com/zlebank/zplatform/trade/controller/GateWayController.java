@@ -34,8 +34,10 @@ import org.springframework.web.servlet.ModelAndView;
 import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.acc.bean.BusiAcct;
 import com.zlebank.zplatform.acc.bean.BusiAcctQuery;
+import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.bean.enums.Usage;
 import com.zlebank.zplatform.acc.pojo.Money;
+import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.AccountQueryService;
 import com.zlebank.zplatform.commons.bean.PagedResult;
 import com.zlebank.zplatform.commons.utils.StringUtil;
@@ -171,7 +173,8 @@ public class GateWayController {
     private MerchService merchService;
     @Autowired
     private CoopInstiService coopInstiService;
-    
+    @Autowired
+    private AccEntryService accEntryService;
     
     @RequestMapping("/coporder.htm")
     public ModelAndView pay(OrderBean order,HttpSession httpSession,HttpServletRequest request) {
@@ -1740,6 +1743,16 @@ public class GateWayController {
                 return new ModelAndView("/erro_gw", model);
             }
             TxnsWithdrawModel withdraw = new TxnsWithdrawModel(tradeBean);
+            //记录提现账务
+           
+            TradeInfo tradeInfo = new TradeInfo();
+            tradeInfo.setPayMemberId(withdraw.getMemberid());
+            tradeInfo.setPayToMemberId(withdraw.getMemberid());
+            tradeInfo.setAmount(new BigDecimal(withdraw.getAmount()));
+            tradeInfo.setCharge(new BigDecimal(0));
+            tradeInfo.setTxnseqno(orderinfo.getRelatetradetxn());
+            //记录分录流水
+            accEntryService.accEntryProcess(tradeInfo);
             if (StringUtil.isNotEmpty(tradeBean.getBindCardId())) {
                 /*QuickpayCustModel card = memberBankCardService.
                         .getCardByBindId(tradeBean.getBindCardId());

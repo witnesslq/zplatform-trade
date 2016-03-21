@@ -255,7 +255,7 @@ public class CMBCTransferServiceImpl implements ICMBCTransferService{
             //检查批次信息是否正确
         	PojoBankTransferBatch bankTransferBatch = bankTransferBatchDAO.getById(tid);
            
-            if(!"01".equals(bankTransferBatch.getTranStatus())){
+            if(!"01".equals(bankTransferBatch.getTranStatus())&&!"02".equals(bankTransferBatch.getTranStatus())){
                 return new ResultBean("", "无法划拨");
             }
             //生成交易日志

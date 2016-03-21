@@ -109,5 +109,12 @@ public interface BankTransferBatchDAO extends BasePagedQueryDAO<PojoBankTransfer
      * @return
      */
     public List<PojoBankTransferBatch> getByTranBatchAndOpenStatus(long tranBatchId,BankTransferBatchOpenStatusEnum openStatus);
+    
+    /**
+     * 关闭事件
+     * @param tid
+     * @return
+     */
+    public boolean closeBankTransferBatch(Long tid);
 }
 

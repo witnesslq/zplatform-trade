@@ -84,7 +84,11 @@ public class FTPCMBCService implements IFTPCMBCService {
             ftpClient.enterLocalPassiveMode();
             // 设置文件类型（二进制）
             ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
-            System.out.println(ftpClient.storeFile(fileName,fis));
+            boolean upload_flag = ftpClient.storeUniqueFile(fileName, fis);
+            if(!upload_flag){
+            	throw new RuntimeException("FTP上传文件失败!");
+            }
+            //System.out.println(ftpClient.storeFile(fileName,fis));
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("FTP客户端出错！", e);
