@@ -26,6 +26,7 @@ import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.trade.bean.UpdateData;
 import com.zlebank.zplatform.trade.bean.enums.InsteadPayDetailStatusEnum;
+import com.zlebank.zplatform.trade.bean.enums.TransferBusiTypeEnum;
 import com.zlebank.zplatform.trade.dao.InsteadPayBatchDAO;
 import com.zlebank.zplatform.trade.dao.InsteadPayDetailDAO;
 import com.zlebank.zplatform.trade.model.PojoInsteadPayDetail;
@@ -105,7 +106,7 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
      */
     @Override
     public String getBusiCode() {
-        return "00";
+        return TransferBusiTypeEnum.INSTEAD.getCode();
     }
 
 
