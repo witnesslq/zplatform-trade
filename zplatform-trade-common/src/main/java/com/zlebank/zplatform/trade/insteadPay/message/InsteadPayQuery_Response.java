@@ -29,6 +29,14 @@ public class InsteadPayQuery_Response  extends BaseMessage {
     /**文件内容**/
     private List<InsteadPayQueryFile> fileContent;
     /**成功总笔数**/
+    private String totalQty ;
+    /**成功总金额**/
+    private String totalAmt ;
+    /**成功总笔数**/
+    private String waitTotalQty ;
+    /**成功总金额**/
+    private String waitTotalAmt ;
+    /**成功总笔数**/
     private String succTotalQty ;
     /**成功总金额**/
     private String succTotalAmt ;
@@ -94,5 +102,29 @@ public class InsteadPayQuery_Response  extends BaseMessage {
     }
     public void setRespMsg(String respMsg) {
         this.respMsg = respMsg;
+    }
+    public String getTotalQty() {
+        return totalQty;
+    }
+    public void setTotalQty(String totalQty) {
+        this.totalQty = totalQty;
+    }
+    public String getTotalAmt() {
+        return totalAmt;
+    }
+    public void setTotalAmt(String totalAmt) {
+        this.totalAmt = totalAmt;
+    }
+    public String getWaitTotalQty() {
+        return waitTotalQty;
+    }
+    public void setWaitTotalQty(String waitTotalQty) {
+        this.waitTotalQty = waitTotalQty;
+    }
+    public String getWaitTotalAmt() {
+        return waitTotalAmt;
+    }
+    public void setWaitTotalAmt(String waitTotalAmt) {
+        this.waitTotalAmt = waitTotalAmt;
     }
 }
