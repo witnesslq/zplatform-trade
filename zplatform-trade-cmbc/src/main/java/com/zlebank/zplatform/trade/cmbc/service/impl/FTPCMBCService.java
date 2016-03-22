@@ -68,8 +68,8 @@ public class FTPCMBCService implements IFTPCMBCService {
         try {
             //ftpClient.connect(FTPIP);
             ftpClient.connect(FTPIP, port);
-            boolean loginFlag =ftpClient.login(USER, PWD);
-            log.info(loginFlag);
+            
+            log.info("login result:"+ftpClient.login(USER, PWD));
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
             String directory = sdf.format(new Date());
             fis = new FileInputStream(srcFile);

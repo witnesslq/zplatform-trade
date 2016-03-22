@@ -177,7 +177,15 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
         }
         //ftpcmbcService = new FTPCMBCService();
         
-        ftpcmbcService.uploadOuterCMBCFile(secretFile, fileName);
+        try {
+			ftpcmbcService.uploadOuterCMBCFile(secretFile, fileName);
+		} catch (Exception e) {//上传失败
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			PojoTxnsInsteadPay txnsInsteadPay = new PojoTxnsInsteadPay(batchNo+"", transferBatch.getChannel().getBankChannelCode(), "01", fileName, resFileName, new Date(), null, "01", "");
+	        txnsInsteadPayDAO.saveA(txnsInsteadPay);
+	        return ;
+		}
         //修改批次状态为正在支付
         bankTransferBatchDAO.updateBatchTranStatus(batchNo, "05");
         //修改每笔划拨的状态为正在支付
@@ -185,14 +193,6 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
         //写代付交易流水
         PojoTxnsInsteadPay txnsInsteadPay = new PojoTxnsInsteadPay(batchNo+"", transferBatch.getChannel().getBankChannelCode(), "02", fileName, resFileName, new Date(), null, "01", "");
         txnsInsteadPayDAO.saveA(txnsInsteadPay);
-        /*// 修改批次状态为正在支付，修改每笔划拨的状态为正在支付
-        transferDataDAO.updateTransDataStatusByBatchNo(batchNo, InsteadPayTypeEnum.Paying);
-        //更新批次数据状态,上传文件
-        transferBatch.setStatus("02");
-        transferBatch.setRequestfilename(fileName);
-        transferBatch.setResponsefilename(resFileName);
-        transferBatch.setTransfertime(DateUtil.getCurrentDateTime());
-        transferBatchDAO.updateBatchToTransfer(transferBatch);*/
     }
 
     private File writeFile(String msg) throws CMBCTradeException,
@@ -329,22 +329,22 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
             e.printStackTrace();
             throw new CMBCTradeException("M004");
         }
-        ftpcmbcService.uploadInnerCMBCFile(secretFile, fileName);
+        try {
+			ftpcmbcService.uploadInnerCMBCFile(secretFile, fileName);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			//写代付交易流水
+	        PojoTxnsInsteadPay txnsInsteadPay = new PojoTxnsInsteadPay(batchNo+"", transferBatch.getChannel().getBankChannelCode(), "01", fileName, resFileName, new Date(), null, "01", "");
+	        txnsInsteadPayDAO.merge(txnsInsteadPay);
+		}
         //修改批次状态为正在支付，修改每笔划拨的状态为正在支付
         bankTransferDataDAO.updateTransDataStatusByBatchNo(batchNo, InsteadPayTypeEnum.Paying);
         //更新批次信息
         bankTransferBatchDAO.updateBatchTranStatus(batchNo, "05");
         //写代付交易流水
-        PojoTxnsInsteadPay txnsInsteadPay = new PojoTxnsInsteadPay(batchNo+"", transferBatch.getChannel().getBankChannelCode(), "01", fileName, resFileName, new Date(), null, "01", "");
+        PojoTxnsInsteadPay txnsInsteadPay = new PojoTxnsInsteadPay(batchNo+"", transferBatch.getChannel().getBankChannelCode(), "02", fileName, resFileName, new Date(), null, "01", "");
         txnsInsteadPayDAO.merge(txnsInsteadPay);
-        /*//修改批次状态为正在支付，修改每笔划拨的状态为正在支付
-        transferDataDAO.updateTransDataStatusByBatchNo(batchNo, InsteadPayTypeEnum.Paying);
-        //更新批次数据状态,上传文件
-        transferBatch.setStatus("02");
-        transferBatch.setRequestfilename(fileName);
-        transferBatch.setResponsefilename(resFileName);
-        transferBatch.setTransfertime(DateUtil.getCurrentDateTime());
-        transferBatchDAO.updateBatchToTransfer(transferBatch);*/
     }
 
     public void analyzeCMBCFile(File file,String fileName,FileTypeEnmu fileTypeEnmu) throws IOException {

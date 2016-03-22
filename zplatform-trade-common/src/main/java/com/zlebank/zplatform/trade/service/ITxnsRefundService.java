@@ -34,4 +34,7 @@ public interface ITxnsRefundService extends IBaseService<TxnsRefundModel, Long>{
      * @param refundOrder
      */
     public void updateRefundResult(TxnsRefundModel refundOrder);
+    public TxnsRefundModel getRefundByRefundor(String refundorderno);
+    public void updateRefund(TxnsRefundModel txnsRefundModel);
+    public TxnsRefundModel getRefundByOldTxnSeqno(String itxnsCode, String string);
 }

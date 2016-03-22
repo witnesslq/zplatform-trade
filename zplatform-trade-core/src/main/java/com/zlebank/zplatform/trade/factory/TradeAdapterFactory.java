@@ -64,7 +64,7 @@ public class TradeAdapterFactory {
             throw new TradeException("");
         }
        /* if(chnlcode.equals("98000001")){
-            //ZLQuickPayTrade quickPayTrade=new ZLQuickPayTrade();
+            ZLQuickPayTrade quickPayTrade=new ZLQuickPayTrade();
             //return quickPayTrade;
             
         }else if (chnlcode.equals("96000001")) {

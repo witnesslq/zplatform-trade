@@ -37,6 +37,7 @@ import com.zlebank.zplatform.trade.cmbc.service.IWithholdingService;
 import com.zlebank.zplatform.trade.dao.BankTransferBatchDAO;
 import com.zlebank.zplatform.trade.dao.BankTransferChannelDAO;
 import com.zlebank.zplatform.trade.dao.BankTransferDataDAO;
+import com.zlebank.zplatform.trade.dao.ITxnsInsteadPayDAO;
 import com.zlebank.zplatform.trade.dao.RealnameAuthDAO;
 import com.zlebank.zplatform.trade.dao.RspmsgDAO;
 import com.zlebank.zplatform.trade.dao.TransferBatchDAO;
@@ -92,6 +93,8 @@ public class CMBCTransferServiceImpl implements ICMBCTransferService{
     private BankTransferChannelDAO bankTransferChannelDAO;
     @Autowired
     private RspmsgDAO rspmsgDAO;
+    @Autowired
+    private ITxnsInsteadPayDAO txnsInsteadPayDAO;
     /**
      * 实名认证
      * @param card
@@ -262,9 +265,12 @@ public class CMBCTransferServiceImpl implements ICMBCTransferService{
         try {
             //检查批次信息是否正确
         	PojoBankTransferBatch bankTransferBatch = bankTransferBatchDAO.getById(tid);
-           
             if(!"01".equals(bankTransferBatch.getTranStatus())&&!"02".equals(bankTransferBatch.getTranStatus())){
-                return new ResultBean("", "无法划拨");
+                return new ResultBean("", "不可重复转账");
+            }
+            //判断当前批次是否已经上传成功
+            if(txnsInsteadPayDAO.isUpload(tid+"")){
+            	return new ResultBean("", "不可重复转账");
             }
             //生成交易日志
             List<PojoBankTransferData> transferDataList = bankTransferDataDAO.findTransDataByBatchNo(tid);

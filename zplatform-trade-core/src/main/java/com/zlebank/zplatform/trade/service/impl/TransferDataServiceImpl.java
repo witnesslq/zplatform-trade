@@ -1,13 +1,4 @@
-/* 
- * TransferDataServiceImpl.java  
- * 
- * version v1.3
- *
- * 2016年3月9日 
- * 
- * Copyright (c) 2016,zlebank.All rights reserved.
- * 
- */
+
 package com.zlebank.zplatform.trade.service.impl;
 
 import java.util.Date;

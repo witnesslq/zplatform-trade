@@ -10,8 +10,11 @@
  */
 package com.zlebank.zplatform.trade.dao.impl;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.zlebank.zplatform.commons.dao.impl.HibernateBaseDAOImpl;
 import com.zlebank.zplatform.trade.dao.ITxnsRefundDAO;
@@ -30,6 +33,16 @@ public class TxnsRefundDAOImpl extends HibernateBaseDAOImpl<TxnsRefundModel> imp
 
     public Session getSession(){
         return super.getSession();
+    }
+    
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+    public void updateRefund(TxnsRefundModel refundOrder) {
+        // TODO Auto-generated method stub
+        String sql = "update TxnsRefundModel set status = ? where refundorderno = ? ";
+        Query query = getSession().createQuery(sql);
+        query.setParameter(0, refundOrder.getStatus());
+        query.setParameter(1, refundOrder.getRefundorderno());
+        query.executeUpdate();
     }
     
 }
