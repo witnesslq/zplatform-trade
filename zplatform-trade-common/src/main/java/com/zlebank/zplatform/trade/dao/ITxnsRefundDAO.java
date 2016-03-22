@@ -26,4 +26,6 @@ import com.zlebank.zplatform.trade.model.TxnsRefundModel;
 public interface ITxnsRefundDAO extends BaseDAO<TxnsRefundModel>{
 
     public Session getSession();
+
+    public void updateRefund(TxnsRefundModel refundOrder);
 }
