@@ -36,7 +36,6 @@ import com.zlebank.zplatform.acc.bean.BusiAcct;
 import com.zlebank.zplatform.acc.bean.BusiAcctQuery;
 import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.bean.enums.Usage;
-import com.zlebank.zplatform.acc.pojo.Money;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.AccountQueryService;
 import com.zlebank.zplatform.commons.bean.PagedResult;
@@ -75,7 +74,6 @@ import com.zlebank.zplatform.trade.cmbc.exception.CMBCTradeException;
 import com.zlebank.zplatform.trade.cmbc.service.ICMBCTransferService;
 import com.zlebank.zplatform.trade.cmbc.service.IWithholdingService;
 import com.zlebank.zplatform.trade.cmbc.service.impl.InsteadPayServiceImpl;
-import com.zlebank.zplatform.trade.cmbc.service.impl.WithholdingServiceImpl;
 import com.zlebank.zplatform.trade.dao.RspmsgDAO;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.factory.AccountingAdapterFactory;
@@ -129,15 +127,12 @@ public class GateWayController {
     private IGateWayService gateWayService;
     @Autowired
     private IWebGateWayService webGateWayService;
-    //private IZlTradeService zlTradeService;
     @Autowired
     private ITxnsQuickpayService txnsQuickpayService;
     @Autowired
     private MemberBankCardService memberBankCardService;
     @Autowired
     private ITxnsLogService txnsLogService;
-    //@Autowired
-    //private IMemberService memberService;
     @Autowired
     private IRouteConfigService routeConfigService;
     @Autowired
@@ -151,8 +146,6 @@ public class GateWayController {
     private MemberService memberService2;
     @Autowired
     private AccountQueryService accountQueryService;
-    //@Autowired
-    //private IQuickpayCustService quickpayCustService;
     @Autowired
     private IAccountPayService accountPayService;
     @Autowired
@@ -342,7 +335,7 @@ public class GateWayController {
                 // 获取会员已绑定的银行卡
                 PagedResult<QuickpayCustBean> bindCardList =  memberBankCardService.queryMemberBankCard(txnsLog.getAccmemberid(), "0", 0, 10);
                 model.put("bindCardList", bindCardList.getPagedResult());
-                QuickpayCustBean quickpayCust = null;
+                //QuickpayCustBean quickpayCust = null;
                 // 处理银行卡验证信息及身份信息，取得卡信息
                 try {
                     if (StringUtil.isNotEmpty(orderInfo.getCustomerInfo())) {
@@ -464,7 +457,7 @@ public class GateWayController {
    }
     
 
-    private int validateBalance(String memberId, Long amt) {
+    /*private int validateBalance(String memberId, Long amt) {
         List<BusiAcct> busiAccList = accountQueryService
                 .getBusiACCByMid(memberId);
         BusiAcct fundAcct = null;
@@ -480,7 +473,7 @@ public class GateWayController {
         // 会员资金账户余额
         return memberAcct.getBalance().compareTo(
                 Money.valueOf(new BigDecimal(amt)));
-    }
+    }*/
 
     @RequestMapping("/accountPay.htm")
     public ModelAndView memberAcctPay(TradeBean tradeBean) {
@@ -545,7 +538,6 @@ public class GateWayController {
         
         Map<String, Object> model = new HashMap<String, Object>();
         TradeBean tradeBean2 = trade.clone();
-        ResultBean bean = null;
         try {
             webGateWayService.bindPay(trade);
         } catch (TradeException e) {
@@ -765,168 +757,9 @@ public class GateWayController {
         return null;
     }
 
-    /**
-     * 融宝支付渠道
-     * 
-     * @param trade
-     *            交易信息实体类
-     * @param routId
-     *            路由版本
-     * @param model
-     *            页面传参参数
-     * @return
-     * @throws Exception
-     */
-    private ResultBean reaPayChannel(TradeBean trade,
-            String routId,
-            Map<String, Object> model) throws Exception {
-        
-        ResultBean returnBean = new ResultBean("success");
-        
-        
-        /*model.put("txnseqno", trade.getTxnseqno());
-        gateWayService.updateOrderToStartPay(trade.getOrderId());
-        IQuickPayTrade quickPayTrade = TradeAdapterFactory.getInstance()
-                .getQuickPayTrade(routId);
-        // trade.setCurrentSetp(routBean.getTxncode_current());
-        // 融宝渠道--确认支付
-        ResultBean resultBean = quickPayTrade.submitPay(trade);
-        // 更新核心交易表路由信息
-        txnsLogService.updateRoutInfo(trade.getTxnseqno(), routId, "",
-                trade.getCashCode());
-        // trade.setCurrentSetp(routBean.getTxncode_current());
+    
 
-        if (resultBean.isResultBool()) {// 确认支付完成，此时只是没有异常出现
-            ReaPayResultBean payResult = (ReaPayResultBean) resultBean
-                    .getResultObj();
-
-            ResultBean routResultBean = routeConfigService.getTransRout(
-                    DateUtil.getCurrentDateTime(), trade.getAmount(),
-                    trade.getMerchId(), trade.getBusicode(), trade.getCardNo(),
-                    trade.getCashCode());
-            if (routResultBean.isResultBool()) {
-                // routBean = routeProcessService.getCurrentStep(routId,
-                // trade.getCurrentSetp(),trade.getBusicode());
-                quickPayTrade = TradeAdapterFactory.getInstance()
-                        .getQuickPayTrade(routId);
-                // trade.setCurrentSetp(routBean.getTxncode_current());
-                routId = routResultBean.getResultObj().toString();
-                PayPartyBean payPartyBean = new PayPartyBean(
-                        trade.getTxnseqno(), "01", trade.getOrderId(), "",
-                        ConsUtil.getInstance().cons
-                                .getReapay_quickpay_merchant_id(), "",
-                        DateUtil.getCurrentDateTime(), "", trade.getCardNo(),
-                        routId, "");
-                txnsLogService.updatePayInfo_Fast(payPartyBean);
-                // 更新核心交易表路由信息
-                // txnsLogService.updateRoutInfo(trade.getTxnseqno(), routId,
-                // "",trade.getCashCode());
-                model.put("errMsg", payResult.getResult_msg());
-                model.put("respCode", payResult.getResult_code());
-
-                txnsLogService.updateReaPayRetInfo(trade.getTxnseqno(),
-                        payResult);
-            }
-
-        }*/
-        return returnBean;
-    }
-
-    /**
-     * 测试渠道
-     * 
-     * @param trade
-     * @param routId
-     * @param model
-     * @return
-     * @throws Exception
-     */
-    private ResultBean testChannel(TradeBean trade,String routId, Map<String, Object> model) throws Exception {
-        model.put("txnseqno", trade.getTxnseqno());
-        ResultBean returnBean = new ResultBean("success");
-       
-       /* IQuickPayTrade quickPayTrade = TradeAdapterFactory.getInstance().getQuickPayTrade(routId);
-        // 测试渠道--确认支付
-        ResultBean resultBean = quickPayTrade.submitPay(trade);
-        if (resultBean.isResultBool()) {// 确认支付完成，此时只是没有异常出现
-            ReaPayResultBean payResult = (ReaPayResultBean) resultBean
-                    .getResultObj();
-            PayPartyBean payPartyBean = new PayPartyBean(trade.getTxnseqno(),
-                    "01", trade.getOrderId(), "",
-                    ConsUtil.getInstance().cons
-                            .getReapay_quickpay_merchant_id(), "",
-                    DateUtil.getCurrentDateTime(), "", trade.getCardNo(),
-                    routId, "");
-            txnsLogService.updatePayInfo_Fast(payPartyBean);// 更新交易渠道信息卡信息，订单状态改为支付中
-
-            model.put("errMsg", payResult.getResult_msg());
-            model.put("respCode", payResult.getResult_code());
-            txnsLogService.updateReaPayRetInfo(trade.getTxnseqno(), payResult);
-            if ("0000".equals(model.get("respCode"))) {
-
-                // 更新绑卡信息
-                quickpayCustService.updateCardStatus(trade.getMerUserId(),
-                        trade.getCardNo());
-
-                String txnseqno = trade.getTxnseqno();
-                TxnsLogModel txnsLog = txnsLogService.get(txnseqno);
-                // 完成核心交易的记录和网关交易记录的更新
-                gateWayService.saveSuccessReaPayTrade(txnseqno,
-                        txnsLog.getAccordno(), payResult);
-                String commiteTime = DateUtil.getCurrentDateTime();
-                IAccounting accounting = AccountingAdapterFactory.getInstance()
-                        .getAccounting(txnsLog.getBusitype());
-                try {
-                    accounting.accountedFor(txnseqno);
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                String reaPayOrderNo = txnsLog.getAccordno();
-                // 处理同步通知和异步通知
-                // 根据原始订单拼接应答报文，异步通知商户
-                TxnsOrderinfoModel gatewayOrderBean = gateWayService
-                        .getOrderinfoByOrderNoAndMemberId(reaPayOrderNo,
-                                trade.getMerchId());
-                // 应用方信息
-                AppPartyBean appParty = new AppPartyBean(OrderNumber
-                        .getInstance().generateAppOrderNo(), "000000000000",
-                        commiteTime, DateUtil.getCurrentDateTime(), txnseqno,
-                        "");
-                txnsLogService.updateAppInfo(appParty);
-                ResultBean orderResp = gateWayService.generateRespMessage(
-                        reaPayOrderNo, trade.getMerchId());
-                OrderRespBean respBean = (OrderRespBean) orderResp
-                        .getResultObj();
-                model.put(
-                        "suburl",
-                        gatewayOrderBean.getFronturl()
-                                + "?"
-                                + ObjectDynamic.generateReturnParamer(respBean,
-                                        false, null));
-                model.put("errMsg", "交易成功");
-                model.put("respCode", "0000");
-                // 记录同步发送的日志
-                TxnsNotifyTaskModel task = new TxnsNotifyTaskModel(
-                        gatewayOrderBean.getFirmemberno(),
-                        gatewayOrderBean.getRelatetradetxn(), 1, 1,
-                        ObjectDynamic.generateReturnParamer(respBean, false,
-                                null), "00", "200",
-                        gatewayOrderBean.getFronturl(), "2");
-                txnsNotifyTaskService.saveTask(task);
-                // 异步消息通知
-                OrderAsynRespBean asynRespBean = (OrderAsynRespBean) gateWayService
-                        .generateAsyncRespMessage(reaPayOrderNo,
-                                trade.getMerchId()).getResultObj();
-                Thread httpThread = new SynHttpRequestThread(
-                        trade.getMerchId(), trade.getTxnseqno(),
-                        gatewayOrderBean.getBackurl(),
-                        asynRespBean.getNotifyParam());
-                httpThread.start();
-            }
-        }*/
-        return returnBean;
-    }
+    
 
     @RequestMapping("/toBankPay.htm")
     public ModelAndView toSubmitPay(TradeBean trade, @RequestParam("txnseqno_")String txnseqno_) {
@@ -1059,7 +892,7 @@ public class GateWayController {
         int[] timeArray = new int[]{1000, 2000, 8000, 16000, 32000};
         try {
             for (int i = 0; i < 5; i++) {
-                Thread.currentThread().sleep(timeArray[i]);
+                Thread.sleep(timeArray[i]);
                 queryResultBean = quickPayTrade.queryTrade(trade);
                 payResult = (ReaPayResultBean) queryResultBean.getResultObj();
                 if ("completed".equalsIgnoreCase(payResult.getStatus())) {
@@ -1074,7 +907,7 @@ public class GateWayController {
                 if ("processing".equalsIgnoreCase(payResult.getStatus())) {
                     log.info("processing");
                 }
-                Thread.currentThread().sleep(timeArray[i]);
+                Thread.sleep(timeArray[i]);
             }
             return payResult.getStatus();
 
@@ -1093,26 +926,6 @@ public class GateWayController {
         TxnsLogModel txnsLog = null;
         int[] timeArray = new int[]{1000, 2000, 8000, 16000, 32000,64000};
         try {
-            /*for (int i = 0; i < 5; i++) {
-                Thread.currentThread().sleep(timeArray[i]);
-                queryResultBean = quickPayTrade.queryTrade(trade);
-                payResult = (ReaPayResultBean) queryResultBean.getResultObj();
-                if ("completed".equalsIgnoreCase(payResult.getStatus())) {
-                    break;
-                }
-                if ("failed".equalsIgnoreCase(payResult.getStatus())) {
-                    break;
-                }
-                if ("wait".equalsIgnoreCase(payResult.getStatus())) {
-                    break;
-                }
-                if ("processing".equalsIgnoreCase(payResult.getStatus())) {
-                    log.info("processing");
-                }
-                Thread.currentThread().sleep(timeArray[i]);
-            }
-            return payResult.getStatus();*/
-            
             for (int i = 0; i < 6; i++) {
                 txnsLog=txnsLogService.getTxnsLogByTxnseqno(txnseqno);
                 if(StringUtil.isNotEmpty(txnsLog.getPayretcode())){
@@ -1176,7 +989,7 @@ public class GateWayController {
                     
                    
                 }
-                Thread.currentThread().sleep(timeArray[i]);
+                Thread.sleep(timeArray[i]);
             }
 
         } catch (InterruptedException e) {
@@ -1293,7 +1106,6 @@ public class GateWayController {
             boolean checkResult = BankCardUtil.checkBankCard(cardNo);
             log.info("Bank Card No Check Result :" + checkResult);
         } catch (TradeException e) {
-            // TODO Auto-generated catch block
             return "carderror";
         }
         Map<String, Object> cardMap = routeConfigService.getCardInfo(cardNo);
@@ -1550,11 +1362,13 @@ public class GateWayController {
                                 }
                             }
                             break;
+					default:
+						break;
                     }
                     
                    
                 }
-                Thread.currentThread().sleep(timeArray[i]);
+                Thread.sleep(timeArray[i]);
             }
         } catch (InterruptedException e) {
             // TODO Auto-generated catch block
@@ -1717,8 +1531,7 @@ public class GateWayController {
         return ip;
     }
     
-    @RequestMapping("/testcmbcrealNameAuth")
-    @ResponseBody
+   
     public Object testCMBC(){
         CardMessageBean card = new CardMessageBean("123");
         try {
@@ -1735,10 +1548,9 @@ public class GateWayController {
         return "";
     }
     
-    @RequestMapping("/testwithholding")
-    @ResponseBody
+    
     public Object testwithholding(){
-       WithholdingServiceImpl service = new WithholdingServiceImpl();
+       //WithholdingServiceImpl service = new WithholdingServiceImpl();
        WithholdingMessageBean messageBean = new WithholdingMessageBean("test");
        TxnsWithholdingModel txnsWithholdingModel = new TxnsWithholdingModel();
        txnsWithholdingModel.setTransdate(DateUtil.getCurrentDate());

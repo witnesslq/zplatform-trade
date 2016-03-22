@@ -42,8 +42,14 @@ public class TxnsInsteadPayDAOImpl extends HibernateBaseDAOImpl<PojoTxnsInsteadP
 			log.info("queryString:" + queryString);
 			Query query = getSession().createQuery(queryString);
 			query.setParameter(0, batchNo);
-			if(query.list().size()>0){
-				return true;
+			List<PojoTxnsInsteadPay> txnsInsteadPayList = query.list();
+			if(txnsInsteadPayList.size()>0){
+				PojoTxnsInsteadPay insteadPay = txnsInsteadPayList.get(0);
+				if(insteadPay.getStatus().equals("01")){
+					return false;
+				}else{
+					return true;
+				}
 			}
 		} catch (HibernateException e) {
 			// TODO Auto-generated catch block

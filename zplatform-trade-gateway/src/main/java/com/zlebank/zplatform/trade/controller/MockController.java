@@ -1,24 +1,17 @@
 package com.zlebank.zplatform.trade.controller;
 
-import java.awt.datatransfer.StringSelection;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.TreeMap;
-import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
-import java.util.zip.Inflater;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,49 +26,22 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.zlebank.zplatform.commons.utils.BeanCopyUtil;
 import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.commons.utils.RSAUtils;
-import com.zlebank.zplatform.commons.utils.StringUtil;
-import com.zlebank.zplatform.member.bean.MerchMK;
 import com.zlebank.zplatform.member.service.MerchMKService;
 import com.zlebank.zplatform.specification.utils.Base64Utils;
-import com.zlebank.zplatform.trade.bean.enums.InsteadPayImportTypeEnum;
-import com.zlebank.zplatform.trade.exception.BalanceNotEnoughException;
-import com.zlebank.zplatform.trade.exception.DuplicateOrderIdException;
-import com.zlebank.zplatform.trade.exception.FailToGetAccountInfoException;
-import com.zlebank.zplatform.trade.exception.FailToInsertAccEntryException;
-import com.zlebank.zplatform.trade.exception.FailToInsertFeeException;
-import com.zlebank.zplatform.trade.exception.InvalidCardException;
-import com.zlebank.zplatform.trade.exception.MerchWhiteListCheckFailException;
-import com.zlebank.zplatform.trade.exception.MessageDecryptFailException;
-import com.zlebank.zplatform.trade.exception.NotInsteadPayWorkTimeException;
-import com.zlebank.zplatform.trade.exception.RealNameAuthFailException;
 import com.zlebank.zplatform.trade.insteadPay.message.BaseMessage;
 import com.zlebank.zplatform.trade.insteadPay.message.InsteadPayFile;
-import com.zlebank.zplatform.trade.insteadPay.message.InsteadPayQuery_Request;
-import com.zlebank.zplatform.trade.insteadPay.message.InsteadPayQuery_Response;
 import com.zlebank.zplatform.trade.insteadPay.message.InsteadPay_Request;
-import com.zlebank.zplatform.trade.insteadPay.message.InsteadPay_Response;
-import com.zlebank.zplatform.trade.insteadPay.message.MerWhiteList_Request;
-import com.zlebank.zplatform.trade.insteadPay.message.MerWhiteList_Response;
-import com.zlebank.zplatform.trade.insteadPay.message.RealnameAuthFile;
-import com.zlebank.zplatform.trade.insteadPay.message.RealnameAuthQuery_Request;
-import com.zlebank.zplatform.trade.insteadPay.message.RealnameAuthQuery_Response;
-import com.zlebank.zplatform.trade.insteadPay.message.RealnameAuth_Request;
-import com.zlebank.zplatform.trade.insteadPay.message.RealnameAuth_Response;
 import com.zlebank.zplatform.trade.service.InsteadPayService;
 import com.zlebank.zplatform.trade.service.MerchWhiteListService;
 import com.zlebank.zplatform.trade.service.RealNameAuthService;
-import com.zlebank.zplatform.trade.utils.HibernateValidatorUtil;
 
 /**
  * 
@@ -90,7 +56,8 @@ import com.zlebank.zplatform.trade.utils.HibernateValidatorUtil;
 @RequestMapping("mock")
 public class MockController {
 
-    private static final Log log = LogFactory.getLog(MockController.class);
+    @SuppressWarnings("unused")
+	private static final Log log = LogFactory.getLog(MockController.class);
 
     ////////////////////178///////////////////////
     /**私钥**/
@@ -206,7 +173,8 @@ public class MockController {
      * 私钥解密
      * @throws Exception 
      */
-    private void privateOpen() throws Exception {
+    @SuppressWarnings("unused")
+	private void privateOpen() throws Exception {
         
         String privateKey = "MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBAOYQmI3QralUVuXxGJmLyvTAtsot2/TWLCIMUa8eG5AvbXBwA8Y+t+oMChL8uZH2/JHg120wTm1jJaEqlh6HK5K0lvGdQYdxYkd1g42cwEzgMr+TENrCONleLHe1AGj3sFOnAexM0m3lUw3KfcIzsjXX2wJB4Yw5zNzLGtehD2flAgMBAAECgYB9fBvZbjLqowfqz4Adb/Q5X0vUJwNMHe1gfNuo6oEaOeQ1acOFQ/xIelycUqBdDxxf7QVTlv+QBn4l0/ahnBSVHYfnQAJuuu8UsOL1Hyw/u2brc+lUOCVRDSMEHHHttHQ4Ke+j5+Yrwl5oB4H7wTfWEOYqin/9nBnSmg1nUb3KAQJBAPa9m1YAKX3kIu1AaDUhhvW2TalWxUHXBbpQ5EkXqTMt+ZBuaXSq36ugP8t1cf5TTaj7ehOqvi4+OeqSImq8o0ECQQDussmYf8+rD68q5C7FcTRLLYvVCdlynuvX2cp0lrugHUD2y1R/XSuIu66oUbm0hXwUfO87VJUJr1TNQT07cW+lAkEA81790owCYPwfPyiiIJXbSozweTDvDAwMyEN1iGrgJ20XldByD/Ni/yPnCMXlFFgSZ7T0KmXlhDM4aRiO/fzmgQJAWgYqDA7gNqbirK2EikiorVXPMBjX3ufbEPx947zZpIiD8NA83RA5lAcc1zSDcncJlfyMiXbcAtwSgpsBSgL9VQJBAOesp37Cybow7cN2KIlkTB3MtbqUXlajOhMTZzfj6PYOe+bL/oNugUbILNlwm7x1J/TGQHGPn2W7qlaTpcF45IE=";
         String encryptedData = "TiVZeHBjqo02VzcqjRzCji5eog5KY11R8J9aRIF/WXZvSRZhe5/PRDao3/JbTJbYht3QicSjsnXltT4puap40DfDxHI3JCTIYwKBD+3Pv2xuxP7PkFL1EY+w72sDYII6vMOVRjPl2vY4BnZPDY6qK4l+MiwGQc4/Z+65TyedZiQIrP+DzUP0e3YAntjHU+GsgAyWRyV5Cf5Bw5VH3aRtnnxUtsyqI3XlZ8H/eQMbS6nsTemnBUNJuGXtf36rwL5obNKHVN2w5qiDc89ZxNWu42co83SLMAsJRZQQJgocoltJUrAeOnLkZkY+RAdkWnfmkO9FqsgO0gOQTt2NVoOkC2r/mV6p/LmNPGdTkVJHMbO+6RgqVcpU59kfZ8YuJauneLu6imII4ZsH2K41KnHQDcTQMK0e+2B92nvuFJEA7+7MVAmh9+5B4gIMMuDJq+/UymY/ncEnTDeDAipqUsy/PTenC9sbDjSvD6nAGw4CGuA2FO/5feDHxJKvnNglDLc=";
@@ -222,7 +190,8 @@ public class MockController {
      * 私钥加签
      * @throws Exception 
      */
-    private void r20151021() throws Exception {
+    @SuppressWarnings("unused")
+	private void r20151021() throws Exception {
         String privateKey = "MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBAKLLsnVlaexD2Xt/7N2EJ6yUNj6Jrv7SZhyrfBoUzX+0LJ62u1Zrok71lBzyY9OscqO+te1anVuKB+1blv4eYuKdIM0vd6AkIYz+AQo+ij4P1uOKIll8wf1Rlshkx5PYAMfM0d6zaqRiLG4pFGn5hLtC/srK40pieX2QLR6Ecgu1AgMBAAECgYBeSKL+otGJ6HHYuOoyEQv5Q413Ar67DpfdGuQxJsMtpugAs8wj7Qp/uHMjoK54NXPfqeArq0NfdL3KljUI0AhsTuU3J83ZVMXKiekXgDzhkZyW9mOwXKMUF0rKlM/yPewQ+tN54Nunew30qMWO5iGg+6gi8uSFNIsWO5Yl/zPisQJBAPDmn59F/JJEb7efD9Hd2IGoaD0pC3fxn33LYXNABs+6kG4e9AjzPPPe84z/mAy7BDaV3Enk9mI0eUhvJPKoaqsCQQCs/9YeZDBvM79Peh1TazsuosFsymyjJ7fklTCA2YuXAKVXmbbBvRZlVgh4x0I9Lj5Il3PB/Q85tIAl4aFCZ2MfAkEAoDAK9oM4Vx7Q1t4bS+dj/5u3bOvtJ13xO1nRPCzYGqupPMCyb30nC9c2RozzU4vMWmu+ZxisSVMxTtwxSnZ5LwJBAKvWf4+2gumiI/BE4qY+iA2durVeKCSzyhRyIDiMXfxCtvlZhM/SC1Hi8A1QFzqAGXuvfFr/C0WNRhDamnxEB48CQGwPxQ91JJkzPXPxlbiIINYNR8R+wJWP3o9MN+aBhMGifjDQUHSDB19ScVAyK0IG0j3YKzUL3v5yAgnfnFb56rM=";
         String strs = RSAUtils.sign("luxiaoshuai".getBytes(), privateKey);
         System.out.println("加签后是："+strs);
