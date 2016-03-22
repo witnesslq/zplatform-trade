@@ -108,6 +108,10 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
     	PojoBankTransferBatch transferBatch = bankTransferBatchDAO.getByBankTranBatchNo(batchNo);
      	//PojoTransferBatch transferBatch = transferBatchDAO.getByBatchNo(batchNo);
         List<PojoBankTransferData> transferDataList =  bankTransferDataDAO.findTransDataByBatchNo(batchNo);
+        //判断代付交易流水中师傅已经上传过文件
+        if(txnsInsteadPayDAO.isUpload(batchNo+"")){
+        	throw new TradeException("");
+        }
         Long sumAmt = 0L;
         Long sumItem = 0L;
         StringBuffer bodyMsg = new StringBuffer();
@@ -450,7 +454,8 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
                 }
                 bankTransferBatchDAO.update(transferBatch);
             }
-            
+            txnsInsteadPay.setStatus("00");
+            txnsInsteadPayDAO.update(txnsInsteadPay);
             //更新划拨明细数据
             
             

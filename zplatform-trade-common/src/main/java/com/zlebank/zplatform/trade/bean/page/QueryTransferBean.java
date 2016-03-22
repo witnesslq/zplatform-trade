@@ -20,6 +20,10 @@ public class QueryTransferBean implements Serializable{
     public String status;
     /**业务类型**/
     private String busiType;
+    /**关闭事件*/
+    private String openStatus;
+    /**转账状态**/
+    private String tranStatus;
     public long getTid() {
         return tid;
     }
@@ -55,6 +59,18 @@ public class QueryTransferBean implements Serializable{
 	}
 	public void setBusiType(String busiType) {
 		this.busiType = busiType;
+	}
+	public String getOpenStatus() {
+		return openStatus;
+	}
+	public void setOpenStatus(String openStatus) {
+		this.openStatus = openStatus;
+	}
+	public String getTranStatus() {
+		return tranStatus;
+	}
+	public void setTranStatus(String tranStatus) {
+		this.tranStatus = tranStatus;
 	}
     
 }

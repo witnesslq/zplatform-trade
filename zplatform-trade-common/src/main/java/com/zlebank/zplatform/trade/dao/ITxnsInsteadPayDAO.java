@@ -12,4 +12,11 @@ public interface ITxnsInsteadPayDAO extends BaseDAO<PojoTxnsInsteadPay>{
 	 * @return
 	 */
 	public PojoTxnsInsteadPay getByResponseFileName(String fileName);
+	
+	/**
+	 * @param batchNo 代付批次号/代付流水号
+	 * 判断文件是否上传
+	 * @return
+	 */
+	public boolean isUpload(String batchNo);
 }

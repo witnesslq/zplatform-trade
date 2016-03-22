@@ -279,10 +279,10 @@ public class BankTransferBatchDAOImpl
 	@Transactional(readOnly=true)
 	public Map<String, Object> queryBankTransferByPage(
 			QueryTransferBean queryTransferBean, int page, int pageSize) throws ParseException {
-		StringBuffer sqlBuffer = new StringBuffer("from PojoBankTransferBatch where openStatus=? ");
-		StringBuffer sqlCountBuffer = new StringBuffer("select count(*) from PojoBankTransferBatch where openStatus=? ");
+		StringBuffer sqlBuffer = new StringBuffer("from PojoBankTransferBatch where 1=1");
+		StringBuffer sqlCountBuffer = new StringBuffer("select count(*) from PojoBankTransferBatch where 1=1 ");
 		List<Object> parameterList = new ArrayList<Object>();
-		parameterList.add("1");
+		
 		if(queryTransferBean!=null){
 			if(StringUtil.isNotEmpty(queryTransferBean.getBatchNo())){
 				sqlBuffer.append(" and bankTranBatchNo = ? ");
@@ -303,6 +303,20 @@ public class BankTransferBatchDAOImpl
                 sqlBuffer.append(" and applyTime <= ? ");
                 sqlCountBuffer.append(" and applyTime <= ? ");
                 parameterList.add(DateUtil.convertToDate(queryTransferBean.getEndDate(), "yyyy-MM-dd"));
+            }
+            if(StringUtil.isNotEmpty(queryTransferBean.getOpenStatus())){
+            	sqlBuffer.append(" and openStatus = ? ");
+                sqlCountBuffer.append(" and openStatus = ? ");
+                parameterList.add(queryTransferBean.getOpenStatus());
+            }else{
+            	sqlBuffer.append(" and openStatus = ? ");
+                sqlCountBuffer.append(" and openStatus = ? ");
+                parameterList.add("1");
+            }
+            if(StringUtil.isNotEmpty(queryTransferBean.getTranStatus())){
+            	sqlBuffer.append(" and tranStatus = ? ");
+                sqlCountBuffer.append(" and tranStatus = ? ");
+                parameterList.add(queryTransferBean.getTranStatus());
             }
 		}
 		Query query = getSession().createQuery(sqlBuffer.toString());
@@ -365,6 +379,22 @@ public class BankTransferBatchDAOImpl
         criteria.add(Restrictions.eq("openStatus", openStatus.getCode()));
         criteria.createAlias("tranBatchs","tranBatchs").add(Restrictions.eq("tranBatchs.tid", tranBatchId));
         return (List<PojoBankTransferBatch>)criteria.list();
+    }
+    
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+    public boolean closeBankTransferBatch(Long tid){
+    	String queryString = "update PojoBankTransferBatch set openStatus = ? where tid = ? ";
+    	try {
+			log.info("queryString:" + queryString);
+			Query query = getSession().createQuery(queryString);
+			query.setParameter(0, "1");
+			query.setParameter(1, tid);
+			query.executeUpdate();
+			return true;
+		} catch (HibernateException e) {
+			e.printStackTrace();
+			throw new CMMException("M001");
+		}
     }
 
 }

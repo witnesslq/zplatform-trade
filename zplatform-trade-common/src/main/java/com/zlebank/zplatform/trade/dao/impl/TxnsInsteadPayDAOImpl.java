@@ -35,4 +35,21 @@ public class TxnsInsteadPayDAOImpl extends HibernateBaseDAOImpl<PojoTxnsInsteadP
 			throw new CMMException("M001");
 		}
 	}
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Throwable.class)
+	public boolean isUpload(String batchNo){
+		String queryString = "from PojoTxnsInsteadPay where insteadPayNo = ? ";
+		try {
+			log.info("queryString:" + queryString);
+			Query query = getSession().createQuery(queryString);
+			query.setParameter(0, batchNo);
+			if(query.list().size()>0){
+				return true;
+			}
+		} catch (HibernateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new CMMException("M001");
+		}
+		return false;
+	}
 }

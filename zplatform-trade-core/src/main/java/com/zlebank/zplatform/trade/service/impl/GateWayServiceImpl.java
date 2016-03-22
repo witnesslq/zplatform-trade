@@ -33,8 +33,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.zlebank.zplatform.acc.bean.BusiAcct;
 import com.zlebank.zplatform.acc.bean.BusiAcctQuery;
+import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.bean.enums.AcctStatusType;
 import com.zlebank.zplatform.acc.bean.enums.Usage;
+import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
+import com.zlebank.zplatform.acc.exception.AccBussinessException;
+import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.AccountQueryService;
 import com.zlebank.zplatform.commons.bean.PagedResult;
 import com.zlebank.zplatform.commons.utils.Base64Utils;
@@ -42,6 +46,7 @@ import com.zlebank.zplatform.commons.utils.RSAUtils;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.member.bean.CoopInstiMK;
 import com.zlebank.zplatform.member.bean.MerchMK;
+import com.zlebank.zplatform.member.bean.PersonManager;
 import com.zlebank.zplatform.member.bean.QuickpayCustBean;
 import com.zlebank.zplatform.member.bean.enums.MemberType;
 import com.zlebank.zplatform.member.bean.enums.TerminalAccessType;
@@ -54,6 +59,7 @@ import com.zlebank.zplatform.member.service.MemberBankCardService;
 import com.zlebank.zplatform.member.service.MemberService;
 import com.zlebank.zplatform.member.service.MerchMKService;
 import com.zlebank.zplatform.member.service.MerchService;
+import com.zlebank.zplatform.member.service.PersonService;
 import com.zlebank.zplatform.trade.adapter.quickpay.IQuickPayTrade;
 import com.zlebank.zplatform.trade.analyzer.GateWayTradeAnalyzer;
 import com.zlebank.zplatform.trade.bean.AccountTradeBean;
@@ -91,9 +97,7 @@ import com.zlebank.zplatform.trade.dao.RspmsgDAO;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.factory.TradeAdapterFactory;
 import com.zlebank.zplatform.trade.model.CashBankModel;
-import com.zlebank.zplatform.trade.model.MemberBaseModel;
 import com.zlebank.zplatform.trade.model.PojoRspmsg;
-import com.zlebank.zplatform.trade.model.QuickpayCustModel;
 import com.zlebank.zplatform.trade.model.TxncodeDefModel;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.model.TxnsOrderinfoModel;
@@ -102,9 +106,7 @@ import com.zlebank.zplatform.trade.model.TxnsWithdrawModel;
 import com.zlebank.zplatform.trade.service.IAccountPayService;
 import com.zlebank.zplatform.trade.service.ICashBankService;
 import com.zlebank.zplatform.trade.service.IGateWayService;
-import com.zlebank.zplatform.trade.service.IMemberService;
 import com.zlebank.zplatform.trade.service.IProdCaseService;
-import com.zlebank.zplatform.trade.service.IQuickpayCustService;
 import com.zlebank.zplatform.trade.service.IRouteConfigService;
 import com.zlebank.zplatform.trade.service.ITxncodeDefService;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
@@ -179,7 +181,12 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
     @Autowired
     private MerchService merchService;
     @Autowired
+    private AccEntryService accEntryService;
+    @Autowired
     private QuickpayCustDAO quickpayCustDAO;
+    @Autowired
+    private PersonService personService;
+    
     /**
      *
      * @return
@@ -407,7 +414,8 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         txnsLog.setTradestatflag("00000000");//交易初始状态
         //txnsLog.setTradcomm(GateWayTradeAnalyzer.generateCommAmt(order.getReserved()));
         if(StringUtil.isNotEmpty(riskRateInfoBean.getMerUserId())){
-            PojoMember personMemeber= memberService2.getMbmberByMemberId(riskRateInfoBean.getMerUserId(), MemberType.INDIVIDUAL);
+        	PersonManager personMemeber = personService.getPersonBeanByMemberId(riskRateInfoBean.getMerUserId());
+            //PojoMember personMemeber= memberService2.getMbmberByMemberId(riskRateInfoBean.getMerUserId(), MemberType.INDIVIDUAL);
             if(personMemeber!=null){
                 txnsLog.setAccmemberid(riskRateInfoBean.getMerUserId());
             }else{
@@ -823,11 +831,27 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlCycle().toString())));
             txnsLog.setAccmemberid(refundBean.getMemberId());
             txnsLogService.save(txnsLog);
+            
+            //退款账务处理
+            TradeInfo tradeInfo = new TradeInfo();
+            tradeInfo.setPayMemberId(refundBean.getMerId());
+            tradeInfo.setPayToMemberId(refundBean.getMemberId());
+            tradeInfo.setAmount(new BigDecimal(refundBean.getTxnAmt()));
+            tradeInfo.setCharge(new BigDecimal(txnsLog.getTxnfee()));
+            tradeInfo.setTxnseqno(txnsLog.getTxnseqno());
+            //记录分录流水
+            accEntryService.accEntryProcess(tradeInfo);
         } catch (NumberFormatException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
             throw new TradeException("T016");
-        }
+        } catch (AccBussinessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (AbstractBusiAcctException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         
        String tn = "";
         try {
@@ -948,6 +972,16 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
                 txnsLog.setTradestatflag("00000000");//交易初始状态
                 txnsLog.setAccmemberid(withdrawBean.getMemberId());
                 txnsLogService.save(txnsLog);
+                
+                //提现账务处理
+                TradeInfo tradeInfo = new TradeInfo();
+                tradeInfo.setPayMemberId(txnsLog.getAccmemberid());
+                tradeInfo.setPayToMemberId(txnsLog.getAccmemberid());
+                tradeInfo.setAmount(new BigDecimal(txnsLog.getAmount()));
+                tradeInfo.setCharge(new BigDecimal(txnsLog.getTxnfee()));
+                tradeInfo.setTxnseqno(txnsLog.getTxnseqno());
+                //记录分录流水
+                accEntryService.accEntryProcess(tradeInfo);
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
