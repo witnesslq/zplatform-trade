@@ -147,7 +147,7 @@ public class AccountPayServiceImpl implements IAccountPayService{
 			PojoMember pojo =memberDAO.getMemberByMemberId(accountTrade.getMemberId(), MemberType.INDIVIDUAL);
 			MemberBean memberBean = new MemberBean();
 			memberBean.setLoginName(pojo.getLoginName());
-			memberBean.setInstiId(pojo.getInstiId());
+			memberBean.setInstiCode(pojo.getInstiId()+"");
 			memberBean.setPaypwd(accountTrade.getPay_pwd());
 			// 校验支付密码
 			if (memberOperationServiceImpl.verifyPayPwd(MemberType.INDIVIDUAL,
