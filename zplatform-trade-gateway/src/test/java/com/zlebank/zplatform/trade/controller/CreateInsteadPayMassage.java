@@ -239,8 +239,8 @@ public class CreateInsteadPayMassage {
         commSetter(request, "22");
         request.setChannelType("00");
         request.setAccessType("0");
-        request.setBatchNo("3157");
-        request.setTxnTime("20160323113157");
+        request.setBatchNo("5454");
+        request.setTxnTime("20160323115454");
         
         JSONObject jsonData = JSONObject.fromObject(request);
         String beforeSign = jsonData.toString();

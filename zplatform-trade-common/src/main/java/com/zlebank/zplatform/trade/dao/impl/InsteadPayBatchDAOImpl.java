@@ -11,7 +11,6 @@
 package com.zlebank.zplatform.trade.dao.impl;
 
 import java.sql.Date;
-import java.text.ParseException;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -22,7 +21,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zlebank.zplatform.commons.dao.impl.AbstractPagedQueryDAOImpl;
-import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.bean.InsteadPayBatchQuery;
 import com.zlebank.zplatform.trade.dao.InsteadPayBatchDAO;
