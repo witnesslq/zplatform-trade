@@ -21,6 +21,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -87,6 +88,9 @@ public class PojoTranBatch implements Serializable{
     /**银行转账流水**/
     @JSONField(serialize = false)  
     private List<PojoTranData> tranDatas;
+    /**代付批次**/
+    @JSONField(serialize = false)  
+    private PojoInsteadPayBatch insteadPayBatch;
    
     @GenericGenerator(name = "id_gen", strategy = "enhanced-table", parameters = {
             @Parameter(name = "table_name", value = "T_C_PRIMAY_KEY"),
@@ -225,6 +229,14 @@ public class PojoTranBatch implements Serializable{
     }
     public void setTranDatas(List<PojoTranData> tranDatas) {
         this.tranDatas = tranDatas;
+    }
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name = "BUSI_BATCH_ID", insertable=false, updatable=false, nullable=false)
+    public PojoInsteadPayBatch getInsteadPayBatch() {
+        return insteadPayBatch;
+    }
+    public void setInsteadPayBatch(PojoInsteadPayBatch insteadPayBatch) {
+        this.insteadPayBatch = insteadPayBatch;
     }
     
     public void addTranDatas(List<PojoTranData> tranDatas){

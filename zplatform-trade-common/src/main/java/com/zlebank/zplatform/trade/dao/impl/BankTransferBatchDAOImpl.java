@@ -376,7 +376,9 @@ public class BankTransferBatchDAOImpl
     public List<PojoBankTransferBatch> getByTranBatchAndOpenStatus(long tranBatchId,
             BankTransferBatchOpenStatusEnum openStatus){
         Criteria criteria = getSession().createCriteria(PojoBankTransferBatch.class);
-        criteria.add(Restrictions.eq("openStatus", openStatus.getCode()));
+        if(openStatus != null && !(BankTransferBatchOpenStatusEnum.UNKNOW).equals(openStatus)){
+        	criteria.add(Restrictions.eq("openStatus", openStatus.getCode()));
+        }
         criteria.createAlias("tranBatchs","tranBatchs").add(Restrictions.eq("tranBatchs.tid", tranBatchId));
         return (List<PojoBankTransferBatch>)criteria.list();
     }
