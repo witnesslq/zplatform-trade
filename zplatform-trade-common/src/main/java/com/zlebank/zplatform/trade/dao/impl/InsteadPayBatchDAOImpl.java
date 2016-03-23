@@ -45,7 +45,7 @@ public class InsteadPayBatchDAOImpl extends AbstractPagedQueryDAOImpl<PojoInstea
      * @return
      */
     @Override
-    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public PojoInsteadPayBatch getByBatchNo(String batchNo, String txnTime) {
         Criteria crite= this.getSession().createCriteria(PojoInsteadPayBatch.class);
         crite.add(Restrictions.eq("batchNo", Long.parseLong(batchNo)));
