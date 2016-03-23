@@ -24,6 +24,8 @@ import javax.persistence.Table;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 /**
  * 代付批次表
  *
@@ -90,6 +92,17 @@ public class PojoInsteadPayBatch {
     /**批次明细**/
     private List<PojoInsteadPayDetail> details = new ArrayList<PojoInsteadPayDetail>();
     
+    /**划拨批次**/
+    @JSONField(serialize = false) 
+    private List<PojoTranBatch> tranBatchs = new ArrayList<PojoTranBatch>();
+    
+    @OneToMany(mappedBy="insteadPayBatch")
+    public List<PojoTranBatch> getTranBatchs(){
+    	return tranBatchs;
+    }
+    public void setTranBatchs(List<PojoTranBatch> tranBatchs){
+    	this.tranBatchs = tranBatchs;
+    }
 
     @OneToMany(mappedBy="insteadPayBatch")
     public List<PojoInsteadPayDetail> getDetails() {
