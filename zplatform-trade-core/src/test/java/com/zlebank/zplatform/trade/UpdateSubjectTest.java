@@ -15,7 +15,6 @@ import org.springframework.context.ApplicationContext;
 
 import com.zlebank.zplatform.trade.batch.spliter.BatchSpliter;
 import com.zlebank.zplatform.trade.bean.UpdateData;
-import com.zlebank.zplatform.trade.service.UpdateInsteadService;
 import com.zlebank.zplatform.trade.service.UpdateSubject;
 
 /**

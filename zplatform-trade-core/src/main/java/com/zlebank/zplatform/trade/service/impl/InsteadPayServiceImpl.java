@@ -190,6 +190,9 @@ public class InsteadPayServiceImpl
         StringBuilder whiteListError = new StringBuilder();
         if (isCheckWhiteList(request.getMerId())) {
             for (InsteadPayFile file : fileContent) {
+                // 如果是对公账户，跳过实名认证和白名单。
+                if ("02".equals(file.getAccType())) 
+                    continue;
                 String error = merchWhiteListService.checkMerchWhiteList(file.getMerId(), file.getAccName(), file.getAccNo());
                 if (StringUtil.isNotEmpty(error)) {
                     whiteListError.append(error);

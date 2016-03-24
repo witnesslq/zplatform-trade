@@ -50,20 +50,20 @@ public class CreateInsteadPayMassage {
     private Clipboard sysc = Toolkit.getDefaultToolkit().getSystemClipboard();
     
     ////////////////////245///////////////////////
-//     /**私钥**/
-//    public static final String PRIVATE_KEY = "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBALfbkQFWfmhZi0pOgTJLkKHUOgMCJmIDmxS7D0gupM2gdXqHkm4wWiIdPjFax009Z/m3JP/Plckwt3PhI22rdgfipeRhCTtSXvb/DC6UuO6WmNinMVtBHa7BFrUdxq3H7IE8grfcT99sv1sANc8B1Nh9iT20m5UWulD7qiPeS4NdAgMBAAECgYAIT/n/WHzAlQPSKTh4IKh6WJEC388CcW1Kg6aOOeWjklSdZJG/P5pjnnTYYGVQXa1cweX/VtBL11MD/zLN24mrf/qO2FkXYje4graXvah++eAscpVZIzQlKDcuuxNM68zHdwpSBuM4N22bOE8MnSdHfRGYWoEBP4hXwJQVISsIQQJBANqfsj/NpP0C+/rMSjnMV5PcSnC5sptft5mZuXPu+yY1G1yoio/5gzBJi9CRTgTgkuSYuLklDP0N9Nqm1rZ3kg0CQQDXSksbcxQagzqntRia1sM2/rWLlob9ldhddUxWdwSHeh5D67XKX0AZvj309FfYPm7dtLHmskE07J22aTDhqHKRAkAHTjrYoviWc9kTwmvgjpGGoV/jcHElfAdYnKhz1VKTLkchy4gF06KspGiFqbVfuFlwRiI2HaTXd/XssJKQOmKpAkAE0ANXzL3BTfessg6nv29DtnPmd+nylzvr8uhO8oAmayNsD0PUD0cGjEskQ6YHDnY5/IURjCCLB1MLNdTC5poRAkEAxKd2+jB5+WGC9rSrq9fezql8s6LkJodZyL8yDFvpMjKbAQcfcSc4Lk+u6BRfkPNQd0kih6AvKQ0XqA1m8fX/yw==";
-//    /**平台公钥**/
-//    public static final String LOCAL_PUB = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCmbaN3Hqy4S61+rYmsBML/k9rc6Br+FV6Kf8txGFfMyIwZiC+qqdWwa3wx4Knu3pXpwvECH/vEJN89TE2ygYEeLPhNN193kCVzQTF+ViOtySdQepw7R/VdAiaaXEWdQEtEaQBIBOf1I9+DgX37z5d0B+qJlwZT38sCsYZj9qNz8QIDAQAB";
-//    /**商户号**/
-//    public static final String MER_ID = "200000000000611";
+     /**私钥**/
+    public static final String PRIVATE_KEY = "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBALfbkQFWfmhZi0pOgTJLkKHUOgMCJmIDmxS7D0gupM2gdXqHkm4wWiIdPjFax009Z/m3JP/Plckwt3PhI22rdgfipeRhCTtSXvb/DC6UuO6WmNinMVtBHa7BFrUdxq3H7IE8grfcT99sv1sANc8B1Nh9iT20m5UWulD7qiPeS4NdAgMBAAECgYAIT/n/WHzAlQPSKTh4IKh6WJEC388CcW1Kg6aOOeWjklSdZJG/P5pjnnTYYGVQXa1cweX/VtBL11MD/zLN24mrf/qO2FkXYje4graXvah++eAscpVZIzQlKDcuuxNM68zHdwpSBuM4N22bOE8MnSdHfRGYWoEBP4hXwJQVISsIQQJBANqfsj/NpP0C+/rMSjnMV5PcSnC5sptft5mZuXPu+yY1G1yoio/5gzBJi9CRTgTgkuSYuLklDP0N9Nqm1rZ3kg0CQQDXSksbcxQagzqntRia1sM2/rWLlob9ldhddUxWdwSHeh5D67XKX0AZvj309FfYPm7dtLHmskE07J22aTDhqHKRAkAHTjrYoviWc9kTwmvgjpGGoV/jcHElfAdYnKhz1VKTLkchy4gF06KspGiFqbVfuFlwRiI2HaTXd/XssJKQOmKpAkAE0ANXzL3BTfessg6nv29DtnPmd+nylzvr8uhO8oAmayNsD0PUD0cGjEskQ6YHDnY5/IURjCCLB1MLNdTC5poRAkEAxKd2+jB5+WGC9rSrq9fezql8s6LkJodZyL8yDFvpMjKbAQcfcSc4Lk+u6BRfkPNQd0kih6AvKQ0XqA1m8fX/yw==";
+    /**平台公钥**/
+    public static final String LOCAL_PUB = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCmbaN3Hqy4S61+rYmsBML/k9rc6Br+FV6Kf8txGFfMyIwZiC+qqdWwa3wx4Knu3pXpwvECH/vEJN89TE2ygYEeLPhNN193kCVzQTF+ViOtySdQepw7R/VdAiaaXEWdQEtEaQBIBOf1I9+DgX37z5d0B+qJlwZT38sCsYZj9qNz8QIDAQAB";
+    /**商户号**/
+    public static final String MER_ID = "200000000000611";
     
     ////////////////////178///////////////////////
-    /**私钥**/
-   public static final String PRIVATE_KEY = "MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAIUoFvVggTt5TA4k2cEMDFprtOQggMgLrQLW9n+Pwx/S1DeUzqUStbArtfiNWvWxkjWm/LrOfpLXhG8zSRZBQMEcANmkiJvQDCb8LMsqbGiUSvj2ytIQgAh5IcbOQA8rkzOGJB1XTO15u0odI5nhtXeKGhwEWpetlMboxh/uMqXDAgMBAAECgYAlrN0qGl8WY9CYI+cUzwLjxpvM/EFT2LHgHtBp8VRFOdLf0xPQ8wVDTmrTY7N71v1GfvP9KxX3GFGZYQpp6JaYZGXcSWON8Mzh0Prixr67ShumXY0vxV8kaI3g7yIVLpH8yDdtCYP2mLcopC2FL3LwpeMuaIPu+I8K3sVmFN7CUQJBAMI6WmlQn0M3uyNpEbKgdfOLGTO5v0qm1aZ233H0Cw74Bl9PpMVYeuh2reLEMxuY5057H1fsUjTxmGZHdh6nLbkCQQCvgW5ihp6Y22YCQUN2JZL/apbkeA9MxfFKjYErk4L9yhVcjx8G4DFlG1cHadVmVuCnXQvyaElpsw1n+GB4iw1bAkAw1nlrZ9FUFoxgwAeqMbzW60//+KHIBKFORS+0OJgbQHRhvOYClVf6YfUhQxJSyyTGUCE2e37EP0eB2FA0LvdJAkAM57SJNCLnVIKsucXPIzYq59iOljFx0MBMXhlYbfFc3gYyFygN5mBbceY1WlfhvZOpWtMtEPQM/KiIs5/MXVUvAkBEvwmSnqoHdGpGSmeaxhqFdOQiumJ59EYvVxrvidHEzbT5o2w85GPV04bhLFwgq9ZsmaScrxb7VMh/7OSTXvHn";
-   /**平台公钥**/
-   public static final String LOCAL_PUB = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCADgeUl14xgaVtHOcrO5I8XFxY4+jtS9O/TzYjOrXx4HOqLaOx5iGqDz8UDRu8U7uDHFNHRnnOFcBj4iQKpoM+l2N9ojZp6UC294q2Hw2NncSP1Bq2bpDYsB6gon6Ig6SG+3A3fCPvzCEtp5K4XQgMJWxd/ybXV/U+LbPmCc9EzQIDAQAB";
-   /**商户号**/
-   public static final String MER_ID = "200000000000593";
+//    /**私钥**/
+//   public static final String PRIVATE_KEY = "MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAIUoFvVggTt5TA4k2cEMDFprtOQggMgLrQLW9n+Pwx/S1DeUzqUStbArtfiNWvWxkjWm/LrOfpLXhG8zSRZBQMEcANmkiJvQDCb8LMsqbGiUSvj2ytIQgAh5IcbOQA8rkzOGJB1XTO15u0odI5nhtXeKGhwEWpetlMboxh/uMqXDAgMBAAECgYAlrN0qGl8WY9CYI+cUzwLjxpvM/EFT2LHgHtBp8VRFOdLf0xPQ8wVDTmrTY7N71v1GfvP9KxX3GFGZYQpp6JaYZGXcSWON8Mzh0Prixr67ShumXY0vxV8kaI3g7yIVLpH8yDdtCYP2mLcopC2FL3LwpeMuaIPu+I8K3sVmFN7CUQJBAMI6WmlQn0M3uyNpEbKgdfOLGTO5v0qm1aZ233H0Cw74Bl9PpMVYeuh2reLEMxuY5057H1fsUjTxmGZHdh6nLbkCQQCvgW5ihp6Y22YCQUN2JZL/apbkeA9MxfFKjYErk4L9yhVcjx8G4DFlG1cHadVmVuCnXQvyaElpsw1n+GB4iw1bAkAw1nlrZ9FUFoxgwAeqMbzW60//+KHIBKFORS+0OJgbQHRhvOYClVf6YfUhQxJSyyTGUCE2e37EP0eB2FA0LvdJAkAM57SJNCLnVIKsucXPIzYq59iOljFx0MBMXhlYbfFc3gYyFygN5mBbceY1WlfhvZOpWtMtEPQM/KiIs5/MXVUvAkBEvwmSnqoHdGpGSmeaxhqFdOQiumJ59EYvVxrvidHEzbT5o2w85GPV04bhLFwgq9ZsmaScrxb7VMh/7OSTXvHn";
+//   /**平台公钥**/
+//   public static final String LOCAL_PUB = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCADgeUl14xgaVtHOcrO5I8XFxY4+jtS9O/TzYjOrXx4HOqLaOx5iGqDz8UDRu8U7uDHFNHRnnOFcBj4iQKpoM+l2N9ojZp6UC294q2Hw2NncSP1Bq2bpDYsB6gon6Ig6SG+3A3fCPvzCEtp5K4XQgMJWxd/ybXV/U+LbPmCc9EzQIDAQAB";
+//   /**商户号**/
+//   public static final String MER_ID = "200000000000593";
 
     /**
      * 总指挥
@@ -239,8 +239,8 @@ public class CreateInsteadPayMassage {
         commSetter(request, "22");
         request.setChannelType("00");
         request.setAccessType("0");
-        request.setBatchNo("5454");
-        request.setTxnTime("20160323115454");
+        request.setBatchNo("0326");
+        request.setTxnTime("20160323160326");
         
         JSONObject jsonData = JSONObject.fromObject(request);
         String beforeSign = jsonData.toString();
