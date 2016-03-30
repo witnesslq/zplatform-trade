@@ -54,6 +54,7 @@ public class TxnsWithdrawModel implements java.io.Serializable {
     private String notes;
     private String remarks;
     private String gatewayorderno;
+    private String texnseqno;
     public TxnsWithdrawModel (){
     }
 
@@ -394,6 +395,21 @@ public class TxnsWithdrawModel implements java.io.Serializable {
      */
     public void setGatewayorderno(String gatewayorderno) {
         this.gatewayorderno = gatewayorderno;
+    }
+
+    /**
+     * @return the texnseqno
+     */
+    @Column(name="TXNSEQNO",length=16)
+    public String getTexnseqno() {
+        return texnseqno;
+    }
+
+    /**
+     * @param texnseqno the texnseqno to set
+     */
+    public void setTexnseqno(String texnseqno) {
+        this.texnseqno = texnseqno;
     }
 
 }
