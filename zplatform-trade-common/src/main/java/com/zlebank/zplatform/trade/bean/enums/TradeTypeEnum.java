@@ -19,14 +19,11 @@ package com.zlebank.zplatform.trade.bean.enums;
  * @since 
  */
 public enum TradeTypeEnum {
-    SENDMARGINSMS(0),
-    MARGINREGISTER(1),
-    ONLINEDEPOSITSHORT(2),
-    WITHDRAWNOTIFY(3),
-    SUBMITPAY(4),
-    QUERYTRADE(5),
-    BANKSIGN(6),
-    ACCOUNTING(7),
+    SENDSMS(0),
+    SUBMITPAY(1),
+    QUERYTRADE(2),
+    BANKSIGN(3),
+    ACCOUNTING(4),
     UNKNOW(99);
    private int tradeType;
     

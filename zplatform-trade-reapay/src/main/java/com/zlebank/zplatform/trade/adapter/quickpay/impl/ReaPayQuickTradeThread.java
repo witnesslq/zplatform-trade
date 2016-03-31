@@ -73,20 +73,18 @@ public class ReaPayQuickTradeThread implements IQuickPayTrade{
        if(tradeBean==null){
            return;
        }
-       if(tradeType==TradeTypeEnum.SENDMARGINSMS){//发送/重发短信验证码
-           sendMarginSms(tradeBean);
-       }else if(tradeType==TradeTypeEnum.MARGINREGISTER){//开户/银行卡签约
-           marginRegister(tradeBean);
-       }else if(tradeType==TradeTypeEnum.ONLINEDEPOSITSHORT){//在线入金（基金产品）
-           onlineDepositShort(tradeBean);
-       }else if(tradeType==TradeTypeEnum.WITHDRAWNOTIFY){//在线出金（基金产品）
-           withdrawNotify(tradeBean);
-       }else if(tradeType==TradeTypeEnum.SUBMITPAY){//确认支付（第三方快捷支付渠道）
-           submitPay(tradeBean);
-       }else if(tradeType==TradeTypeEnum.BANKSIGN){//交易查询
-           bankSign(tradeBean);
-       }else if(tradeType==TradeTypeEnum.UNKNOW){//银行卡签约
-          
+       switch (tradeType) {
+			case SENDSMS:
+				sendSms(tradeBean);
+				break;
+			case SUBMITPAY:
+				submitPay(tradeBean);
+				break;
+			case BANKSIGN:
+				bankSign(tradeBean);
+				break;
+			default:
+				break;
        }
    }
     /**
@@ -95,7 +93,7 @@ public class ReaPayQuickTradeThread implements IQuickPayTrade{
      * @return
      */
     
-    public ResultBean sendMarginSms(TradeBean trade) {
+    public ResultBean sendSms(TradeBean trade) {
         trade.setPayinstiId(PAYINSTID);
         ResultBean resultBean = null;
         trade.setValidthru(trade.getMonth()+trade.getYear());
@@ -197,26 +195,7 @@ public class ReaPayQuickTradeThread implements IQuickPayTrade{
         return resultBean;
     }
 
-    /**
-     *
-     * @param trade
-     * @return
-     */
     
-    public ResultBean onlineDepositShort(TradeBean trade) {
-        return null;
-    }
-
-    /**
-     *
-     * @param trade
-     * @return
-     */
-    
-    public ResultBean withdrawNotify(TradeBean trade) {
-        // TODO Auto-generated method stub
-        return null;
-    }
     /**
      *
      * @param trade

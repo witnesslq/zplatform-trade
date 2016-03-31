@@ -689,7 +689,7 @@ public class TxnsQuickpayModel implements java.io.Serializable {
     
     public TxnsQuickpayModel(TradeBean trade,TradeTypeEnum tradeType){
         switch (tradeType) {
-            case MARGINREGISTER :
+            case SENDSMS :
                 this.id=OrderNumber.getInstance().generateID();
                 this.payorderno = OrderNumber.getInstance().generateCMBCQuickOrderNo();
                 this.payamt = Long.valueOf(trade.getAmount());
@@ -740,6 +740,8 @@ public class TxnsQuickpayModel implements java.io.Serializable {
                 this.mobile = trade.getMobile();
                 this.institution = trade.getPayinstiId();
                 break;
+		default:
+			break;
         }
         
     }

@@ -30,51 +30,90 @@ public class TradeBean implements Serializable,Cloneable{
      * serialVersionUID
      */
     private static final long serialVersionUID = 7990669165684148748L;
+    /**银行代码**/
     private String bankCode;
+    /**商户订单号**/
     private String orderId;
+    /**交易金额**/
     private String amount;
+    /**银行卡号**/
     private String cardNo;
+    /**账户名称**/    
     private String acctName;
+    /**证件号**/
     private String certId;
+    /**手机号**/
     private String mobile;
+    /**短信验证码**/
     private String identifyingCode;
+    /**交易类型**/
     private String tradeType;
+    /**证件类型**/
     private String certType;
+    /**备注**/
     private String resv;
+    /**证联支付用户ID**/
     private String userId;
+    /**交易序列号**/
     private String txnseqno;
+    /**商户号**/
     private String merchId;
+    /****/
     private String currentSetp;
+    /**商户名称**/
     private String merchName;
+    /**子商户号**/
     private String subMerchId="0";
+    /**子商户名称**/
     private String subMerchName;
+    /****/
     private String cashCode;
+    /**业务代码**/
     private String busicode;
+    /**业务类型**/
     private String busitype;
+    /**银行卡类型**/
     private String cardType;
-    
+    /**商品名称**/
     private String goodsName;
+    /**商品描述**/
     private String goodsDesc;
-    
+    /**cvv2**/
     private String cvv2;
+    /**信用卡有效期**/
     private String validthru;
+    /**证联金融会员号**/
     private String merUserId;
+    /**绑卡标示**/
     private String bindCardId;
+    /**支付机构标示**/
     private String payinstiId;
+    /**融宝订单号**/
     private String reaPayOrderNo;
+    /**有效期-年**/
     private String year;
+    /**有效期-月**/
     private String month;
+    /**绑卡主键**/
     private Long cardId=0L;
+    /**后四位卡号**/
     private String miniCardNo; 
+    /**交易金额（元）**/
     private String amount_y;
+    /**交易tn号**/
     private String tn;
+    /**账户余额**/
     private String balance;
+    /**支付密码**/
     private String pay_pwd;
+    /**支付会员IP**/
     private String memberIP;
-    
+    /**支付标志**/
     private String payFlag;
-    
+    /****/
     private String provno;
+    /**交易日期 **/
+    private String orderDate;
     /**
      * @return the memberIP
      */
@@ -765,6 +804,18 @@ public class TradeBean implements Serializable,Cloneable{
     public void setProvno(String provno) {
         this.provno = provno;
     }
+	/**
+	 * @return the orderDate
+	 */
+	public String getOrderDate() {
+		return orderDate;
+	}
+	/**
+	 * @param orderDate the orderDate to set
+	 */
+	public void setOrderDate(String orderDate) {
+		this.orderDate = orderDate;
+	}
     
     
 }

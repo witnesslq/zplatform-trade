@@ -82,15 +82,7 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
      */
     public void onReceive(ResultBean resultBean,TradeBean tradeBean,TradeTypeEnum tradeType) {
         // TODO Auto-generated method stub
-        if(tradeType==TradeTypeEnum.SENDMARGINSMS){//发送/重发短信验证码
-           
-        }else if(tradeType==TradeTypeEnum.MARGINREGISTER){//开户/银行卡签约
-           
-        }else if(tradeType==TradeTypeEnum.ONLINEDEPOSITSHORT){//在线入金（基金产品）
-           
-        }else if(tradeType==TradeTypeEnum.WITHDRAWNOTIFY){//在线出金（基金产品）
-            
-        }else if(tradeType==TradeTypeEnum.SUBMITPAY){//确认支付（第三方快捷支付渠道）
+        if(tradeType==TradeTypeEnum.SUBMITPAY){//确认支付（第三方快捷支付渠道）
             saveCMBCTradeResult(resultBean,tradeBean);
         }else if(tradeType==TradeTypeEnum.BANKSIGN){//交易查询
             
@@ -106,7 +98,7 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
             
             if(resultBean.isResultBool()){//交易成功
                 TxnsWithholdingModel withholding = (TxnsWithholdingModel) resultBean.getResultObj();
-                PayPartyBean payPartyBean = new PayPartyBean(tradeBean.getTxnseqno(),"01", tradeBean.getOrderId(), "93000002", ConsUtil.getInstance().cons.getCmbc_merid(), "", DateUtil.getCurrentDateTime(), "",tradeBean.getCardNo(),"","");
+                PayPartyBean payPartyBean = new PayPartyBean(tradeBean.getTxnseqno(),"01", tradeBean.getOrderId(), "93000002", ConsUtil.getInstance().cons.getCmbc_merid(), "", DateUtil.getCurrentDateTime(), "",tradeBean.getCardNo());
                 //更新支付方信息
                 txnsLogService.updatePayInfo_Fast(payPartyBean);
                 //更新交易流水中心应答信息
@@ -155,13 +147,13 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
                 /**异步通知处理结束 **/
             }else{
                 if(resultBean.getErrCode().equals("R")){//对于交易结果不确定的，需要启动查询机制进行处理，最多3分钟后有明确结果
-                    PayPartyBean payPartyBean = new PayPartyBean(tradeBean.getTxnseqno(),"01", tradeBean.getOrderId(), "93000002", ConsUtil.getInstance().cons.getCmbc_merid(), "", DateUtil.getCurrentDateTime(), "",tradeBean.getCardNo(),"","");
+                    PayPartyBean payPartyBean = new PayPartyBean(tradeBean.getTxnseqno(),"01", tradeBean.getOrderId(), "93000002", ConsUtil.getInstance().cons.getCmbc_merid(), "", DateUtil.getCurrentDateTime(), "",tradeBean.getCardNo());
                     //更新支付方信息
                     txnsLogService.updatePayInfo_Fast(payPartyBean);
                 }else{
                     //订单状态更新为失败
                     txnsOrderinfoDAO.updateOrderToFail(tradeBean.getOrderId(),tradeBean.getMerUserId());
-                    PayPartyBean payPartyBean = new PayPartyBean(tradeBean.getTxnseqno(),"01", tradeBean.getOrderId(), "93000002", ConsUtil.getInstance().cons.getCmbc_merid(), "", DateUtil.getCurrentDateTime(), "",tradeBean.getCardNo(),"","");
+                    PayPartyBean payPartyBean = new PayPartyBean(tradeBean.getTxnseqno(),"01", tradeBean.getOrderId(), "93000002", ConsUtil.getInstance().cons.getCmbc_merid(), "", DateUtil.getCurrentDateTime(), "",tradeBean.getCardNo());
                     //更新支付方信息
                     txnsLogService.updatePayInfo_Fast(payPartyBean);
                     //更新支付方返回结果
@@ -272,9 +264,9 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
         if(StringUtil.isNotEmpty(withholding.getOrireqserialno())){
             TxnsWithholdingModel old_withholding = txnsWithholdingService.getWithholdingBySerialNo(withholding.getOrireqserialno());
             //更新支付方信息
-            payPartyBean = new PayPartyBean(txnseqno,"01", withholding.getSerialno(), old_withholding.getChnlcode(), ConsUtil.getInstance().cons.getCmbc_merid(), "", DateUtil.getCurrentDateTime(), "",old_withholding.getAccno(),"","");
+            payPartyBean = new PayPartyBean(txnseqno,"01", withholding.getSerialno(), old_withholding.getChnlcode(), ConsUtil.getInstance().cons.getCmbc_merid(), "", DateUtil.getCurrentDateTime(), "",old_withholding.getAccno());
         }else{
-            payPartyBean = new PayPartyBean(txnseqno,"01", withholding.getSerialno(), withholding.getChnlcode(), ConsUtil.getInstance().cons.getCmbc_merid(), "", DateUtil.getCurrentDateTime(), "",withholding.getAccno(),"","");
+            payPartyBean = new PayPartyBean(txnseqno,"01", withholding.getSerialno(), withholding.getChnlcode(), ConsUtil.getInstance().cons.getCmbc_merid(), "", DateUtil.getCurrentDateTime(), "",withholding.getAccno());
         }
         
         txnsLogService.updatePayInfo_Fast(payPartyBean);

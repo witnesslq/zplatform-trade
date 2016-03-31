@@ -1672,7 +1672,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             trade.setMerUserId(txnsLog.getAccmemberid());
             trade.setPayinstiId(routId);
             quickPayTrade.setTradeBean(trade);
-            quickPayTrade.setTradeType(TradeTypeEnum.MARGINREGISTER);
+            quickPayTrade.setTradeType(TradeTypeEnum.BANKSIGN);
             QuickpayCustBean bean = new QuickpayCustBean();
             bean.setCardno(cardBean.getCardNo());
             bean.setCardtype(cardBean.getCardType());
@@ -1745,7 +1745,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
                 throw new TradeException("T001");
             }
             quickPayTrade.setTradeBean(trade);
-            quickPayTrade.setTradeType(TradeTypeEnum.MARGINREGISTER);
+            quickPayTrade.setTradeType(TradeTypeEnum.SENDSMS);
             ResultBean resultBean = quickPayTrade.bankSign(trade);
             if (resultBean.isResultBool()) {
                 if(routId.equals("93000002")||routId.equals("93000003")){
@@ -2100,7 +2100,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             trade.setMerUserId(personMemberId);
             trade.setPayinstiId(routId);
             quickPayTrade.setTradeBean(trade);
-            quickPayTrade.setTradeType(TradeTypeEnum.MARGINREGISTER);
+            quickPayTrade.setTradeType(TradeTypeEnum.BANKSIGN);
             //Long bindId=quickpayCustService.saveQuickpayCust(trade);
             //trade.setCardId(bindId);
             resultBean = quickPayTrade.bankSign(trade);

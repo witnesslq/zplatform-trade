@@ -191,8 +191,8 @@ public class PayPartyBean implements Serializable{
      */
     public PayPartyBean(String txnseqno, String paytype, String payordno,
             String payinst, String payfirmerno, String paysecmerno,
-            String payordcomtime, String payordfintime, String cardNo,
-            String rout, String routlvl) {
+            String payordcomtime, String payordfintime, String cardNo
+            ) {
         super();
         this.txnseqno = txnseqno;
         this.paytype = paytype;
@@ -203,8 +203,7 @@ public class PayPartyBean implements Serializable{
         this.payordcomtime = payordcomtime;
         this.payordfintime = payordfintime;
         this.cardNo = cardNo;
-        this.rout = rout;
-        this.routlvl = routlvl;
+        
     }
     /**
      * @return the payrettsnseqno

@@ -62,7 +62,7 @@ public class TestQuickTrade implements IQuickPayTrade{
      * @return
      */
     
-    public ResultBean sendMarginSms(TradeBean trade) {
+    public ResultBean sendSms(TradeBean trade) {
         trade.setPayinstiId(PAYINSTID);
         ResultBean resultBean = null;
         if(StringUtil.isEmpty(trade.getValidthru())){//判断有效是是否为空

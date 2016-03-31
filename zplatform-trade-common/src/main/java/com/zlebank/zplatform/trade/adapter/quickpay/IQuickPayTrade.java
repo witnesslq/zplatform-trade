@@ -27,47 +27,27 @@ public interface IQuickPayTrade extends Runnable{
      * 发送/重发短信验证码
      * @param trade
      * @return
-     */
-    ResultBean sendMarginSms(TradeBean trade);
-    /**
-     * 开户/银行卡签约
-     * @param trade
-     * @return
-     */
-    ResultBean marginRegister(TradeBean trade);
-    /**
-     * 在线入金（基金产品）
-     * @param trade
-     * @return
-     */
-    ResultBean onlineDepositShort(TradeBean trade);
-    /**
-     * 在线出金（基金产品）
-     * @param trade
-     * @return
-     */
-    ResultBean withdrawNotify(TradeBean trade);
-    /**
-     * 确认支付（第三方快捷支付渠道）
-     * @return
-     */
-    ResultBean submitPay(TradeBean trade);
-    
-    /**
-     * 交易查询
-     * @param trade
-     * @return
-     */
-    ResultBean queryTrade(TradeBean trade);
-    
+     */ 
+    public ResultBean sendSms(TradeBean trade);
     /**
      * 银行卡签约
      * @param trade
      * @return
      */
-    ResultBean bankSign(TradeBean trade);
+    public ResultBean bankSign(TradeBean trade);
+    /**
+     * 确认支付（第三方快捷支付渠道）
+     * @return
+     */
+    public ResultBean submitPay(TradeBean trade);
+    /**
+     * 交易查询
+     * @param trade
+     * @return
+     */
+    public ResultBean queryTrade(TradeBean trade);
     
-    void setTradeType(TradeTypeEnum tradeType);
+    public void setTradeType(TradeTypeEnum tradeType);
     
-    void setTradeBean(TradeBean tradeBean);
+    public void setTradeBean(TradeBean tradeBean);
 }

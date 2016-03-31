@@ -139,7 +139,7 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
             sumAmt += bean.getTranAmt().longValue();
             sumItem++;
             //PojoTranData tranData = transferDataDAO.queryTransferData(bean.getTranData().getTid());
-            TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(bean.getTranData().getTxnseqno());
+            //TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(bean.getTranData().getTxnseqno());
             //风控
             //txnsLogService.tradeRiskControl(txnsLog.getTxnseqno(),txnsLog.getAccfirmerno(),txnsLog.getAccsecmerno(),txnsLog.getAccmemberid(),txnsLog.getBusicode(),txnsLog.getAmount()+"",bean.getAccType(),bean.getAccNo());
         }

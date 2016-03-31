@@ -62,26 +62,24 @@ public class CMBCSelfQuickPayTradeThread implements IQuickPayTrade{
         if(tradeBean==null){
             return;
         }
-        if(tradeType==TradeTypeEnum.SENDMARGINSMS){//发送/重发短信验证码
-            sendMarginSms(tradeBean);
-        }else if(tradeType==TradeTypeEnum.MARGINREGISTER){//开户/银行卡签约
-            marginRegister(tradeBean);
-        }else if(tradeType==TradeTypeEnum.ONLINEDEPOSITSHORT){//在线入金（基金产品）
-            onlineDepositShort(tradeBean);
-        }else if(tradeType==TradeTypeEnum.WITHDRAWNOTIFY){//在线出金（基金产品）
-            withdrawNotify(tradeBean);
-        }else if(tradeType==TradeTypeEnum.SUBMITPAY){//确认支付（第三方快捷支付渠道）
-            submitPay(tradeBean);
-        }else if(tradeType==TradeTypeEnum.BANKSIGN){//银行卡签约
-            bankSign(tradeBean);
-        }else if(tradeType==TradeTypeEnum.UNKNOW){//
-           
-        }
+        switch (tradeType) {
+		case SENDSMS:
+			sendSms(tradeBean);
+			break;
+		case SUBMITPAY:
+			submitPay(tradeBean);
+			break;
+		case BANKSIGN:
+			bankSign(tradeBean);
+			break;
+		default:
+			break;
+	}
         
     }
 
     @Override
-    public ResultBean sendMarginSms(TradeBean trade) {
+    public ResultBean sendSms(TradeBean trade) {
         ResultBean resultBean = null;
         try {
             
@@ -98,36 +96,6 @@ public class CMBCSelfQuickPayTradeThread implements IQuickPayTrade{
         return resultBean;
     }
 
-    /**
-     * 银行卡签约
-     *
-     * @param trade
-     * @return
-     */
-    @Override
-    public ResultBean marginRegister(TradeBean trade) {
-        ResultBean resultBean = null;
-        log.info("CMBC Self withholding bank sign start!");
-        if(log.isDebugEnabled()){
-                log.debug(JSON.toJSONString(trade));
-        }
-        trade.setPayinstiId(PAYINSTID);
-        resultBean = sendMarginSms(trade);
-        log.info("CMBC withholding bank sign end!");
-        return resultBean;
-    }
-
-    @Override
-    public ResultBean onlineDepositShort(TradeBean trade) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public ResultBean withdrawNotify(TradeBean trade) {
-        // TODO Auto-generated method stub
-        return null;
-    }
 
     @Override
     public ResultBean submitPay(TradeBean trade) {
@@ -148,7 +116,7 @@ public class CMBCSelfQuickPayTradeThread implements IQuickPayTrade{
                 resultBean = new ResultBean("30HK", "交易失败，动态口令或短信验证码校验失败");
             }
             //更新支付方信息
-            PayPartyBean payPartyBean = new PayPartyBean(trade.getTxnseqno(),"01", "", ChannelEnmu.CMBCSELFWITHHOLDING.getChnlcode(), ConsUtil.getInstance().cons.getCmbc_merid(), "", DateUtil.getCurrentDateTime(), "",trade.getCardNo(),"","");
+            PayPartyBean payPartyBean = new PayPartyBean(trade.getTxnseqno(),"01", "", ChannelEnmu.CMBCSELFWITHHOLDING.getChnlcode(), ConsUtil.getInstance().cons.getCmbc_merid(), "", DateUtil.getCurrentDateTime(), "",trade.getCardNo());
             txnsLogService.updatePayInfo_Fast(payPartyBean);
             if(resultBean!=null){
                 txnsLogService.updatePayInfo_Fast_result(tradeBean.getTxnseqno(), resultBean.getErrCode(),resultBean.getErrMsg());
@@ -212,7 +180,14 @@ public class CMBCSelfQuickPayTradeThread implements IQuickPayTrade{
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        return marginRegister(trade);
+        log.info("CMBC Self withholding bank sign start!");
+        if(log.isDebugEnabled()){
+                log.debug(JSON.toJSONString(trade));
+        }
+        trade.setPayinstiId(PAYINSTID);
+        resultBean = sendSms(trade);
+        log.info("CMBC withholding bank sign end!");
+        return resultBean;
     }
 
     /**

@@ -618,7 +618,7 @@ public class GateWayController {
                 String routId = routResultBean.getResultObj().toString();
                 IQuickPayTrade quickPayTrade = TradeAdapterFactory
                         .getInstance().getQuickPayTrade(routId);
-                bean = quickPayTrade.sendMarginSms(trade);
+                bean = quickPayTrade.sendSms(trade);
             } else {
                 return routResultBean;
             }
@@ -648,7 +648,7 @@ public class GateWayController {
         IQuickPayTrade quickPayTrade = TradeAdapterFactory.getInstance()
                 .getQuickPayTrade(routBean.getChnlcode());
         trade.setCurrentSetp(routBean.getTxncode_current());
-        ResultBean resultBean = quickPayTrade.marginRegister(trade);
+        ResultBean resultBean = quickPayTrade.bankSign(trade);
         // 更新核心交易表路由信息
         txnsLogService.updateRoutInfo(trade.getTxnseqno(), routId,
                 routBean.getTxncode_current(), trade.getCashCode());
@@ -673,13 +673,13 @@ public class GateWayController {
                 PayPartyBean payPartyBean = new PayPartyBean(
                         trade.getTxnseqno(), "01", trade.getOrderId(), "",
                         ConsUtil.getInstance().cons.getInstuId(), "",
-                        DateUtil.getCurrentDateTime(), "", trade.getCardNo(),
-                        routId, routBean.getTxncode_current());
+                        DateUtil.getCurrentDateTime(), "", trade.getCardNo()
+                        );
                 txnsLogService.updatePayInfo_Fast(payPartyBean);
                 // 更新核心交易表路由信息
                 txnsLogService.updateRoutInfo(trade.getTxnseqno(), routId,
                         routBean.getTxncode_current(), trade.getCashCode());
-                resultBean = quickPayTrade.onlineDepositShort(trade);
+                resultBean = quickPayTrade.submitPay(trade);
                 if (resultBean.isResultBool()) {// 快捷支付成功
                     zlPayResult = (ZLPayResultBean) resultBean.getResultObj();
                     // 完成核心交易的记录和网关交易记录的更新

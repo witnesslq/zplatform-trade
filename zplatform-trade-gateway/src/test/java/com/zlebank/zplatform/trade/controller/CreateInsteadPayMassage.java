@@ -75,15 +75,15 @@ public class CreateInsteadPayMassage {
     public static void main(String[] args) throws Exception {
         CreateInsteadPayMassage run = new CreateInsteadPayMassage();
         // 生成代付报文
-        run.createInsteadPay();
-        // 生成代付查询结果
-//        run.createInsteadPayQuery();
+        //run.createInsteadPay();
+        // 生成代付查询结果      
+        //run.createInsteadPayQuery();
         // 生成实名认证 
-//        run.createRealNameAuth();
+        //run.createRealNameAuth();
         // 生成实名认证查询
-//        run.createRealNameAuthQuery();
+        run.createRealNameAuthQuery();
         // 生成白名单添加
-//        run.createMerchWhiteList();
+        //run.createMerchWhiteList();
         // 加密
 //        run.compressionByDeflated();
         
@@ -243,7 +243,6 @@ public class CreateInsteadPayMassage {
         request.setAccessType("0");
         request.setBatchNo("1025");
         request.setTxnTime("20151126121212");
-        
         JSONObject jsonData = JSONObject.fromObject(request);
         String beforeSign = jsonData.toString();
         String signedData = RSAUtils.sign(beforeSign.getBytes(), PRIVATE_KEY);

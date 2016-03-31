@@ -63,7 +63,7 @@ public class ReaPayQuickTrade implements IQuickPayTrade{
      * @return
      */
     
-    public ResultBean sendMarginSms(TradeBean trade) {
+    public ResultBean sendSms(TradeBean trade) {
         trade.setPayinstiId(PAYINSTID);
         ResultBean resultBean = null;
         trade.setValidthru(trade.getMonth()+trade.getYear());

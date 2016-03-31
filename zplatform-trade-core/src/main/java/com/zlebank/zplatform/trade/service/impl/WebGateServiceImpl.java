@@ -264,7 +264,7 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             trade.setCardId(Id);
             trade.setReaPayOrderNo(OrderNumber.getInstance().generateReaPayOrderId());
             trade.setMerUserId(txnsLog.getAccmemberid());
-            quickPayTrade.setTradeType(TradeTypeEnum.MARGINREGISTER);
+            quickPayTrade.setTradeType(TradeTypeEnum.BANKSIGN);
             quickPayTrade.setTradeBean(trade);
             //TradeAdapterFactory.getInstance().getThreadPool(routId).executeMission(quickPayTrade);
             ResultBean resultBean = quickPayTrade.bankSign(trade);
@@ -327,11 +327,11 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         trade.setCertId(custCard.getIdnum());
         trade.setValidthru(custCard.getValidtime());// web收银台使用
         trade.setCvv2(custCard.getCvv2());
-        quickPayTrade.setTradeType(TradeTypeEnum.MARGINREGISTER);
+        quickPayTrade.setTradeType(TradeTypeEnum.BANKSIGN);
         quickPayTrade.setTradeBean(trade);
         //ReaPayTradeThreadPool.getInstance().executeMission(quickPayTrade);
         //TradeAdapterFactory.getInstance().getThreadPool(routId).executeMission(quickPayTrade);
-        ResultBean bean =quickPayTrade.marginRegister(trade);
+        ResultBean bean =quickPayTrade.bankSign(trade);
         if (bean.isResultBool()) {
             ChannelEnmu channel = ChannelEnmu.fromValue(routId);
             switch (channel) {

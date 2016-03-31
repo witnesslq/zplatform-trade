@@ -69,7 +69,6 @@ public class TxnsQuickpayServiceImpl extends BaseServiceImpl<TxnsQuickpayModel, 
     @Transactional
     public void saveMobileCode(TradeBean trade,MarginSmsBean marginSmsBean) {
         TxnsQuickpayModel txnsQuickpay = new TxnsQuickpayModel(trade,marginSmsBean);
-        
         super.save(txnsQuickpay);
     }
     
@@ -298,7 +297,7 @@ public class TxnsQuickpayServiceImpl extends BaseServiceImpl<TxnsQuickpayModel, 
      */
     @Transactional
     public String saveCMBCOuterBankSign(TradeBean trade) {
-        TxnsQuickpayModel txnsQuickpay = new TxnsQuickpayModel(trade,TradeTypeEnum.MARGINREGISTER);
+        TxnsQuickpayModel txnsQuickpay = new TxnsQuickpayModel(trade,TradeTypeEnum.BANKSIGN);
         super.save(txnsQuickpay);
         return txnsQuickpay.getPayorderno();
     }

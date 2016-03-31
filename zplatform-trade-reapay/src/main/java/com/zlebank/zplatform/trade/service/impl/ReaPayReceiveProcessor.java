@@ -57,15 +57,7 @@ public class ReaPayReceiveProcessor implements ITradeReceiveProcessor{
             TradeTypeEnum tradeType) {
         
      // TODO Auto-generated method stub
-        if(tradeType==TradeTypeEnum.SENDMARGINSMS){//发送/重发短信验证码
-           
-        }else if(tradeType==TradeTypeEnum.MARGINREGISTER){//开户/银行卡签约
-           
-        }else if(tradeType==TradeTypeEnum.ONLINEDEPOSITSHORT){//在线入金（基金产品）
-           
-        }else if(tradeType==TradeTypeEnum.WITHDRAWNOTIFY){//在线出金（基金产品）
-            
-        }else if(tradeType==TradeTypeEnum.SUBMITPAY){//确认支付（第三方快捷支付渠道）
+        if(tradeType==TradeTypeEnum.SUBMITPAY){//确认支付（第三方快捷支付渠道）
             saveReaPayTradeResult(resultBean,tradeBean);
         }else if(tradeType==TradeTypeEnum.BANKSIGN){//交易查询
             
@@ -87,7 +79,7 @@ public class ReaPayReceiveProcessor implements ITradeReceiveProcessor{
                 txnsOrderinfoDAO.updateOrderToFail(tradeBean.getOrderId(),tradeBean.getMerchId());
             }
             //String txnseqno, String paytype, String payordno, String payinst, String payfirmerno, String paysecmerno, String payordcomtime, String payordfintime, String cardNo, String rout, String routlvl
-            PayPartyBean payPartyBean = new PayPartyBean(tradeBean.getTxnseqno(),"01", tradeBean.getOrderId(), ConsUtil.getInstance().cons.getReapay_chnl_code(), ConsUtil.getInstance().cons.getReapay_quickpay_merchant_id(), "", DateUtil.getCurrentDateTime(), "",tradeBean.getCardNo(),"","");
+            PayPartyBean payPartyBean = new PayPartyBean(tradeBean.getTxnseqno(),"01", tradeBean.getOrderId(), ConsUtil.getInstance().cons.getReapay_chnl_code(), ConsUtil.getInstance().cons.getReapay_quickpay_merchant_id(), "", DateUtil.getCurrentDateTime(), "",tradeBean.getCardNo());
             txnsLogService.updatePayInfo_Fast(payPartyBean);
             txnsLogService.updateReaPayRetInfo(tradeBean.getTxnseqno(), payResult);
     }
