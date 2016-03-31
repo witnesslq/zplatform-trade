@@ -4,3 +4,5 @@
 /*.bat
 /bin/
 .classpath
+/target/
+/target/
