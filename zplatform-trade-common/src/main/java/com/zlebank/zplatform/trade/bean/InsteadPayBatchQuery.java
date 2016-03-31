@@ -25,6 +25,8 @@ import com.zlebank.zplatform.commons.bean.Bean;
  */
 public class InsteadPayBatchQuery implements Bean{
 
+	/**代付批次**/
+	private Long id;
     /**划拨批次号*/
     private String batchNo;
     /**开始时间*/
@@ -36,7 +38,13 @@ public class InsteadPayBatchQuery implements Bean{
     /** 状态列表 **/
     private List<String> statusList;
     
-    public String getBatchNo() {
+    public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
+	public String getBatchNo() {
         return batchNo;
     }
     public void setBatchNo(String batchNo) {

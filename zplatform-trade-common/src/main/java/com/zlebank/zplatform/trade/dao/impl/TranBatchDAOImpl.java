@@ -20,7 +20,9 @@ import com.zlebank.zplatform.commons.bean.TransferBatchQuery;
 import com.zlebank.zplatform.commons.dao.impl.AbstractPagedQueryDAOImpl;
 import com.zlebank.zplatform.commons.dao.pojo.AccStatusEnum;
 import com.zlebank.zplatform.commons.utils.StringUtil;
+import com.zlebank.zplatform.trade.bean.enums.TransferBatchStatusEnum;
 import com.zlebank.zplatform.trade.dao.TranBatchDAO;
+import com.zlebank.zplatform.trade.model.PojoBankTransferBatch;
 import com.zlebank.zplatform.trade.model.PojoTranBatch;
 
 @Repository
@@ -250,4 +252,16 @@ public class TranBatchDAOImpl extends
 		
 		
 	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	@Transactional(propagation=Propagation.REQUIRED)
+	public List<PojoTranBatch> getByInsteadPayBatchandStaus(
+			Long id, List<String> status) {
+		Criteria criteria = getSession().createCriteria(PojoTranBatch.class);
+		criteria.add(Restrictions.eq("insteadPayBatch.id", id));
+        criteria.createAlias("insteadPayBatch","insteadPayBatch").add(Restrictions.in("status", status));
+        return (List<PojoTranBatch>)criteria.list();
+	}
+	
 }

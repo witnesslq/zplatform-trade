@@ -91,8 +91,7 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
     @Autowired
     private ITxnsInsteadPayDAO txnsInsteadPayDAO;
     
-    @Autowired
-    private UpdateSubject updateSubject;
+    
     /**
      * 批量代付(跨行)
      * 

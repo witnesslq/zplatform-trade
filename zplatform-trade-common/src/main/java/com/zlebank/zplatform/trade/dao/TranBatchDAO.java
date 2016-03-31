@@ -5,6 +5,7 @@ import java.util.List;
 import com.zlebank.zplatform.commons.bean.TransferBatchQuery;
 import com.zlebank.zplatform.commons.dao.BasePagedQueryDAO;
 import com.zlebank.zplatform.commons.dao.pojo.AccStatusEnum;
+import com.zlebank.zplatform.trade.bean.enums.TransferBatchStatusEnum;
 import com.zlebank.zplatform.trade.model.PojoTranBatch;
 
 public interface TranBatchDAO extends BasePagedQueryDAO<PojoTranBatch,TransferBatchQuery>{
@@ -72,4 +73,11 @@ public interface TranBatchDAO extends BasePagedQueryDAO<PojoTranBatch,TransferBa
      * @param tid
      */
     public void updateBankTransferResult(Long tid);
+    /**
+     * 根据代付批次和审核状态查询划拨批次
+     * @param insteadBatchNo
+     * @param status
+     * @return
+     */
+    public List<PojoTranBatch> getByInsteadPayBatchandStaus(Long id, List<String> status);
 }

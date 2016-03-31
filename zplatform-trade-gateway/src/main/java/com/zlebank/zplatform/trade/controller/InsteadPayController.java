@@ -62,6 +62,7 @@ import com.zlebank.zplatform.trade.insteadPay.message.RealnameAuthQuery_Request;
 import com.zlebank.zplatform.trade.insteadPay.message.RealnameAuthQuery_Response;
 import com.zlebank.zplatform.trade.insteadPay.message.RealnameAuth_Request;
 import com.zlebank.zplatform.trade.insteadPay.message.RealnameAuth_Response;
+import com.zlebank.zplatform.trade.message.ResultMessage;
 import com.zlebank.zplatform.trade.service.InsteadPayService;
 import com.zlebank.zplatform.trade.service.MerchWhiteListService;
 import com.zlebank.zplatform.trade.service.RealNameAuthService;
@@ -145,7 +146,7 @@ public class InsteadPayController {
         InsteadPay_Response responseBean = new InsteadPay_Response();
         
         if (StringUtil.isEmpty(data)) {
-            responseBean.setRespCode(ERROR_CODE);
+            responseBean.setRespCode("10");
             responseBean.setRespMsg("收到数据为空");
             responseData(responseStream, responseBean);
             return null;
@@ -155,11 +156,11 @@ public class InsteadPayController {
         try {
             jsonObject = JSONObject.fromObject( data);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             responseBean.setRespCode(ERROR_CODE);
             responseBean.setRespMsg("无效的Json数据");
             responseData(responseStream, responseBean);
             return null;
-//            e.printStackTrace();
         }
         
         // 请求报文
@@ -182,7 +183,7 @@ public class InsteadPayController {
             // 商户白名单添加
             merWhiteList(data, httpSession, response);
         } else {
-            responseBean.setRespCode(ERROR_CODE);
+            responseBean.setRespCode("12");
             responseBean.setRespMsg("不是合法的交易类型");
             responseData(responseStream, responseBean);
             return null;
@@ -222,17 +223,17 @@ public class InsteadPayController {
             jsonObject.put("fileContent", unzipData);
         } catch (DataFormatException e1) {
             log.error(e1.getMessage(),e1);
-            compressMsg = "数据解决压缩出现错误";
+            compressMsg = "数据解密或解压缩出现错误";
         } catch (UnsupportedEncodingException e) {
             log.error(e.getMessage(),e);
-            compressMsg = "数据解决压缩出现错误";
+            compressMsg = "数据解密或解压缩出现错误";
         } catch (Exception e) {
             log.error(e.getMessage(),e);
-            compressMsg = "数据解决压缩出现错误";
+            compressMsg = "数据解密或解压缩出现错误";
         }
         if (StringUtil.isNotEmpty(compressMsg)) {
             InsteadPay_Response responseBean = BeanCopyUtil.copyBean(InsteadPay_Response.class, JSONObject.toBean(jsonObject));
-            responseBean.setRespCode(ERROR_CODE);
+            responseBean.setRespCode("21");
             responseBean.setRespMsg(compressMsg);
             responseData(responseStream, responseBean);
             return null;
@@ -248,7 +249,14 @@ public class InsteadPayController {
         InsteadPay_Response responseBean = BeanCopyUtil.copyBean(InsteadPay_Response.class, requestBean);
         
         // 共通检查
-       String errorMsg = requestCheck(response, data, responseBean, requestBean);
+       ResultMessage errorMsg = requestCheck(response, data, responseBean, requestBean);
+       if (errorMsg != null) {
+           responseBean.setRespCode(errorMsg.getErrorCode());
+           responseBean.setRespMsg(errorMsg.getErrorMessage());
+           responseData(responseStream, responseBean);
+           return null;
+       }
+       // 检查代付明细
        StringBuilder errorMsgDetail = new StringBuilder();
        for (InsteadPayFile file : requestBean.getFileContent()) {
            // 校验报文bean数据
@@ -258,9 +266,9 @@ public class InsteadPayController {
            }
        }
 
-        if (StringUtil.isNotEmpty(errorMsg) || StringUtil.isNotEmpty(errorMsgDetail.toString())) {
-            responseBean.setRespCode(ERROR_CODE);
-            responseBean.setRespMsg((errorMsg==null ? "":errorMsg) +errorMsgDetail.toString() );
+        if (StringUtil.isNotEmpty(errorMsgDetail.toString())) {
+            responseBean.setRespCode("13");
+            responseBean.setRespMsg(errorMsgDetail.toString() );
             responseData(responseStream, responseBean);
             return null;
         }
@@ -269,43 +277,43 @@ public class InsteadPayController {
         try {
             insteadPayService.insteadPay(requestBean, InsteadPayImportTypeEnum.API, null);
         } catch (NotInsteadPayWorkTimeException e) {
-            errorMsg = "非代付工作时间";
+            errorMsg = new ResultMessage("50", "非代付工作时间");
             log.error(e.getMessage(), e);
         } catch (FailToGetAccountInfoException e) {
-            errorMsg = "获取一级商户账户信息失败";
+            errorMsg = new ResultMessage("51", "获取商户账户信息失败");
             log.error(e.getMessage(), e);
         } catch (BalanceNotEnoughException e) {
-            errorMsg = "余额不足";
+            errorMsg = new ResultMessage("52", "余额不足");
             log.error(e.getMessage(), e);
         } catch (DuplicateOrderIdException e) {
-            errorMsg = "订单号重复";
+            errorMsg = new ResultMessage("53", "订单号重复");
             log.error(e.getMessage(), e);
         }  catch (DataIntegrityViolationException e) {
-            errorMsg = "批次号或订单号重复";
+            errorMsg = new ResultMessage("54", "批次号或订单号重复");
             log.error(e.getMessage(), e);
         }  catch (ConstraintViolationException e) {
-            errorMsg = "批次号或订单号重复";
+            errorMsg = new ResultMessage("54", "批次号或订单号重复");
             log.error(e.getMessage(), e);
         } catch (InvalidCardException e) {
-            errorMsg = "无效卡信息";
+            errorMsg = new ResultMessage("55", "无效卡信息");
             log.error(e.getMessage(), e);
         } catch (FailToInsertAccEntryException e) {
-            errorMsg = "插入分录流水时出现异常";
+            errorMsg = new ResultMessage("56", "记账时出现异常");
             log.error(e.getMessage(), e);
         } catch (MerchWhiteListCheckFailException e) {
-            errorMsg = "商户白名单检查失败"+e.getMessage();
+            errorMsg = new ResultMessage("57", "商户白名单检查失败："+e.getMessage());
             log.error(e.getMessage(), e);
         } catch (FailToInsertFeeException e) {
-            errorMsg = "代付商户不存在";
+            errorMsg = new ResultMessage("58", "代付商户不存在");
             log.error(e.getMessage(), e);
         }  catch (Exception e) {
-            errorMsg = "未知错误";
+            errorMsg = new ResultMessage("59", "代付失败");
             log.error(e.getMessage(), e);
         }
 
-        if (StringUtil.isNotEmpty(errorMsg)) {
-            responseBean.setRespCode(ERROR_CODE);
-            responseBean.setRespMsg(errorMsg);
+        if (errorMsg != null) {
+            responseBean.setRespCode(errorMsg.getErrorCode());
+            responseBean.setRespMsg(errorMsg.getErrorMessage());
             responseData(responseStream, responseBean);
             return null;
         }
@@ -338,10 +346,10 @@ public class InsteadPayController {
         InsteadPayQuery_Response responseBean = BeanCopyUtil.copyBean(InsteadPayQuery_Response.class, requestBean);
         
         // 共通检查
-       String errorMsg = requestCheck(response, data, responseBean, requestBean);
-        if (StringUtil.isNotEmpty(errorMsg)) {
-            responseBean.setRespCode(ERROR_CODE);
-            responseBean.setRespMsg(errorMsg);
+       ResultMessage errorMsg = requestCheck(response, data, responseBean, requestBean);
+        if (errorMsg != null) {
+            responseBean.setRespCode(errorMsg.getErrorCode());
+            responseBean.setRespMsg(errorMsg.getErrorMessage());
             responseData(responseStream, responseBean);
             return null;
         }
@@ -350,13 +358,13 @@ public class InsteadPayController {
         try {
             insteadPayService.insteadPayQuery(requestBean, responseBean);
         }  catch (Exception e) {
-            errorMsg = "未知错误";
-            e.printStackTrace();
+            errorMsg = new ResultMessage("60", "代付交易查询失败");
+            log.error(e.getMessage(), e);
         }
 
-        if (StringUtil.isNotEmpty(errorMsg)) {
-            responseBean.setRespCode(ERROR_CODE);
-            responseBean.setRespMsg(errorMsg);
+        if (errorMsg != null) {
+            responseBean.setRespCode(errorMsg.getErrorCode());
+            responseBean.setRespMsg(errorMsg.getErrorMessage());
             responseData(responseStream, responseBean);
             return null;
         }
@@ -384,13 +392,13 @@ public class InsteadPayController {
         RealnameAuth_Response responseBean = BeanCopyUtil.copyBean(RealnameAuth_Response.class, requestBean);
         
         // 共通检查
-       String errorMsg = requestCheck(response, data, responseBean, requestBean);
-        if (StringUtil.isNotEmpty(errorMsg)) {
-            responseBean.setRespCode(ERROR_CODE);
-            responseBean.setRespMsg(errorMsg);
-            responseData(responseStream, responseBean);
-            return null;
-        }
+       ResultMessage errorMsg = requestCheck(response, data, responseBean, requestBean);
+       if (errorMsg != null) {
+           responseBean.setRespCode(errorMsg.getErrorCode());
+           responseBean.setRespMsg(errorMsg.getErrorMessage());
+           responseData(responseStream, responseBean);
+           return null;
+       }
         // 解密
         RealnameAuthFile realNameAuth = null;
         try {
@@ -407,13 +415,18 @@ public class InsteadPayController {
             }
         } catch (Exception e) {
             log.error(e.getMessage(),e); 
-            errorMsg = "报文解密失败";
+            errorMsg = new ResultMessage("21", "报文解密失败");
         }
-        if (StringUtil.isEmpty(errorMsg))
-            errorMsg = HibernateValidatorUtil.validateBeans(realNameAuth);
-        if (StringUtil.isNotEmpty(errorMsg)) {
-            responseBean.setRespCode(ERROR_CODE);
-            responseBean.setRespMsg(errorMsg);
+        if (errorMsg != null) {
+            responseBean.setRespCode(errorMsg.getErrorCode());
+            responseBean.setRespMsg(errorMsg.getErrorMessage());
+            responseData(responseStream, responseBean);
+            return null;
+        }
+        String detailErrorMsg = HibernateValidatorUtil.validateBeans(realNameAuth);
+        if (StringUtil.isNotEmpty(detailErrorMsg)) {
+            responseBean.setRespCode("13");
+            responseBean.setRespMsg(detailErrorMsg);
             responseData(responseStream, responseBean);
             return null;
         }
@@ -423,25 +436,25 @@ public class InsteadPayController {
             Long orderId = realNameAuthService.saveRealNameAuthOrder(requestBean, realNameAuth);
             realNameAuthService.realNameAuth(requestBean,realNameAuth,orderId);
         } catch (MessageDecryptFailException e) {
-            errorMsg = "报文解密失败";
-            e.printStackTrace();
+            errorMsg = new ResultMessage("21", "报文解密失败");
+            log.error(e.getMessage(),e); 
         } catch (RealNameAuthFailException e) {
-            errorMsg = e.getMessage();
+            errorMsg = new ResultMessage("70", "实名认证失败："+e.getMessage());
             log.error(e.getMessage(), e);
         } catch (DuplicateOrderIdException e) {
-            errorMsg = "请不要提交重复的订单";
+            errorMsg = new ResultMessage("71", "请不要提交重复的订单");
             log.error(e.getMessage(), e);
         } catch (BalanceNotEnoughException e) {
-            errorMsg = "余额不足";
+            errorMsg = new ResultMessage("72", "余额不足");
             log.error(e.getMessage(), e);
         }  catch (Exception e) {
-            errorMsg = "实名认证失败";
+            errorMsg = new ResultMessage("70", "实名认证失败："+e.getMessage());
             log.error(e.getMessage(), e);
         }
 
-        if (StringUtil.isNotEmpty(errorMsg)) {
-            responseBean.setRespCode(ERROR_CODE);
-            responseBean.setRespMsg(errorMsg);
+        if (errorMsg != null) {
+            responseBean.setRespCode(errorMsg.getErrorCode());
+            responseBean.setRespMsg(errorMsg.getErrorMessage());
             responseData(responseStream, responseBean);
             return null;
         }
@@ -471,25 +484,25 @@ public class InsteadPayController {
         RealnameAuthQuery_Response responseBean = BeanCopyUtil.copyBean(RealnameAuthQuery_Response.class, requestBean);
 
         // 共通检查
-       String errorMsg = requestCheck(response, data, responseBean, requestBean);
-        if (StringUtil.isNotEmpty(errorMsg)) {
-            responseBean.setRespCode(ERROR_CODE);
-            responseBean.setRespMsg(errorMsg);
-            responseData(responseStream, responseBean);
-            return null;
-        }
+       ResultMessage errorMsg = requestCheck(response, data, responseBean, requestBean);
+       if (errorMsg != null) {
+           responseBean.setRespCode(errorMsg.getErrorCode());
+           responseBean.setRespMsg(errorMsg.getErrorMessage());
+           responseData(responseStream, responseBean);
+           return null;
+       }
 
         // 调用接口
         try {
             realNameAuthService.realNameAuthQuery(requestBean, responseBean);
         } catch (Exception e) {
-            errorMsg = "认证查询失败";
-            e.printStackTrace();
+            errorMsg = new ResultMessage("80", "认证查询失败");
+            log.error(e.getMessage(), e);
         }
 
-        if (StringUtil.isNotEmpty(errorMsg)) {
-            responseBean.setRespCode(ERROR_CODE);
-            responseBean.setRespMsg(errorMsg);
+        if (errorMsg != null) {
+            responseBean.setRespCode(errorMsg.getErrorCode());
+            responseBean.setRespMsg(errorMsg.getErrorMessage());
             responseData(responseStream, responseBean);
             return null;
         }
@@ -519,25 +532,28 @@ public class InsteadPayController {
         MerWhiteList_Response responseBean = BeanCopyUtil.copyBean(MerWhiteList_Response.class, requestBean);
 
         // 共通检查
-       String errorMsg = requestCheck(response, data, responseBean, requestBean);
-        if (StringUtil.isNotEmpty(errorMsg)) {
-            responseBean.setRespCode(ERROR_CODE);
-            responseBean.setRespMsg(errorMsg);
-            responseData(responseStream, responseBean);
-            return null;
-        }
+       ResultMessage errorMsg = requestCheck(response, data, responseBean, requestBean);
+       if (errorMsg != null) {
+           responseBean.setRespCode(errorMsg.getErrorCode());
+           responseBean.setRespMsg(errorMsg.getErrorMessage());
+           responseData(responseStream, responseBean);
+           return null;
+       }
 
         // 调用接口
         try {
-            errorMsg  = merchWhiteListService.addMerchWhiteListService(requestBean);
+            String error = merchWhiteListService.addMerchWhiteListService(requestBean);
+            if (StringUtil.isNotEmpty(error)) {
+                errorMsg = new ResultMessage("90", error);
+            }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            errorMsg = "添加白名单失败";
+            errorMsg = new ResultMessage("90", "添加白名单失败");
         }
 
-        if (StringUtil.isNotEmpty(errorMsg)) {
-            responseBean.setRespCode(ERROR_CODE);
-            responseBean.setRespMsg(errorMsg);
+        if (errorMsg != null) {
+            responseBean.setRespCode(errorMsg.getErrorCode());
+            responseBean.setRespMsg(errorMsg.getErrorMessage());
             responseData(responseStream, responseBean);
             return null;
         }
@@ -591,11 +607,11 @@ public class InsteadPayController {
      * @param requestBean 请求bean
      * @return 错误信息，如果没有返回 null
      */
-    private String  requestCheck(HttpServletResponse response, String data, BaseMessage responseBean, BaseMessage requestBean) {
+    private ResultMessage  requestCheck(HttpServletResponse response, String data, BaseMessage responseBean, BaseMessage requestBean) {
 
         JSONObject verifyData = JSONObject.fromObject(data);
         if (verifyData.isNullObject())
-            return "无效Json数据";
+            return new ResultMessage("11", "无效Json数据");
         verifyData.put("signature", "");
         if (log.isDebugEnabled()) {
             log.debug("验签用原数据："+verifyData.toString());
@@ -606,13 +622,13 @@ public class InsteadPayController {
             log.debug("【验签结果】："+isOk);
         }
         if (!isOk) {
-            return "验签失败";
+            return new ResultMessage("20", "验签失败");
         }
 
         // 校验报文bean数据
         String errorMsg = HibernateValidatorUtil.validateBeans(requestBean);
         if (StringUtil.isNotEmpty(errorMsg)) {
-            return "报文内容校验失败："+errorMsg;
+            return new ResultMessage("13", "报文内容校验失败："+errorMsg);
         }
 
         return null;
@@ -631,4 +647,6 @@ public class InsteadPayController {
         }
         return responseStream;
     }
+    
+
 }

@@ -73,11 +73,12 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
             return;
         }
         if ("00".equals(data.getResultCode())) {
+            detail.setRespCode(data.getResultCode());
             detail.setStatus(InsteadPayDetailStatusEnum.TRAN_FINISH.getCode());
         } else {
+            detail.setRespCode("09");
             detail.setStatus(InsteadPayDetailStatusEnum.TRAN_FAILED.getCode());
         }
-        detail.setRespCode(data.getResultCode());
         detail.setRespMsg(data.getResultMessage());
         insteadPayDetailDAO.merge(detail);
         

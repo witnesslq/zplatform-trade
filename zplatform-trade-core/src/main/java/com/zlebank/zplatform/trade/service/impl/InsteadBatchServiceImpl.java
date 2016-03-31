@@ -23,12 +23,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.service.AccEntryService;
-import com.zlebank.zplatform.commons.dao.pojo.BusiTypeEnum;
 import com.zlebank.zplatform.commons.service.impl.AbstractBasePageService;
 import com.zlebank.zplatform.commons.utils.BeanCopyUtil;
 import com.zlebank.zplatform.trade.bean.InsteadPayBatchBean;
 import com.zlebank.zplatform.trade.bean.InsteadPayBatchQuery;
-import com.zlebank.zplatform.trade.bean.UpdateData;
 import com.zlebank.zplatform.trade.bean.enums.InsteadPayBatchStatusEnum;
 import com.zlebank.zplatform.trade.bean.enums.InsteadPayDetailStatusEnum;
 import com.zlebank.zplatform.trade.bean.enums.TransferBusiTypeEnum;
@@ -42,7 +40,6 @@ import com.zlebank.zplatform.trade.model.PojoInsteadPayDetail;
 import com.zlebank.zplatform.trade.model.PojoTranData;
 import com.zlebank.zplatform.trade.service.InsteadBatchService;
 import com.zlebank.zplatform.trade.service.TransferDataService;
-import com.zlebank.zplatform.trade.service.UpdateSubject;
 
 /**
  * 代付业务
@@ -204,6 +201,8 @@ public class InsteadBatchServiceImpl extends AbstractBasePageService<InsteadPayB
             // 更新代付状态
             for (PojoInsteadPayDetail detail : details) {
                 detail.setStatus(InsteadPayDetailStatusEnum.INSTEAD_REFUSE.getCode());
+                detail.setRespCode("09");
+                detail.setRespMsg("审核拒绝");
                 insteadPayDetailDAO.merge(detail);
                 
                  // 账务处理

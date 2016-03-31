@@ -190,6 +190,9 @@ public class InsteadPayServiceImpl
         StringBuilder whiteListError = new StringBuilder();
         if (isCheckWhiteList(request.getMerId())) {
             for (InsteadPayFile file : fileContent) {
+                // 如果是对公账户，跳过实名认证和白名单。
+                if ("02".equals(file.getAccType())) 
+                    continue;
                 String error = merchWhiteListService.checkMerchWhiteList(file.getMerId(), file.getAccName(), file.getAccNo());
                 if (StringUtil.isNotEmpty(error)) {
                     whiteListError.append(error);
@@ -430,10 +433,18 @@ public class InsteadPayServiceImpl
         PojoInsteadPayBatch batch = insteadPayBatchDAO.getByBatchNo(
                 requestBean.getBatchNo(), requestBean.getTxnTime());
         if (batch == null) {
-            responseBean.setRespCode("00");
-            responseBean.setRespMsg("该批次尚未处理");
+            responseBean.setRespCode("61");
+            responseBean.setRespMsg("该批次不存在");
             return;
         }
+        // 总笔数
+        int totalQty = 0;
+        // 总金额
+        Long totalAmt = 0L;
+        // 未处理笔数
+        int waitQty = 0;
+        // 未处理金额
+        Long waitAmt = 0L;
         // 成功笔数
         int successQty = 0;
         // 成功金额
@@ -445,13 +456,19 @@ public class InsteadPayServiceImpl
         List<InsteadPayQueryFile> queryFiles = new ArrayList<InsteadPayQueryFile>();
         List<PojoInsteadPayDetail> detailList = batch.getDetails();
         for (PojoInsteadPayDetail detail : detailList) {
-            if (detail.getStatus().equals("00")) {
+            totalQty++;
+            totalAmt += detail.getAmt();
+            if ("00".equals(detail.getRespCode())) {
                 successQty++;
                 successAmt = successAmt+ detail.getAmt();
-            } else {
+            } else if ("09".equals(detail.getRespCode())) {
                 failQty++;
                 failAmt = failAmt+ detail.getAmt();
+            } else {
+                waitQty++;
+                waitAmt += detail.getAmt();
             }
+            
             InsteadPayQueryFile queryFile = new InsteadPayQueryFile();
             queryFile.setMerId(detail.getMerId());
             queryFile.setOrderId(detail.getOrderId());
@@ -470,33 +487,19 @@ public class InsteadPayServiceImpl
             queryFile.setPhoneNo(String.valueOf(detail.getPhoneNo()));
             queryFile.setBillType(detail.getBillType());
             queryFile.setNotes(detail.getNotes());
+            // 00：划拨完成 09：划拨失败  11：未处理
             queryFile.setRespCode(detail.getRespCode());
             queryFile.setRespMsg(detail.getRespMsg());
-            //01:待初审，09初审未过，11：待复审，19：复审未过，21：等待批处理，29：批处理失败，00：代付成功,39：自行终止
-            if ("01".equals(detail.getStatus())) {
-                queryFile.setRespCode(detail.getStatus());
-                queryFile.setRespMsg("待初审");
-            } else if ("09".equals(detail.getStatus())) {
-                queryFile.setRespCode(detail.getStatus());
-                queryFile.setRespMsg("初审未过");
-            }else if ("11".equals(detail.getStatus())) {
-                queryFile.setRespCode(detail.getStatus());
-                queryFile.setRespMsg("待复审");
-            }else if ("19".equals(detail.getStatus())) {
-                queryFile.setRespCode(detail.getStatus());
-                queryFile.setRespMsg("复审未过");
-            }else if ("21".equals(detail.getStatus())) {
-                queryFile.setRespCode(detail.getStatus());
-                queryFile.setRespMsg("等待批处理");
-            }else if ("29".equals(detail.getStatus())) {
-                queryFile.setRespCode(detail.getStatus());
-                queryFile.setRespMsg("批处理失败");
-            }
+
             queryFiles.add(queryFile);
         }
 
         // 应答报文
         responseBean.setFileContent(queryFiles);
+        responseBean.setTotalQty(String.valueOf(totalQty));
+        responseBean.setTotalAmt(String.valueOf(totalAmt));
+        responseBean.setWaitTotalQty(String.valueOf(waitQty));
+        responseBean.setWaitTotalAmt(String.valueOf(waitAmt));
         responseBean.setSuccTotalQty(String.valueOf(successQty));
         responseBean.setSuccTotalAmt(String.valueOf(successAmt));
         responseBean.setFailTotalQty(String.valueOf(failQty));

@@ -26,4 +26,5 @@ import com.zlebank.zplatform.trade.model.TxnsWithdrawModel;
 public interface ITxnsWithdrawDAO extends BaseDAO<TxnsWithdrawModel>{
 
     public Session getSession();
+    public TxnsWithdrawModel getWithdrawBySeqNo(String seqNo);
 }

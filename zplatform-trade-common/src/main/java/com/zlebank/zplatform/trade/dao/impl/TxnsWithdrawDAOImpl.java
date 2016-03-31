@@ -10,7 +10,10 @@
  */
 package com.zlebank.zplatform.trade.dao.impl;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
 import com.zlebank.zplatform.commons.dao.impl.HibernateBaseDAOImpl;
@@ -30,5 +33,15 @@ public class TxnsWithdrawDAOImpl extends HibernateBaseDAOImpl<TxnsWithdrawModel>
 
     public Session getSession(){
         return super.getSession();
+    }
+    /**
+     *
+     * @param seqNo
+     * @return
+     */
+    public TxnsWithdrawModel getWithdrawBySeqNo(String seqNo){
+        Criteria cri=getSession().createCriteria(TxnsWithdrawModel.class);
+        cri.add(Restrictions.eq("texnseqno", seqNo));
+        return (TxnsWithdrawModel) cri.uniqueResult();
     }
 }
