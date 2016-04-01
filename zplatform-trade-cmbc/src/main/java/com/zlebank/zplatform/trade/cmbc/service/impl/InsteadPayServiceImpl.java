@@ -58,7 +58,6 @@ import com.zlebank.zplatform.trade.model.PojoTxnsInsteadPay;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
 import com.zlebank.zplatform.trade.service.ObserverListService;
-import com.zlebank.zplatform.trade.service.UpdateSubject;
 import com.zlebank.zplatform.trade.utils.ConsUtil;
 import com.zlebank.zplatform.trade.utils.OrderNumber;
 
@@ -90,7 +89,6 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
     private BankTransferDataDAO bankTransferDataDAO;
     @Autowired
     private ITxnsInsteadPayDAO txnsInsteadPayDAO;
-    
     
     /**
      * 批量代付(跨行)

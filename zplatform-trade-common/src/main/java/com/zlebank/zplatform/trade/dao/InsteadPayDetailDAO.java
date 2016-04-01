@@ -66,5 +66,10 @@ public interface InsteadPayDetailDAO extends   BasePagedQueryDAO<PojoInsteadPayD
      */
     PojoInsteadPayDetail getDetailByTxnseqno(String txnseqno);
     
+    /**
+     * 通过代付判断是否已经处理完毕
+     * @return
+     */
+    public boolean  isBatchProcessFinished(Long batchId); 
     
     }

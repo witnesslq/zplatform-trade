@@ -373,6 +373,7 @@ public class InsteadPayServiceImpl
         batch.setApproveCount(0L);
         batch.setApproveAmt(0L);
         batch.setApplyTime(new Date());// 申请时间
+        batch.setNotifyUrl(request.getBackUrl());
         return batch;
     }
     /**
