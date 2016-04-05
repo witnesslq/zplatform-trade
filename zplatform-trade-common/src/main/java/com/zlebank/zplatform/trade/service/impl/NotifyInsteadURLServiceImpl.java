@@ -145,6 +145,6 @@ public class NotifyInsteadURLServiceImpl implements NotifyInsteadURLService,  Ap
         for (int index = 0; index < THREAD_NUM; index++) {
             exec.execute(new ExecuteInsteadPayTaskQueue(taskQueue));
         }
-        exec.shutdown();
+//        exec.shutdown();
     }
 }

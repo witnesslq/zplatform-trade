@@ -41,6 +41,7 @@ import com.zlebank.zplatform.acc.exception.AccBussinessException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.AccountQueryService;
 import com.zlebank.zplatform.commons.bean.PagedResult;
+import com.zlebank.zplatform.commons.enums.BusinessCodeEnum;
 import com.zlebank.zplatform.commons.utils.Base64Utils;
 import com.zlebank.zplatform.commons.utils.RSAUtils;
 import com.zlebank.zplatform.commons.utils.StringUtil;
@@ -978,8 +979,9 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
                 tradeInfo.setPayMemberId(txnsLog.getAccmemberid());
                 tradeInfo.setPayToMemberId(txnsLog.getAccmemberid());
                 tradeInfo.setAmount(new BigDecimal(txnsLog.getAmount()));
-                tradeInfo.setCharge(new BigDecimal(txnsLog.getTxnfee()));
+                tradeInfo.setCharge(new BigDecimal(txnsLog.getTxnfee() == null ? 0L : txnsLog.getTxnfee()));
                 tradeInfo.setTxnseqno(txnsLog.getTxnseqno());
+                tradeInfo.setBusiCode(BusinessCodeEnum.WITHDRAWALS.getBusiCode());
                 //记录分录流水
                 accEntryService.accEntryProcess(tradeInfo);
             } catch (Exception e) {
