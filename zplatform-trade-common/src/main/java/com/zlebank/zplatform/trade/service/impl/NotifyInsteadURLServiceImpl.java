@@ -64,8 +64,11 @@ public class NotifyInsteadURLServiceImpl implements NotifyInsteadURLService,  Ap
     @Autowired
     private MerchMKService merchMKService;
     
-    // 初始化线程池（1个线程长期使用）
-    ExecutorService exec=Executors.newFixedThreadPool(2);
+    // 线程数量
+    private static final int THREAD_NUM = 1;
+    
+    // 初始化线程池
+    ExecutorService exec=Executors.newFixedThreadPool(THREAD_NUM);
 
     // 初始化阻塞队列（10万个）
     private BlockingQueue<InsteadPayNotifyTask> taskQueue = new LinkedBlockingQueue<InsteadPayNotifyTask>(100000);
@@ -139,7 +142,7 @@ public class NotifyInsteadURLServiceImpl implements NotifyInsteadURLService,  Ap
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         // 并发N个线程执行
-        for (int index = 0; index < 4; index++) {
+        for (int index = 0; index < THREAD_NUM; index++) {
             exec.execute(new ExecuteInsteadPayTaskQueue(taskQueue));
         }
         exec.shutdown();
