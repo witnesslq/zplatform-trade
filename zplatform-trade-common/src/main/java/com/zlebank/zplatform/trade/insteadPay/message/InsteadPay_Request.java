@@ -47,7 +47,6 @@ public class InsteadPay_Request extends BaseMessage{
     /**接入类型**/
     @N(max=1,isNull=false)
     private String accessType;
-    @NotEmpty
     private String backUrl;
 
     
