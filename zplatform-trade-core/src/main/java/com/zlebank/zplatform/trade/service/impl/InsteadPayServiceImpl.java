@@ -491,6 +491,8 @@ public class InsteadPayServiceImpl
             // 00：划拨完成 09：划拨失败  11：未处理
             queryFile.setRespCode(detail.getRespCode());
             queryFile.setRespMsg(detail.getRespMsg());
+            queryFile.setTxnFee(detail.getTxnfee() == null ? "0" : detail.getTxnfee().toString()); // 手续费
+            queryFile.setInsteadPayDataSeqNo(detail.getInsteadPayDataSeqNo()); // 代付交易流水号
 
             queryFiles.add(queryFile);
         }
