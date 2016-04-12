@@ -114,4 +114,12 @@ public interface ITxnsLogService extends IBaseService<TxnsLogModel, String>{
      * @param retinfo
      */
     public void updateCoreRetResult(String txnseqno,String retcode,String retinfo);
+    
+    public List<?> getAllMemberByDate(String date);
+    public List<?> getAllMemberByDateByCharge(String date);
+    public List<?> getCountExpenseAndRecharge(String memberId,String date);
+    public List<?>  getAllMemberDetailedByDate(String memberId,String date);
+    public List<?> getCountRefundAndPay(String memberId,String date);
+    public List<?> getCountSpendingAccount(String memberId,String date);
+    public List<?> getCountHandPay(String memberId,String date);
 }
