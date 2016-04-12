@@ -18,6 +18,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -187,5 +188,22 @@ public class InsteadPayDetailDAOImpl
             crite.add(Restrictions.in("id", ids));
             crite.add(Restrictions.eq("status", InsteadPayDetailStatusEnum.WAIT_INSTEAD_APPROVE.getCode()));
             return crite.list();
+        }
+
+        /**
+         *通过代付判断是否已经处理完毕
+         * @param batchId
+         * @return
+         */
+        @Override
+        public boolean isBatchProcessFinished(Long batchId) {
+            Criteria crite = this.getSession().createCriteria(
+                    PojoInsteadPayDetail.class);
+            crite.add(Restrictions.eq("insteadPayBatch.id", batchId));
+            String[] codes = new String[]{"00", "09"};
+            crite.add(Restrictions.not(Restrictions.in("respCode", codes)));
+            crite.setProjection(Projections.rowCount());  
+            int count = Integer.parseInt(crite.uniqueResult().toString());
+            return count > 0 ? false : true;
         }
  }

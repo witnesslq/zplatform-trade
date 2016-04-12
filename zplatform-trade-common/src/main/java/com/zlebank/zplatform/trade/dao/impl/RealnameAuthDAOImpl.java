@@ -10,6 +10,8 @@
  */
 package com.zlebank.zplatform.trade.dao.impl;
 
+import java.util.List;
+
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -89,12 +91,15 @@ public class RealnameAuthDAOImpl extends HibernateBaseDAOImpl<PojoRealnameAuth> 
      * @return
      */
     @Override
-    public PojoRealnameAuth getByCardNoAndName(String cardNo, String accName) {
+    public PojoRealnameAuth getByCardNoAndName(String cardNo, String accName, String certifId) {
         Criteria crite= this.getSession().createCriteria(PojoRealnameAuth.class);
         crite.add(Restrictions.eq("cardNo", cardNo));
         crite.add(Restrictions.eq("customerNm", accName));
+        crite.add(Restrictions.eq("certifId", certifId));
         crite.add(Restrictions.eq("status", "00"));
-        return (PojoRealnameAuth) crite.uniqueResult();
+        @SuppressWarnings("unchecked")
+        List<PojoRealnameAuth> pojos = crite.list();
+        return pojos.size() > 0 ? (PojoRealnameAuth) pojos.get(0) : null;
     }
 
     

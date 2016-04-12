@@ -12,6 +12,8 @@ package com.zlebank.zplatform.trade.insteadPay.message;
 
 import java.util.List;
 
+import org.hibernate.validator.constraints.NotEmpty;
+
 import com.zlebank.zplatform.trade.common.validator.N;
 
 /**
@@ -45,6 +47,7 @@ public class InsteadPay_Request extends BaseMessage{
     /**接入类型**/
     @N(max=1,isNull=false)
     private String accessType;
+    private String backUrl;
 
     
     public String getBatchNo() {
@@ -95,6 +98,12 @@ public class InsteadPay_Request extends BaseMessage{
     }
     public void setAccessType(String accessType) {
         this.accessType = accessType;
+    }
+    public String getBackUrl() {
+        return backUrl;
+    }
+    public void setBackUrl(String backUrl) {
+        this.backUrl = backUrl;
     }
     
 }

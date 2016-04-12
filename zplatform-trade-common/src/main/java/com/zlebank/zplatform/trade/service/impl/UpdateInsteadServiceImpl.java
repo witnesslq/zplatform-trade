@@ -17,6 +17,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -30,6 +31,7 @@ import com.zlebank.zplatform.trade.bean.enums.TransferBusiTypeEnum;
 import com.zlebank.zplatform.trade.dao.InsteadPayBatchDAO;
 import com.zlebank.zplatform.trade.dao.InsteadPayDetailDAO;
 import com.zlebank.zplatform.trade.model.PojoInsteadPayDetail;
+import com.zlebank.zplatform.trade.service.NotifyInsteadURLService;
 import com.zlebank.zplatform.trade.service.ObserverListService;
 import com.zlebank.zplatform.trade.service.UpdateInsteadService;
 import com.zlebank.zplatform.trade.service.UpdateSubject;
@@ -55,6 +57,9 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
     
     @Autowired
     private AccEntryService accEntryService;
+    
+    @Autowired
+    private NotifyInsteadURLService notifyInsteadURLService;
     
     /**
      *  更新状态和记账
@@ -98,6 +103,11 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
             accEntryService.accEntryProcess(tradeInfo );
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+        }
+
+        // 如果批次已经全部处理完毕，则添加到通知
+        if (insteadPayDetailDAO.isBatchProcessFinished(detail.getInsteadPayBatch().getId())) {
+            notifyInsteadURLService.addInsteadPayTask(detail.getInsteadPayBatch().getId());
         }
     }
 
