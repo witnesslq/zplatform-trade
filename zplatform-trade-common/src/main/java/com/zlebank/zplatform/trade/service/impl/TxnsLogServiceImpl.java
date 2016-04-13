@@ -636,7 +636,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
     
     @Override
     public List<?>  getAllMemberDetailedByDate(String memberId,String date){
-        String queryString="select t.TXNDATE,t.ACCSETTLEDATE,t.payordno,t.amount,t.busicode,t.TXNFEE from t_txns_log t left join t_bnk_txn b on t.payordno=b.payordno where (b.status=9 or b.status is null) and t.ACCFIRMERNO=? and t.ACCSETTLEDATE=? and t.payordno is not null";
+        String queryString="select t.ACCORDNO,t.TXNSEQNO,t.ACCORDCOMMITIME,t.ACCSETTLEDATE,t.amount,t.busicode,t.TXNFEE from t_txns_log t left join t_bnk_txn b on t.payordno=b.payordno where (b.status=9 or b.status is null) and t.ACCFIRMERNO=? and t.ACCSETTLEDATE=? and t.payordno is not null";
         return (List<?>) super.queryBySQL(queryString, new Object[]{memberId,date});
     }
 
