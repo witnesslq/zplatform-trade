@@ -78,6 +78,18 @@ public class ConsModel {
 	private int cmbc_insteadpay_ftp_port=22;
 	private String cmbc_insteadpay_sign_md5="";
 	private String cmbc_insteadpay_ip = "";
+	
+	/**博士金电***/
+	private String bosspay_agreement_id="";
+	private String bosspay_user_id="";
+	private String bosspay_user_key="";
+	private String bosspay_bank_account="";
+	private String bosspay_bank_number="";
+	private String bosspay_bank_account_name="";
+	
+	
+	
+	
 	public String getZlrt_url() {
 		return zlrt_url;
 	}
@@ -882,6 +894,90 @@ public class ConsModel {
 
 	public void setCmbc_insteadpay_ip(String cmbc_insteadpay_ip) {
 		this.cmbc_insteadpay_ip = cmbc_insteadpay_ip;
+	}
+
+	/**
+	 * @return the bosspay_agreement_id
+	 */
+	public String getBosspay_agreement_id() {
+		return bosspay_agreement_id;
+	}
+
+	/**
+	 * @param bosspay_agreement_id the bosspay_agreement_id to set
+	 */
+	public void setBosspay_agreement_id(String bosspay_agreement_id) {
+		this.bosspay_agreement_id = bosspay_agreement_id;
+	}
+
+	/**
+	 * @return the bosspay_user_id
+	 */
+	public String getBosspay_user_id() {
+		return bosspay_user_id;
+	}
+
+	/**
+	 * @param bosspay_user_id the bosspay_user_id to set
+	 */
+	public void setBosspay_user_id(String bosspay_user_id) {
+		this.bosspay_user_id = bosspay_user_id;
+	}
+
+	/**
+	 * @return the bosspay_user_key
+	 */
+	public String getBosspay_user_key() {
+		return bosspay_user_key;
+	}
+
+	/**
+	 * @param bosspay_user_key the bosspay_user_key to set
+	 */
+	public void setBosspay_user_key(String bosspay_user_key) {
+		this.bosspay_user_key = bosspay_user_key;
+	}
+
+	/**
+	 * @return the bosspay_bank_account
+	 */
+	public String getBosspay_bank_account() {
+		return bosspay_bank_account;
+	}
+
+	/**
+	 * @param bosspay_bank_account the bosspay_bank_account to set
+	 */
+	public void setBosspay_bank_account(String bosspay_bank_account) {
+		this.bosspay_bank_account = bosspay_bank_account;
+	}
+
+	/**
+	 * @return the bosspay_bank_number
+	 */
+	public String getBosspay_bank_number() {
+		return bosspay_bank_number;
+	}
+
+	/**
+	 * @param bosspay_bank_number the bosspay_bank_number to set
+	 */
+	public void setBosspay_bank_number(String bosspay_bank_number) {
+		this.bosspay_bank_number = bosspay_bank_number;
+	}
+
+	/**
+	 * @return the bosspay_bank_account_name
+	 */
+	public String getBosspay_bank_account_name() {
+		return bosspay_bank_account_name;
+	}
+
+	/**
+	 * @param bosspay_bank_account_name the bosspay_bank_account_name to set
+	 */
+	public void setBosspay_bank_account_name(String bosspay_bank_account_name) {
+		this.bosspay_bank_account_name = bosspay_bank_account_name;
 	}
 	
 	

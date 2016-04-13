@@ -106,6 +106,14 @@ public class ConsUtil {
 			cons.setCmbc_insteadpay_ftp_port(Integer.valueOf(prop.getProperty("cmbc_insteadpay_ftp_port")));
 			cons.setCmbc_insteadpay_sign_md5(prop.getProperty("cmbc_insteadpay_sign_md5"));
 			
+			cons.setBosspay_agreement_id(prop.getProperty("bosspay_agreement_id"));
+			cons.setBosspay_bank_account(prop.getProperty("bosspay_bank_account"));
+			cons.setBosspay_bank_account_name(prop.getProperty("bosspay_bank_account_name"));
+			cons.setBosspay_bank_number(prop.getProperty("bosspay_bank_number"));
+			cons.setBosspay_user_id(prop.getProperty("bosspay_user_id"));
+			cons.setBosspay_user_key(prop.getProperty("bosspay_user_key"));
+			
+			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

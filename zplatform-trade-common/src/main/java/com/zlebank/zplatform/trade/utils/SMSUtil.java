@@ -38,7 +38,6 @@ public class SMSUtil implements Runnable{
         int inputLine = 999;
         try {
             //验证码:%s(为了资金安全,切勿将验证码泄露于他人),请在10分钟内按页面提示提交验证码,您正使用尾号%s进行支付,支付金额%s元。
-           
             inputLine = smsService.sendSMS(ModuleTypeEnum.PAY, mobile, tn, miniCardNo,amount);
             String retInfo="";
             switch (inputLine) {

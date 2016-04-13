@@ -25,6 +25,13 @@ import com.zlebank.zplatform.trade.model.ProdCaseModel;
  * @since 
  */
 public interface IProdCaseService extends IBaseService<ProdCaseModel, Long>{
+	
     public ResultBean verifyBusiness(OrderBean order);
+    /**
+     * 验证商户收银台商户业务版本
+     * @param order
+     * @return
+     */
+    public ResultBean verifyMerchBusiness(OrderBean order);
     public void verifyWapBusiness(WapOrderBean order) throws TradeException;
 }

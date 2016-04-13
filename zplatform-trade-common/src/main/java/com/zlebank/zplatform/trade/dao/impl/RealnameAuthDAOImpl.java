@@ -46,7 +46,11 @@ public class RealnameAuthDAOImpl extends HibernateBaseDAOImpl<PojoRealnameAuth> 
     public void saveRealNameAuth(PojoRealnameAuth realnameAuth)
             throws TradeException {
         try {
-            getSession().save(realnameAuth);
+        	PojoRealnameAuth cardInfo = getByCardInfo(realnameAuth);
+        	if(cardInfo==null){
+        		getSession().save(realnameAuth);
+        	}
+            
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -116,5 +120,5 @@ public class RealnameAuthDAOImpl extends HibernateBaseDAOImpl<PojoRealnameAuth> 
         }
         return null;
     }
-    
+	
 }

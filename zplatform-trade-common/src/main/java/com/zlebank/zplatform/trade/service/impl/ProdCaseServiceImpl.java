@@ -91,6 +91,25 @@ public class ProdCaseServiceImpl extends BaseServiceImpl<ProdCaseModel, Long> im
         return resultBean;
     }
     
+    public ResultBean verifyMerchBusiness(OrderBean order) {
+        ResultBean resultBean = null;
+        PojoMerchDeta member = null;
+        TxncodeDefModel busiModel = txncodeDefService.getBusiCode(order.getTxnType(), order.getTxnSubType(), order.getBizType());
+        if(StringUtil.isNotEmpty(order.getMerId())){//商户号不为空
+        	member = merchService.getMerchBymemberId(order.getMerId());
+        	ProdCaseModel prodCase= getMerchProd(member.getPrdtVer(),busiModel.getBusicode());
+            if(prodCase==null){
+                resultBean = new ResultBean("GW26", "商户未开通此业务");
+            }else {
+                resultBean = new ResultBean("success");
+            }
+        }else{
+        	resultBean = new ResultBean("RC02", "商户不存在");
+        }
+        
+        return resultBean;
+    }
+    
     @Transactional(propagation=Propagation.REQUIRES_NEW)
     public ProdCaseModel getMerchProd(String prdtver,String busicode){
         return super.getUniqueByHQL("from ProdCaseModel where prdtver=? and busicode=?", new Object[]{prdtver,busicode});

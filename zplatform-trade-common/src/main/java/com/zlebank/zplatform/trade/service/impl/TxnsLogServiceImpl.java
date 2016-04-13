@@ -106,21 +106,6 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
     @Transactional(propagation=Propagation.REQUIRES_NEW)
     public ResultBean updatePayInfo_Fast(PayPartyBean payPartyBean){
         TxnsLogModel txnsLog = getTxnsLogByTxnseqno(payPartyBean.getTxnseqno());
-            /*TxnsLogModel txnsLog = getTxnsLogByTxnseqno(payPartyBean.getTxnseqno());
-            txnsLog.setPaytype("01"); //支付类型（01：快捷，02：网银，03：账户）
-            txnsLog.setPayordno(payPartyBean.getPayordno());//支付定单号
-            txnsLog.setPayinst(payPartyBean.getPayinst());//支付所属机构
-            txnsLog.setPayfirmerno(payPartyBean.getPayfirmerno());//支付一级商户号
-            //txnsLog.setPaysecmerno(payPartyBean.getPaysecmerno());//支付二级商户号
-            txnsLog.setPayordcomtime(payPartyBean.getPayordcomtime());//支付定单提交时间
-            
-            //卡信息
-            txnsLog.setPan(payPartyBean.getCardNo());
-            
-            txnsLog.setCardtype(cardMap.get("TYPE").toString());
-            txnsLog.setCardinstino(cardMap.get("BANKCODE").toString());
-            txnsLog.setTxnfee(getTxnFee(txnsLog));
-            updateTxnsLog(txnsLog);*/
         Map<String, Object> cardMap = getCardInfo(payPartyBean.getCardNo());
         String hql = "update TxnsLogModel set paytype=?,payordno=?,payinst=?,payfirmerno=?,payordcomtime=?,pan=?,cardtype=?,cardinstino=?,txnfee=? where txnseqno=?";
         super.updateByHQL(hql, new Object[]{"01",payPartyBean.getPayordno(),payPartyBean.getPayinst(),payPartyBean.getPayfirmerno(),payPartyBean.getPayordcomtime(),

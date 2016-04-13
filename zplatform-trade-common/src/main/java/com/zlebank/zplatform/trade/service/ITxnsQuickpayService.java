@@ -35,29 +35,157 @@ import com.zlebank.zplatform.trade.model.TxnsWithholdingModel;
  * @since 
  */
 public interface ITxnsQuickpayService extends IBaseService<TxnsQuickpayModel, Long>{
-    void saveMobileCode(TradeBean trade,MarginSmsBean marginSmsBean);
-    void updateMobileCode(ResultBean bean);
-    void saveMarginRegister(TradeBean trade,MarginRegisterBean marginRegisterBean);
-    void updateMarginRegister(ResultBean bean);
-    void saveOnlineDepositShort(TradeBean trade,OnlineDepositShortBean onlineDepositShortBean);
-    void updateOnlineDepositShort(ResultBean bean);
-    TxnsQuickpayModel saveReaPayDebitSign(TradeBean trade,DebitBean creditBean);
-    String saveReaPaySMS(TradeBean trade,SMSBean smsBean);
-    String saveReaPayCreditSign(TradeBean trade,CreditBean creditBean);
-    String saveReaPayBindSign(TradeBean trade,BindBean bindBean);
-    String saveReaPayToPay(TradeBean trade,PayBean payBean);
-    String saveReaPayQuery(TradeBean trade,QueryBean queryBean);
-    void updateReaPaySMS(ResultBean bean,String payorderno);
-    void updateReaPaySign(ResultBean bean,String payorderno);
-    void updateReaPayQuery(ResultBean bean,String payorderno);
-    List<TxnsQuickpayModel> queryTxnsByOrderNo(String orderNo);
-    String getReapayOrderNo(String txnseqno);
+	/**
+	 * 保存证联支付发送短信验证码流水
+	 * @param trade
+	 * @param marginSmsBean
+	 */
+    public void saveMobileCode(TradeBean trade,MarginSmsBean marginSmsBean);
+    /**
+     * 更新证联支付发送短信验证流水
+     * @param bean
+     */
+    public void updateMobileCode(ResultBean bean);
+    /**
+     * 保存同步开户流水
+     * @param trade
+     * @param marginRegisterBean
+     */
+    public void saveMarginRegister(TradeBean trade,MarginRegisterBean marginRegisterBean);
+    /**
+     * 更新同步开会流水 
+     * @param bean
+     */
+    public void updateMarginRegister(ResultBean bean);
+    /**
+     * 保存在线入金流水
+     * @param trade
+     * @param onlineDepositShortBean
+     */
+    public void saveOnlineDepositShort(TradeBean trade,OnlineDepositShortBean onlineDepositShortBean);
+    /**
+     * 更新在线入金流水
+     * @param bean
+     */
+    public void updateOnlineDepositShort(ResultBean bean);
+    /**
+     * 保存融宝借记卡签约流水
+     * @param trade
+     * @param creditBean
+     * @return
+     */
+    public TxnsQuickpayModel saveReaPayDebitSign(TradeBean trade,DebitBean creditBean);
+    /**
+     * 保存融宝发送短信验证码流水
+     * @param trade
+     * @param smsBean
+     * @return
+     */
+    public String saveReaPaySMS(TradeBean trade,SMSBean smsBean);
+    /**
+     * 保存融宝信用卡签约流水
+     * @param trade
+     * @param creditBean
+     * @return
+     */
+    public String saveReaPayCreditSign(TradeBean trade,CreditBean creditBean);
+    /**
+     * 保存已绑卡签约流水
+     * @param trade
+     * @param bindBean
+     * @return
+     */
+    public String saveReaPayBindSign(TradeBean trade,BindBean bindBean);
+    /**
+     * 保存融宝确认支付流水
+     * @param trade
+     * @param payBean
+     * @return
+     */
+    public String saveReaPayToPay(TradeBean trade,PayBean payBean);
+    /**
+     * 保存融宝交易查询流水
+     * @param trade
+     * @param queryBean
+     * @return
+     */
+    public String saveReaPayQuery(TradeBean trade,QueryBean queryBean);
+    /**
+     * 更新融宝短信流水
+     * @param bean
+     * @param payorderno
+     */
+    public void updateReaPaySMS(ResultBean bean,String payorderno);
+    /**
+     * 更新融宝支付流水
+     * @param bean
+     * @param payorderno
+     */
+    public void updateReaPaySign(ResultBean bean,String payorderno);
+    /**
+     * 更新融宝交易查询流水
+     * @param bean
+     * @param payorderno
+     */
+    public void updateReaPayQuery(ResultBean bean,String payorderno);
+    /**
+     * 通过订单号查询快捷交易流水
+     * @param orderNo
+     * @return
+     */
+    public List<TxnsQuickpayModel> queryTxnsByOrderNo(String orderNo);
+    /**
+     * 通过交易序列号获取融宝订单号
+     * @param txnseqno
+     * @return
+     */
+    public String getReapayOrderNo(String txnseqno);
+    /**
+     * 保存测试渠道交绑卡签约
+     * @param trade
+     * @param bindBean
+     * @return
+     */
     public String saveTestBindSign(TradeBean trade, BindBean bindBean);
+    /**
+     * 测试渠道
+     * @param bean
+     * @param payorderno
+     */
     public void updateTestPaySign(ResultBean bean,String payorderno) ;
+    /**
+     * 测试渠道
+     * @param trade
+     * @param debitBean
+     * @return
+     */
     public TxnsQuickpayModel saveTestDebitSign(TradeBean trade,DebitBean debitBean);
-    public String saveTestCreditSign(TradeBean trade, CreditBean creditBean) ;
+    /**
+     * 测试渠道
+     * @param trade
+     * @param creditBean
+     * @return
+     */
+    public String saveTestCreditSign(TradeBean trade, CreditBean creditBean);
+    /**
+     * 测试渠道
+     * @param bean
+     * @param payorderno
+     */
     public void updateTestSign(ResultBean bean,String payorderno);
-    public String saveTestSMS(TradeBean trade,SMSBean smsBean) ;
+    /**
+     * 测试渠道
+     * @param trade
+     * @param smsBean
+     * @return
+     */
+    public String saveTestSMS(TradeBean trade,SMSBean smsBean);
+    /**
+     * 
+     * @param trade
+     * @param payBean
+     * @return
+     */
     public String saveTestToPay(TradeBean trade, PayBean payBean);
     
     /**

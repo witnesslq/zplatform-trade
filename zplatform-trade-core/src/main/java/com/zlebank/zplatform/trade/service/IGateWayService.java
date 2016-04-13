@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.alibaba.fastjson.JSONObject;
+import com.zlebank.zplatform.member.bean.enums.MemberType;
 import com.zlebank.zplatform.trade.bean.ReaPayResultBean;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.ZLPayResultBean;
@@ -146,4 +147,21 @@ public interface IGateWayService extends IBaseService<TxnsOrderinfoModel, Long>{
      */
     public void checkBusiAcct(String merchNo,String memberId) throws TradeException;
 
+    /**
+     * 处理商户收银台的订单，保存交易流水数据和交易订单数据
+     * @param order
+     * @return
+     * @throws TradeException
+     */
+    public String dealWithMerchOrder(OrderBean order) throws TradeException;
+    
+    /**
+     * 验证会员支付密码
+     * @param memberId
+     * @param pwd
+     * @param memberType
+     * @return
+     * @throws TradeException
+     */
+    public boolean validatePayPWD(String memberId,String pwd,MemberType memberType) throws TradeException;
 }

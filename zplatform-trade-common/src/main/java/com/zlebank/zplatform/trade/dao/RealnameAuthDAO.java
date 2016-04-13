@@ -50,5 +50,8 @@ public interface RealnameAuthDAO extends BaseDAO<PojoRealnameAuth>{
      * @return
      */
     public PojoRealnameAuth getByCardInfo(PojoRealnameAuth realnameAuth);
+    
+   
+    
 
 }

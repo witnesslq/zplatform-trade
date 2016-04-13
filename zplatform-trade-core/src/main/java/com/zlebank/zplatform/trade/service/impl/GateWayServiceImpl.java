@@ -45,17 +45,21 @@ import com.zlebank.zplatform.commons.utils.Base64Utils;
 import com.zlebank.zplatform.commons.utils.RSAUtils;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.member.bean.CoopInstiMK;
+import com.zlebank.zplatform.member.bean.MemberBean;
 import com.zlebank.zplatform.member.bean.MerchMK;
 import com.zlebank.zplatform.member.bean.PersonManager;
 import com.zlebank.zplatform.member.bean.QuickpayCustBean;
 import com.zlebank.zplatform.member.bean.enums.MemberType;
 import com.zlebank.zplatform.member.bean.enums.TerminalAccessType;
+import com.zlebank.zplatform.member.dao.MemberDAO;
 import com.zlebank.zplatform.member.dao.QuickpayCustDAO;
+import com.zlebank.zplatform.member.exception.DataCheckFailedException;
 import com.zlebank.zplatform.member.pojo.PojoMember;
 import com.zlebank.zplatform.member.pojo.PojoMerchDeta;
 import com.zlebank.zplatform.member.pojo.PojoQuickpayCust;
 import com.zlebank.zplatform.member.service.CoopInstiService;
 import com.zlebank.zplatform.member.service.MemberBankCardService;
+import com.zlebank.zplatform.member.service.MemberOperationService;
 import com.zlebank.zplatform.member.service.MemberService;
 import com.zlebank.zplatform.member.service.MerchMKService;
 import com.zlebank.zplatform.member.service.MerchService;
@@ -186,7 +190,10 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
     private QuickpayCustDAO quickpayCustDAO;
     @Autowired
     private PersonService personService;
-    
+    @Autowired
+    private MemberOperationService memberOperationService;
+    @Autowired
+    private MemberDAO memberDAO;
     /**
      *
      * @return
@@ -491,6 +498,121 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         
         return txnsLog.getTxnseqno();
     }
+    
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+    public String dealWithMerchOrder(OrderBean order) throws TradeException{
+        List<TxnsOrderinfoModel> orderinfoList =  getSecondPayOrder(order.getOrderId(),order.getTxnTime(),order.getMerId());
+        if(orderinfoList.size()==1){
+            TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(orderinfoList.get(0).getRelatetradetxn());
+            String orign_memberId = txnsLog.getAccmemberid();
+            String new_memberId = order.getMerId();
+            if(!orign_memberId.equals(new_memberId)){
+                throw new TradeException("T036");
+            }
+            return orderinfoList.get(0).getRelatetradetxn();
+        }
+        
+        TxncodeDefModel busiModel = txncodeDefService.getBusiCode(order.getTxnType(), order.getTxnSubType(), order.getBizType());
+        if(busiModel==null){
+            return "";
+        }
+        TxnsLogModel txnsLog = new TxnsLogModel();
+        PojoMerchDeta member = null;
+        if(StringUtil.isNotEmpty(order.getMerId())){//商户为空时，取商户的各个版本信息
+        	
+        	member =  merchService.getMerchBymemberId(order.getMerId());
+        	//member = memberService2.getMbmberByMemberId(order.getMerId(),MemberType.);
+        	txnsLog.setRiskver(member.getRiskVer());
+            txnsLog.setSplitver(member.getSpiltVer());
+            txnsLog.setFeever(member.getFeeVer());
+            txnsLog.setPrdtver(member.getPrdtVer());
+           
+            txnsLog.setRoutver(member.getRoutVer());
+            txnsLog.setAccordinst(member.getParent());
+            txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlCycle().toString())));
+        }else{
+        	//10-产品版本,11-扣率版本,12-分润版本,13-风控版本,20-路由版本
+        	txnsLog.setRiskver(getDefaultVerInfo(order.getCoopInstiId(),busiModel.getBusicode(),13));
+            txnsLog.setSplitver(getDefaultVerInfo(order.getCoopInstiId(),busiModel.getBusicode(),12));
+            txnsLog.setFeever(getDefaultVerInfo(order.getCoopInstiId(),busiModel.getBusicode(),11));
+            txnsLog.setPrdtver(getDefaultVerInfo(order.getCoopInstiId(),busiModel.getBusicode(),10));
+            txnsLog.setRoutver(getDefaultVerInfo(order.getCoopInstiId(),busiModel.getBusicode(),20));
+            txnsLog.setAccsettledate(DateUtil.getSettleDate(1));
+        }
+        txnsLog.setTxndate(DateUtil.getCurrentDate());
+        txnsLog.setTxntime(DateUtil.getCurrentTime());
+        txnsLog.setBusicode(busiModel.getBusicode());
+        txnsLog.setBusitype(busiModel.getBusitype());
+        //核心交易流水号，交易时间（yymmdd）+业务代码+6位流水号（每日从0开始）
+        txnsLog.setTxnseqno(OrderNumber.getInstance().generateTxnseqno(txnsLog.getBusicode()));
+        txnsLog.setAmount(Long.valueOf(order.getTxnAmt()));
+        txnsLog.setAccordno(order.getOrderId());
+        txnsLog.setAccfirmerno(order.getCoopInstiId());
+        txnsLog.setAcccoopinstino(order.getCoopInstiId());
+        txnsLog.setAccsecmerno(order.getMerId());
+        txnsLog.setAccordcommitime(DateUtil.getCurrentDateTime());
+        txnsLog.setTradestatflag("00000000");//交易初始状态
+        txnsLog.setAccmemberid(order.getMerId());//商户收银台中，受理会员号为商户号
+        //记录分账信息和交易佣金
+        if("01".equals(order.getTxnType())&&"99".equals(order.getTxnSubType())){
+            if(StringUtil.isNotEmpty(order.getReserved())){
+                List<SplitAcctBean> resultList =  JSON.parseArray(order.getReserved(), SplitAcctBean.class);
+                Long tradecomm = txnsSplitAccountService.saveTxnsSplitAccount(resultList, txnsLog.getTxnseqno());
+                txnsLog.setTradcomm(tradecomm);//佣金之和
+            }
+        }else{
+            if(StringUtil.isNotEmpty(order.getReserved())){
+                SplitAcctBean splitAcctBean = JSON.parseObject(order.getReserved(), SplitAcctBean.class);
+                txnsLog.setTradcomm(Long.valueOf(splitAcctBean.getCommAmt()));//单一收款商户佣金
+            }else{
+                txnsLog.setTradcomm(0L);
+            }
+        }
+        
+        
+        
+        //记录订单流水
+        TxnsOrderinfoModel orderinfo = new TxnsOrderinfoModel();
+        orderinfo.setId(-1L);
+        orderinfo.setOrderno(order.getOrderId());//商户提交的订单号
+        orderinfo.setOrderamt(Long.valueOf(order.getTxnAmt()));
+        orderinfo.setOrderfee(txnsLog.getTxnfee());
+        orderinfo.setOrdercommitime(order.getTxnTime());
+        orderinfo.setRelatetradetxn(txnsLog.getTxnseqno());//关联的交易流水表中的交易序列号
+        orderinfo.setFirmemberno(order.getCoopInstiId());
+        orderinfo.setFirmembername(coopInstiService.getInstiByInstiCode(order.getCoopInstiId()).getInstiName());
+        if(StringUtil.isNotEmpty(order.getMerId())){
+        	orderinfo.setSecmemberno(order.getMerId());
+            orderinfo.setSecmembername(StringUtil.isNotEmpty(order.getMerName())?order.getMerName():member.getAccName());
+        }
+        orderinfo.setStatus("01");
+        orderinfo.setSecmembershortname(order.getMerAbbr());
+        orderinfo.setPayerip(order.getCustomerIp());
+        orderinfo.setAccesstype(order.getAccessType());
+        orderinfo.setFronturl(order.getFrontUrl());
+        orderinfo.setBackurl(order.getBackUrl());
+        
+        orderinfo.setTxntype(order.getTxnType());
+        orderinfo.setTxnsubtype(order.getTxnSubType());
+        orderinfo.setBiztype(order.getBizType());
+        orderinfo.setCustomerInfo(order.getCustomerInfo());
+        //orderinfo.setTn(OrderNumber.getInstance().generateTN(order.getMerId()));
+        orderinfo.setOrderdesc(order.getOrderDesc());
+        orderinfo.setReqreserved(order.getReqReserved());
+        orderinfo.setReserved(order.getReserved());
+        orderinfo.setPaytimeout(order.getPayTimeout());
+        orderinfo.setTn(OrderNumber.getInstance().generateTN(order.getCoopInstiId()));
+        orderinfo.setMemberid(order.getMerId());
+        orderinfo.setCurrencycode("156");
+        saveOrderInfo(orderinfo);
+        txnsLogService.saveTxnsLog(txnsLog);
+        
+        return txnsLog.getTxnseqno();
+    }
+    
+    
+    
+    
     
     @Transactional(propagation=Propagation.REQUIRES_NEW)
     public void saveOrderInfo(TxnsOrderinfoModel orderinfo) throws TradeException{
@@ -2010,6 +2132,8 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         }
         return new ResultBean("success");
     }
+    
+    
     private ResultBean validateWapMemberBusiness(WapOrderBean orderBean,RiskRateInfoBean rateInfoBean){
         TxncodeDefModel busiModel = txncodeDefService.getBusiCode(orderBean.getTxnType(), orderBean.getTxnSubType(), orderBean.getBizType());
         BusinessEnum businessEnum = BusinessEnum.fromValue(busiModel.getBusicode());
@@ -2167,20 +2291,23 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
 	@Override
 	public void checkBusiAcct(String merchNo, String memberId)
 			throws TradeException {
-		List<BusiAcct> busiAccList = accountQueryService
-                .getBusiACCByMid(memberId);
         BusiAcct fundAcct = null;
-        // 取得资金账户
-        for (BusiAcct busiAcct : busiAccList) {
-            if (Usage.BASICPAY == busiAcct.getUsage()) {
-                fundAcct = busiAcct;
+        List<BusiAcct> busiAccList = null;
+        if(StringUtil.isNotEmpty(memberId)){
+        	busiAccList = accountQueryService.getBusiACCByMid(memberId);
+            // 取得资金账户
+            for (BusiAcct busiAcct : busiAccList) {
+                if (Usage.BASICPAY == busiAcct.getUsage()) {
+                    fundAcct = busiAcct;
+                }
+            }
+            BusiAcctQuery memberAcct = accountQueryService
+                    .getMemberQueryByID(fundAcct.getBusiAcctCode());
+            if(memberAcct.getStatus()!=AcctStatusType.NORMAL){
+            	throw new TradeException("GW19");
             }
         }
-        BusiAcctQuery memberAcct = accountQueryService
-                .getMemberQueryByID(fundAcct.getBusiAcctCode());
-        if(memberAcct.getStatus()!=AcctStatusType.NORMAL){
-        	throw new TradeException("GW19");
-        }
+        
 		
         
         busiAccList = accountQueryService
@@ -2197,6 +2324,24 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         	throw new TradeException("GW05");
         }
 	}
+	
+	public boolean validatePayPWD(String memberId,String pwd,MemberType memberType) throws TradeException{
+    	
+    	try {
+			PojoMember pojo =memberDAO.getMemberByMemberId(memberId, memberType);
+			MemberBean memberBean = new MemberBean();
+			memberBean.setLoginName(pojo.getLoginName());
+			memberBean.setInstiId(pojo.getInstiId());
+			memberBean.setPaypwd(pwd);
+			// 校验支付密码
+			return memberOperationService.verifyPayPwd(memberType,
+			        memberBean);
+		} catch (DataCheckFailedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
+    }
 	
 	
 }

@@ -163,6 +163,8 @@ public class CMBCWithholdingReciveProcessor implements ReceiveProcessor{
                                 realnameAuth.setCertifId(withholding.getCertno());
                                 realnameAuth.setPhoneNo(Long.valueOf(withholding.getPhone()));
                                 realnameAuth.setCustomerNm(withholding.getAccname());
+                                //判断实名认证数据是否已经记录
+                                
                                 if(realNameAuthResultBean.getValidatestatus().equals("00")){
                                     realnameAuth.setStatus("00");
                                     realnameAuthDAO.saveRealNameAuth(realnameAuth);

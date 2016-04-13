@@ -79,33 +79,33 @@ public class AccountPayServiceImpl implements IAccountPayService{
         if(validateBalance(accountTrade.getMemberId(),Long.valueOf(accountTrade.getAmount()))<0){
             throw new TradeException("T025");
         }
-        //if(validatePayPWD(accountTrade)){
-        //记录账户支付流水
-        txnsLogService.saveAccountTrade(accountTrade);
-        try {
-            String commiteTime = DateUtil.getCurrentDateTime();
-            //开始账户余额支付
-            ConsumeAccounting accounting = new ConsumeAccounting();
-            ResultBean resultBean =accounting.accountedFor(accountTrade.getTxnseqno());
-            if(!resultBean.isResultBool()){
-                throw new TradeException("AP05");
-            }
-            //更新账户支付信息
-            txnsLogService.updateAccountTrade(accountTrade, resultBean);
-            //应用方信息
-            AppPartyBean appParty = new AppPartyBean(OrderNumber.getInstance().generateAppOrderNo(), "000000000000", commiteTime, DateUtil.getCurrentDateTime(), accountTrade.getTxnseqno(),"");
-            txnsLogService.updateAppInfo(appParty);
-            if(!resultBean.isResultBool()){
-                throw new TradeException("AP05");
-            }
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            throw new TradeException("AP05");
-        }
-        /*}else{
+        if(validatePayPWD(accountTrade)){
+	        //记录账户支付流水
+	        txnsLogService.saveAccountTrade(accountTrade);
+	        try {
+	            String commiteTime = DateUtil.getCurrentDateTime();
+	            //开始账户余额支付
+	            ConsumeAccounting accounting = new ConsumeAccounting();
+	            ResultBean resultBean =accounting.accountedFor(accountTrade.getTxnseqno());
+	            if(!resultBean.isResultBool()){
+	                throw new TradeException("AP05");
+	            }
+	            //更新账户支付信息
+	            txnsLogService.updateAccountTrade(accountTrade, resultBean);
+	            //应用方信息
+	            AppPartyBean appParty = new AppPartyBean(OrderNumber.getInstance().generateAppOrderNo(), "000000000000", commiteTime, DateUtil.getCurrentDateTime(), accountTrade.getTxnseqno(),"");
+	            txnsLogService.updateAppInfo(appParty);
+	            if(!resultBean.isResultBool()){
+	                throw new TradeException("AP05");
+	            }
+	        } catch (Exception e) {
+	            // TODO Auto-generated catch block
+	            e.printStackTrace();
+	            throw new TradeException("AP05");
+	        }
+        }else{
             throw new TradeException("AP04");
-        }*/
+        }
     }
     
     public void webAccountPay(AccountTradeBean accountTrade) throws TradeException{

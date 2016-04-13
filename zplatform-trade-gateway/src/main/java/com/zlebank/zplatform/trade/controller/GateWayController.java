@@ -546,51 +546,6 @@ public class GateWayController {
             model.put("txnseqno", txnseqno_);
             return new ModelAndView("/erro", model);
         }
-       
-        /*try {
-            String bindCardId = trade.getBindCardId();
-            // 直接获取短信验证码
-            QuickpayCustModel custCard = quickpayCustService.get(Long
-                    .valueOf(trade.getBindCardId()));
-            String routId = custCard.getInstitution();
-            trade.setReaPayOrderNo(OrderNumber.getInstance()
-                    .generateReaPayOrderId());
-            IQuickPayTrade quickPayTrade = TradeAdapterFactory.getInstance()
-                    .getQuickPayTrade(routId);
-            if ("00".equals(custCard.getStatus())) {
-                trade.setBindCardId(custCard.getBindcardid());
-
-            } else {
-                trade.setBindCardId("");
-            }
-            trade.setCardNo(custCard.getCardno());
-            trade.setMobile(custCard.getPhone());
-            trade.setAcctName(custCard.getAccname());
-            trade.setCertId(custCard.getIdnum());
-            trade.setValidthru(custCard.getValidtime());// web收银台使用
-            trade.setCvv2(custCard.getCvv2());
-            bean = quickPayTrade.marginRegister(trade);
-            trade.setBindCardId(bindCardId);
-            if (bean.isResultBool()) {
-                ReaPayResultBean resultBean = (ReaPayResultBean) bean
-                        .getResultObj();
-                if (!"0000".equals(resultBean.getResult_code())) {
-                    model.put("errMsg", resultBean.getResult_msg());
-                    model.put("errCode", resultBean.getResult_code());
-                    model.put("txnseqno", txnseqno_);
-
-                    return new ModelAndView("/erro", model);
-                }
-            }
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            model.put("errMsg", "订单信息异常，请返回收银台重新支付");
-            model.put("errCode", "RC98");
-            model.put("trade", trade);
-            model.put("txnseqno", txnseqno_);
-            return new ModelAndView("/erro", model);
-        }*/
         tradeBean2.setCardNo(trade.getCardNo());
         tradeBean2.setReaPayOrderNo(trade.getReaPayOrderNo());
         tradeBean2.setCardNo(trade.getCardNo());
@@ -1471,9 +1426,12 @@ public class GateWayController {
                 model.put("txnseqno", tradeBean.getTxnseqno());
                 return new ModelAndView("/erro_gw", model);
             }
+            //验证提现密码
+            
+            
+            
             TxnsWithdrawModel withdraw = new TxnsWithdrawModel(tradeBean);
             //记录提现账务
-           
             TradeInfo tradeInfo = new TradeInfo();
             tradeInfo.setPayMemberId(withdraw.getMemberid());
             tradeInfo.setPayToMemberId(withdraw.getMemberid());

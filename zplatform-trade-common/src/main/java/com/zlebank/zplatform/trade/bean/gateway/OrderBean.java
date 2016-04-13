@@ -576,6 +576,105 @@ public class OrderBean implements Serializable{
 	public void setMerAbbr(String merAbbr) {
 		this.merAbbr = merAbbr;
 	}
+	/**
+	 * @param version
+	 * @param encoding
+	 * @param certId
+	 * @param frontUrl
+	 * @param backUrl
+	 * @param signature
+	 * @param signMethod
+	 * @param coopInstiId
+	 * @param merId
+	 * @param merName
+	 * @param merAbbr
+	 * @param orderId
+	 * @param txnType
+	 * @param txnSubType
+	 * @param bizType
+	 * @param channelType
+	 * @param accessType
+	 * @param txnTime
+	 * @param accType
+	 * @param accNo
+	 * @param txnAmt
+	 * @param currencyCode
+	 * @param customerInfo
+	 * @param orderTimeout
+	 * @param payTimeout
+	 * @param reqReserved
+	 * @param reserved
+	 * @param riskRateInfo
+	 * @param encryptCertId
+	 * @param frontFailUrl
+	 * @param instalTransInfo
+	 * @param defaultPayType
+	 * @param issInsCode
+	 * @param supPayType
+	 * @param userMac
+	 * @param customerIp
+	 * @param cardTransData
+	 * @param orderDesc
+	 */
+	public OrderBean(String version, String encoding, String certId,
+			String frontUrl, String backUrl, String signature,
+			String signMethod, String coopInstiId, String merId,
+			String merName, String merAbbr, String orderId, String txnType,
+			String txnSubType, String bizType, String channelType,
+			String accessType, String txnTime, String accType, String accNo,
+			String txnAmt, String currencyCode, String customerInfo,
+			String orderTimeout, String payTimeout, String reqReserved,
+			String reserved, String riskRateInfo, String encryptCertId,
+			String frontFailUrl, String instalTransInfo, String defaultPayType,
+			String issInsCode, String supPayType, String userMac,
+			String customerIp, String cardTransData, String orderDesc) {
+		super();
+		this.version = version;
+		this.encoding = encoding;
+		this.certId = certId;
+		this.frontUrl = frontUrl;
+		this.backUrl = backUrl;
+		this.signature = signature;
+		this.signMethod = signMethod;
+		this.coopInstiId = coopInstiId;
+		this.merId = merId;
+		this.merName = merName;
+		this.merAbbr = merAbbr;
+		this.orderId = orderId;
+		this.txnType = txnType;
+		this.txnSubType = txnSubType;
+		this.bizType = bizType;
+		this.channelType = channelType;
+		this.accessType = accessType;
+		this.txnTime = txnTime;
+		this.accType = accType;
+		this.accNo = accNo;
+		this.txnAmt = txnAmt;
+		this.currencyCode = currencyCode;
+		this.customerInfo = customerInfo;
+		this.orderTimeout = orderTimeout;
+		this.payTimeout = payTimeout;
+		this.reqReserved = reqReserved;
+		this.reserved = reserved;
+		this.riskRateInfo = riskRateInfo;
+		this.encryptCertId = encryptCertId;
+		this.frontFailUrl = frontFailUrl;
+		this.instalTransInfo = instalTransInfo;
+		this.defaultPayType = defaultPayType;
+		this.issInsCode = issInsCode;
+		this.supPayType = supPayType;
+		this.userMac = userMac;
+		this.customerIp = customerIp;
+		this.cardTransData = cardTransData;
+		this.orderDesc = orderDesc;
+	}
+	/**
+	 * 
+	 */
+	public OrderBean() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
     
     
     
