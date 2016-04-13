@@ -616,7 +616,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 
     @Override
     public List<?> getAllMemberByDate(String date) {
-        String queryString="select distinct t.ACCSECMERNO, t.ACCSETTLEDATE from t_txns_log t where t.ACCSETTLEDATE=? and t.ACCSECMERNO is not null";
+        String queryString="select distinct t.ACCSECMERNO, t.ACCSETTLEDATE from t_txns_log t where t.ACCSETTLEDATE=? and t.ACCSECMERNO is not null and SUBSTR (trim(t.retcode),-2) = '00'";
         return (List<?>) super.queryBySQL(queryString, new Object[]{date});
        
     }
@@ -630,37 +630,34 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
     //消费和充值
     @Override
     public List<?> getCountExpenseAndRecharge(String memberId,String date) {
-        String queryString="select count(*) total ,sum(t.amount-t.txnfee) clearing ,sum(t.txnfee) totalfee  from  t_txns_log t,t_bnk_txn b where t.payordno=b.payordno and t.ACCSECMERNO=?  and t.ACCSETTLEDATE=? and b.status=9 and t.busicode in (10000001,20000001)";
+        String queryString="select count(*) total ,sum(t.amount-t.txnfee) clearing ,sum(t.txnfee) totalfee  from  t_txns_log t,t_bnk_txn b where t.payordno=b.payordno and t.ACCSECMERNO=?  and t.ACCSETTLEDATE=? and b.status=9 and t.busicode in (10000001,20000001) and SUBSTR (trim(t.retcode),-2) = '00'";
         return (List<?>) super.queryBySQL(queryString, new Object[]{memberId,date});
     }
     
     @Override
     public List<?>  getAllMemberDetailedByDate(String memberId,String date){
-        String queryString="select t.ACCORDNO,t.TXNSEQNO,t.ACCORDCOMMITIME,t.ACCSETTLEDATE,t.amount,t.busicode,t.TXNFEE from t_txns_log t left join t_bnk_txn b on t.payordno=b.payordno where (b.status=9 or b.status is null) and t.ACCFIRMERNO=? and t.ACCSETTLEDATE=? and t.payordno is not null";
+        String queryString="select t.ACCORDNO,t.TXNSEQNO,t.ACCORDCOMMITIME,t.ACCSETTLEDATE,t.amount,t.busicode,t.TXNFEE from t_txns_log t left join t_bnk_txn b on t.payordno=b.payordno where (b.status=9 or b.status is null) and t.ACCFIRMERNO=? and t.ACCSETTLEDATE=? and t.payordno is not null and SUBSTR (trim(t.retcode), -2) = '00'";
         return (List<?>) super.queryBySQL(queryString, new Object[]{memberId,date});
     }
 
 
     @Override
     public List<?> getCountRefundAndPay(String memberId, String date) {
-        String queryString="select count(*) total ,sum(t.amount+t.txnfee) clearing ,sum(t.txnfee) totalfee  from  t_txns_log t where t.ACCSECMERNO=?  and t.ACCSETTLEDATE=? and t.busicode in (30000001,40000001,70000001)";
+        String queryString="select count(*) total ,sum(t.amount+t.txnfee) clearing ,sum(t.txnfee) totalfee  from  t_txns_log t where t.ACCSECMERNO=?  and t.ACCSETTLEDATE=? and t.busicode in (30000001,40000001,70000001) and SUBSTR (trim(t.retcode),-2) = '00'";
         return (List<?>) super.queryBySQL(queryString, new Object[]{memberId,date});
     }
 
 
     @Override
     public List<?> getCountSpendingAccount(String memberId, String date) {
-        String queryString="select count(*) total ,sum(t.amount+t.txnfee) clearing ,sum(t.txnfee) totalfee  from  t_txns_log t where t.ACCSECMERNO=?  and t.ACCSETTLEDATE=? and t.busicode in (10000002)";
+        String queryString="select count(*) total ,sum(t.amount+t.txnfee) clearing ,sum(t.txnfee) totalfee  from  t_txns_log t where t.ACCSECMERNO=?  and t.ACCSETTLEDATE=? and t.busicode in (10000002) and SUBSTR (trim(t.retcode),-2) = '00'";
         return (List<?>) super.queryBySQL(queryString, new Object[]{memberId,date});
     }
 
 
     @Override
     public List<?> getCountHandPay(String memberId, String date) {
-        String queryString="select count(*) total ,sum(t.amount) clearing   from t_txns_charge t ,t_member m where t.memberid=m.mem_id and m.MEMBER_ID=?   ";//and t.ACCSETTLEDATE=?
-        return (List<?>) super.queryBySQL(queryString, new Object[]{memberId});//,date
+        String queryString="select count(*) total ,sum(t.amount) clearing   from t_txns_charge t ,t_member m where t.memberid=m.mem_id and m.MEMBER_ID=? and trunc(t.CVLEXATIME)=TO_DATE(?,'YYYYMMDD')   ";//
+        return (List<?>) super.queryBySQL(queryString, new Object[]{memberId,date});//,date
     }
-    
-   
-
-}
+    }
