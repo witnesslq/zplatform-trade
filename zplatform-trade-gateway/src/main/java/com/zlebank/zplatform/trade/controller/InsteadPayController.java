@@ -44,11 +44,13 @@ import com.zlebank.zplatform.trade.exception.DuplicateOrderIdException;
 import com.zlebank.zplatform.trade.exception.FailToGetAccountInfoException;
 import com.zlebank.zplatform.trade.exception.FailToInsertAccEntryException;
 import com.zlebank.zplatform.trade.exception.FailToInsertFeeException;
+import com.zlebank.zplatform.trade.exception.InconsistentMerchNoException;
 import com.zlebank.zplatform.trade.exception.InvalidCardException;
 import com.zlebank.zplatform.trade.exception.MerchWhiteListCheckFailException;
 import com.zlebank.zplatform.trade.exception.MessageDecryptFailException;
 import com.zlebank.zplatform.trade.exception.NotInsteadPayWorkTimeException;
 import com.zlebank.zplatform.trade.exception.RealNameAuthFailException;
+import com.zlebank.zplatform.trade.exception.RealNameCheckFailException;
 import com.zlebank.zplatform.trade.insteadPay.message.BaseMessage;
 import com.zlebank.zplatform.trade.insteadPay.message.InsteadPayFile;
 import com.zlebank.zplatform.trade.insteadPay.message.InsteadPayQuery_Request;
@@ -306,9 +308,16 @@ public class InsteadPayController {
         } catch (FailToInsertFeeException e) {
             errorMsg = new ResultMessage("58", "代付商户不存在");
             log.error(e.getMessage(), e);
-        }  catch (Exception e) {
-            errorMsg = new ResultMessage("59", "代付失败");
+        } catch (RealNameCheckFailException e) {
+            errorMsg = new ResultMessage("5A", e.getMessage());
             log.error(e.getMessage(), e);
+        } catch (InconsistentMerchNoException e) {
+            errorMsg = new ResultMessage("5B", e.getMessage());
+            log.error(e.getMessage(), e);
+        }
+        catch (Exception e) {
+          errorMsg = new ResultMessage("59", "代付失败");
+          log.error(e.getMessage(), e);
         }
 
         if (errorMsg != null) {

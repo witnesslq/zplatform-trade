@@ -25,8 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.zlebank.zplatform.acc.bean.BusiAcctQuery;
-import com.zlebank.zplatform.acc.bean.QueryAccount;
 import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.bean.enums.Usage;
 import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
@@ -36,14 +34,18 @@ import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.BusiAcctService;
 import com.zlebank.zplatform.acc.service.FreezeAmountService;
 import com.zlebank.zplatform.commons.bean.CardBin;
-import com.zlebank.zplatform.commons.bean.PagedResult;
 import com.zlebank.zplatform.commons.dao.CardBinDao;
 import com.zlebank.zplatform.commons.enums.BusinessCodeEnum;
 import com.zlebank.zplatform.commons.service.impl.AbstractBasePageService;
 import com.zlebank.zplatform.commons.utils.BeanCopyUtil;
 import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.commons.utils.StringUtil;
+import com.zlebank.zplatform.member.bean.MemberAccountBean;
+import com.zlebank.zplatform.member.bean.MemberBean;
+import com.zlebank.zplatform.member.bean.Person;
+import com.zlebank.zplatform.member.bean.enums.MemberType;
 import com.zlebank.zplatform.member.pojo.PojoMerchDeta;
+import com.zlebank.zplatform.member.service.MemberAccountService;
 import com.zlebank.zplatform.member.service.MemberService;
 import com.zlebank.zplatform.member.service.MerchService;
 import com.zlebank.zplatform.trade.bean.InsteadPayDetailBean;
@@ -55,15 +57,19 @@ import com.zlebank.zplatform.trade.bean.enums.SeqNoEnum;
 import com.zlebank.zplatform.trade.dao.ConfigInfoDAO;
 import com.zlebank.zplatform.trade.dao.InsteadPayBatchDAO;
 import com.zlebank.zplatform.trade.dao.InsteadPayDetailDAO;
+import com.zlebank.zplatform.trade.dao.MerchInstpayConfDAO;
+import com.zlebank.zplatform.trade.dao.RealnameAuthOrderDAO;
 import com.zlebank.zplatform.trade.dao.TransferDataDAO;
 import com.zlebank.zplatform.trade.exception.BalanceNotEnoughException;
 import com.zlebank.zplatform.trade.exception.DuplicateOrderIdException;
 import com.zlebank.zplatform.trade.exception.FailToGetAccountInfoException;
 import com.zlebank.zplatform.trade.exception.FailToInsertAccEntryException;
 import com.zlebank.zplatform.trade.exception.FailToInsertFeeException;
+import com.zlebank.zplatform.trade.exception.InconsistentMerchNoException;
 import com.zlebank.zplatform.trade.exception.InvalidCardException;
 import com.zlebank.zplatform.trade.exception.MerchWhiteListCheckFailException;
 import com.zlebank.zplatform.trade.exception.NotInsteadPayWorkTimeException;
+import com.zlebank.zplatform.trade.exception.RealNameCheckFailException;
 import com.zlebank.zplatform.trade.insteadPay.message.InsteadPayFile;
 import com.zlebank.zplatform.trade.insteadPay.message.InsteadPayQueryFile;
 import com.zlebank.zplatform.trade.insteadPay.message.InsteadPayQuery_Request;
@@ -72,6 +78,8 @@ import com.zlebank.zplatform.trade.insteadPay.message.InsteadPay_Request;
 import com.zlebank.zplatform.trade.model.ConfigInfoModel;
 import com.zlebank.zplatform.trade.model.PojoInsteadPayBatch;
 import com.zlebank.zplatform.trade.model.PojoInsteadPayDetail;
+import com.zlebank.zplatform.trade.model.PojoMerchInstpayConf;
+import com.zlebank.zplatform.trade.model.PojoRealnameAuthOrder;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.service.IGateWayService;
 import com.zlebank.zplatform.trade.service.InsteadPayService;
@@ -130,24 +138,36 @@ public class InsteadPayServiceImpl
     
     @Autowired
     private SeqNoService seqNoService;
+    
+    @Autowired
+    private MerchInstpayConfDAO merchInstpayConfDAO;
+    
+    @Autowired
+    private RealnameAuthOrderDAO realnameAuthOrderDAO;
+    
+    @Autowired
+    private MemberAccountService memberAccountService;
 
     /**
-     * 代付处理
-     * 
+     *  代付处理
+     *   
      * @param request
-     * @return 错误代码，如果没有错误则返回NULL
+     * @param type
+     * @param param
      * @throws NotInsteadPayWorkTimeException
      * @throws FailToGetAccountInfoException
      * @throws BalanceNotEnoughException
      * @throws DuplicateOrderIdException
-     * @throws InvalidCardException 
-     * @throws FailToInsertAccEntryException 
-     * @throws MerchWhiteListCheckFailException 
-     * @throws FailToInsertFeeException 
+     * @throws InvalidCardException
+     * @throws FailToInsertAccEntryException
+     * @throws MerchWhiteListCheckFailException
+     * @throws FailToInsertFeeException
+     * @throws RealNameCheckFailException
+     * @throws InconsistentMerchNoException 
      */
     @Override
     @Transactional(propagation = Propagation.REQUIRED,rollbackFor=Throwable.class)
-    public void insteadPay(InsteadPay_Request request, InsteadPayImportTypeEnum type,InsteadPayInterfaceParamBean param) throws NotInsteadPayWorkTimeException, FailToGetAccountInfoException, BalanceNotEnoughException, DuplicateOrderIdException, InvalidCardException, FailToInsertAccEntryException, MerchWhiteListCheckFailException, FailToInsertFeeException {
+    public void insteadPay(InsteadPay_Request request, InsteadPayImportTypeEnum type,InsteadPayInterfaceParamBean param) throws NotInsteadPayWorkTimeException, FailToGetAccountInfoException, BalanceNotEnoughException, DuplicateOrderIdException, InvalidCardException, FailToInsertAccEntryException, MerchWhiteListCheckFailException, FailToInsertFeeException, RealNameCheckFailException, InconsistentMerchNoException {
 
 
         if (log.isDebugEnabled()) {
@@ -186,8 +206,15 @@ public class InsteadPayServiceImpl
         // 代付明细
         List<InsteadPayFile> fileContent = request.getFileContent();
         
+        // 明细检查
+        for (InsteadPayFile file : fileContent) {
+            if (!file.getMerId().equals(request.getMerId())) {
+                throw new InconsistentMerchNoException();
+            }
+        }
+        
         // 是否要判断白名单
-        StringBuilder whiteListError = new StringBuilder();
+        StringBuilder totalError = new StringBuilder();
         if (isCheckWhiteList(request.getMerId())) {
             for (InsteadPayFile file : fileContent) {
                 // 如果是对公账户，跳过实名认证和白名单。
@@ -195,40 +222,45 @@ public class InsteadPayServiceImpl
                     continue;
                 String error = merchWhiteListService.checkMerchWhiteList(file.getMerId(), file.getAccName(), file.getAccNo());
                 if (StringUtil.isNotEmpty(error)) {
-                    whiteListError.append(error);
+                    totalError.append(error);
                 }
             }
         }
-        if (whiteListError.length() != 0) {
-            throw new MerchWhiteListCheckFailException(new Object[]{whiteListError.toString()+"不在白名单内"});
+        if (totalError.length() != 0) {
+            throw new MerchWhiteListCheckFailException(new Object[]{totalError.toString()+"不在白名单内"});
         }
+        // 是否要判断实名认证信息
+        if (isCheckRealname(request.getMerId())) {
+            for (InsteadPayFile file : fileContent) {
+                // 如果是对公账户，跳过实名认证和白名单。
+                if ("02".equals(file.getAccType())) 
+                    continue;
+                PojoRealnameAuthOrder realNameAuth = realnameAuthOrderDAO.isRealNameAuth(request.getMerId(), file.getAccNo(), file.getAccName());
+                if (realNameAuth == null) {
+                    totalError.append(String.format("(账户：%s,姓名：%s)", file.getAccNo(),file.getAccName()));
+                }
+            }
+        }
+        if (totalError.length() != 0) {
+            throw new RealNameCheckFailException(new Object[]{totalError.toString()+"未经过实名认证"});
+        }
+        
         
         // 商户信息
         PojoMerchDeta merchPojo = merch.getMerchBymemberId(request.getMerId());
 
         // 商户余额是否足够
         BigDecimal payBalance = new BigDecimal(request.getTotalAmt());
-        BigDecimal merBalance = null;
-        QueryAccount queryAccount = new QueryAccount();
-        queryAccount.setMemberId(request.getMerId());
-        queryAccount.setUsage(Usage.BASICPAY.getCode());
-        PagedResult<BusiAcctQuery> busiAccount = memberService.getBusiAccount(
-                queryAccount, 1, 10);
+        MemberBean member = new Person();
+        member.setMemberId(request.getMerId());
+        MemberAccountBean resultBalance = null;
         try {
-            if (busiAccount != null) {
-                List<BusiAcctQuery> pagedResult = busiAccount.getPagedResult();
-                if (pagedResult != null && pagedResult.size() == 1) {
-                    BusiAcctQuery result = pagedResult.get(0);
-                    merBalance = result.getBalance().getAmount();
-                }
-            }
+            resultBalance = memberAccountService.queryBalance(MemberType.ENTERPRISE, member, Usage.BASICPAY);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new FailToGetAccountInfoException();
         }
-        if (merBalance == null) {
-            throw new FailToGetAccountInfoException();
-        }
+        BigDecimal merBalance = resultBalance != null ? resultBalance.getBalance() : BigDecimal.ZERO;
         if (merBalance.compareTo(payBalance) < 0) {
             throw new BalanceNotEnoughException();
         }
@@ -300,8 +332,21 @@ public class InsteadPayServiceImpl
      * @return 是否要判断白名单
      */
     private boolean isCheckWhiteList(String merId) {
-        ConfigInfoModel  isCheckWhiteList = configInfoDAO.getConfigByParaName("IS_CHECK_WHITE_LIST_INSTEAD_PAY");
-        if (isCheckWhiteList != null && "1".equals( isCheckWhiteList.getPara())){
+        PojoMerchInstpayConf conf = merchInstpayConfDAO.getByMemberId(merId);
+        if (conf != null && "1".equals( conf.getIsCheckWhiteList())){
+            return true;
+        } else {
+            return false;
+        }
+    }
+    /**
+     * 是否要判断实名认证【默认不判断】
+     * @param merId 一级商户号
+     * @return 是否要实名认证
+     */
+    private boolean isCheckRealname(String merId) {
+        PojoMerchInstpayConf conf = merchInstpayConfDAO.getByMemberId(merId);
+        if (conf != null && "1".equals( conf.getIsCheckRealname())){
             return true;
         } else {
             return false;
