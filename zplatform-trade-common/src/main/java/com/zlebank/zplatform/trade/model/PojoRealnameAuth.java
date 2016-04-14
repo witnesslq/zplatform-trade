@@ -210,7 +210,7 @@ public class PojoRealnameAuth {
     public PojoRealnameAuth(TradeBean trade) {
         super();
         this.cardNo = trade.getCardNo();
-        this.cardType = trade.getCardType();
+        this.cardType = trade.getCardType().equals("1")?"0":"2";
         this.customerNm = trade.getAcctName();
         this.certifTp = "01";
         this.certifId = trade.getCertId();

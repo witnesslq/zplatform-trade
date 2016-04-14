@@ -321,15 +321,15 @@ public class CreateInsteadPayMassage {
      */
     private InsteadPayFile createPayFile( String amt) {
         InsteadPayFile file1 = new InsteadPayFile();
-        file1.setMerId("200000000000610");
+        file1.setMerId(MER_ID);
         Random random = new Random();
         file1.setOrderId("IP"+System.currentTimeMillis()+random.nextInt(100));
         file1.setCurrencyCode("156");
         file1.setAmt(amt);
         file1.setBizType("000001");
         file1.setAccType("01");
-        file1.setAccNo("6226091212413805");
-        file1.setAccName("鲁晓帅");
+        file1.setAccNo(" 6226091212413815");
+        file1.setAccName("鲁大帅");
         file1.setBankCode("123456789012");
         file1.setIssInsProvince("");
         file1.setIssInsCity("");

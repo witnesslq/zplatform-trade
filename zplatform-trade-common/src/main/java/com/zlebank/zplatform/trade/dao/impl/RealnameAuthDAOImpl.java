@@ -91,11 +91,12 @@ public class RealnameAuthDAOImpl extends HibernateBaseDAOImpl<PojoRealnameAuth> 
      * @return
      */
     @Override
-    public PojoRealnameAuth getByCardNoAndName(String cardNo, String accName, String certifId) {
+    public PojoRealnameAuth getByCardNoAndName(String cardNo, String accName, String certifId, String phoneNo) {
         Criteria crite= this.getSession().createCriteria(PojoRealnameAuth.class);
         crite.add(Restrictions.eq("cardNo", cardNo));
         crite.add(Restrictions.eq("customerNm", accName));
         crite.add(Restrictions.eq("certifId", certifId));
+        crite.add(Restrictions.eq("phoneNo", Long.parseLong(phoneNo == null ? "0" : phoneNo)));
         crite.add(Restrictions.eq("status", "00"));
         @SuppressWarnings("unchecked")
         List<PojoRealnameAuth> pojos = crite.list();

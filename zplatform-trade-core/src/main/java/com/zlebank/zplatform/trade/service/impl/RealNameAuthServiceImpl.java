@@ -106,7 +106,7 @@ public class RealNameAuthServiceImpl  implements RealNameAuthService{
 
         // 实名认证表
         boolean isCost = false;
-        PojoRealnameAuth pojo = realnameAuthDAO.getByCardNoAndName(cardNo, accName, realNameAuth.getCertifId());
+        PojoRealnameAuth pojo = realnameAuthDAO.getByCardNoAndName(cardNo, accName, realNameAuth.getCertifId(), realNameAuth.getPhoneNo());
         if (pojo == null || !"00".equals(pojo.getStatus())) {
             try {
                 // Pojo属性设定
@@ -226,7 +226,7 @@ public class RealNameAuthServiceImpl  implements RealNameAuthService{
      */
     private void setPojoProperty(PojoRealnameAuth pojo, RealnameAuthFile realNameAuth) {
         pojo.setCardNo(realNameAuth.getCardNo());
-        pojo.setCardType(realNameAuth.getCardType());
+        pojo.setCardType(realNameAuth.getCardType().equals("1") ? "0" : "2");
         pojo.setCertifTp(realNameAuth.getCertifTp());
         pojo.setCertifId(realNameAuth.getCertifId());
         pojo.setCustomerNm(realNameAuth.getCustomerNm());
