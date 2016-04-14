@@ -230,20 +230,20 @@ public class InsteadPayServiceImpl
             throw new MerchWhiteListCheckFailException(new Object[]{totalError.toString()+"不在白名单内"});
         }
         // 是否要判断实名认证信息
-        if (isCheckRealname(request.getMerId())) {
-            for (InsteadPayFile file : fileContent) {
-                // 如果是对公账户，跳过实名认证和白名单。
-                if ("02".equals(file.getAccType())) 
-                    continue;
-                PojoRealnameAuthOrder realNameAuth = realnameAuthOrderDAO.isRealNameAuth(request.getMerId(), file.getAccNo(), file.getAccName());
-                if (realNameAuth == null) {
-                    totalError.append(String.format("(账户：%s,姓名：%s)", file.getAccNo(),file.getAccName()));
-                }
-            }
-        }
-        if (totalError.length() != 0) {
-            throw new RealNameCheckFailException(new Object[]{totalError.toString()+"未经过实名认证"});
-        }
+//        if (isCheckRealname(request.getMerId())) {
+//            for (InsteadPayFile file : fileContent) {
+//                // 如果是对公账户，跳过实名认证和白名单。
+//                if ("02".equals(file.getAccType())) 
+//                    continue;
+//                PojoRealnameAuthOrder realNameAuth = realnameAuthOrderDAO.isRealNameAuth(request.getMerId(), file.getAccNo(), file.getAccName());
+//                if (realNameAuth == null) {
+//                    totalError.append(String.format("(账户：%s,姓名：%s)", file.getAccNo(),file.getAccName()));
+//                }
+//            }
+//        }
+//        if (totalError.length() != 0) {
+//            throw new RealNameCheckFailException(new Object[]{totalError.toString()+"未经过实名认证"});
+//        }
         
         
         // 商户信息
