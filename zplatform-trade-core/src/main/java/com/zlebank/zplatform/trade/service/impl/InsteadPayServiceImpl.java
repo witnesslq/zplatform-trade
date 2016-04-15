@@ -215,7 +215,7 @@ public class InsteadPayServiceImpl
         
         // 是否要判断白名单
         StringBuilder totalError = new StringBuilder();
-        if (isCheckWhiteList(request.getMerId())) {
+//        if (isCheckWhiteList(request.getMerId())) {
             for (InsteadPayFile file : fileContent) {
                 // 如果是对公账户，跳过实名认证和白名单。
                 if ("02".equals(file.getAccType())) 
@@ -225,7 +225,7 @@ public class InsteadPayServiceImpl
                     totalError.append(error);
                 }
             }
-        }
+//        }
         if (totalError.length() != 0) {
             throw new MerchWhiteListCheckFailException(new Object[]{totalError.toString()+"不在白名单内"});
         }
