@@ -54,7 +54,7 @@ public class TxnsRefundServiceImpl extends BaseServiceImpl<TxnsRefundModel,Long>
     }
     
     public TxnsRefundModel getRefundByOldTxnSeqno(String refundorderno,String merchno) {
-        String hql = " from TxnsRefundModel where oldtxnseqno=?";
+        String hql = " from TxnsRefundModel c where c.oldtxnseqno=? and c.status in (01,21,00)";
         return super.getUniqueByHQL(hql, new Object[]{refundorderno});
     }
     public TxnsRefundModel getRefundByRefundor(String refundorderno) {
