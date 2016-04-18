@@ -20,9 +20,11 @@ import com.zlebank.zplatform.trade.exception.DuplicateOrderIdException;
 import com.zlebank.zplatform.trade.exception.FailToGetAccountInfoException;
 import com.zlebank.zplatform.trade.exception.FailToInsertAccEntryException;
 import com.zlebank.zplatform.trade.exception.FailToInsertFeeException;
+import com.zlebank.zplatform.trade.exception.InconsistentMerchNoException;
 import com.zlebank.zplatform.trade.exception.InvalidCardException;
 import com.zlebank.zplatform.trade.exception.MerchWhiteListCheckFailException;
 import com.zlebank.zplatform.trade.exception.NotInsteadPayWorkTimeException;
+import com.zlebank.zplatform.trade.exception.RealNameCheckFailException;
 import com.zlebank.zplatform.trade.insteadPay.message.InsteadPayQuery_Request;
 import com.zlebank.zplatform.trade.insteadPay.message.InsteadPayQuery_Response;
 import com.zlebank.zplatform.trade.insteadPay.message.InsteadPay_Request;
@@ -48,8 +50,10 @@ public interface InsteadPayService  extends IBasePageService<InsteadPayDetailQue
      * @throws InvalidCardException 
      * @throws FailToInsertAccEntryException 
      * @throws MerchWhiteListCheckFailException 
+     * @throws RealNameCheckFailException 
+     * @throws InconsistentMerchNoException 
      */
-    public void insteadPay(InsteadPay_Request request, InsteadPayImportTypeEnum type,InsteadPayInterfaceParamBean param) throws NotInsteadPayWorkTimeException, FailToGetAccountInfoException, BalanceNotEnoughException, DuplicateOrderIdException, InvalidCardException, FailToInsertAccEntryException, MerchWhiteListCheckFailException, FailToInsertFeeException;
+    public void insteadPay(InsteadPay_Request request, InsteadPayImportTypeEnum type,InsteadPayInterfaceParamBean param) throws NotInsteadPayWorkTimeException, FailToGetAccountInfoException, BalanceNotEnoughException, DuplicateOrderIdException, InvalidCardException, FailToInsertAccEntryException, MerchWhiteListCheckFailException, FailToInsertFeeException, RealNameCheckFailException, InconsistentMerchNoException;
     /**
      * 代付状态查询处理
      * @param requestBean

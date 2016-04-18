@@ -88,6 +88,8 @@ public class PojoInsteadPayBatch {
     private String filePath;
     /**原文件名**/
     private String originalFileName;
+    /**URL**/
+    private String notifyUrl;
     
     /**批次明细**/
     private List<PojoInsteadPayDetail> details = new ArrayList<PojoInsteadPayDetail>();
@@ -294,5 +296,12 @@ public class PojoInsteadPayBatch {
     }
     public void setOriginalFileName(String originalFileName) {
         this.originalFileName = originalFileName;
+    }
+    @Column(name = "NOTIFY_URL")
+    public String getNotifyUrl() {
+        return notifyUrl;
+    }
+    public void setNotifyUrl(String notifyUrl) {
+        this.notifyUrl = notifyUrl;
     }
 }

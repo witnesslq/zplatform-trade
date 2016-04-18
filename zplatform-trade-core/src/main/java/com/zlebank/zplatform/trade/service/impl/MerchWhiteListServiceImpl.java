@@ -26,9 +26,7 @@ import com.zlebank.zplatform.trade.dao.MerchWhiteListDAO;
 import com.zlebank.zplatform.trade.dao.RealnameAuthDAO;
 import com.zlebank.zplatform.trade.dao.RealnameAuthOrderDAO;
 import com.zlebank.zplatform.trade.insteadPay.message.MerWhiteList_Request;
-import com.zlebank.zplatform.trade.model.ConfigInfoModel;
 import com.zlebank.zplatform.trade.model.PojoMerchWhiteList;
-import com.zlebank.zplatform.trade.model.PojoRealnameAuthOrder;
 import com.zlebank.zplatform.trade.service.MerchWhiteListService;
 
 /**
@@ -68,16 +66,15 @@ public class MerchWhiteListServiceImpl implements MerchWhiteListService{
             log.debug(JSONObject.fromObject(request));
         }
         // 判断是否需要实名认证
-        ConfigInfoModel config = configInfoDAO.getConfigByParaName("IS_WHITE_LIST_REALNAME_AUTH");
+//        ConfigInfoModel config = configInfoDAO.getConfigByParaName("IS_WHITE_LIST_REALNAME_AUTH");
         // 是否进行实名认证
-        boolean isRealNameAuth = "1".equals(config.getPara());
-        if (isRealNameAuth) {
-//            PojoRealnameAuth pojo = realnameAuthDAO.getByCardNoAndName(request.getAccNo(), request.getAccName());
-            PojoRealnameAuthOrder realNameAuth = realnameAuthOrderDAO.isRealNameAuth(request.getMerId(), request.getAccNo(), request.getAccName());
-            if (realNameAuth == null) {
-                return "该卡没有经过实名认证";
-            }
-        }
+//        boolean isRealNameAuth = "1".equals(config.getPara());
+//        if (isRealNameAuth) {
+//            PojoRealnameAuthOrder realNameAuth = realnameAuthOrderDAO.isRealNameAuth(request.getMerId(), request.getAccNo(), request.getAccName());
+//            if (realNameAuth == null) {
+//                return "该卡没有经过实名认证";
+//            }
+//        }
         PojoMerchWhiteList oldPojo = merchWhiteListDAO.getWhiteListByCardNoAndName(request.getMerId(), request.getAccNo(), request.getAccName());
         if (oldPojo != null) {
             return "已经存在相应的记录";
@@ -90,11 +87,11 @@ public class MerchWhiteListServiceImpl implements MerchWhiteListService{
         whiteList.setUptime(new Date());
         whiteList.setInuser(0L);
         whiteList.setUpuser(0L);
-        if (isRealNameAuth) {
-            whiteList.setStatus("1");
-        } else {
+//        if (isRealNameAuth) {
+//            whiteList.setStatus("1");
+//        } else {
             whiteList.setStatus("0");
-        }
+//        }
         merchWhiteListDAO.merge(whiteList);
         return null;
     }

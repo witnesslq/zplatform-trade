@@ -78,9 +78,11 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
         <div id="Content-Left"> 
 		    <ul class="nav nav-pills nav-stacked">
 		      <li onclick="changeTab('10086')"><a href="#">模拟客户端</a></li>
-			  <li class=active   onclick="changeTab('21')"><a href="#">实名认证</a></li>
-			  <li  onclick="changeTab('02')"><a href="#">添加白名单</a></li>
-			  <li  onclick="changeTab('03')"><a href="#">批量代付</a></li>
+			  <li class=active   onclick="changeTab('72')"><a href="#">实名认证</a></li>
+			  <li  onclick="changeTab('73')"><a href="#">实名认证查询</a></li>
+			  <li  onclick="changeTab('74')"><a href="#">添加白名单</a></li>
+			  <li  onclick="changeTab('21')"><a href="#">批量代付</a></li>
+			  <li  onclick="changeTab('22')"><a href="#">批量代付查询</a></li>
 			</ul>
         </div>
         <div id="Content-Main">
@@ -113,18 +115,64 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 				   </div>
 				</div>
         	</div>
-        	<div id="21" class="functions">
+        	<div id="72" class="functions">
         		<div class="panel panel-success">
 	        		<div class="panel-heading">
-				      <h3 class="panel-title">查询</h3>
+				      <h3 class="panel-title">实名认证</h3>
 				   </div>
 				   <div class="panel-body">
-				     	<form id="f21">
+				     	<form id="f72">
 			        		<div class="input-group col-xs-5"> 
-							  <span class="input-group-addon" id="basic-addon1">商户号</span>
-							  <input type="text" class="form-control" name="loginId" value="13426342943">
+							  <span class="input-group-addon" id="basic-addon1">合作机构号</span>
+							  <input type="text" class="form-control" name="coopInstiId" value="300000000000027">
 							</div><br>
-							<button type="button" class="btn btn-danger" onclick="sub('21')">提交</button>
+			        		<div class="input-group col-xs-5"> 
+							  <span class="input-group-addon" id="basic-addon1">商户代码</span>
+							  <input type="text" class="form-control" name="merId" value="200000000000593">
+							</div><br>
+			        		<div class="input-group col-xs-5"> 
+							  <span class="input-group-addon" id="basic-addon1">商户订单号</span> 
+							  <input type="text" class="form-control" name="orderId" id="orderId" value="">
+							</div><input class="btn btn-info btn-sm" type="button" onclick="getCurrentTimeStamp()" value="生成一个商户订单号"/><br>
+			        		<div class="input-group col-xs-5"> 
+							  <span class="input-group-addon" id="basic-addon1">订单发送时间</span>
+							  <input type="text" class="form-control" name="txnTime" id="txnTime" value="">
+							</div><input class="btn btn-info btn-sm" type="button" onclick="getCurrentTimeStr()" value="生成一个订单发送时间"/><br>
+							
+							<div class="input-group col-xs-5"> 
+							  <span class="input-group-addon" id="basic-addon1">银行卡号</span>
+							  <input type="text" class="form-control" name="cardNo" value="">
+							</div><br>
+							<div class="input-group col-xs-5"> 
+							  <span class="input-group-addon" id="basic-addon1">卡类型</span>
+							  <input type="text" class="form-control" name="cardType" value="">
+							</div><br>
+							<div class="input-group col-xs-5"> 
+							  <span class="input-group-addon" id="basic-addon1">持卡人姓名</span>
+							  <input type="text" class="form-control" name="customerNm" value=""> 
+							</div><br>
+							<div class="input-group col-xs-5"> 
+							  <span class="input-group-addon" id="basic-addon1">证件类型</span>
+							  <input type="text" class="form-control" name="certifTp" value="">
+							</div><br>
+							<div class="input-group col-xs-5"> 
+							  <span class="input-group-addon" id="basic-addon1">证件号</span>
+							  <input type="text" class="form-control" name="certifId" value="">
+							</div><br>
+							<div class="input-group col-xs-5"> 
+							  <span class="input-group-addon" id="basic-addon1">手机号</span>
+							  <input type="text" class="form-control" name="phoneNo" value="">
+							</div><br>
+							<div class="input-group col-xs-5"> 
+							  <span class="input-group-addon" id="basic-addon1">cvn2(信用卡时必填)</span>
+							  <input type="text" class="form-control" name="cvn2" value="">
+							</div><br>
+							<div class="input-group col-xs-5"> 
+							  <span class="input-group-addon" id="basic-addon1">卡有效期(信用卡时必填)</span>
+							  <input type="text" class="form-control" name="expired" value="">
+							</div><br>
+							
+							<button type="button" class="btn btn-danger" onclick="sub('72')">提交</button>
 		        		</form>
 				   </div>
 				</div>
@@ -212,6 +260,22 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
 </div>
 <script type="text/javascript">
+Date.prototype.Format = function (fmt) { //author: meizz 
+    var o = {
+        "M+": this.getMonth() + 1, //月份 
+        "d+": this.getDate(), //日 
+        "h+": this.getHours(), //小时 
+        "m+": this.getMinutes(), //分 
+        "s+": this.getSeconds(), //秒 
+        "q+": Math.floor((this.getMonth() + 3) / 3), //季度 
+        "S": this.getMilliseconds() //毫秒 
+    };
+    if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    for (var k in o)
+    if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    return fmt;
+}
+
 	$(".functions").hide();
 	function changeTab(divid) {
 		$(".functions").hide();
@@ -263,7 +327,14 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		    var that = $ (this);
 		    that.addClass ('active').siblings ('li').removeClass ('active');
 	    })
-	})
+	});
+	function getCurrentTimeStamp() {
+		$("#orderId").val(Date.parse(new Date()));
+	}
+	function getCurrentTimeStr() {
+		var time = new Date().Format("yyyyMMddhhmmss");  
+		$("#txnTime").val(time);
+	}
 </script>
 </body>
 </html>

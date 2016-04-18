@@ -235,9 +235,9 @@ public class CMBCTransferServiceImpl implements ICMBCTransferService{
             if(StringUtil.isEmpty(card.getCardType())){//无卡类型
                 card.setCardType(cardType);
             }else{
-                if(!cardType.equals(card.getCardType())){
-                    return new ResultBean("","卡类型错误");
-                }
+//                if(!cardType.equals(card.getCardType())){
+//                    return new ResultBean("","卡类型错误");
+//                }
             }
             //检验信用卡信息
             if("2".equals(card.getCardType())){

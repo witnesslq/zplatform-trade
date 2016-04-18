@@ -40,9 +40,11 @@ public interface RealnameAuthDAO extends BaseDAO<PojoRealnameAuth>{
      * 根据卡号和持卡人姓名得到
      * @param cardNo
      * @param accName
+     * @param phoneNo 
+     * @param string 
      * @return 
      */
-    public PojoRealnameAuth getByCardNoAndName(String cardNo, String accName);
+    public PojoRealnameAuth getByCardNoAndName(String cardNo, String accName, String certifId, String phoneNo);
     
     /**
      * 通过卡信息获取实名认证数据

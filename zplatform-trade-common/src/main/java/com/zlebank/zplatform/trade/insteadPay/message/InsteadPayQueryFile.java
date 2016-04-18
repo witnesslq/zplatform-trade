@@ -20,6 +20,10 @@ package com.zlebank.zplatform.trade.insteadPay.message;
  */
 public class InsteadPayQueryFile extends InsteadPayFile{
 
+    /**代付交易流水号**/
+    private String insteadPayDataSeqNo;
+    /**手续费**/
+    private String txnFee;
     /**响应码**/
     private String respCode;
     /**应答信息**/
@@ -35,6 +39,18 @@ public class InsteadPayQueryFile extends InsteadPayFile{
     }
     public void setRespMsg(String respMsg) {
         this.respMsg = respMsg;
+    }
+    public String getTxnFee() {
+        return txnFee;
+    }
+    public void setTxnFee(String txnFee) {
+        this.txnFee = txnFee;
+    }
+    public String getInsteadPayDataSeqNo() {
+        return insteadPayDataSeqNo;
+    }
+    public void setInsteadPayDataSeqNo(String insteadPayDataSeqNo) {
+        this.insteadPayDataSeqNo = insteadPayDataSeqNo;
     }
     
 }
