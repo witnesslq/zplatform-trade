@@ -160,7 +160,7 @@
 						function showAccBalance(memberId){
 							$.ajax({
 								type: "POST",
-							  	url: "/zplatform-trade/gateway/showAccount",
+							  	url: "/zplatform-trade/merch/showAccount",
 							  	data: "rand="+new Date().getTime()+"&memberId="+memberId,
 							  	async:false,
 							 	dataType: "json",

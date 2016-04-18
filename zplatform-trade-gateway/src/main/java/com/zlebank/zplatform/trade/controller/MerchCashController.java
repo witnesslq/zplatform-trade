@@ -29,18 +29,25 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.alibaba.fastjson.JSON;
+import com.zlebank.zplatform.acc.bean.BusiAcct;
+import com.zlebank.zplatform.acc.bean.BusiAcctQuery;
 import com.zlebank.zplatform.acc.bean.TradeInfo;
+import com.zlebank.zplatform.acc.bean.enums.Usage;
 import com.zlebank.zplatform.acc.service.AccEntryService;
+import com.zlebank.zplatform.acc.service.AccountQueryService;
 import com.zlebank.zplatform.commons.bean.PagedResult;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.member.bean.CoopInsti;
 import com.zlebank.zplatform.member.bean.EnterpriseBean;
 import com.zlebank.zplatform.member.bean.QuickpayCustBean;
 import com.zlebank.zplatform.member.bean.enums.MemberType;
+import com.zlebank.zplatform.member.pojo.PojoMember;
 import com.zlebank.zplatform.member.pojo.PojoMerchDeta;
+import com.zlebank.zplatform.member.pojo.PojoPersonDeta;
 import com.zlebank.zplatform.member.service.CoopInstiService;
 import com.zlebank.zplatform.member.service.EnterpriseService;
 import com.zlebank.zplatform.member.service.MemberBankCardService;
+import com.zlebank.zplatform.member.service.MemberService;
 import com.zlebank.zplatform.member.service.MerchService;
 import com.zlebank.zplatform.trade.adapter.quickpay.IQuickPayTrade;
 import com.zlebank.zplatform.trade.analyzer.GateWayTradeAnalyzer;
@@ -103,6 +110,11 @@ public class MerchCashController {
     private AccEntryService accEntryService;
 	@Autowired
     private ITxnsWithdrawService txnsWithdrawService;
+	@Autowired
+	private AccountQueryService accountQueryService;
+	@Autowired
+	private MemberService memberService;
+	
 	@RequestMapping("/coporder.htm")
 	public ModelAndView pay(OrderBean order, HttpSession httpSession,
 			HttpServletRequest request) {
@@ -459,6 +471,36 @@ public class MerchCashController {
         }
         model.put("errMsg", "提现申请成功");
         return new ModelAndView("/fastpay/success", model);
+    }
+ 	
+ 	@RequestMapping("/showAccount")
+    @ResponseBody
+    public Object showMemberAccount(String memberId) {
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        List<BusiAcct> busiAccList = accountQueryService
+                .getBusiACCByMid(memberId);
+        BusiAcct fundAcct = null;
+        // 取得资金账户
+        for (BusiAcct busiAcct : busiAccList) {
+            if (Usage.BASICPAY == busiAcct.getUsage()) {
+                fundAcct = busiAcct;
+            }
+        }
+        BusiAcctQuery memberAcct = accountQueryService
+                .getMemberQueryByID(fundAcct.getBusiAcctCode());
+        
+        PojoMember person = memberService.getMbmberByMemberId(memberId, null);
+        
+        if(StringUtil.isEmpty(person.getPayPwd())){
+            resultMap.put("paypwd", "none");
+        }else{
+            resultMap.put("paypwd", "ok");
+        }
+        resultMap.put("money", memberAcct.getBalance().toYuan());
+        // 会员资金账户余额
+        
+        log.info(JSON.toJSONString(resultMap));
+        return resultMap;
     }
 
 	private String getIpAddr(HttpServletRequest request) {
