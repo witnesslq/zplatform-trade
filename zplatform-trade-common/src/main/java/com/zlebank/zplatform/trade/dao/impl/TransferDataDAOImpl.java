@@ -1,6 +1,5 @@
 package com.zlebank.zplatform.trade.dao.impl;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,13 +14,11 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
 import com.zlebank.zplatform.acc.exception.AccBussinessException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.commons.dao.impl.HibernateBaseDAOImpl;
 import com.zlebank.zplatform.commons.utils.StringUtil;
-import com.zlebank.zplatform.trade.bean.enums.BusinessEnum;
 import com.zlebank.zplatform.trade.bean.page.QueryTransferBean;
 import com.zlebank.zplatform.trade.dao.TransferBatchDAO;
 import com.zlebank.zplatform.trade.dao.TransferDataDAO;
@@ -122,15 +119,6 @@ public class TransferDataDAOImpl  extends HibernateBaseDAOImpl<PojoTranData> imp
 			this.update(transferData);
     		transferBatch.setRefuseAmt(transferBatch.getRefuseAmt()+unApproveAmount);
     		transferBatch.setRefuseCount(unApproveCount+transferBatch.getRefuseCount());
-    		BusinessEnum businessEnum = null;
-    		//00：代付01：提现02：退款
-    		if("00".equals(transferBatch.getBusiType())){
-    			businessEnum = BusinessEnum.INSTEADPAY_REFUND;
-    		}else if("01".equals(transferBatch.getBusiType())){
-    			businessEnum = BusinessEnum.WITHDRAWALS_REFUND;
-    		}else if("02".equals(transferBatch.getBusiType())){
-    			businessEnum = BusinessEnum.REFUND_REFUND;
-    		}
     	}
     	updateBatchTransferSingle(transferBatch);
     }
@@ -179,13 +167,16 @@ public class TransferDataDAOImpl  extends HibernateBaseDAOImpl<PojoTranData> imp
 
 	@Override
 	public Long queryWaritTransferCount(Long tranBatchId) {
-		String sql = "select count(*) from PojoTranData  where tranBatch.tid = ? and status= ?";
+		String sql = "select count(*) from PojoTranData  where tranBatch.tid = ? and status not in (?,?,?)";
 		Query query = getSession().createQuery(sql);
 		query.setParameter(0, tranBatchId);
 		query.setParameter(1, "02");
+		query.setParameter(2, "03");
+		query.setParameter(3, "09");
 		return ((Long)query.uniqueResult()).longValue();
 	}
-	@Override
+	@SuppressWarnings("unchecked")
+    @Override
 	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
 	public List<PojoTranData> queryWaritTransferData(Long tranBatchId) {
 		String sql = "from PojoTranData  where tranBatchId = ? and status= ?";

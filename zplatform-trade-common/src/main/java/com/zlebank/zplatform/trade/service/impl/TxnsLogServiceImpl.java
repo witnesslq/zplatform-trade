@@ -561,7 +561,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 
 
 	@Override
-	@Transactional(propagation=Propagation.REQUIRED)
+	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public void saveBankTransferLogs(List<PojoBankTransferData> transferDataList) {
 		// TODO Auto-generated method stub
 		for(PojoBankTransferData data : transferDataList){

@@ -189,7 +189,7 @@ public class InsteadBatchServiceImpl extends AbstractBasePageService<InsteadPayB
                 batch.setUnapproveCount(batch.getUnapproveCount()-1);
                 batch.setUnapproveAmt(batch.getUnapproveAmt() - detail.getAmt());
             }
-            if (batch.getUnapproveCount() == 0) {
+            if (batch.getUnapproveCount() <= 0) {
                 batch.setStatus(InsteadPayBatchStatusEnum.ALL_APPROVED.getCode());
             } else {
                 batch.setStatus(InsteadPayBatchStatusEnum.PART_APPROVED.getCode());
@@ -227,7 +227,7 @@ public class InsteadBatchServiceImpl extends AbstractBasePageService<InsteadPayB
                 batch.setUnapproveCount(batch.getUnapproveCount()-1);
                 batch.setUnapproveAmt(batch.getUnapproveAmt() - detail.getAmt());
             }
-            if (batch.getUnapproveCount() == 0) {
+            if (batch.getUnapproveCount() <= 0) {
                 batch.setStatus(InsteadPayBatchStatusEnum.ALL_APPROVED.getCode());
             } else {
                 batch.setStatus(InsteadPayBatchStatusEnum.PART_APPROVED.getCode());

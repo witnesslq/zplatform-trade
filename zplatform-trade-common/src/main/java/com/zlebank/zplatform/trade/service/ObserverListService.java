@@ -38,7 +38,9 @@ public class ObserverListService {
     public void add(UpdateSubject subject) {
         if (observerList == null || observerList.size() == 0) 
             observerList = new ArrayList<UpdateSubject>();
-        observerList.add(subject);
+        if (!observerList.contains(subject)) {
+            observerList.add(subject);    
+        }
     }
     public List<UpdateSubject> getObserverList() {
         return observerList;
