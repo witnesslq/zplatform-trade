@@ -96,15 +96,14 @@ import com.zlebank.zplatform.trade.utils.OrderNumber;
  * @date 2015年11月25日 上午10:48:24
  * @since
  */
-@Service
+@Service("insteadPayServiceImpl")
 public class InsteadPayServiceImpl
         extends
             AbstractBasePageService<InsteadPayDetailQuery, InsteadPayDetailBean>
         implements
             InsteadPayService {
 
-    private static final Log log = LogFactory
-            .getLog(InsteadPayServiceImpl.class);
+    private static final Log log = LogFactory.getLog(InsteadPayServiceImpl.class);
 
     @Autowired
     private ConfigInfoDAO configInfoDAO;

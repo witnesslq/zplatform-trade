@@ -22,10 +22,10 @@
 				<!-- <ref bean="simpleTrigger" /> -->
 				<!-- <ref bean="simpleTrigger2" />  转移到DB-->
 				<!-- <ref bean="simpleTrigger3" /> 
-				
+				<ref bean="cmbcTrigger1"/> 
 				<ref bean="insteadPayAccountingTrigger"/>   -->
 				<!-- <ref bean="cmbcTestTrigger"/> -->
-				<ref bean="cmbcTrigger1"/> 
+				
 			</list>
 		</property>
 	</bean>

@@ -388,11 +388,14 @@ public class MerchCashController {
                         model.put("respCode", "0000");
                         return new ModelAndView("/fastpay/success", model);
                     case CMBCWITHHOLDING:
-                        return new ModelAndView("redirect:/gateway/payment.htm?txnseqno="+ trade.getTxnseqno()+"&reapayOrderNo="+trade.getReaPayOrderNo()+"&orderNo="+trade.getOrderId());
+                        return new ModelAndView("redirect:/merch/payment.htm?txnseqno="+ trade.getTxnseqno()+"&reapayOrderNo="+trade.getReaPayOrderNo()+"&orderNo="+trade.getOrderId());
                     case CMBCSELFWITHHOLDING:
-                        return new ModelAndView("redirect:/gateway/payment.htm?txnseqno="+ trade.getTxnseqno()+"&reapayOrderNo="+trade.getReaPayOrderNo()+"&orderNo="+trade.getOrderId());
-				default:
-					break;
+                        return new ModelAndView("redirect:/merch/payment.htm?txnseqno="+ trade.getTxnseqno()+"&reapayOrderNo="+trade.getReaPayOrderNo()+"&orderNo="+trade.getOrderId());
+                    case BOSSPAYCOLLECTION:
+                    	return new ModelAndView("redirect:/merch/pay/payment.htm?txnseqno="+ trade.getTxnseqno()+"&reapayOrderNo="+trade.getReaPayOrderNo()+"&orderNo="+trade.getOrderId());
+                    	
+                    default:
+                    	break;
                     
                 }
                 model.put("trade", trade);
@@ -414,6 +417,28 @@ public class MerchCashController {
         }
         model.put("txnseqno", trade.getTxnseqno());
         return new ModelAndView("/fastpay/result", model);
+    }
+ 	
+ 	@RequestMapping("/payment.htm")
+    public ModelAndView payJumpCMBC(String orderNo, String txnseqno,String reapayOrderNo ){
+        Map<String, Object> model = new HashMap<String, Object>();
+        TradeBean tradeBean = new TradeBean();
+        tradeBean.setTxnseqno(txnseqno);
+        tradeBean.setOrderId(orderNo);
+        tradeBean.setReaPayOrderNo(reapayOrderNo);
+        model.put("trade", tradeBean);
+        return new ModelAndView("/fastpay/pay_jump_cmbc", model);
+    }
+ 	
+ 	@RequestMapping("/pay/payment.htm")
+    public ModelAndView payJumpBossPay(String orderNo, String txnseqno,String reapayOrderNo ){
+        Map<String, Object> model = new HashMap<String, Object>();
+        TradeBean tradeBean = new TradeBean();
+        tradeBean.setTxnseqno(txnseqno);
+        tradeBean.setOrderId(orderNo);
+        tradeBean.setReaPayOrderNo(reapayOrderNo);
+        model.put("trade", tradeBean);
+        return new ModelAndView("/fastpay/pay_jump_bosspay", model);
     }
  	
  	@RequestMapping("/withdraw.htm")
@@ -467,7 +492,7 @@ public class MerchCashController {
             model.put("errMsg", "提现申请失败");
             model.put("respCode", "ZL34");
             model.put("txnseqno", tradeBean.getTxnseqno());
-            return new ModelAndView("/fastpay/erro", model);
+            return new ModelAndView("/erro_merch_withdraw", model);
         }
         model.put("errMsg", "提现申请成功");
         return new ModelAndView("/fastpay/success", model);

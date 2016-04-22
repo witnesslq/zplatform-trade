@@ -86,8 +86,8 @@ public class ConsModel {
 	private String bosspay_bank_account="";
 	private String bosspay_bank_number="";
 	private String bosspay_bank_account_name="";
-	
-	
+	private int bosspay_test_flag=1;//测试开关默认打开
+	private String bosspay_userId="";
 	
 	
 	public String getZlrt_url() {
@@ -979,6 +979,35 @@ public class ConsModel {
 	public void setBosspay_bank_account_name(String bosspay_bank_account_name) {
 		this.bosspay_bank_account_name = bosspay_bank_account_name;
 	}
+
+	/**
+	 * @return the bosspay_test_flag
+	 */
+	public int getBosspay_test_flag() {
+		return bosspay_test_flag;
+	}
+
+	/**
+	 * @param bosspay_test_flag the bosspay_test_flag to set
+	 */
+	public void setBosspay_test_flag(int bosspay_test_flag) {
+		this.bosspay_test_flag = bosspay_test_flag;
+	}
+
+	/**
+	 * @return the bosspay_userId
+	 */
+	public String getBosspay_userId() {
+		return bosspay_userId;
+	}
+
+	/**
+	 * @param bosspay_userId the bosspay_userId to set
+	 */
+	public void setBosspay_userId(String bosspay_userId) {
+		this.bosspay_userId = bosspay_userId;
+	}
+	
 	
 	
 }

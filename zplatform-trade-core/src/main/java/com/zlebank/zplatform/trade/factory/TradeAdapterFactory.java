@@ -17,6 +17,7 @@ import com.zlebank.zplatform.trade.adapter.insteadpay.IInsteadPayTrade;
 import com.zlebank.zplatform.trade.adapter.quickpay.IQuickPayTrade;
 import com.zlebank.zplatform.trade.adapter.quickpay.impl.ReaPayTradeThreadPool;
 import com.zlebank.zplatform.trade.adapter.quickpay.impl.TestTradeThreadPool;
+import com.zlebank.zplatform.trade.bosspay.quickpay.BossPayTradeThreadPool;
 import com.zlebank.zplatform.trade.cmbc.quickpay.CMBCTradeThreadPool;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.model.ChnlDetaModel;
@@ -88,6 +89,9 @@ public class TradeAdapterFactory {
             threadPool = CMBCTradeThreadPool.getInstance();
         }else if(chnlcode.equals("93000003")){
             threadPool = CMBCTradeThreadPool.getInstance();
+        }else if(chnlcode.equals("92000001")){
+        	threadPool = BossPayTradeThreadPool.getInstance();
+        	
         }
         return threadPool;
     }

@@ -272,6 +272,8 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             if (resultBean.isResultBool()) {
                 if(routId.equals("93000002")||routId.equals("93000003")){
                     
+                }else if(routId.equals("92000001")){
+                	
                 }else{
                     ReaPayResultBean payResultBean = (ReaPayResultBean) resultBean
                             .getResultObj();
@@ -320,6 +322,7 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         } else {
             trade.setBindCardId("");
         }
+        trade.setCardType(custCard.getCardtype());
         trade.setCertType(custCard.getIdtype());
         trade.setCardNo(custCard.getCardno());
         trade.setMobile(custCard.getPhone());

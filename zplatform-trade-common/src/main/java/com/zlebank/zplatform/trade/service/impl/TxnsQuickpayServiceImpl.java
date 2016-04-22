@@ -37,7 +37,9 @@ import com.zlebank.zplatform.trade.model.TxnsQuickpayModel;
 import com.zlebank.zplatform.trade.model.TxnsWithholdingModel;
 import com.zlebank.zplatform.trade.service.ITxnsQuickpayService;
 import com.zlebank.zplatform.trade.service.base.BaseServiceImpl;
+import com.zlebank.zplatform.trade.utils.ConsUtil;
 import com.zlebank.zplatform.trade.utils.DateUtil;
+import com.zlebank.zplatform.trade.utils.OrderNumber;
 
 /**
  * Class Description
@@ -429,5 +431,88 @@ public class TxnsQuickpayServiceImpl extends BaseServiceImpl<TxnsQuickpayModel, 
         return txnsQuickpay.getPayorderno();
     }
     
-
+    @Transactional
+    public String saveBossBankCardSign(TradeBean trade) {
+        TxnsQuickpayModel txnsQuickpay = new TxnsQuickpayModel();
+        txnsQuickpay.setId(OrderNumber.getInstance().generateID());
+        txnsQuickpay.setPayorderno(OrderNumber.getInstance().generateCMBCQuickOrderNo());//支付订单号不对
+        txnsQuickpay.setPayamt(Long.valueOf(trade.getAmount()));
+        txnsQuickpay.setPaycommitime(DateUtil.getCurrentDateTime());
+        txnsQuickpay.setRelatetradetxnseqno( trade.getTxnseqno());
+        txnsQuickpay.setFirmemberno( ConsUtil.getInstance().cons.getBosspay_user_id());
+        txnsQuickpay.setFirmembername(ConsUtil.getInstance().cons.getZlpay_chnl_merch_name());
+        txnsQuickpay.setPayname(trade.getAcctName());
+        txnsQuickpay.setPaynum(1L);
+        txnsQuickpay.setPaycode("1001");
+        txnsQuickpay.setPaydescr("博士金电-银行卡签约");
+        txnsQuickpay.setPaytype("1000");
+        txnsQuickpay.setStatus("01");
+        txnsQuickpay.setMobile(trade.getMobile());
+        txnsQuickpay.setInstitution(trade.getPayinstiId());
+        super.save(txnsQuickpay);
+        return txnsQuickpay.getPayorderno();
+    }
+    
+    public void updateBossBankCardSign(String payorderno,String retCode,String retInfo) {
+    	 TxnsQuickpayModel txnsQuickpay = super.findByProperty("payorderno", payorderno).get(0);
+         txnsQuickpay.setPayfinishtime(DateUtil.getCurrentDateTime());
+         txnsQuickpay.setStatus("00");
+         txnsQuickpay.setPayretcode(retCode);
+         txnsQuickpay.setPayretinfo(retInfo);
+         super.update(txnsQuickpay);
+    }
+    
+    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    public String saveBossPay(TradeBean trade){
+        TxnsQuickpayModel txnsQuickpay = new TxnsQuickpayModel();
+        txnsQuickpay.setId(OrderNumber.getInstance().generateID());
+        txnsQuickpay.setPayorderno(OrderNumber.getInstance().generateCMBCQuickOrderNo());//支付订单号不对
+        txnsQuickpay.setPayamt(Long.valueOf(trade.getAmount()));
+        txnsQuickpay.setPaycommitime(DateUtil.getCurrentDateTime());
+        txnsQuickpay.setRelatetradetxnseqno( trade.getTxnseqno());
+        txnsQuickpay.setFirmemberno( ConsUtil.getInstance().cons.getBosspay_user_id());
+        txnsQuickpay.setFirmembername(ConsUtil.getInstance().cons.getZlpay_chnl_merch_name());
+        txnsQuickpay.setPayname(trade.getAcctName());
+        txnsQuickpay.setPaynum(1L);
+        txnsQuickpay.setPaycode("1005");
+        txnsQuickpay.setPaydescr("博士金电-实时代收");
+        txnsQuickpay.setPaytype("1000");
+        txnsQuickpay.setStatus("01");
+        txnsQuickpay.setMobile(trade.getMobile());
+        txnsQuickpay.setInstitution(trade.getPayinstiId());
+        super.save(txnsQuickpay);
+        return txnsQuickpay.getPayorderno();
+    }
+    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    public void updateBossPayResult(String payorderno,String retCode,String retInfo,String retorderno){
+        TxnsQuickpayModel txnsQuickpay = super.findByProperty("payorderno", payorderno).get(0);
+        txnsQuickpay.setRetorderno(retorderno);
+        txnsQuickpay.setPayfinishtime(DateUtil.getCurrentDateTime());
+        txnsQuickpay.setStatus("00");
+        txnsQuickpay.setPayretcode(retCode);
+        txnsQuickpay.setPayretinfo(retInfo);
+        super.update(txnsQuickpay);
+    }
+    
+    @Transactional
+    public String saveBossPaySMS(TradeBean trade) {
+    	 TxnsQuickpayModel txnsQuickpay = new TxnsQuickpayModel();
+         txnsQuickpay.setId(OrderNumber.getInstance().generateID());
+         txnsQuickpay.setPayorderno(OrderNumber.getInstance().generateCMBCQuickOrderNo());//支付订单号不对
+         txnsQuickpay.setPayamt(Long.valueOf(trade.getAmount()));
+         txnsQuickpay.setPaycommitime(DateUtil.getCurrentDateTime());
+         txnsQuickpay.setRelatetradetxnseqno( trade.getTxnseqno());
+         txnsQuickpay.setFirmemberno( ConsUtil.getInstance().cons.getBosspay_user_id());
+         txnsQuickpay.setFirmembername(ConsUtil.getInstance().cons.getZlpay_chnl_merch_name());
+         txnsQuickpay.setPayname(trade.getAcctName());
+         txnsQuickpay.setPaynum(1L);
+         txnsQuickpay.setPaycode("1004");
+         txnsQuickpay.setPaydescr("博士金电-短信验证码");
+         txnsQuickpay.setPaytype("1000");
+         txnsQuickpay.setStatus("00");
+         txnsQuickpay.setMobile(trade.getMobile());
+         txnsQuickpay.setInstitution(trade.getPayinstiId());
+         super.save(txnsQuickpay);
+         return txnsQuickpay.getPayorderno();
+    }
 }

@@ -1490,36 +1490,31 @@ public class GateWayController {
     }
     
    
-    public Object testCMBC(){
-        CardMessageBean card = new CardMessageBean("123");
+    @RequestMapping("/queryBossPayTrade")
+    @ResponseBody
+    public Object queryBossPayTrade(String txnseqno){
+    	Map<String, Object> model = new HashMap<String, Object>();
+        TxnsLogModel txnsLog = null;
+        int[] timeArray = new int[]{1000, 2000, 8000, 16000, 32000,64000};
         try {
-            PojoRealnameAuth realnameAuth = new PojoRealnameAuth(true);
-            System.out.println(JSON.toJSONString(cmbcTransferService.realNameAuth(realnameAuth)));
-            withholdingService.realNameAuthentication(card);
-        } catch (CMBCTradeException e) {
+            for (int i = 0; i < 6; i++) {
+                txnsLog=txnsLogService.getTxnsLogByTxnseqno(txnseqno);
+                if(StringUtil.isNotEmpty(txnsLog.getRetcode())){
+                	if("0000".equalsIgnoreCase(txnsLog.getRetcode())){
+                        return "completed";
+                    }else{
+                        return "failed";
+                    }
+                   
+                }
+                Thread.sleep(timeArray[i]);
+            }
+
+        } catch (InterruptedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        } catch (TradeException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+
         }
-        return "";
-    }
-    
-    
-    public Object testwithholding(){
-       //WithholdingServiceImpl service = new WithholdingServiceImpl();
-       WithholdingMessageBean messageBean = new WithholdingMessageBean("test");
-       TxnsWithholdingModel txnsWithholdingModel = new TxnsWithholdingModel();
-       txnsWithholdingModel.setTransdate(DateUtil.getCurrentDate());
-       txnsWithholdingModel.setTranstime(DateUtil.getCurrentTime());
-       txnsWithholdingModel.setSerialno(OrderNumber.getInstance().generateRealNameOrderNo());
-       messageBean.setWithholding(txnsWithholdingModel);
-        try {
-            withholdingService.realTimeWitholding(messageBean);
-        } catch (CMBCTradeException e) {
-            e.printStackTrace();
-        }
-        return "";
+        return "overtime";
     }
 }

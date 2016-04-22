@@ -112,7 +112,8 @@ public class ConsUtil {
 			cons.setBosspay_bank_number(prop.getProperty("bosspay_bank_number"));
 			cons.setBosspay_user_id(prop.getProperty("bosspay_user_id"));
 			cons.setBosspay_user_key(prop.getProperty("bosspay_user_key"));
-			
+			cons.setBosspay_test_flag(Integer.valueOf(prop.getProperty("bosspay_test_flag")));
+			cons.setBosspay_userId(prop.getProperty("bosspay_userId"));
 			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

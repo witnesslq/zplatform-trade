@@ -222,4 +222,33 @@ public interface ITxnsQuickpayService extends IBaseService<TxnsQuickpayModel, Lo
      * @return
      */
     public String saveCMBCOuterBankCardSign(TradeBean trade);
+    
+    /**
+     * 保存博士金电银行卡认证记录
+     * @param trade
+     * @return
+     */
+    public String saveBossBankCardSign(TradeBean trade);
+    
+    /**
+     * 保存博士金电交易流水
+     * @param trade
+     * @return
+     */
+    public String saveBossPay(TradeBean trade);
+    
+    /**
+     * 更新快捷交易结果
+     * @param payorderno
+     * @param retCode
+     * @param retInfo
+     */
+    public void updateBossPayResult(String payorderno,String retCode,String retInfo,String retorderno);
+    
+    /**
+     * 保存博士金电短信验证码流水
+     * @param trade
+     * @return
+     */
+    public String saveBossPaySMS(TradeBean trade);
 }

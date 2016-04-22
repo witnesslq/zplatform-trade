@@ -47,7 +47,7 @@ import com.zlebank.zplatform.trade.service.NotifyInsteadURLService;
  * @date 2016年3月30日 下午3:37:04
  * @since 
  */
-@Service
+@Service("notifyInsteadURLService")
 public class NotifyInsteadURLServiceImpl implements NotifyInsteadURLService,  ApplicationListener<ContextRefreshedEvent>{
 
     private static final Log log = LogFactory.getLog(NotifyInsteadURLServiceImpl.class);
@@ -58,7 +58,7 @@ public class NotifyInsteadURLServiceImpl implements NotifyInsteadURLService,  Ap
     @Autowired
     private InsteadPayDetailDAO insteadPayDetailDAO;
     
-    @Autowired
+    //@Autowired
     private InsteadPayService insteadPayService;
     
     @Autowired
