@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.zlebank.zplatform.commons.bean.TransferBatchQuery;
 import com.zlebank.zplatform.commons.dao.impl.AbstractPagedQueryDAOImpl;
-import com.zlebank.zplatform.commons.dao.pojo.AccStatusEnum;
 import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.bean.enums.BankTransferBatchOpenStatusEnum;

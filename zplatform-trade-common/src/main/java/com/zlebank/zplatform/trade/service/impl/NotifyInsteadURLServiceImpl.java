@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.zlebank.zplatform.commons.utils.BeanCopyUtil;
 import com.zlebank.zplatform.commons.utils.RegExpValidatorUtil;
+import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.member.service.MerchMKService;
 import com.zlebank.zplatform.trade.dao.InsteadPayBatchDAO;
 import com.zlebank.zplatform.trade.dao.InsteadPayDetailDAO;
@@ -95,14 +96,14 @@ public class NotifyInsteadURLServiceImpl implements NotifyInsteadURLService,  Ap
         String data = responseData(responseBean);
         
         // 如果URL合法，则发送通知，否则不通知。
-        if (RegExpValidatorUtil.IsUrl(batch.getNotifyUrl())) {
+        if (StringUtil.isEmpty(batch.getNotifyUrl()) || RegExpValidatorUtil.IsUrl(batch.getNotifyUrl())) {
             // 添加一个代付任务
             InsteadPayNotifyTask task = new InsteadPayNotifyTask();
             task.setData(data);
             task.setUrl(batch.getNotifyUrl());
             taskQueue.add(task);
         } else {
-            log.warn("URL为空，无法执行通知任务。InsteadPayBatchSeqNo->"+batch.getInsteadPayBatchSeqNo());
+            log.warn("URL为空或非法URL，无法执行通知任务。InsteadPayBatchSeqNo->"+batch.getInsteadPayBatchSeqNo());
         }
 
     }
