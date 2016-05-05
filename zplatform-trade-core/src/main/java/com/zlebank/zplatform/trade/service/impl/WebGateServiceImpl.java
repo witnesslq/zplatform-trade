@@ -318,7 +318,6 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         }
         if ("00".equals(custCard.getStatus())) {
             trade.setBindCardId(custCard.getBindcardid());
-
         } else {
             trade.setBindCardId("");
         }

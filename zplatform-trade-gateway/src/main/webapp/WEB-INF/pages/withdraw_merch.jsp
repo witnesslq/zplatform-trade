@@ -188,7 +188,7 @@
 				<div id="payType">
 					<div id="accountpay_">
 							<!--提现 -->
-							<form method="post" action="/zplatform-trade/merch/withdraw.htm?txnseqno_=${txnseqno }">
+							<form method="post" action="/zplatform-trade/merch/withdraw.htm?txnseqno_=${txnseqno }" id="withdraw_form">
 								<input type="hidden" value="0" name="balance" id="balance"/>
 								<input type="hidden" value="${orderId }" name="orderId">
 								<input type="hidden" value="${txnAmt }" name="amount" id="acct_amount"/>
@@ -201,6 +201,10 @@
 								<input type="hidden" value="${subMerName }" name="subMerName" />
 								<input type="hidden" value="${memberId }" name="merUserId" id="merUserId" />
 								<input type="hidden" value="${busitype }" name="busitype" />
+								
+								<input type="hidden" name="bankName" id="bankName"/>
+								<input type="hidden" name="cardNo" id="cardNo"/>
+								<input type="hidden" name="acctName" id="acctName" />
 								<ul class="mod_list">
 								<li>
 								</li>
@@ -213,8 +217,11 @@
 											<input type="radio" name="bindCardId" checked="checked" value="${card.id}" index="${i.index }" />
 												<label for="communications_radio" class="fastPaybank" title="${card.bankname }" >
 											    	<span title="" class="" id="bank_lab_${i.index }" ></span>
-											    	<span class="card-number">**${fn:substring(card.cardno,fn:length(card.cardno)-4, fn:length(card.cardno))} </span>
+											    	<span class="card-number">${fn:substring(card.cardno,0, 5)}***********${fn:substring(card.cardno,fn:length(card.cardno)-4, fn:length(card.cardno))} </span>
 											    	<input type="hidden" name="bankCode_" id="radio_bank_${i.index}" value="${fn:substring(card.bankcode,0, 4)}"/>
+											    	
+											    	<input type="hidden" id="cardNo_${i.index }"  value="${card.cardno }"/>
+											    	<input type="hidden" id="acctName_${i.index }" value="${card.accname }"/>
 											    </label>
 											</c:if>
 											<c:if test="${i.index!=0 }">
@@ -223,6 +230,10 @@
 											    	<span title="" class="" id="bank_lab_${i.index }" ></span>
 											    	<span class="card-number">**${fn:substring(card.cardno,fn:length(card.cardno)-4, fn:length(card.cardno))} </span>
 											    	<input type="hidden" name="bankCode_" id="radio_bank_${i.index}" value="${fn:substring(card.bankcode,0, 4)}"/>
+											    	<input type="hidden" id="bankName_${i.index }" value="${card.bankname }"/>
+											    	<input type="hidden" id="cardNo_${i.index }" value="${card.cardno }"/>
+											    	<input type="hidden" id="acctName_${i.index }" value="${card.accname }"/>
+											    	
 											    </label>
 											</c:if>
 										</c:forEach>
@@ -243,7 +254,7 @@
 										<p id="errTip" style="display:none;"><span class="onError">支付密码输入错误,再错误3次后账户将被锁定</span></p>
 									</li>
 									<li class="submit">
-										<input id="btnPay" type="submit" class="btn btnOff" value="提现"/>
+										<input id="btnPay" type="button" class="btn btnOff" value="提现"/>
 									</li>
 								</ul>
 								
@@ -556,18 +567,15 @@ $("#chooseBank").click(function(){
 		$("#default_bank").show()
 	}
 });
-$("#btn_next").click(function(){
-	if($("#other-bank").css("display")=='none'){
-		var index=$("#bank_form input:checked ").attr("index");
-		var bank_code = $("#radio_bank_"+index).val();
-		//alert(bank_code);
-		$("#rad_bankCode").val(bank_code);
-		//alert($("#rad_bankCode").val());
-		$("#bank_form").submit();
-	}else{
-		//alert($("#bank_form input:checked ").attr("index"));
-		$("#other_bank_form").submit();
-	}
+$("#btnPay").click(function(){
+	var index=$("#bank_form input:checked ").attr("index");
+	var bankName=$("#bankName_"+index).val();
+	var cardNo=$("#cardNo_"+index).val();
+	var acctName=$("#acctName_"+index).val();
+	$("#bankName").val(bankName);
+	$("#cardNo").val(cardNo);
+	$("#acctName").val(acctName);
+	$("#withdraw_form").submit();
 })
 
 
@@ -635,7 +643,7 @@ function initBankPic(){
 	}
 </script>
 <div class="footer">
-	<p class="foot_nav"><a href="/website/help/index.htm" target="_blank">关于我们</a> | <a href="/website/help/service.htm" target="_blank">隐私条款</a> | <a href="/website/help/mer.htm" target="_blank">合作加盟</a> | <a href="/website/help/reg.htm" target="_blank">会员服务</a></p>
+	<p class="foot_nav"><a href="" target="_blank">关于我们</a> | <a href="" target="_blank">隐私条款</a> | <a href="" target="_blank">合作加盟</a> | <a href="" target="_blank">会员服务</a></p>
 	<p class="copyright">Copyright  © 2015 北京证联资本管理有限责任公司版权所有</p>
 	<p class="contact_info"> <span>联系电话：010-84298418</span> <span>传真：010-84299579</span> <!--  <span>版本：2013V1.4 Beta</span> --></p>
 	<p class="icp"><a href=" http://www.miibeian.gov.cn/" target="_blank">京ICP备15034871号</a></p>

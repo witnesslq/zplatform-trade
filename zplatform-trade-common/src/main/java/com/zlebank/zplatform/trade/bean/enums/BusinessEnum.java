@@ -29,6 +29,10 @@ public enum BusinessEnum {
     INSTEADPAY_REFUND("70000003"),//代付退汇
     WITHDRAWALS_REFUND("30000003"),//提现退汇
     REFUND_REFUND("40000003"),//退款退汇
+    
+    INSTEADPAY_SUCCESS("70000002"),//代付退汇
+    WITHDRAWALS_SUCCESS("30000002"),//提现退汇
+    REFUND_SUCCESS("40000002"),//退款退汇
     UNKNOW("");//未知
     private String busiCode;
     

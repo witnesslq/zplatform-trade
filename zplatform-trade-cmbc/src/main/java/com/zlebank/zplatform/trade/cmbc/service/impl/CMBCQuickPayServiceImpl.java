@@ -52,11 +52,12 @@ public class CMBCQuickPayServiceImpl implements ICMBCQuickPayService{
      * @param withholdingMsg
      * @return
      */
-    
     public ResultBean crossLineWithhold(TradeBean trade){
         ResultBean resultBean = null;
         try {
             TxnsWithholdingModel withholding = new TxnsWithholdingModel(trade,ChannelEnmu.CMBCWITHHOLDING);
+            //处理平安银行bankcode不匹配
+            dealWithPingAn(withholding);
             withholding.setSerialno(generateSerialDateNumber("SEQ_CMBC_REALNAME_QUERY_NO"));
             txnsWithholdingService.saveWithholdingLog(withholding);
             WithholdingMessageBean withholdingMsg = new WithholdingMessageBean(withholding);
@@ -159,6 +160,13 @@ public class CMBCQuickPayServiceImpl implements ICMBCQuickPayService{
             e.printStackTrace();
         }
         return new ResultBean("success");
-        
+    }
+    
+    private void dealWithPingAn(TxnsWithholdingModel withholding){
+    	String payerbankinscode = withholding.getPayerbankinscode();
+    	if("05100000".equals(payerbankinscode)||"04100000".equals(payerbankinscode)){
+    		withholding.setPayerbankinscode("03070000");
+    	}
+    	
     }
 }

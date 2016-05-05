@@ -30,8 +30,10 @@ import com.zlebank.zplatform.trade.bean.UpdateData;
 import com.zlebank.zplatform.trade.bean.enums.BusinessEnum;
 import com.zlebank.zplatform.trade.bean.enums.TransferBusiTypeEnum;
 import com.zlebank.zplatform.trade.bean.enums.WithdrawEnum;
+import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
 import com.zlebank.zplatform.trade.dao.ITxnsWithdrawDAO;
 import com.zlebank.zplatform.trade.dao.impl.TxnsWithdrawDAOImpl;
+import com.zlebank.zplatform.trade.model.TxnsOrderinfoModel;
 import com.zlebank.zplatform.trade.model.TxnsWithdrawModel;
 import com.zlebank.zplatform.trade.service.ObserverListService;
 import com.zlebank.zplatform.trade.service.UpdateSubject;
@@ -53,7 +55,9 @@ public class UpdateWithdrawServiceImpl implements UpdateWithdrawService,UpdateSu
     private ITxnsWithdrawDAO withdrawDao;
     @Autowired
     private AccEntryService accEntryService;
-   
+    @Autowired
+    private ITxnsOrderinfoDAO txnsOrderinfoDAO;
+    
     /**
      *
      * @param event
@@ -75,19 +79,32 @@ public class UpdateWithdrawServiceImpl implements UpdateWithdrawService,UpdateSu
             log.error("不存在的提现信息,交易序列号："+data.getTxnSeqNo());
             return;
         }
+        TxnsOrderinfoModel orderinfo = txnsOrderinfoDAO.getOrderinfoByOrderNoAndMemberId(withdrawModel.getGatewayorderno(), withdrawModel.getMemberid());
         WithdrawEnum wdEnum=WithdrawEnum.fromValue(data.getResultCode());
+        BusinessEnum businessEnum = null;
+        
         if (wdEnum.getCode().equals(data.getResultCode())) {
             withdrawModel.setStatus(wdEnum.getCode());
         }else{
             withdrawModel.setStatus(WithdrawEnum.UNKNOW.getCode());
         }
         withdrawDao.merge(withdrawModel);
+        if("00".equals(data.getResultCode())){
+        	businessEnum = BusinessEnum.WITHDRAWALS_SUCCESS;
+        	orderinfo.setStatus("00");
+        }else{
+        	businessEnum = BusinessEnum.WITHDRAWALS_REFUND;
+        	orderinfo.setStatus("03");
+        }
+        //更新订单信息
+        txnsOrderinfoDAO.update(orderinfo);
         TradeInfo tradeInfo=new TradeInfo();
         tradeInfo.setPayMemberId(withdrawModel.getMemberid());
         tradeInfo.setAmount(new BigDecimal(withdrawModel.getAmount()));
         tradeInfo.setCharge(new BigDecimal(withdrawModel.getFee()));
         tradeInfo.setTxnseqno(withdrawModel.getTexnseqno());
-        tradeInfo.setBusiCode(BusinessEnum.WITHDRAWALS_REFUND.getBusiCode());
+        tradeInfo.setBusiCode(businessEnum.getBusiCode());
+        tradeInfo.setChannelId(data.getChannelCode());
         try {
             accEntryService.accEntryProcess(tradeInfo);
         } catch (Exception e) {

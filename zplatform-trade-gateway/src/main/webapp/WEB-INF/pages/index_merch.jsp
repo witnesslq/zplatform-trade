@@ -344,7 +344,7 @@ String path = request.getContextPath();
 												<label for="communications_radio" class="fastPaybank" title="${card.bankname }" >
 											    	<input type="radio" name="bindCardId"  value="${card.id}" index="${i.index }" checked="checked" />
 											    	<span title="" class="" id="bank_lab_${i.index }" ></span>
-											    	<span class="card-number">**${fn:substring(card.cardno,fn:length(card.cardno)-4, fn:length(card.cardno))} </span>
+											    	<span class="card-number">${fn:substring(card.cardno,0, 5)}*********${fn:substring(card.cardno,fn:length(card.cardno)-4, fn:length(card.cardno))} </span>
 											    	<input type="hidden" name="bankCode_" id="radio_bank_${i.index}" value="${fn:substring(card.bankcode,0, 4)}"/>
 											    </label>
 											</li>
@@ -367,7 +367,7 @@ String path = request.getContextPath();
 						        </div>
 							</div>
 							</form>
-							<a class="blues ml30 f14" href="javascript:void(0);" id="chooseBank" style="color:#06f;text-decoration:underline;"><i>▼</i>选择其他银行</a>
+							<!-- <a class="blues ml30 f14" href="javascript:void(0);" id="chooseBank" style="color:#06f;text-decoration:underline;"><i>▼</i>选择其他银行</a> -->
 						</c:if>
 						
 						
@@ -546,7 +546,7 @@ function initBankPic(){
 	}
 </script>
 <div class="footer">
-	<p class="foot_nav"><a href="/website/help/index.htm" target="_blank">关于我们</a> | <a href="/website/help/service.htm" target="_blank">隐私条款</a> | <a href="/website/help/mer.htm" target="_blank">合作加盟</a> | <a href="/website/help/reg.htm" target="_blank">会员服务</a></p>
+	<p class="foot_nav"><a href="" target="_blank">关于我们</a> | <a href="" target="_blank">隐私条款</a> | <a href="" target="_blank">合作加盟</a> | <a href="" target="_blank">会员服务</a></p>
 	<p class="copyright">Copyright  © 2015 北京证联资本管理有限责任公司版权所有</p>
 	<p class="contact_info"> <span>联系电话：010-84298418</span> <span>传真：010-84299579</span> <!--  <span>版本：2013V1.4 Beta</span> --></p>
 	<p class="icp"><a href=" http://www.miibeian.gov.cn/" target="_blank">京ICP备15034871号</a></p>

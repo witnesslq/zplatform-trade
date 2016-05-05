@@ -26,6 +26,11 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zlebank.zplatform.commons.utils.StringUtil;
+import com.zlebank.zplatform.member.pojo.PojoMember;
+import com.zlebank.zplatform.member.pojo.PojoMerchDeta;
+import com.zlebank.zplatform.member.service.CoopInstiService;
+import com.zlebank.zplatform.member.service.MemberService;
+import com.zlebank.zplatform.member.service.MerchService;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.dao.IRouteConfigDAO;
 import com.zlebank.zplatform.trade.exception.TradeException;
@@ -48,8 +53,14 @@ public class RouteConfigServiceImpl extends BaseServiceImpl<RouteConfigModel, Lo
     private static final Log log = LogFactory.getLog(RouteConfigServiceImpl.class);
     @Autowired
     private IRouteConfigDAO routeConfigDAO;
+    //@Autowired
+    //private IMemberService memberService;
     @Autowired
-    private IMemberService memberService;
+    private MemberService memberService;
+    @Autowired
+    private MerchService merchService;
+    @Autowired
+    private CoopInstiService coopInstiService;
     /**
      *
      * @return
@@ -63,8 +74,13 @@ public class RouteConfigServiceImpl extends BaseServiceImpl<RouteConfigModel, Lo
     
     public ResultBean getTransRout(String transTime,String transAmt,String memberId,String busiCode,String cardNo,String cashCode){
         try {
-            MemberBaseModel merchant =  memberService.get(memberId);
-            String merchRoutver= merchant.getRoutver();
+        	String merchRoutver = null;
+        	if(memberId.startsWith("3")){//合作机构
+        		merchRoutver = getDefaultVerInfo(memberId,busiCode,20);
+        	}else{//商户
+        		PojoMerchDeta merch = merchService.getMerchBymemberId(memberId);
+        		merchRoutver = merch.getRoutVer();
+        	}
             if (log.isDebugEnabled()) {
                 log.debug("transTime：" + transTime);
                 log.debug("transAmt：" + transAmt);
@@ -84,9 +100,6 @@ public class RouteConfigServiceImpl extends BaseServiceImpl<RouteConfigModel, Lo
                 bankcode = cardInfoMap.get("BANKCODE").toString();
                 cardType = cardInfoMap.get("TYPE").toString();
             }
-            
-            
-            
             StringBuffer sqlBuffer = new StringBuffer();
             List<Object> paramList = new ArrayList<Object>();
             sqlBuffer = new StringBuffer();
@@ -109,7 +122,7 @@ public class RouteConfigServiceImpl extends BaseServiceImpl<RouteConfigModel, Lo
             paramList.add(transTime);
             sqlBuffer.append("AND t.minamt <= ? ");
             paramList.add(transAmt);
-            sqlBuffer.append("AND t.maxamt > ? ");
+            sqlBuffer.append("AND t.maxamt >= ? ");
             paramList.add(transAmt);
             
             sqlBuffer.append("AND t.isdef = '1' ");
@@ -152,7 +165,7 @@ public class RouteConfigServiceImpl extends BaseServiceImpl<RouteConfigModel, Lo
             }
         } catch (Exception e) {
             // TODO: handle exception
-           log.error(e);
+           e.printStackTrace();
         }
         log.info("member "+memberId+" no find member rout!!!");
         return new ResultBean("RC99", "交易路由异常");
@@ -188,13 +201,13 @@ public class RouteConfigServiceImpl extends BaseServiceImpl<RouteConfigModel, Lo
     @Transactional(propagation=Propagation.REQUIRES_NEW)
     public ResultBean getWapTransRout(String transTime,String transAmt,String memberId,String busiCode,String cardNo){
         try {
-            MemberBaseModel merchant =  memberService.get(memberId);
-            String merchRoutver = null;
-            if(merchant==null){
-            	merchRoutver = getDefaultVerInfo(memberId,busiCode,20);
-            }else{
-            	merchRoutver = merchant.getRoutver();
-            }
+        	String merchRoutver = null;
+        	if(memberId.startsWith("3")){//合作机构
+        		merchRoutver = getDefaultVerInfo(memberId,busiCode,20);
+        	}else{//商户
+        		PojoMerchDeta merch = merchService.getMerchBymemberId(memberId);
+        		merchRoutver = merch.getRoutVer();
+        	}
             
             if (log.isDebugEnabled()) {
                 log.debug("transTime：" + transTime);
@@ -234,7 +247,7 @@ public class RouteConfigServiceImpl extends BaseServiceImpl<RouteConfigModel, Lo
             paramList.add(transTime);
             sqlBuffer.append("AND t.minamt <= ? ");
             paramList.add(transAmt);
-            sqlBuffer.append("AND t.maxamt > ? ");
+            sqlBuffer.append("AND t.maxamt >= ? ");
             paramList.add(transAmt);
             sqlBuffer.append("AND t.isdef = '1' ");
             if (StringUtils.isNotEmpty(bankcode)) {
@@ -262,7 +275,6 @@ public class RouteConfigServiceImpl extends BaseServiceImpl<RouteConfigModel, Lo
                 sqlBuffer = new StringBuffer();
                 sqlBuffer.append("SELECT t.ROUTVER as rout ");
                 sqlBuffer.append("FROM t_route_config t ");
-                sqlBuffer.append("WHERE 1=1 ");
                 sqlBuffer.append("WHERE t.merchroutver = ? ");
                 sqlBuffer.append("AND t.status = '00' ");
                 sqlBuffer.append("AND t.isdef = '0' ");
@@ -283,5 +295,7 @@ public class RouteConfigServiceImpl extends BaseServiceImpl<RouteConfigModel, Lo
         log.info("member "+memberId+" no find member rout!!!");
         return new ResultBean("RC99", "交易路由异常");
     }
+    
+   
 
 }

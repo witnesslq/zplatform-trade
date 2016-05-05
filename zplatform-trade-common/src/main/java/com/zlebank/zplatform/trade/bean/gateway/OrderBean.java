@@ -66,13 +66,13 @@ public class OrderBean implements Serializable{
     @NotEmpty(message="param.empty.bizType")
     @Length(max=6,message="param.error.bizType")
     private String bizType="";
-    @NotEmpty(message="param.empty.channelType")
+    
     @Length(max=2,message="param.error.channelType")
     private String channelType="";
     @NotEmpty(message="param.empty.accessType")
     @Length(max=1,message="param.error.accessType")
     private String accessType="";
-    @NotEmpty(message="param.empty.,txnTime")
+    @NotEmpty(message="param.empty.txnTime")
     @Length(max=14,message="param.error.txnTime")
     private String txnTime="";
     @Length(max=2,message="param.error.accType")

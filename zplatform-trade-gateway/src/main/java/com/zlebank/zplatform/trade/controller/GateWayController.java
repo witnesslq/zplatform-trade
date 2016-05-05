@@ -42,6 +42,7 @@ import com.zlebank.zplatform.commons.bean.PagedResult;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.member.bean.CoopInsti;
 import com.zlebank.zplatform.member.bean.QuickpayCustBean;
+import com.zlebank.zplatform.member.bean.enums.MemberType;
 import com.zlebank.zplatform.member.dao.PersonDAO;
 import com.zlebank.zplatform.member.pojo.PojoMerchDeta;
 import com.zlebank.zplatform.member.pojo.PojoPersonDeta;
@@ -333,7 +334,7 @@ public class GateWayController {
 
             if (!"999999999999999".equals(txnsLog.getAccmemberid())) {
                 // 获取会员已绑定的银行卡
-                PagedResult<QuickpayCustBean> bindCardList =  memberBankCardService.queryMemberBankCard(txnsLog.getAccmemberid(), "0", 0, 10);
+                PagedResult<QuickpayCustBean> bindCardList =  memberBankCardService.queryMemberBankCard(txnsLog.getAccmemberid(), "0",null, 0, 10);
                 model.put("bindCardList", bindCardList.getPagedResult());
                 //QuickpayCustBean quickpayCust = null;
                 // 处理银行卡验证信息及身份信息，取得卡信息
@@ -366,7 +367,7 @@ public class GateWayController {
                     cardType = "1";
                 }
                 // 显示会员已绑定的银行卡
-                PagedResult<QuickpayCustBean> cardPageList = memberBankCardService.queryMemberBankCard(txnsLog.getAccmemberid(), cardType, 0, 10);
+                PagedResult<QuickpayCustBean> cardPageList = memberBankCardService.queryMemberBankCard(txnsLog.getAccmemberid(), cardType,null, 0, 10);
                 List<QuickpayCustBean> cardList = cardPageList.getPagedResult();
                 /*for (QuickpayCustBean cust : cardList) {
                     // 判断依据卡号相同，账户名称相同，身份证号相同
@@ -1065,7 +1066,7 @@ public class GateWayController {
         }
         Map<String, Object> cardMap = routeConfigService.getCardInfo(cardNo);
         if (cardMap == null) {
-            return "error";
+            return "carderror";
         }
         return cardMap;
     }
@@ -1427,12 +1428,21 @@ public class GateWayController {
                 return new ModelAndView("/erro_gw", model);
             }
             //验证提现密码
-            
+            if(!gateWayService.validatePayPWD(orderinfo.getSecmemberno(), tradeBean.getPay_pwd(), MemberType.ENTERPRISE)){
+            	model.put("errMsg", "支付密码错误");
+                model.put("respCode", "ZL34");
+                model.put("txnseqno", tradeBean.getTxnseqno());
+                return new ModelAndView("/erro_gw", model);
+            }
             
             
             TxnsWithdrawModel withdraw = new TxnsWithdrawModel(tradeBean);
+            Map<String, Object> cardMap = routeConfigService.getCardInfo(tradeBean.getCardNo());
+            withdraw.setBankcode(cardMap.get("BANKCODE").toString());
+            withdraw.setBankname(cardMap.get("BANKNAME").toString());
             //记录提现账务
             TradeInfo tradeInfo = new TradeInfo();
+            tradeInfo.setBusiCode("30000001");
             tradeInfo.setPayMemberId(withdraw.getMemberid());
             tradeInfo.setPayToMemberId(withdraw.getMemberid());
             tradeInfo.setAmount(new BigDecimal(withdraw.getAmount()));

@@ -2012,7 +2012,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         if ("0".equals(querySignCardBean.getCardType().trim())) {
             querySignCardBean.setCardType("");
         }
-        PagedResult<QuickpayCustBean> pagedResult = memberBankCardService.queryMemberBankCard(querySignCardBean.getMemberId(), querySignCardBean.getCardType(), 1, 10);
+        PagedResult<QuickpayCustBean> pagedResult = memberBankCardService.queryMemberBankCard(querySignCardBean.getMemberId(), querySignCardBean.getCardType(),null, 1, 10);
         //List<QuickpayCustModel> resultList = quickpayCustService.querBankCardByMemberId_Reapay(querySignCardBean.getMemberId(),querySignCardBean.getCardType());
         if(pagedResult.getTotal()==0){
             return "";
@@ -2293,6 +2293,10 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
 	@Override
 	public void checkBusiAcct(String merchNo, String memberId)
 			throws TradeException {
+		
+		if("999999999999999".equals(memberId)){
+			return ;
+		}
         BusiAcct fundAcct = null;
         List<BusiAcct> busiAccList = null;
         if(StringUtil.isNotEmpty(memberId)){
@@ -2345,5 +2349,155 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
 		return false;
     }
 	
+	
+	@Transactional
+    public String dealWithRefundOrder(String orderNo,String merchNo,String txnAmt) throws TradeException {
+       
+        TxnsOrderinfoModel orderinfo_old = this.getOrderinfoByOrderNoAndMemberId(orderNo, merchNo);
+        
+        TxnsLogModel old_txnsLog = txnsLogService.queryLogByTradeseltxn(orderinfo_old.getRelatetradetxn());
+        if(old_txnsLog==null){
+            throw new TradeException("GW14");
+        }
+        TxnsOrderinfoModel old_orderInfo = getOrderinfoByOrderNo(old_txnsLog.getAccordno());
+        if(old_orderInfo==null){
+            throw new TradeException("GW15");
+        }
+        
+        try {
+            Long old_amount = old_orderInfo.getOrderamt();
+            Long refund_amount = Long.valueOf(txnAmt);
+            if(refund_amount>old_amount){
+                throw new TradeException("T021");
+            }else if(refund_amount==old_amount){//原始订单退款(全额退款)
+                //具体的处理方法暂时不明
+            }else if(refund_amount<old_amount){//部分退款
+               //具体的处理方法暂时不明
+            	throw new TradeException("T021");
+            }
+        } catch (NumberFormatException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+            throw new TradeException("T020");
+        }
+        
+        String  orderId = OrderNumber.getInstance().generateRefundOrderNo();
+        PojoMerchDeta member=null;
+        TxnsLogModel txnsLog=null;
+        try {
+            
+            //member = memberService.get(refundBean.getCoopInstiId());
+            txnsLog = new TxnsLogModel();
+            PojoMember mbmberd = memberService2.getMbmberByMemberId(merchNo, null);
+           
+            member = merchService.getMerchBymemberId(merchNo);
+        	txnsLog.setRiskver(member.getRiskVer());
+            txnsLog.setSplitver(member.getSpiltVer());
+            txnsLog.setFeever(member.getFeeVer());
+            txnsLog.setPrdtver(member.getPrdtVer());
+            //txnsLog.setCheckstandver(member.getCashver());
+            txnsLog.setRoutver(member.getRoutVer());
+            txnsLog.setAccordinst(member.getParent()+"");
+            txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlCycle().toString())));
+            
+            
+            txnsLog.setTxndate(DateUtil.getCurrentDate());
+            txnsLog.setTxntime(DateUtil.getCurrentTime());
+            txnsLog.setBusicode("40000001");
+            txnsLog.setBusitype("4000");
+            //核心交易流水号，交易时间（yymmdd）+业务代码+6位流水号（每日从0开始）
+            txnsLog.setTxnseqno(OrderNumber.getInstance().generateTxnseqno(txnsLog.getBusicode()));
+            txnsLog.setAmount(Long.valueOf(txnAmt));
+            txnsLog.setAccordno(orderId);
+            txnsLog.setAccfirmerno(old_txnsLog.getAccfirmerno());
+            txnsLog.setAccsecmerno(old_txnsLog.getAccsecmerno());
+            txnsLog.setAcccoopinstino(old_txnsLog.getAccfirmerno());
+            txnsLog.setTxnseqnoOg(old_txnsLog.getTxnseqno());
+            txnsLog.setAccordcommitime(DateUtil.getCurrentDateTime());
+            txnsLog.setTradestatflag("00000000");//交易初始状态
+            txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlCycle().toString())));
+            txnsLog.setAccmemberid(txnsLog.getAccmemberid());
+            txnsLogService.save(txnsLog);
+            
+            //退款账务处理
+            TradeInfo tradeInfo = new TradeInfo();
+            tradeInfo.setPayMemberId(merchNo);
+            tradeInfo.setPayToMemberId(old_txnsLog.getTxnseqno());
+            tradeInfo.setAmount(new BigDecimal(txnAmt));
+            tradeInfo.setCharge(new BigDecimal(txnsLog.getTxnfee()));
+            tradeInfo.setTxnseqno(txnsLog.getTxnseqno());
+            //记录分录流水
+            accEntryService.accEntryProcess(tradeInfo);
+        } catch (NumberFormatException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            throw new TradeException("T016");
+        } catch (AccBussinessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (AbstractBusiAcctException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+       String tn = "";
+        try {
+            //保存订单信息
+            TxnsOrderinfoModel orderinfo = new TxnsOrderinfoModel();
+            orderinfo.setId(OrderNumber.getInstance().generateID());
+           
+            orderinfo.setOrderno(orderId);//商户提交的订单号
+            orderinfo.setOrderamt(Long.valueOf(txnAmt));
+            orderinfo.setOrdercommitime(DateUtil.getCurrentDateTime());
+            orderinfo.setRelatetradetxn(txnsLog.getTxnseqno());//关联的交易流水表中的交易序列号
+            orderinfo.setFirmemberno(old_txnsLog.getAccfirmerno());
+            orderinfo.setFirmembername(coopInstiService.getInstiByInstiCode(old_txnsLog.getAccfirmerno()).getInstiName());
+            orderinfo.setSecmemberno(merchNo);
+            orderinfo.setSecmembername(member==null?"":member.getAccName());
+            //orderinfo.setBackurl(refundBean.getBackUrl());
+            orderinfo.setTxntype("14");
+            orderinfo.setTxnsubtype("00");
+            orderinfo.setBiztype("000202");
+            //orderinfo.setReqreserved(refundBean.getReqReserved());
+            //orderinfo.setOrderdesc(refundBean.getOrderDesc());
+            orderinfo.setAccesstype("0");
+            orderinfo.setTn(OrderNumber.getInstance().generateTN(txnsLog.getAccfirmerno()));
+            orderinfo.setStatus("02");
+            orderinfo.setMemberid(old_txnsLog.getAccmemberid());
+            orderinfo.setCurrencycode("156");
+            super.save(orderinfo);
+            tn = orderinfo.getTn();
+        } catch (NumberFormatException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            throw new TradeException("T020");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new TradeException("T018");
+        }
+        
+        try {
+            //无异常时保存退款交易流水表，以便于以后退款审核操作
+            TxnsRefundModel refundOrder = new TxnsRefundModel();
+            refundOrder.setId(OrderNumber.getInstance().generateID());
+            refundOrder.setRefundorderno(OrderNumber.getInstance().generateRefundOrderNo());
+            refundOrder.setOldorderno(orderNo);
+            refundOrder.setOldtxnseqno(old_txnsLog.getTxnseqno());
+            refundOrder.setMerchno(merchNo);
+            refundOrder.setMemberid(old_txnsLog.getAccmemberid());
+            refundOrder.setAmount(Long.valueOf(txnAmt));
+            refundOrder.setOldamount(Long.valueOf(txnAmt));
+            refundOrder.setRefundtype("");
+            refundOrder.setTxntime(DateUtil.getCurrentDateTime());
+            refundOrder.setReltxnseqno(txnsLog.getTxnseqno());
+            txnsRefundService.saveRefundOrder(refundOrder);
+            return tn;
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            throw new TradeException("T022");
+        }
+        
+    }
 	
 }

@@ -266,24 +266,30 @@ $.validator.addMethod("cardNoValidator", function(value) {
 			  	async:false,
 			 	dataType: "json",
 			 	success:function(json){
-			 		$("#cardType").val(json.TYPE);
-					if(json.TYPE=="2"){
-						//$("#li_validatetime").show();
-						//$("#li_cvv2").show();
-						if(json.BANKCODE.substring(0,4)==$("#bankCode").val()){
-							flag = true;
-							
-						}else{alert("该卡号不是所选银行");}
-					}else if(json.TYPE=="1"){
-						//$("#li_validatetime").hide();
-						//$("#li_cvv2").hide();
-						if(json.BANKCODE.substring(0,4)==$("#bankCode").val()){
-							flag = true;
-							
-						}else{alert("该卡号不是所选银行");}
-					}else{
-						alert("银行卡号错误，请填写正确的银行卡号");
-					}
+			 		if(text=="carderror"){
+			 			alert("银行卡号错误，请填写正确的银行卡号");
+			 		}else{
+			 			
+			 			var json = eval('(' + text + ')');
+			 			$("#cardType").val(json.TYPE);
+						if(json.TYPE=="2"){
+							//$("#li_validatetime").show();
+							//$("#li_cvv2").show();
+							if(json.BANKCODE.substring(0,4)==$("#bankCode").val()){
+								flag = true;
+								
+							}else{alert("该卡号不是所选银行");}
+						}else if(json.TYPE=="1"){
+							//$("#li_validatetime").hide();
+							//$("#li_cvv2").hide();
+							if(json.BANKCODE.substring(0,4)==$("#bankCode").val()){
+								flag = true;
+								
+							}else{alert("该卡号不是所选银行");}
+						}else{
+							alert("银行卡号错误，请填写正确的银行卡号");
+						}
+			 		}
 			 		
 					
 					
@@ -384,7 +390,7 @@ function cardType(){
 }
 $("#btnSubmit").click(function(){
 	$("#form1").submit();
-	$("#btnSubmit").removeClass("btnA").addClass("btn_off").attr("disabled","disabled");
+	//$("#btnSubmit").removeClass("btnA").addClass("btn_off").attr("disabled","disabled");
 })
 </script>
 </body>

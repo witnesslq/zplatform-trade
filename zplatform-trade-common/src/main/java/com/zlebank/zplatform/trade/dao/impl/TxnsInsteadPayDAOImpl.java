@@ -58,4 +58,24 @@ public class TxnsInsteadPayDAOImpl extends HibernateBaseDAOImpl<PojoTxnsInsteadP
 		}
 		return false;
 	}
+	/**
+	 *
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<PojoTxnsInsteadPay> queryBossPayNoResult() {
+		String queryString = "from PojoTxnsInsteadPay where channelCode = ? and status = ?";
+		try {
+			log.info("queryString:" + queryString);
+			Query query = getSession().createQuery(queryString);
+			query.setParameter(0, "92000002");
+			query.setParameter(1, "01");
+			return query.list();
+		} catch (HibernateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new CMMException("M001");
+		}
+	}
 }

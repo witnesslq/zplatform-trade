@@ -123,6 +123,10 @@ public class ReaPayQuickTradeThread implements IQuickPayTrade{
             //已绑卡支付
             if(StringUtil.isNotEmpty(trade.getBindCardId())){
                 log.info("ReaPay bindcard sign start!");
+                //
+                
+                
+                
                 //使用已绑定的卡进行支付
                 BindBean bindBean = ReaPayTradeAnalyzer.generateBindBean(trade);
                 if(log.isDebugEnabled()){

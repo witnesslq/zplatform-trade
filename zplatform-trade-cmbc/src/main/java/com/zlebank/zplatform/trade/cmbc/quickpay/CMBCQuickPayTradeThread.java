@@ -20,6 +20,7 @@ import com.zlebank.zplatform.trade.cmbc.service.ICMBCTransferService;
 import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.model.PojoRealnameAuth;
+import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.model.TxnsWithholdingModel;
 import com.zlebank.zplatform.trade.service.IQuickpayCustService;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
@@ -134,12 +135,11 @@ public class CMBCQuickPayTradeThread implements IQuickPayTrade {
 					DateUtil.getCurrentDateTime(), "", trade.getCardNo());
 			txnsLogService.updatePayInfo_Fast(payPartyBean);
 			if (resultBean != null) {
-				txnsLogService.updatePayInfo_Fast_result(
-						tradeBean.getTxnseqno(), resultBean.getErrCode(),
-						resultBean.getErrMsg());
-				txnsLogService.updateCoreRetResult(tradeBean.getTxnseqno(),
-						resultBean.getErrCode(), resultBean.getErrMsg());
+				txnsLogService.updatePayInfo_Fast_result(tradeBean.getTxnseqno(), resultBean.getErrCode(),resultBean.getErrMsg());
+				txnsLogService.updateCoreRetResult(tradeBean.getTxnseqno(),resultBean.getErrCode(), resultBean.getErrMsg());
 				log.info(JSON.toJSONString(resultBean));
+				TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(tradeBean.getTxnseqno());
+                txnsOrderinfoDAO.updateOrderToFail(txnsLog.getAccordno(), txnsLog.getAccfirmerno());
 				return resultBean;
 			}
 			trade.setPayinstiId(PAYINSTID);
@@ -209,10 +209,14 @@ public class CMBCQuickPayTradeThread implements IQuickPayTrade {
 			}
 		} catch (CMBCTradeException e1) {
 			// TODO Auto-generated catch block
+			resultBean = new ResultBean(e1.getCode(), e1.getMessage());
 			e1.printStackTrace();
+			return resultBean;
 		} catch (TradeException e) {
 			// TODO Auto-generated catch block
+			resultBean = new ResultBean(e.getCode(), e.getMessage());
 			e.printStackTrace();
+			return resultBean;
 		}
 
 		// 民生银行的实名认证和白名单采集已经做完，这里只发送短信验证码发送短信验证码

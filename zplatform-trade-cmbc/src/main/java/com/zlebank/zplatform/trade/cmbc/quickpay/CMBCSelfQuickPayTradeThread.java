@@ -18,6 +18,7 @@ import com.zlebank.zplatform.trade.cmbc.service.ICMBCTransferService;
 import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.model.PojoRealnameAuth;
+import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.model.TxnsWithholdingModel;
 import com.zlebank.zplatform.trade.service.IQuickpayCustService;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
@@ -47,6 +48,8 @@ public class CMBCSelfQuickPayTradeThread implements IQuickPayTrade{
     private ITxnsOrderinfoDAO txnsOrderinfoDAO;
     private ICMBCTransferService cmbcTransferService;
     private IQuickpayCustService quickpayCustService;
+   
+    
     public CMBCSelfQuickPayTradeThread() {
          txnsQuickpayService = (ITxnsQuickpayService) SpringContext.getContext().getBean("txnsQuickpayService");
          smsService = (ISMSService) SpringContext.getContext().getBean("smsService");
@@ -122,6 +125,8 @@ public class CMBCSelfQuickPayTradeThread implements IQuickPayTrade{
                 txnsLogService.updatePayInfo_Fast_result(tradeBean.getTxnseqno(), resultBean.getErrCode(),resultBean.getErrMsg());
                 txnsLogService.updateCoreRetResult(tradeBean.getTxnseqno(), resultBean.getErrCode(),resultBean.getErrMsg());
                 log.info(JSON.toJSONString(resultBean));
+                TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(tradeBean.getTxnseqno());
+                txnsOrderinfoDAO.updateOrderToFail(txnsLog.getAccordno(), txnsLog.getAccfirmerno());
                 return resultBean;
             }
             trade.setPayinstiId(PAYINSTID);

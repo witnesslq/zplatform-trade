@@ -30,7 +30,7 @@ public class TxnsWithdrawModel implements java.io.Serializable {
     private String withdraworderno;
     private String batchno;
     private String memberid;
-    private Character withdrawtype;
+    private String withdrawtype;
     private Long amount;
     private String acctno;
     private String acctname;
@@ -63,7 +63,7 @@ public class TxnsWithdrawModel implements java.io.Serializable {
         this.intime = intime;
     }
     public TxnsWithdrawModel(long id, String withdraworderno, String batchno,
-            String memberid, Character withdrawtype, Long amount,
+            String memberid, String withdrawtype, Long amount,
             String acctno, String acctname, String bankcode, String bankname,
             Long fee, String txntime, String finishtime, String status,
             String withdrawinstid, String retcode, String retinfo, Long inuser,
@@ -103,9 +103,9 @@ public class TxnsWithdrawModel implements java.io.Serializable {
         this.withdraworderno = OrderNumber.getInstance().generateWithdrawOrderNo();
         this.memberid = withdrawBean.getMemberId();
         if(withdrawBean.getMemberId().startsWith("1")){
-            this.withdrawtype = 1;
+            this.withdrawtype = "0";
         }else {
-            this.withdrawtype = 2;
+            this.withdrawtype = "1";
         }
         this.amount =Long.valueOf(withdrawBean.getAmount());
         this.acctno = withdrawAccBean.getAccNo();
@@ -124,16 +124,19 @@ public class TxnsWithdrawModel implements java.io.Serializable {
         this.withdraworderno = OrderNumber.getInstance().generateWithdrawOrderNo();
         this.memberid = tradeBean.getMerUserId();
         if(tradeBean.getMerUserId().startsWith("1")){
-            this.withdrawtype = 1;
+            this.withdrawtype = "0";
         }else {
-            this.withdrawtype = 2;
+            this.withdrawtype = "1";
         }
         this.acctno=tradeBean.getCardNo();
         this.acctname = tradeBean.getAcctName();
         this.amount = Long.valueOf(tradeBean.getAmount());
+        this.bankcode = tradeBean.getBankCode();
+        //this.bankname = tradeBean.getb
         this.status = "01";
         this.intime = new Date();
         this.gatewayorderno = tradeBean.getOrderId();
+        this.texnseqno = tradeBean.getTxnseqno();
     }
     @Id
     @Column(name = "ID", unique = true, nullable = false, precision = 12, scale = 0)
@@ -173,11 +176,11 @@ public class TxnsWithdrawModel implements java.io.Serializable {
     }
 
     @Column(name = "WITHDRAWTYPE", length = 1)
-    public Character getWithdrawtype() {
+    public String getWithdrawtype() {
         return this.withdrawtype;
     }
 
-    public void setWithdrawtype(Character withdrawtype) {
+    public void setWithdrawtype(String withdrawtype) {
         this.withdrawtype = withdrawtype;
     }
 

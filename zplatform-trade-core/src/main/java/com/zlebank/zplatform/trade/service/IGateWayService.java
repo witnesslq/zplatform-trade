@@ -164,4 +164,6 @@ public interface IGateWayService extends IBaseService<TxnsOrderinfoModel, Long>{
      * @throws TradeException
      */
     public boolean validatePayPWD(String memberId,String pwd,MemberType memberType) throws TradeException;
+    
+    public String dealWithRefundOrder(String orderNo,String merchNo,String txnAmt) throws TradeException;
 }

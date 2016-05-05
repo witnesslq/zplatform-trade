@@ -314,5 +314,7 @@
 		<module>../zplatform-trade-gateway</module>
 		<module>../zplatform-trade-reapay</module>
 		<module>../zplatform-trade-test</module>
+		<module>../zplatform-trade-bosspay</module>
+		<module>../zplatform-trade-chanpay</module>
 	</modules>
 </project>

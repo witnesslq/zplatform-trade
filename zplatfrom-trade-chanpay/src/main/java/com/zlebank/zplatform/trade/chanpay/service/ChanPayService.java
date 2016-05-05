@@ -1,0 +1,63 @@
+/* 
+ * ChanPayService.java  
+ * 
+ * version TODO
+ *
+ * 2016年4月29日 
+ * 
+ * Copyright (c) 2016,zlebank.All rights reserved.
+ * 
+ */
+package com.zlebank.zplatform.trade.chanpay.service;
+
+import com.zlebank.zplatform.trade.chanpay.bean.async.RefundAsyncResultBean;
+import com.zlebank.zplatform.trade.chanpay.bean.async.TradeAsyncResultBean;
+import com.zlebank.zplatform.trade.chanpay.bean.order.RefundOrderBean;
+import com.zlebank.zplatform.trade.chanpay.bean.query.QueryBankBean;
+import com.zlebank.zplatform.trade.chanpay.bean.query.QueryTradeBean;
+
+/**
+ * Class Description
+ *
+ * @author guojia
+ * @version
+ * @date 2016年4月29日 下午1:20:19
+ * @since 
+ */
+public interface ChanPayService {
+
+	/**
+	 * 退款
+	 * @param refundOrderBean
+	 * @return
+	 */
+	public Object refund(RefundOrderBean refundOrderBean);
+	
+	/**
+	 * 交易查询
+	 * @param queryTradeBean
+	 * @return
+	 */
+	public Object queryTrade(QueryTradeBean queryTradeBean);
+	
+	/**
+	 * 查询银行列表
+	 * @param queryBankBean
+	 * @return
+	 */
+	public Object queryBank(QueryBankBean queryBankBean);
+	
+	/**
+	 * 交易异步通知处理方法
+	 * @param tradeAsyncResultBean
+	 * @return
+	 */
+	public Object asyncNotifyTrade(TradeAsyncResultBean tradeAsyncResultBean);
+	
+	/**
+	 * 退款异步通知处理方法
+	 * @param refundAsyncResultBean
+	 * @return
+	 */
+	public Object asyncNotifyRefund(RefundAsyncResultBean refundAsyncResultBean);
+}

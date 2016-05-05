@@ -73,7 +73,7 @@ $("#btn_Return").click(function(){
 	if(txnseqno==""||txnseqno==null){
 		return;
 	}
-	window.location="<%=basePath %>gateway/cash.htm?txnseqno="+txnseqno;
+	window.location="<%=basePath %>merch/cash.htm?txnseqno="+txnseqno;
 	
 });
 </script>

@@ -154,6 +154,53 @@ HibernateBaseDAOImpl<PojoBankTransferData>
         }
 
     }
+    
+    @SuppressWarnings("unchecked")
+    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    public void batchUpdateBossPayTransData(List<PojoBankTransferData> transferDataList) {
+        Session session = getSession();
+        for (PojoBankTransferData data : transferDataList) {
+            Query query = session.createQuery("from PojoBankTransferData where accNo = ? and accName = ? and tranAmt = ? and status = ?");
+            query.setParameter(0, data.getAccNo());
+            query.setParameter(1, data.getAccName());
+            query.setParameter(2, data.getTranAmt());
+            query.setParameter(3, "03");
+			List<PojoBankTransferData> tranferDataList = query.list();
+            if(tranferDataList.size()>0){
+            	PojoBankTransferData data_old = tranferDataList.get(0);
+            	data_old.setResInfo(data.getResInfo());
+            	data_old.setResCode(data.getResCode().equals("PR02")? "00":"03");
+            	data_old.setBankTranResNo(data.getBankTranResNo());
+            	this.update(data_old);
+                query = session.createQuery("update TxnsLogModel set payretcode=?,payretinfo=?,payordfintime=?,payrettsnseqno=?,retcode=?,retinfo=?, tradeseltxn=? where txnseqno=?");
+                if(data.getResCode().equals("PR02")){
+                    query.setParameter(0, "000000");
+                    query.setParameter(1, "交易成功");
+                    query.setParameter(4, "0000");
+                    query.setParameter(5, "交易成功");
+                }else{
+                    query.setParameter(0, data.getResCode());
+                    query.setParameter(1, data.getResInfo());
+                    query.setParameter(4, data.getResCode());
+                    query.setParameter(5, data.getResInfo());
+                }
+                query.setParameter(2, DateUtil.getCurrentDateTime());
+                query.setParameter(3, "");
+                query.setParameter(6, UUID.randomUUID().toString().replaceAll("-", "").toUpperCase());
+                query.setParameter(7, data_old.getTranData().getTxnseqno());
+                query.executeUpdate();
+                
+                //更新划拨数据
+                PojoTranData tranData = data_old.getTranData();
+                tranData.setStatus(data.getResCode().equals("PR02")? "02": "03");
+                tranDataDAO.update(tranData);
+                //更新划拨批次信息
+                tranBatchDAO.updateBankTransferResult(data_old.getTranData().getTranBatch().getTid());
+            }
+            
+        }
+
+    }
 
     @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void batchUpdateTransDataAccStatus(List<PojoBankTransferData> transferDataList) {

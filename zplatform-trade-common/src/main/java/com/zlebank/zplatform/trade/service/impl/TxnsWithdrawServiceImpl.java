@@ -20,7 +20,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zlebank.zplatform.trade.dao.ITxnsWithdrawDAO;
+import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.model.TxnsWithdrawModel;
+import com.zlebank.zplatform.trade.service.ITxnsLogService;
 import com.zlebank.zplatform.trade.service.ITxnsWithdrawService;
 import com.zlebank.zplatform.trade.service.base.BaseServiceImpl;
 
@@ -37,6 +39,8 @@ public class TxnsWithdrawServiceImpl extends BaseServiceImpl<TxnsWithdrawModel, 
 
     @Autowired
     private ITxnsWithdrawDAO txnsWithdrawDAO;
+    @Autowired
+    private ITxnsLogService txnsLogService;
     
     /**
      *
@@ -60,6 +64,11 @@ public class TxnsWithdrawServiceImpl extends BaseServiceImpl<TxnsWithdrawModel, 
     
     @Transactional
     public void saveWithdraw(TxnsWithdrawModel withdraw){
+    	String txnseqno = withdraw.getTexnseqno();
+    	TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(txnseqno);
+    	txnsLog.setTxnfee(txnsLogService.getTxnFee(txnsLog));
+    	txnsLogService.update(txnsLog);
+    	withdraw.setFee(txnsLog.getTxnfee());
         super.save(withdraw);
     }
 

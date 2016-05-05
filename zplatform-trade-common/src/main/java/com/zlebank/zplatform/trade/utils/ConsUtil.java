@@ -112,9 +112,17 @@ public class ConsUtil {
 			cons.setBosspay_bank_number(prop.getProperty("bosspay_bank_number"));
 			cons.setBosspay_user_id(prop.getProperty("bosspay_user_id"));
 			cons.setBosspay_user_key(prop.getProperty("bosspay_user_key"));
-			cons.setBosspay_test_flag(Integer.valueOf(prop.getProperty("bosspay_test_flag")));
+			cons.setBosspay_test_flag(Integer.valueOf(prop.getProperty("bosspay_test_flag","1")));
 			cons.setBosspay_userId(prop.getProperty("bosspay_userId"));
 			
+			
+			cons.setChanpay_partner_id(prop.getProperty("chanpay_partner_id"));
+			cons.setChanpay_private_key(prop.getProperty("chanpay_private_key"));
+			cons.setChanpay_url(prop.getProperty("chanpay_url"));
+			cons.setChanpay_public_key(prop.getProperty("chanpay_public_key"));
+			cons.setChanpay_input_charset(prop.getProperty("chanpay_input_charset","UTF-8"));
+			cons.setChanpay_version(prop.getProperty("chanpay_version","1.0"));
+			cons.setChanpay_sign_type(prop.getProperty("chanpay_sign_type"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

@@ -320,6 +320,6 @@ public class TxnsRefundModel implements java.io.Serializable {
     public void setFlag(String flag) {
         this.flag = flag;
     }
-	
+    
 
 }

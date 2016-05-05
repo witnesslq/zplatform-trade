@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=utf-8"
 	pageEncoding="utf-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
@@ -76,7 +77,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 						<ul class="mt10 mod_list ">
 							<li><label class="mod_side">银行：</label>
 								<p class="myWay">
-									<span id="myWay"><label id="bank_lab" class="" ></label>**${trade.miniCardNo }</span>
+									<span id="myWay"><label id="bank_lab" class="" ></label>${fn:substring(trade.cardNo,0, 5)}************${trade.miniCardNo }</span>
 								</p>
 							</li>
 							<li>
@@ -97,7 +98,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 								<label for="fast_payment">同意 
 									<span style="color: blue;">
 										<a href="" class="blues" target="_blank">《实名认证相关协议》</a>
-										<a href="/website/help/service.htm" class="blues" target="_blank">《快捷支付服务相关协议》</a>
+										<a href="" class="blues" target="_blank">《快捷支付服务相关协议》</a>
 									</span>（本次即可享受快捷支付保障）
 								</label>
 							</li>
@@ -135,7 +136,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
 
 <div class="footer">
-	<p class="foot_nav"><a href="/website/help/index.htm" target="_blank">关于我们</a> | <a href="/website/help/service.htm" target="_blank">隐私条款</a> | <a href="/website/help/mer.htm" target="_blank">合作加盟</a> | <a href="/website/help/reg.htm" target="_blank">会员服务</a></p>
+	<p class="foot_nav"><a href="" target="_blank">关于我们</a> | <a href="" target="_blank">隐私条款</a> | <a href="" target="_blank">合作加盟</a> | <a href="" target="_blank">会员服务</a></p>
 	<p class="copyright">Copyright  © 2015 北京证联资本管理有限责任公司版权所有</p>
 	<p class="contact_info"> <span>联系电话：010-84298418</span> <span>传真：010-84299579</span> <!--  <span>版本：2013V1.4 Beta</span> --></p>
 	<p class="icp"><a href=" http://www.miibeian.gov.cn/" target="_blank">京ICP备15034871号</a></p>

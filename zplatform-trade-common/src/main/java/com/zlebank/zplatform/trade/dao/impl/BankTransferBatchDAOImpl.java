@@ -398,5 +398,20 @@ public class BankTransferBatchDAOImpl
 			throw new CMMException("M001");
 		}
     }
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+    public void rollbackBankTrans(Long tid){
+    	try {
+			String hql = "update PojoBankTransferBatch set tranStatus = ?,status = ? where tid = ? ";
+			Query query = getSession().createQuery(hql);
+			query.setParameter(0, "01");
+			query.setParameter(1, "01");
+			query.setParameter(2, tid);
+			query.executeUpdate();
+		} catch (HibernateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new CMMException("M002");
+		}
+    }
 
 }

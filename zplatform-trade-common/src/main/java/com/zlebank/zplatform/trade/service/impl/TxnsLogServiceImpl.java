@@ -546,7 +546,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 
 
 	@Override
-	@Transactional(propagation=Propagation.REQUIRED)
+	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public void saveBankTransferLogs(List<PojoBankTransferData> transferDataList) {
 		// TODO Auto-generated method stub
 		for(PojoBankTransferData data : transferDataList){
@@ -598,6 +598,57 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         }
 	}
 
+	@Transactional(propagation=Propagation.REQUIRES_NEW)
+	public void saveBossPayBankTransferLogs(List<PojoBankTransferData> transferDataList) {
+		// TODO Auto-generated method stub
+		for(PojoBankTransferData data : transferDataList){
+        	TxnsLogModel txnsLog = getTxnsLogByTxnseqno(data.getTranData().getTxnseqno());
+            if(txnsLog!=null){
+                continue;
+            }
+            txnsLog = new TxnsLogModel();
+            MemberBaseModel member = memberService.get(data.getTranData().getMemberId());
+            txnsLog.setTxnseqno(data.getTranData().getTxnseqno());
+            txnsLog.setTxndate(DateUtil.getCurrentDate());
+            txnsLog.setTxntime(DateUtil.getCurrentTime());
+            if("00".equals(data.getTranData().getBusiType())){//代付
+            	txnsLog.setBusicode(BusinessEnum.INSTEADPAY.getBusiCode());
+                txnsLog.setBusitype(BusiTypeEnum.insteadPay.getCode());
+            }else if("01".equals(data.getTranData().getBusiType())){
+            	txnsLog.setBusicode(BusinessEnum.WITHDRAWALS.getBusiCode());
+                txnsLog.setBusitype(BusiTypeEnum.withdrawal.getCode());
+            }else if("02".equals(data.getTranData().getBusiType())){
+            	txnsLog.setBusicode(BusinessEnum.REFUND.getBusiCode());
+                txnsLog.setBusitype(BusiTypeEnum.refund.getCode());
+            }
+            
+            txnsLog.setAmount(data.getTranAmt().longValue());
+            txnsLog.setRiskver(member.getRiskver());
+            txnsLog.setSplitver(member.getSpiltver());
+            txnsLog.setFeever(member.getFeever());
+            txnsLog.setPrdtver(member.getPrdtver());
+            txnsLog.setCheckstandver(member.getCashver());
+            txnsLog.setRoutver(member.getRoutver());
+            //txnsLog.setAccordno(data.getRelatedorderno());
+            txnsLog.setAccordinst(member.getMerchinsti());
+            txnsLog.setAccfirmerno(data.getTranData().getMemberId());
+            txnsLog.setAccordcommitime(DateUtil.getCurrentDateTime());
+            txnsLog.setTradestatflag("00000000");//交易初始状态
+            txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlcycle().toString())));
+            txnsLog.setPaytype("04"); //支付类型（01：快捷，02：网银，03：账户）
+            txnsLog.setPayordno(data.getTranData().getBusiDataId()+"");//支付定单号
+            txnsLog.setPayinst(ChannelEnmu.BOSSPAYCOLLECTION.getChnlcode());//支付所属机构
+            txnsLog.setPayfirmerno(ConsUtil.getInstance().cons.getBosspay_user_id());//支付一级商户号
+            txnsLog.setPayordcomtime(DateUtil.getCurrentDateTime());//支付定单提交时间
+            //卡信息
+            txnsLog.setPan(data.getAccNo());
+            Map<String, Object> cardMap = getCardInfo(data.getAccNo());
+            txnsLog.setCardtype(cardMap.get("TYPE").toString());
+            txnsLog.setCardinstino(cardMap.get("BANKCODE").toString());
+            txnsLog.setTxnfee(data.getTranData().getTranFee().longValue());
+            super.save(txnsLog);
+        }
+	}
 
     @Override
     public List<?> getAllMemberByDate(String date) {

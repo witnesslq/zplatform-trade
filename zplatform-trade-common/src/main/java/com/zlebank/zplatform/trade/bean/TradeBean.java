@@ -114,6 +114,10 @@ public class TradeBean implements Serializable,Cloneable{
     private String provno;
     /**交易日期 **/
     private String orderDate;
+    
+    /****/
+    private String bankName;
+    
     /**
      * @return the memberIP
      */
@@ -815,6 +819,18 @@ public class TradeBean implements Serializable,Cloneable{
 	 */
 	public void setOrderDate(String orderDate) {
 		this.orderDate = orderDate;
+	}
+	/**
+	 * @return the bankName
+	 */
+	public String getBankName() {
+		return bankName;
+	}
+	/**
+	 * @param bankName the bankName to set
+	 */
+	public void setBankName(String bankName) {
+		this.bankName = bankName;
 	}
     
     

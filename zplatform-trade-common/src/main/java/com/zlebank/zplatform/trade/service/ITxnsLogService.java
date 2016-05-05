@@ -122,4 +122,10 @@ public interface ITxnsLogService extends IBaseService<TxnsLogModel, String>{
     public List<?> getCountRefundAndPay(String memberId,String date);
     public List<?> getCountSpendingAccount(String memberId,String date);
     public List<?> getCountHandPay(String memberId,String date);
+    
+    /**
+     * 保存博士金电交易流水
+     * @param transferDataList
+     */
+    public void saveBossPayBankTransferLogs(List<PojoBankTransferData> transferDataList);
 }

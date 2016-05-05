@@ -116,5 +116,11 @@ public interface BankTransferBatchDAO extends BasePagedQueryDAO<PojoBankTransfer
      * @return
      */
     public boolean closeBankTransferBatch(Long tid);
+    
+    /**
+     * 转账失败，回滚批次数据为未审核状态
+     * @param tid
+     */
+    public void rollbackBankTrans(Long tid);
 }
 

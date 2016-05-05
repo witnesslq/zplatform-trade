@@ -89,6 +89,14 @@ public class ConsModel {
 	private int bosspay_test_flag=1;//测试开关默认打开
 	private String bosspay_userId="";
 	
+	/**畅捷支付网关**/
+	private String chanpay_partner_id="";
+	private String chanpay_url="";
+	private String chanpay_private_key="";
+	private String chanpay_public_key="";
+	private String chanpay_version="";
+	private String chanpay_input_charset="";
+	private String chanpay_sign_type="";
 	
 	public String getZlrt_url() {
 		return zlrt_url;
@@ -1007,6 +1015,105 @@ public class ConsModel {
 	public void setBosspay_userId(String bosspay_userId) {
 		this.bosspay_userId = bosspay_userId;
 	}
+
+	/**
+	 * @return the chanpay_partner_id
+	 */
+	public String getChanpay_partner_id() {
+		return chanpay_partner_id;
+	}
+
+	/**
+	 * @param chanpay_partner_id the chanpay_partner_id to set
+	 */
+	public void setChanpay_partner_id(String chanpay_partner_id) {
+		this.chanpay_partner_id = chanpay_partner_id;
+	}
+
+	/**
+	 * @return the chanpay_url
+	 */
+	public String getChanpay_url() {
+		return chanpay_url;
+	}
+
+	/**
+	 * @param chanpay_url the chanpay_url to set
+	 */
+	public void setChanpay_url(String chanpay_url) {
+		this.chanpay_url = chanpay_url;
+	}
+
+	/**
+	 * @return the chanpay_private_key
+	 */
+	public String getChanpay_private_key() {
+		return chanpay_private_key;
+	}
+
+	/**
+	 * @param chanpay_private_key the chanpay_private_key to set
+	 */
+	public void setChanpay_private_key(String chanpay_private_key) {
+		this.chanpay_private_key = chanpay_private_key;
+	}
+
+	/**
+	 * @return the chanpay_public_key
+	 */
+	public String getChanpay_public_key() {
+		return chanpay_public_key;
+	}
+
+	/**
+	 * @param chanpay_public_key the chanpay_public_key to set
+	 */
+	public void setChanpay_public_key(String chanpay_public_key) {
+		this.chanpay_public_key = chanpay_public_key;
+	}
+
+	/**
+	 * @return the chanpay_version
+	 */
+	public String getChanpay_version() {
+		return chanpay_version;
+	}
+
+	/**
+	 * @param chanpay_version the chanpay_version to set
+	 */
+	public void setChanpay_version(String chanpay_version) {
+		this.chanpay_version = chanpay_version;
+	}
+
+	/**
+	 * @return the chanpay_input_charset
+	 */
+	public String getChanpay_input_charset() {
+		return chanpay_input_charset;
+	}
+
+	/**
+	 * @param chanpay_input_charset the chanpay_input_charset to set
+	 */
+	public void setChanpay_input_charset(String chanpay_input_charset) {
+		this.chanpay_input_charset = chanpay_input_charset;
+	}
+
+	/**
+	 * @return the chanpay_sign_type
+	 */
+	public String getChanpay_sign_type() {
+		return chanpay_sign_type;
+	}
+
+	/**
+	 * @param chanpay_sign_type the chanpay_sign_type to set
+	 */
+	public void setChanpay_sign_type(String chanpay_sign_type) {
+		this.chanpay_sign_type = chanpay_sign_type;
+	}
+
 	
 	
 	

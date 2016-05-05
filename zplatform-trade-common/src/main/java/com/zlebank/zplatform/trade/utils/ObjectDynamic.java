@@ -62,7 +62,7 @@ public class ObjectDynamic {
          
         Class<?> cls = obj.getClass();
         Field[] fields = cls.getDeclaredFields();
-        
+        //Field[] father_fields =cls.getSuperclass().getDeclaredFields();
         for (Field field : fields) {
             String name = field.getName();
             if("serialVersionUID".equals(name)) continue;

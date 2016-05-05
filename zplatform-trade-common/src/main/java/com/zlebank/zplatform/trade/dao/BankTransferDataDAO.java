@@ -83,4 +83,10 @@ public interface BankTransferDataDAO  extends BaseDAO<PojoBankTransferData>{
      * @return
      */
     public PojoBankTransferData getTransferDataByTranId(String bankTranDataSeqNo);
+    
+    /***
+     * 更新博士金电的批量代付结果
+     * @param transferDataList
+     */
+    public void batchUpdateBossPayTransData(List<PojoBankTransferData> transferDataList) ;
 }

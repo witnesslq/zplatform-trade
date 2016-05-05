@@ -11,6 +11,7 @@
 package com.zlebank.zplatform.trade.controller;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,40 +36,43 @@ import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.bean.enums.Usage;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.AccountQueryService;
-import com.zlebank.zplatform.commons.bean.PagedResult;
+import com.zlebank.zplatform.commons.dao.BankInfoDAO;
+import com.zlebank.zplatform.commons.dao.pojo.PojoBankInfo;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.member.bean.CoopInsti;
 import com.zlebank.zplatform.member.bean.EnterpriseBean;
 import com.zlebank.zplatform.member.bean.QuickpayCustBean;
 import com.zlebank.zplatform.member.bean.enums.MemberType;
+import com.zlebank.zplatform.member.dao.EnterpriseDAO;
+import com.zlebank.zplatform.member.pojo.PojoEnterpriseDeta;
 import com.zlebank.zplatform.member.pojo.PojoMember;
 import com.zlebank.zplatform.member.pojo.PojoMerchDeta;
-import com.zlebank.zplatform.member.pojo.PojoPersonDeta;
 import com.zlebank.zplatform.member.service.CoopInstiService;
 import com.zlebank.zplatform.member.service.EnterpriseService;
 import com.zlebank.zplatform.member.service.MemberBankCardService;
 import com.zlebank.zplatform.member.service.MemberService;
 import com.zlebank.zplatform.member.service.MerchService;
-import com.zlebank.zplatform.trade.adapter.quickpay.IQuickPayTrade;
 import com.zlebank.zplatform.trade.analyzer.GateWayTradeAnalyzer;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.TradeBean;
 import com.zlebank.zplatform.trade.bean.enums.ChannelEnmu;
 import com.zlebank.zplatform.trade.bean.gateway.OrderBean;
 import com.zlebank.zplatform.trade.bean.gateway.OrderRespBean;
-import com.zlebank.zplatform.trade.bean.gateway.RiskRateInfoBean;
 import com.zlebank.zplatform.trade.dao.RspmsgDAO;
 import com.zlebank.zplatform.trade.exception.TradeException;
-import com.zlebank.zplatform.trade.factory.TradeAdapterFactory;
 import com.zlebank.zplatform.trade.model.PojoRspmsg;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
+import com.zlebank.zplatform.trade.model.TxnsNotifyTaskModel;
 import com.zlebank.zplatform.trade.model.TxnsOrderinfoModel;
 import com.zlebank.zplatform.trade.model.TxnsWithdrawModel;
+import com.zlebank.zplatform.trade.model.TxnsWithholdingModel;
 import com.zlebank.zplatform.trade.service.IGateWayService;
 import com.zlebank.zplatform.trade.service.IProdCaseService;
 import com.zlebank.zplatform.trade.service.IRouteConfigService;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
+import com.zlebank.zplatform.trade.service.ITxnsNotifyTaskService;
 import com.zlebank.zplatform.trade.service.ITxnsWithdrawService;
+import com.zlebank.zplatform.trade.service.ITxnsWithholdingService;
 import com.zlebank.zplatform.trade.service.IWebGateWayService;
 import com.zlebank.zplatform.trade.utils.AmountUtil;
 import com.zlebank.zplatform.trade.utils.DateUtil;
@@ -114,6 +118,16 @@ public class MerchCashController {
 	private AccountQueryService accountQueryService;
 	@Autowired
 	private MemberService memberService;
+	@Autowired
+	private BankInfoDAO bankInfoDAO;
+	@Autowired
+	private MemberBankCardService bankCardService;
+	@Autowired
+	private EnterpriseDAO enterpriseDAO;
+	@Autowired
+	private ITxnsWithholdingService txnsWithholdingService;
+	@Autowired
+	private ITxnsNotifyTaskService txnsNotifyTaskService;
 	
 	@RequestMapping("/coporder.htm")
 	public ModelAndView pay(OrderBean order, HttpSession httpSession,
@@ -174,13 +188,21 @@ public class MerchCashController {
             model.put("tn", orderInfo.getTn());
             model.put("amount_y", AmountUtil.numberFormat(txnsLog.getAmount()));
             if (StringUtil.isNotEmpty(orderInfo.getSecmemberno())) {
-                // 获取会员已绑定的银行卡
-                PagedResult<QuickpayCustBean> bindCardList =  memberBankCardService.queryMemberBankCard(orderInfo.getSecmemberno(), "0", 0, 10);
+            	
+            	PojoMerchDeta merch = merchService.getMerchBymemberId(txnsLog.getAccsecmerno());
+            	
+                /*// 获取会员已绑定的银行卡
+                PagedResult<QuickpayCustBean> bindCardList =  memberBankCardService.queryMemberBankCard(orderInfo.getSecmemberno(), "0",null, 0, 10);
                 model.put("bindCardList", bindCardList.getPagedResult());
                 String cardType = "1";
                 // 显示会员已绑定的银行卡
-                PagedResult<QuickpayCustBean> cardPageList = memberBankCardService.queryMemberBankCard(orderInfo.getSecmemberno(), cardType, 0, 10);
-                List<QuickpayCustBean> cardList = cardPageList.getPagedResult();
+                PagedResult<QuickpayCustBean> cardPageList = memberBankCardService.queryMemberBankCard(orderInfo.getSecmemberno(), cardType,null, 0, 10);
+                List<QuickpayCustBean> cardList = cardPageList.getPagedResult();*/
+            	List<QuickpayCustBean> cardList = new ArrayList<QuickpayCustBean>();
+            	QuickpayCustBean quickpayCustBean = new QuickpayCustBean();
+            	quickpayCustBean.setAccname(merch.getAccName());
+            	quickpayCustBean.setCardno(merch.getAccNum());
+            	cardList.add(quickpayCustBean);
                 model.put("cardList", cardList);
                 //获取请求方IP
                 model.put("memberIP", orderInfo.getPayerip());
@@ -313,6 +335,20 @@ public class MerchCashController {
 	    
 	    Map<String, Object> model = new HashMap<String, Object>();
 	    TradeBean tradeBean2 = trade.clone();
+	    TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(txnseqno_);
+	    PojoMerchDeta merch = merchService.getMerchBymemberId(txnsLog.getAccsecmerno());
+	    PojoEnterpriseDeta enterprise = enterpriseDAO.getEnterpriseByMemberId(txnsLog.getAccsecmerno());
+	    QuickpayCustBean bean = new QuickpayCustBean();
+	    bean.setCustomerno(txnsLog.getAccfirmerno());
+	    bean.setCardno(merch.getAccNum());
+	    bean.setAccname(merch.getAccName());
+	    bean.setIdnum(enterprise.getCorpNo());
+	    bean.setIdtype("01");
+	    bean.setPhone(enterprise.getContPhone());
+	    bean.setRelatememberno(txnsLog.getAccsecmerno());
+	    bean.setCardtype("1");
+	    long bindId = bankCardService.saveQuickPayCust(bean);
+	    trade.setBindCardId(bindId+"");
 	    try {
 	        webGateWayService.bindPay(trade);
 	    } catch (TradeException e) {
@@ -329,7 +365,7 @@ public class MerchCashController {
 	    tradeBean2.setCertId(trade.getCertId());
 	    tradeBean2.setValidthru(trade.getValidthru());// web收银台使用
 	    tradeBean2.setCvv2(trade.getCvv2());
-	    tradeBean2.setCardId(Long.valueOf(tradeBean2.getBindCardId()));
+	    tradeBean2.setCardId(bindId);
 	    model.put("trade", tradeBean2);
 	    return new ModelAndView("/fastpay/pay_merch", model);
 	}
@@ -358,7 +394,7 @@ public class MerchCashController {
                 model.put("respCode", "RC99");
                 model.put("trade", trade);
                 model.put("txnseqno", txnseqno_);
-                return new ModelAndView("/erro", model);
+                return new ModelAndView("/erro_merch", model);
             }
 
             //获取路由信息
@@ -406,17 +442,17 @@ public class MerchCashController {
             model.put("errMsg", e.getMessage());
             model.put("respCode", "RC99");
             model.put("txnseqno", txnseqno_);
-            return new ModelAndView("/erro", model);
+            return new ModelAndView("/erro_merch", model);
         }catch (Exception e) {
             e.printStackTrace();
             model.put("trade", trade);
             model.put("errMsg", "订单信息错误，请重新提交");
             model.put("respCode", "RC99");
             model.put("txnseqno", txnseqno_);
-            return new ModelAndView("/erro", model);
+            return new ModelAndView("/erro_merch", model);
         }
         model.put("txnseqno", trade.getTxnseqno());
-        return new ModelAndView("/fastpay/result", model);
+        return new ModelAndView("/fastpay/result_merch", model);
     }
  	
  	@RequestMapping("/payment.htm")
@@ -427,7 +463,7 @@ public class MerchCashController {
         tradeBean.setOrderId(orderNo);
         tradeBean.setReaPayOrderNo(reapayOrderNo);
         model.put("trade", tradeBean);
-        return new ModelAndView("/fastpay/pay_jump_cmbc", model);
+        return new ModelAndView("/fastpay/pay_jump_cmbc_merch", model);
     }
  	
  	@RequestMapping("/pay/payment.htm")
@@ -455,14 +491,23 @@ public class MerchCashController {
             }
             //验证提现密码
             if(!gateWayService.validatePayPWD(orderinfo.getSecmemberno(), tradeBean.getPay_pwd(), MemberType.ENTERPRISE)){
+            	orderinfo.setStatus("05");//支付密码错误
+            	gateWayService.update(orderinfo);
             	model.put("errMsg", "支付密码错误");
                 model.put("respCode", "ZL34");
                 model.put("txnseqno", tradeBean.getTxnseqno());
                 return new ModelAndView("/erro_merch_withdraw", model);
             }
+            PojoMerchDeta merch = merchService.getMerchBymemberId(orderinfo.getSecmemberno());
             TxnsWithdrawModel withdraw = new TxnsWithdrawModel(tradeBean);
+            withdraw.setAcctno(merch.getAccNum());
+            withdraw.setAcctname(merch.getAccName());
+            withdraw.setBankcode(merch.getBankCode());
+            PojoBankInfo bankNodeinfo = bankInfoDAO.getByBankNode(merch.getBankNode());
+            withdraw.setBankname(bankNodeinfo.getMainBankSname());
             //记录提现账务
             TradeInfo tradeInfo = new TradeInfo();
+            tradeInfo.setBusiCode("30000001");
             tradeInfo.setPayMemberId(withdraw.getMemberid());
             tradeInfo.setPayToMemberId(withdraw.getMemberid());
             tradeInfo.setAmount(new BigDecimal(withdraw.getAmount()));
@@ -527,6 +572,191 @@ public class MerchCashController {
         log.info(JSON.toJSONString(resultMap));
         return resultMap;
     }
+ 	
+ 	@RequestMapping("/refund")
+ 	@ResponseBody
+ 	public Object refund(@RequestParam("merchNo")String merchNo,@RequestParam("orderNo")String orderNo,@RequestParam("txnAmt")String txnAmt){
+ 		try {
+			//TxnsOrderinfoModel orderinfo = gateWayService.getOrderinfoByOrderNoAndMemberId(orderNo, merchNo);
+			gateWayService.dealWithRefundOrder(merchNo,orderNo,txnAmt);
+		} catch (TradeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return "failed";
+		}
+ 		
+ 		return "success";
+ 	}
+ 	
+ 	
+ 	///////
+ 	@RequestMapping("/success.htm")
+    public ModelAndView toSuccessPage(String orderNo, String txnseqno)
+            throws Exception {
+        Map<String, Object> model = new HashMap<String, Object>();
+        TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(txnseqno);
+        TxnsOrderinfoModel gatewayOrderBean = gateWayService
+                .getOrderinfoByOrderNoAndMemberId(txnsLog.getAccordno(),txnsLog.getAccfirmerno());
+        ResultBean orderResp = gateWayService.generateRespMessage(orderNo,txnsLog.getAccfirmerno());
+        OrderRespBean respBean = (OrderRespBean) orderResp.getResultObj();
+        model.put("suburl", gatewayOrderBean.getFronturl() + "?"+ ObjectDynamic.generateReturnParamer(respBean, false, null));
+        model.put("errMsg", "交易成功");
+        model.put("respCode", "0000");
+        model.put("txnseqno", txnseqno);
+        // 记录同步发送的日志
+        TxnsNotifyTaskModel task = new TxnsNotifyTaskModel(
+                gatewayOrderBean.getFirmemberno(),
+                gatewayOrderBean.getRelatetradetxn(), 1, 1,
+                ObjectDynamic.generateReturnParamer(respBean, false, null),
+                "00", "200", gatewayOrderBean.getFronturl(), "2");
+        txnsNotifyTaskService.saveTask(task);
+        return new ModelAndView("/fastpay/success", model);
+    }
+    @RequestMapping("/fail.htm")
+    public ModelAndView toFailPage(String orderNo, String txnseqno) {
+        Map<String, Object> model = new HashMap<String, Object>();
+        // TxnsOrderinfoModel gatewayOrderBean =
+        // gateWayService.getOrderinfoByOrderNo(orderNo);
+        gateWayService.updateOrderToFail(orderNo);
+        TxnsLogModel txnsLog = txnsLogService.get(txnseqno);
+        model.put("errMsg", txnsLog.getRetinfo());
+        model.put("respCode", txnsLog.getRetcode());
+        model.put("txnseqno", txnseqno);;
+        return new ModelAndView("/erro_merch", model);
+    }
+
+    @RequestMapping("/processing.htm")
+    public ModelAndView toProcessingPage(String orderNo, String txnseqno) {
+        Map<String, Object> model = new HashMap<String, Object>();
+        model.put("errMsg", "交易正在处理中，请稍后查询");
+        model.put("respCode", "ZL34");
+        model.put("txnseqno", txnseqno);
+        return new ModelAndView("/fastpay/result_merch", model);
+    }
+
+    @RequestMapping("/wait.htm")
+    public ModelAndView toWaitPage(String orderNo, String txnseqno,String reapayOrderNo) {
+        Map<String, Object> model = new HashMap<String, Object>();
+        TxnsLogModel txnsLog = null;
+        int[] timeArray = new int[]{1000, 2000, 8000, 16000, 32000};
+        try {
+            for (int i = 0; i < 5; i++) {
+                txnsLog=txnsLogService.getTxnsLogByTxnseqno(txnseqno);
+                if(StringUtil.isNotEmpty(txnsLog.getPayretcode())){
+                    ChannelEnmu channel = ChannelEnmu.fromValue(txnsLog.getPayinst());
+                    switch (channel) {
+                        case REAPAY :
+                            if ("0000".equals(txnsLog.getPayretcode())
+                                    || "3006".equals(txnsLog.getPayretcode())
+                                    || "3053".equals(txnsLog.getPayretcode())
+                                    || "3054".equals(txnsLog.getPayretcode())
+                                    || "3056".equals(txnsLog.getPayretcode())
+                                    || "3083".equals(txnsLog.getPayretcode())
+                                    || "3081".equals(txnsLog.getPayretcode())) {
+                                //return new ModelAndView("redirect:/gateway/cash.htm?txnseqno=" + txnseqno);
+                                TradeBean tradeBean = new TradeBean();
+                                tradeBean.setTxnseqno(txnseqno);
+                                tradeBean.setOrderId(orderNo);
+                                tradeBean.setReaPayOrderNo(reapayOrderNo);
+                                model.put("trade", tradeBean);
+                                return new ModelAndView("/fastpay/pay_jump", model);
+                            }else{
+                                model.put("errMsg", txnsLog.getPayretinfo());
+                                model.put("respCode", txnsLog.getPayretcode());
+                                TradeBean tradeBean = new TradeBean();
+                                tradeBean.setTxnseqno(txnseqno);
+                                model.put("trade", tradeBean);
+                                model.put("txnseqno", txnseqno);
+                                return new ModelAndView("/erro_merch", model);
+                            }
+
+                        case CMBCWITHHOLDING :
+                            String serialno = txnsLog.getPayordno();
+                            if(!txnsLog.getPayretcode().equals("000000")){
+                                model.put("errMsg", txnsLog.getRetinfo());
+                                model.put("respCode", txnsLog.getRetcode());
+                                TradeBean tradeBean = new TradeBean();
+                                tradeBean.setTxnseqno(txnseqno);
+                                model.put("trade", tradeBean);
+                                model.put("txnseqno", txnseqno);
+                                return new ModelAndView("redirect:/merch/fail.htm?txnseqno="+ txnseqno+"&orderNo="+txnsLog.getAccordno());
+                            }
+                            TxnsWithholdingModel withholding = txnsWithholdingService.getWithholdingBySerialNo(serialno);
+                            if(!withholding.getExectype().equalsIgnoreCase("R")){
+                                model.put("errMsg", txnsLog.getPayretinfo());
+                                model.put("respCode", txnsLog.getPayretcode());
+                                TradeBean tradeBean = new TradeBean();
+                                tradeBean.setTxnseqno(txnseqno);
+                                model.put("trade", tradeBean);
+                                model.put("txnseqno", txnseqno);
+                                if("S".equalsIgnoreCase(withholding.getExectype())){
+                                    return new ModelAndView("redirect:/merch/success.htm?txnseqno="+ txnseqno+"&orderNo="+txnsLog.getAccordno());
+                                }else{
+                                    return new ModelAndView("redirect:/merch/fail.htm?txnseqno="+ txnseqno+"&orderNo="+txnsLog.getAccordno());
+                                }
+                            }
+                            break;
+                        case CMBCSELFWITHHOLDING :
+                            String tranId = txnsLog.getPayordno();
+                            if(!txnsLog.getPayretcode().equals("000000")){
+                                model.put("errMsg", txnsLog.getRetinfo());
+                                model.put("respCode", txnsLog.getRetcode());
+                                TradeBean tradeBean = new TradeBean();
+                                tradeBean.setTxnseqno(txnseqno);
+                                model.put("trade", tradeBean);
+                                model.put("txnseqno", txnseqno);
+                                return new ModelAndView("redirect:/merch/fail.htm?txnseqno="+ txnseqno+"&orderNo="+txnsLog.getAccordno());
+                            }
+                            TxnsWithholdingModel withholdingSelf = txnsWithholdingService.getWithholdingBySerialNo(tranId);
+                            if(!withholdingSelf.getExectype().equalsIgnoreCase("R")){
+                                model.put("errMsg", txnsLog.getPayretinfo());
+                                model.put("respCode", txnsLog.getPayretcode());
+                                TradeBean tradeBean = new TradeBean();
+                                tradeBean.setTxnseqno(txnseqno);
+                                model.put("trade", tradeBean);
+                                model.put("txnseqno", txnseqno);
+                                if("S".equalsIgnoreCase(withholdingSelf.getExectype())){
+                                    return new ModelAndView("redirect:/merch/success.htm?txnseqno="+ txnseqno+"&orderNo="+txnsLog.getAccordno());
+                                }else{
+                                    return new ModelAndView("redirect:/merch/fail.htm?txnseqno="+ txnseqno+"&orderNo="+txnsLog.getAccordno());
+                                }
+                            }
+                            break;
+					default:
+						break;
+                    }
+                    
+                   
+                }
+                Thread.sleep(timeArray[i]);
+            }
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
+        model.put("errMsg", txnsLog.getPayretinfo());
+        model.put("respCode", txnsLog.getPayretcode());
+        TradeBean tradeBean = new TradeBean();
+        tradeBean.setTxnseqno(txnseqno);
+        model.put("trade", tradeBean);
+        model.put("txnseqno", txnseqno);
+        return new ModelAndView("/fastpay/result", model);
+    }
+    @RequestMapping("/error.htm")
+    public ModelAndView toExceptionPage(String orderNo, String txnseqno) {
+        Map<String, Object> model = new HashMap<String, Object>();
+        gateWayService.updateOrderToFail(orderNo);
+        model.put("errMsg", "系统异常,请联系证联金融客服");
+        model.put("respCode", "ZL34");
+        model.put("txnseqno", txnseqno);
+        return new ModelAndView("/fastpay/result_merch", model);
+    }
+ 	
+ 	
+ 	
+ 	
+ 	
 
 	private String getIpAddr(HttpServletRequest request) {
 		String ip = request.getHeader("x-forwarded-for");
