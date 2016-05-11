@@ -26,6 +26,7 @@ import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
 import com.zlebank.zplatform.acc.exception.AccBussinessException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
+import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.trade.bean.UpdateData;
 import com.zlebank.zplatform.trade.bean.enums.BusinessEnum;
 import com.zlebank.zplatform.trade.bean.enums.TransferBusiTypeEnum;
@@ -89,12 +90,15 @@ public class UpdateWithdrawServiceImpl implements UpdateWithdrawService,UpdateSu
             withdrawModel.setStatus(WithdrawEnum.UNKNOW.getCode());
         }
         withdrawDao.merge(withdrawModel);
+        EntryEvent entryEvent = null;
         if("00".equals(data.getResultCode())){
         	businessEnum = BusinessEnum.WITHDRAWALS_SUCCESS;
         	orderinfo.setStatus("00");
+        	entryEvent = EntryEvent.TRADE_SUCCESS;
         }else{
         	businessEnum = BusinessEnum.WITHDRAWALS_REFUND;
         	orderinfo.setStatus("03");
+        	entryEvent = EntryEvent.TRADE_FAIL;
         }
         //更新订单信息
         txnsOrderinfoDAO.update(orderinfo);
@@ -106,7 +110,7 @@ public class UpdateWithdrawServiceImpl implements UpdateWithdrawService,UpdateSu
         tradeInfo.setBusiCode(businessEnum.getBusiCode());
         tradeInfo.setChannelId(data.getChannelCode());
         try {
-            accEntryService.accEntryProcess(tradeInfo);
+            accEntryService.accEntryProcess(tradeInfo,entryEvent);
         } catch (Exception e) {
             log.error(e.getMessage(),e);
         }

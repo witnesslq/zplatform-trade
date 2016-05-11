@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.service.AccEntryService;
+import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.commons.service.impl.AbstractBasePageService;
 import com.zlebank.zplatform.commons.utils.BeanCopyUtil;
 import com.zlebank.zplatform.trade.bean.InsteadPayBatchBean;
@@ -213,7 +214,7 @@ public class InsteadBatchServiceImpl extends AbstractBasePageService<InsteadPayB
                 tradeInfo.setTxnseqno(detail.getTxnseqno());
                 tradeInfo.setBusiCode("70000003");
                 try {
-                    accEntryService.accEntryProcess(tradeInfo );
+                    accEntryService.accEntryProcess(tradeInfo,EntryEvent.AUDIT_REJECT );
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                     throw new FailToInsertAccEntryException();

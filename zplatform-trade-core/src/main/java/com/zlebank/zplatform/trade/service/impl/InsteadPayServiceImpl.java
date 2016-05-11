@@ -33,6 +33,7 @@ import com.zlebank.zplatform.acc.pojo.Money;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.BusiAcctService;
 import com.zlebank.zplatform.acc.service.FreezeAmountService;
+import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.commons.bean.CardBin;
 import com.zlebank.zplatform.commons.dao.CardBinDao;
 import com.zlebank.zplatform.commons.enums.BusinessCodeEnum;
@@ -302,7 +303,7 @@ public class InsteadPayServiceImpl
             tradeInfo.setPayToMemberId(detail.getMerId());
             tradeInfo.setPayToParentMemberId(detail.getMerId());
             try {
-                accEntryService.accEntryProcess(tradeInfo);
+                accEntryService.accEntryProcess(tradeInfo,EntryEvent.AUDIT_APPLY);
             } catch (AccBussinessException e) {
                 log.error(e.getMessage(),e);
                 if ("E000019".equals(e.getCode()))

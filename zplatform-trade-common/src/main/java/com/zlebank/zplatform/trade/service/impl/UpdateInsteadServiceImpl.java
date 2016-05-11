@@ -17,7 +17,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.annotation.Primary;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -25,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.service.AccEntryService;
+import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.trade.bean.UpdateData;
 import com.zlebank.zplatform.trade.bean.enums.InsteadPayDetailStatusEnum;
 import com.zlebank.zplatform.trade.bean.enums.TransferBusiTypeEnum;
@@ -92,15 +92,17 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
         tradeInfo.setAmount(new BigDecimal(detail.getAmt()));
         tradeInfo.setCharge(new BigDecimal(detail.getTxnfee()));
         tradeInfo.setTxnseqno(detail.getTxnseqno());
+        EntryEvent entryEvent = null;
         if ("00".equals(data.getResultCode())) {
             tradeInfo.setBusiCode("70000002");
             tradeInfo.setChannelId(data.getChannelCode());
+            entryEvent = EntryEvent.TRADE_SUCCESS;
         } else {
             tradeInfo.setBusiCode("70000003");
+            entryEvent = EntryEvent.TRADE_FAIL;
         }
-        
         try {
-            accEntryService.accEntryProcess(tradeInfo );
+            accEntryService.accEntryProcess(tradeInfo, entryEvent);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }

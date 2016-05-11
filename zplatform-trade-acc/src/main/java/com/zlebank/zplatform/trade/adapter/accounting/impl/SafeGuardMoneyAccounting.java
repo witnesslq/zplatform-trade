@@ -19,6 +19,7 @@ import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
 import com.zlebank.zplatform.acc.exception.AccBussinessException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
+import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.trade.adapter.accounting.IAccounting;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
@@ -88,7 +89,7 @@ public class SafeGuardMoneyAccounting implements IAccounting{
                 tradeInfo.setPayToMemberId(payToMemberId);
                 tradeInfo.setPayToParentMemberId(payToParentMemberId);
                 tradeInfo.setProductId(productId);
-                accEntryService.accEntryProcess(tradeInfo);
+                accEntryService.accEntryProcess(tradeInfo,EntryEvent.TRADE_SUCCESS);
                 resultBean = new ResultBean("success");
                 log.info("保障金入账成功");
             } catch (AccBussinessException e) {

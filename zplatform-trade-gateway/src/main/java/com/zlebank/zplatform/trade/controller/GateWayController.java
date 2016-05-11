@@ -39,6 +39,7 @@ import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.bean.enums.Usage;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.AccountQueryService;
+import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.commons.bean.PagedResult;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.member.bean.CoopInsti;
@@ -1454,7 +1455,7 @@ public class GateWayController {
             tradeInfo.setCharge(new BigDecimal(0));
             tradeInfo.setTxnseqno(orderinfo.getRelatetradetxn());
             //记录分录流水
-            accEntryService.accEntryProcess(tradeInfo);
+            accEntryService.accEntryProcess(tradeInfo,EntryEvent.AUDIT_APPLY);
             if (StringUtil.isNotEmpty(tradeBean.getBindCardId())) {
                 /*QuickpayCustModel card = memberBankCardService.
                         .getCardByBindId(tradeBean.getBindCardId());

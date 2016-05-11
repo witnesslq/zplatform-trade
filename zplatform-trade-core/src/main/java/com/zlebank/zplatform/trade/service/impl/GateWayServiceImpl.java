@@ -40,6 +40,7 @@ import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
 import com.zlebank.zplatform.acc.exception.AccBussinessException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.AccountQueryService;
+import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.commons.bean.PagedResult;
 import com.zlebank.zplatform.commons.enums.BusinessCodeEnum;
 import com.zlebank.zplatform.commons.utils.Base64Utils;
@@ -963,7 +964,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             tradeInfo.setCharge(new BigDecimal(txnsLog.getTxnfee()));
             tradeInfo.setTxnseqno(txnsLog.getTxnseqno());
             //记录分录流水
-            accEntryService.accEntryProcess(tradeInfo);
+            accEntryService.accEntryProcess(tradeInfo,EntryEvent.AUDIT_APPLY);
         } catch (NumberFormatException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -1105,7 +1106,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
                 tradeInfo.setTxnseqno(txnsLog.getTxnseqno());
                 tradeInfo.setBusiCode(BusinessCodeEnum.WITHDRAWALS.getBusiCode());
                 //记录分录流水
-                accEntryService.accEntryProcess(tradeInfo);
+                accEntryService.accEntryProcess(tradeInfo,EntryEvent.AUDIT_APPLY);
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -2427,7 +2428,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             tradeInfo.setCharge(new BigDecimal(txnsLog.getTxnfee()));
             tradeInfo.setTxnseqno(txnsLog.getTxnseqno());
             //记录分录流水
-            accEntryService.accEntryProcess(tradeInfo);
+            accEntryService.accEntryProcess(tradeInfo,EntryEvent.AUDIT_APPLY);
         } catch (NumberFormatException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
