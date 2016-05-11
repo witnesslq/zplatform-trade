@@ -97,6 +97,11 @@ public class ConsModel {
 	private String chanpay_version="";
 	private String chanpay_input_charset="";
 	private String chanpay_sign_type="";
+	private String chanpay_channel_code="";
+	private String chanpay_front_url="";
+	private String chanpay_back_url="";
+	private String chanpay_partner_name="";
+	
 	
 	public String getZlrt_url() {
 		return zlrt_url;
@@ -1112,6 +1117,62 @@ public class ConsModel {
 	 */
 	public void setChanpay_sign_type(String chanpay_sign_type) {
 		this.chanpay_sign_type = chanpay_sign_type;
+	}
+
+	/**
+	 * @return the chanpay_channel_code
+	 */
+	public String getChanpay_channel_code() {
+		return chanpay_channel_code;
+	}
+
+	/**
+	 * @param chanpay_channel_code the chanpay_channel_code to set
+	 */
+	public void setChanpay_channel_code(String chanpay_channel_code) {
+		this.chanpay_channel_code = chanpay_channel_code;
+	}
+
+	/**
+	 * @return the chanpay_front_url
+	 */
+	public String getChanpay_front_url() {
+		return chanpay_front_url;
+	}
+
+	/**
+	 * @param chanpay_front_url the chanpay_front_url to set
+	 */
+	public void setChanpay_front_url(String chanpay_front_url) {
+		this.chanpay_front_url = chanpay_front_url;
+	}
+
+	/**
+	 * @return the chanpay_back_url
+	 */
+	public String getChanpay_back_url() {
+		return chanpay_back_url;
+	}
+
+	/**
+	 * @param chanpay_back_url the chanpay_back_url to set
+	 */
+	public void setChanpay_back_url(String chanpay_back_url) {
+		this.chanpay_back_url = chanpay_back_url;
+	}
+
+	/**
+	 * @return the chanpay_partner_name
+	 */
+	public String getChanpay_partner_name() {
+		return chanpay_partner_name;
+	}
+
+	/**
+	 * @param chanpay_partner_name the chanpay_partner_name to set
+	 */
+	public void setChanpay_partner_name(String chanpay_partner_name) {
+		this.chanpay_partner_name = chanpay_partner_name;
 	}
 
 	

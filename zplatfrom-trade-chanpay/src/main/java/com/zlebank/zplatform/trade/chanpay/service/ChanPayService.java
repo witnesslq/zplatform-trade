@@ -52,12 +52,12 @@ public interface ChanPayService {
 	 * @param tradeAsyncResultBean
 	 * @return
 	 */
-	public Object asyncNotifyTrade(TradeAsyncResultBean tradeAsyncResultBean);
+	public boolean asyncNotifyTrade(TradeAsyncResultBean tradeAsyncResultBean);
 	
 	/**
 	 * 退款异步通知处理方法
 	 * @param refundAsyncResultBean
 	 * @return
 	 */
-	public Object asyncNotifyRefund(RefundAsyncResultBean refundAsyncResultBean);
+	public boolean asyncNotifyRefund(RefundAsyncResultBean refundAsyncResultBean);
 }

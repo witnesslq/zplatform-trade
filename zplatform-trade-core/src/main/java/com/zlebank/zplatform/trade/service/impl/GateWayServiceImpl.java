@@ -1971,9 +1971,9 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         if("999999999999999".equals(acctPayBean.getMemberId())){
             throw new TradeException("AP09");
         }
-        if(!acctPayBean.getMemberId().equals(txnsLog.getAccmemberid())){
+        /*if(!acctPayBean.getMemberId().equals(txnsLog.getAccmemberid())){
             throw new TradeException("AP10");
-        }
+        }*/
         
         
         ResultBean resultBean = null;

@@ -521,9 +521,9 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
             txnsLog.setPayordcomtime(DateUtil.getCurrentDateTime());//支付定单提交时间
             //卡信息
             txnsLog.setPan(data.getAccNo());
-            Map<String, Object> cardMap = getCardInfo(data.getAccNo());
+            /*Map<String, Object> cardMap = getCardInfo(data.getAccNo());
             txnsLog.setCardtype(cardMap.get("TYPE").toString());
-            txnsLog.setCardinstino(cardMap.get("BANKCODE").toString());
+            txnsLog.setCardinstino(cardMap.get("BANKCODE").toString());*/
             txnsLog.setTxnfee(data.getTranFee().longValue());
             super.save(txnsLog);
         }
@@ -590,10 +590,10 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
             txnsLog.setPayordcomtime(DateUtil.getCurrentDateTime());//支付定单提交时间
             //卡信息
             txnsLog.setPan(data.getAccNo());
-            Map<String, Object> cardMap = getCardInfo(data.getAccNo());
+            /*Map<String, Object> cardMap = getCardInfo(data.getAccNo());
             txnsLog.setCardtype(cardMap.get("TYPE").toString());
             txnsLog.setCardinstino(cardMap.get("BANKCODE").toString());
-            txnsLog.setTxnfee(data.getTranData().getTranFee().longValue());
+            txnsLog.setTxnfee(data.getTranData().getTranFee().longValue());*/
             super.save(txnsLog);
         }
 	}
@@ -663,24 +663,37 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         String queryString="select distinct m.member_id ,t.INTIME from t_txns_charge t left join t_member m on t.memberid=m.mem_id  where trunc(t.intime)=TO_DATE(?,'YYYYMMDD')";
         return (List<?>) super.queryBySQL(queryString, new Object[]{date});
     }
-    //消费和充值
+ // 消费
     @Override
-    public List<?> getCountExpenseAndRecharge(String memberId,String date) {
-        String queryString="select count(*) total ,sum(t.amount-t.txnfee) clearing ,sum(t.txnfee) totalfee  from  t_txns_log t,t_bnk_txn b where t.payordno=b.payordno and t.ACCSECMERNO=?  and t.ACCSETTLEDATE=? and b.status=9 and t.busicode in (10000001,20000001) and SUBSTR (trim(t.retcode),-2) = '00'";
-        return (List<?>) super.queryBySQL(queryString, new Object[]{memberId,date});
+    public List<?> getSumExpense(String memberId, String date) {
+        String queryString = "select count(*) total,"
+                + " sum (t.amount) totalAmount," + " sum(t.txnfee) totalfee"
+                + " from t_txns_log t" + " where"
+                + " t.ACCSECMERNO = ?" + " and t.ACCSETTLEDATE = ?"
+                + " and t.busicode in (10000001,10000002)"
+                + " and SUBSTR(trim(t.retcode), -2) = '00'";
+        return (List<?>) super.queryBySQL(queryString, new Object[]{memberId,
+                date});
     }
+
     
     @Override
     public List<?>  getAllMemberDetailedByDate(String memberId,String date){
-        String queryString="select t.ACCORDNO,t.TXNSEQNO,t.ACCORDCOMMITIME,t.ACCSETTLEDATE,t.amount,t.busicode,t.TXNFEE from t_txns_log t left join t_bnk_txn b on t.payordno=b.payordno where (b.status=9 or b.status is null) and t.ACCFIRMERNO=? and t.ACCSETTLEDATE=? and t.payordno is not null and SUBSTR (trim(t.retcode), -2) = '00'";
+    	String queryString = "select t.ACCORDNO,t.TXNSEQNO,t.ACCORDCOMMITIME,t.ACCSETTLEDATE,t.amount,t.busicode,t.TXNFEE from t_txns_log t left join t_bnk_txn b on t.payordno=b.payordno where (b.status=9 or b.status is null) and t.accsecmerno=? and t.ACCSETTLEDATE=? and t.payordno is not null and SUBSTR (trim(t.retcode), -2) = '00'  and t.busicode in ('10000001','10000002','40000001')";
         return (List<?>) super.queryBySQL(queryString, new Object[]{memberId,date});
     }
 
 
     @Override
-    public List<?> getCountRefundAndPay(String memberId, String date) {
-        String queryString="select count(*) total ,sum(t.amount+t.txnfee) clearing ,sum(t.txnfee) totalfee  from  t_txns_log t where t.ACCSECMERNO=?  and t.ACCSETTLEDATE=? and t.busicode in (30000001,40000001,70000001) and SUBSTR (trim(t.retcode),-2) = '00'";
-        return (List<?>) super.queryBySQL(queryString, new Object[]{memberId,date});
+    public List<?> getSumRefund(String memberId, String date) {
+        String queryString = "select count(*) total,"
+                + " sum(t.amount) totalAmount,"
+                + " sum(t.txnfee) totalfee" + " from t_txns_log t"
+                + " where t.ACCSECMERNO = ?" + " and t.ACCSETTLEDATE = ?"
+                + " and t.busicode in (40000001)"
+                + " and SUBSTR(trim(t.retcode), -2) = '00'";
+        return (List<?>) super.queryBySQL(queryString, new Object[]{memberId,
+                date});
     }
 
 

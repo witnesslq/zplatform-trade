@@ -32,7 +32,8 @@ public class DefaultSignServiceTest {
        String signature = RSA.sign(expPlain, WALLET_PRIVATE_KEY, "UTF-8");
        		
        boolean testTrue = RSA.verify(expPlain, signature, WALLET_PUBLIC_KEY, "UTF-8");
-       boolean testFalse = RSA.verify(expPlain, "1" + signature, WALLET_PUBLIC_KEY, "UTF-8");
+       System.out.println(testTrue);
+       //boolean testFalse = RSA.verify(expPlain, "1" + signature, WALLET_PUBLIC_KEY, "UTF-8");
 } 
 
 }

@@ -13,13 +13,18 @@ package com.zlebank.zplatform.trade.service.impl;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.trade.bean.ResultBean;
+import com.zlebank.zplatform.trade.bean.chanpay.ChanPayOrderBean;
 import com.zlebank.zplatform.trade.dao.ITxnsGatewaypayDAO;
+import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.model.TxnsGatewaypayModel;
 import com.zlebank.zplatform.trade.service.ITxnsGatewaypayService;
 import com.zlebank.zplatform.trade.service.base.BaseServiceImpl;
+import com.zlebank.zplatform.trade.utils.ConsUtil;
 
 /**
  * Class Description
@@ -67,6 +72,34 @@ public class TxnsGatewaypayServiceImpl extends BaseServiceImpl<TxnsGatewaypayMod
     public TxnsGatewaypayModel getOrderByOrderNo(String orderNo) {
         return super.getUniqueByHQL("from TxnsGatewaypayModel where payorderno = ?", new Object[]{orderNo});
     }
+
+	/**
+	 *
+	 * @param orderBean
+	 * @throws TradeException
+	 */
+	@Override
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+	public void saveChanPayGateWay(ChanPayOrderBean orderBean)
+			throws TradeException {
+		TxnsGatewaypayModel txnsGateway = new  TxnsGatewaypayModel();
+		txnsGateway.setInstitution(ConsUtil.getInstance().cons.getChanpay_channel_code());
+		txnsGateway.setPayorderno(orderBean.getOut_trade_no());
+		txnsGateway.setPayamt(Long.valueOf(orderBean.getTrade_amount()));
+		txnsGateway.setPaycommtime(DateUtil.getCurrentDateTime());
+		txnsGateway.setRelatetradetxn(orderBean.getTxnseqno());
+		txnsGateway.setFirmembername(ConsUtil.getInstance().cons.getChanpay_partner_id());
+		txnsGateway.setFirmembername(ConsUtil.getInstance().cons.getChanpay_partner_name());
+		txnsGateway.setPaynum(1L);
+		txnsGateway.setPaycode(orderBean.getPay_method());
+		txnsGateway.setPaytype(orderBean.getPay_type());
+		txnsGateway.setBankcode(orderBean.getBank_code());
+		txnsGateway.setStatus("01");//支付中
+		txnsGateway.setBankcode(orderBean.getBank_code());
+		super.update(txnsGateway);
+	}
+	
+	
     
     
 

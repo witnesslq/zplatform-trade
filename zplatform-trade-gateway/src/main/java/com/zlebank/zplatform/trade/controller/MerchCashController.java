@@ -338,13 +338,14 @@ public class MerchCashController {
 	    TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(txnseqno_);
 	    PojoMerchDeta merch = merchService.getMerchBymemberId(txnsLog.getAccsecmerno());
 	    PojoEnterpriseDeta enterprise = enterpriseDAO.getEnterpriseByMemberId(txnsLog.getAccsecmerno());
+	    PojoMember member = memberService.getMbmberByMemberId(txnsLog.getAccsecmerno(), null);
 	    QuickpayCustBean bean = new QuickpayCustBean();
 	    bean.setCustomerno(txnsLog.getAccfirmerno());
 	    bean.setCardno(merch.getAccNum());
 	    bean.setAccname(merch.getAccName());
 	    bean.setIdnum(enterprise.getCorpNo());
 	    bean.setIdtype("01");
-	    bean.setPhone(enterprise.getContPhone());
+	    bean.setPhone(member.getPhone());
 	    bean.setRelatememberno(txnsLog.getAccsecmerno());
 	    bean.setCardtype("1");
 	    long bindId = bankCardService.saveQuickPayCust(bean);

@@ -30,6 +30,7 @@ import com.zlebank.zplatform.trade.chanpay.bean.query.QueryBankBean;
 import com.zlebank.zplatform.trade.chanpay.bean.query.QueryBankResultBean;
 import com.zlebank.zplatform.trade.chanpay.bean.query.QueryTradeBean;
 import com.zlebank.zplatform.trade.chanpay.service.ChanPayService;
+import com.zlebank.zplatform.trade.chanpay.utils.ChanPayUtil;
 import com.zlebank.zplatform.trade.chanpay.utils.HttpProtocolHandler;
 import com.zlebank.zplatform.trade.chanpay.utils.HttpRequest;
 import com.zlebank.zplatform.trade.chanpay.utils.HttpResponse;
@@ -122,16 +123,29 @@ public class ChanPayServiceImpl implements ChanPayService {
 		return null;
 	}
 	
-	public Object asyncNotifyTrade(TradeAsyncResultBean tradeAsyncResultBean){
-		
-		
-		return null;
+	public boolean asyncNotifyTrade(TradeAsyncResultBean tradeAsyncResultBean){
+		boolean testTrue = false;
+		try {
+			String msg = ChanPayUtil.generateParamer(tradeAsyncResultBean, true, new String[]{"sign","sign_type"});
+			testTrue = RSA.verify(msg, tradeAsyncResultBean.getSign(), ConsUtil.getInstance().cons.getChanpay_public_key(), "UTF-8");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return testTrue;
 	}
 	
-	public Object asyncNotifyRefund(RefundAsyncResultBean refundAsyncResultBean){
+	public boolean asyncNotifyRefund(RefundAsyncResultBean refundAsyncResultBean){
+		boolean flag = false;
+		try {
+			String msg = ChanPayUtil.generateParamer(refundAsyncResultBean, true, new String[]{"sign","sign_type"});
+			flag = RSA.verify(msg, refundAsyncResultBean.getSign(), ConsUtil.getInstance().cons.getChanpay_public_key(), "UTF-8");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-		
-		return null;
+		return flag;
 	}
 	
 

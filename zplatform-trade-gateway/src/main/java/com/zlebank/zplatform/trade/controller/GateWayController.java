@@ -10,6 +10,7 @@
  */
 package com.zlebank.zplatform.trade.controller;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.PrivateKey;
 import java.util.HashMap;
@@ -68,6 +69,7 @@ import com.zlebank.zplatform.trade.bean.gateway.OrderRespBean;
 import com.zlebank.zplatform.trade.bean.gateway.QueryBean;
 import com.zlebank.zplatform.trade.bean.gateway.QueryResultBean;
 import com.zlebank.zplatform.trade.bean.gateway.RiskRateInfoBean;
+import com.zlebank.zplatform.trade.chanpay.bean.async.TradeAsyncResultBean;
 import com.zlebank.zplatform.trade.cmbc.bean.gateway.CardMessageBean;
 import com.zlebank.zplatform.trade.cmbc.bean.gateway.InsteadPayMessageBean;
 import com.zlebank.zplatform.trade.cmbc.bean.gateway.WithholdingMessageBean;
@@ -90,6 +92,7 @@ import com.zlebank.zplatform.trade.model.TxnsWithdrawModel;
 import com.zlebank.zplatform.trade.model.TxnsWithholdingModel;
 import com.zlebank.zplatform.trade.security.reapay.AES;
 import com.zlebank.zplatform.trade.security.reapay.RSA;
+import com.zlebank.zplatform.trade.service.ChanPayAsyncService;
 import com.zlebank.zplatform.trade.service.IAccountPayService;
 import com.zlebank.zplatform.trade.service.IGateWayService;
 import com.zlebank.zplatform.trade.service.IProdCaseService;
@@ -169,6 +172,8 @@ public class GateWayController {
     private CoopInstiService coopInstiService;
     @Autowired
     private AccEntryService accEntryService;
+    @Autowired
+    private ChanPayAsyncService chanPayAsyncService;
     
     @RequestMapping("/coporder.htm")
     public ModelAndView pay(OrderBean order,HttpSession httpSession,HttpServletRequest request) {
@@ -1526,5 +1531,34 @@ public class GateWayController {
 
         }
         return "overtime";
+    }
+    
+    
+    
+    
+    
+    @RequestMapping("/reciveChanPay")
+    @ResponseBody
+    public String reciveChanPay(TradeAsyncResultBean tradeAsyncResultBean,HttpServletResponse response ) {
+	    try {
+			log.info("chanpay data :" + JSON.toJSONString(tradeAsyncResultBean));
+			
+			ResultBean dealWithTradeAsync = chanPayAsyncService.dealWithTradeAsync(tradeAsyncResultBean);
+			
+			
+			response.setContentType("text/html");
+			response.setCharacterEncoding("utf-8");
+			response.getWriter().print("success");
+			response.getWriter().flush();
+			response.getWriter().close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TradeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+   
+	    return "";
     }
 }

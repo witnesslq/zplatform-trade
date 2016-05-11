@@ -22,6 +22,7 @@ import net.sf.json.JSONObject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
@@ -60,6 +61,7 @@ public class NotifyInsteadURLServiceImpl implements NotifyInsteadURLService,  Ap
     private InsteadPayDetailDAO insteadPayDetailDAO;
     
     //@Autowired
+    //@Qualifier("insteadPayServiceImpl")
     private InsteadPayService insteadPayService;
     
     @Autowired

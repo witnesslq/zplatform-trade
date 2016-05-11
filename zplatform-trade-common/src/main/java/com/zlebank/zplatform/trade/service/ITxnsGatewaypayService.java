@@ -11,6 +11,8 @@
 package com.zlebank.zplatform.trade.service;
 
 import com.zlebank.zplatform.trade.bean.ResultBean;
+import com.zlebank.zplatform.trade.bean.chanpay.ChanPayOrderBean;
+import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.model.TxnsGatewaypayModel;
 
 /**
@@ -25,5 +27,8 @@ public interface ITxnsGatewaypayService extends IBaseService<TxnsGatewaypayModel
     public ResultBean saveGateWay(TxnsGatewaypayModel txnsGateway);
     public ResultBean updateGateWay(TxnsGatewaypayModel txnsGateway);
     public TxnsGatewaypayModel getOrderByOrderNo(String orderNo);
+    
+    
+    public void saveChanPayGateWay(ChanPayOrderBean orderBean) throws TradeException;
    
 }

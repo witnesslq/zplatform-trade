@@ -127,6 +127,8 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
      */
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        ObserverListService.getInstance().add(this);
+    	if (event.getApplicationContext().getParent() == null) {
+            ObserverListService.getInstance().add(this);
+        }
     }
 }

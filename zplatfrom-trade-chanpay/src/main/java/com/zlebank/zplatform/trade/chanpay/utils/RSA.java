@@ -121,7 +121,7 @@ public class RSA {
      */
     public static boolean verify(String text, String sign, String publicKey, String charset)
                                                                                             throws Exception {
-        byte[] keyBytes = Base64.decodeBase64(publicKey);
+        byte[] keyBytes = org.apache.commons.net.util.Base64.decodeBase64(publicKey);
         X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
         PublicKey publicK = keyFactory.generatePublic(keySpec);
@@ -129,7 +129,7 @@ public class RSA {
         Signature signature = Signature.getInstance(SIGNATURE_ALGORITHM);
         signature.initVerify(publicK);
         signature.update(getContentBytes(text, charset));
-        return signature.verify(Base64.decodeBase64(sign));
+        return signature.verify(org.apache.commons.net.util.Base64.decodeBase64(sign));
 
 
     }

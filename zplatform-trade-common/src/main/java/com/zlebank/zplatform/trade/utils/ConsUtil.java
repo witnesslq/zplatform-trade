@@ -123,6 +123,10 @@ public class ConsUtil {
 			cons.setChanpay_input_charset(prop.getProperty("chanpay_input_charset","UTF-8"));
 			cons.setChanpay_version(prop.getProperty("chanpay_version","1.0"));
 			cons.setChanpay_sign_type(prop.getProperty("chanpay_sign_type"));
+			cons.setChanpay_back_url(prop.getProperty("chanpay_back_url"));
+			cons.setChanpay_front_url(prop.getProperty("chanpay_front_url"));
+			cons.setChanpay_channel_code(prop.getProperty("chanpay_channel_code"));
+			cons.setChanpay_partner_name(prop.getProperty("chanpay_partner_name"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

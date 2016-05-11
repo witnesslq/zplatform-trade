@@ -70,6 +70,7 @@ public class ConsumeAccounting implements IAccounting{
                 String channelId = txnsLog.getPayinst();//支付机构代码
                 if("99999999".equals(channelId)){
                     busiCode = "10000002";
+                    payMemberId = txnsLog.getPayfirmerno();
                 }else {
                     busiCode = "10000001";
                 }

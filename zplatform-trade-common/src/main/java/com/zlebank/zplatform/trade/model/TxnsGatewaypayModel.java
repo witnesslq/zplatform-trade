@@ -43,6 +43,9 @@ public class TxnsGatewaypayModel implements java.io.Serializable {
 	private String payretcode;
 	private String payretinfo;
 	private String payrettxnseqno;
+	private String bankcode;
+	private String closetime;
+	
 	// Constructors
 
 	/** default constructor */
@@ -324,6 +327,36 @@ public class TxnsGatewaypayModel implements java.io.Serializable {
     public void setPayrettxnseqno(String payrettxnseqno) {
         this.payrettxnseqno = payrettxnseqno;
     }
+
+	/**
+	 * @return the bankcode
+	 */
+	public String getBankcode() {
+		return bankcode;
+	}
+
+	/**
+	 * @param bankcode the bankcode to set
+	 */
+	@Column(name = "BANKCODE")
+	public void setBankcode(String bankcode) {
+		this.bankcode = bankcode;
+	}
+
+	/**
+	 * @return the closetime
+	 */
+	public String getClosetime() {
+		return closetime;
+	}
+
+	/**
+	 * @param closetime the closetime to set
+	 */
+	@Column(name = "CLOSETIME")
+	public void setClosetime(String closetime) {
+		this.closetime = closetime;
+	}
 
 	
 }

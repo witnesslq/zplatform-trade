@@ -10,6 +10,7 @@
  */
 package com.zlebank.zplatform.trade.controller;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.alibaba.fastjson.JSON;
+import com.zlebank.zplatform.acc.pojo.Money;
+import com.zlebank.zplatform.trade.bean.chanpay.ChanPayOrderBean;
 import com.zlebank.zplatform.trade.chanpay.bean.file.FeeTradeFileBean;
 import com.zlebank.zplatform.trade.chanpay.bean.file.PayTradeFileBean;
 import com.zlebank.zplatform.trade.chanpay.bean.file.ReceiptBean;
@@ -32,9 +35,12 @@ import com.zlebank.zplatform.trade.chanpay.bean.order.BatchOrderBean;
 import com.zlebank.zplatform.trade.chanpay.bean.order.OrderItemBean;
 import com.zlebank.zplatform.trade.chanpay.bean.order.SingleOrderBean;
 import com.zlebank.zplatform.trade.chanpay.utils.RSA;
+import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.service.IGateWayService;
+import com.zlebank.zplatform.trade.service.ITxnsGatewaypayService;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
 import com.zlebank.zplatform.trade.utils.ConsUtil;
+
 
 
 /**
@@ -53,23 +59,32 @@ public class ChanPayController {
 	private ITxnsLogService txnsLogService;
 	@Autowired
 	private IGateWayService gateWayService;
+	@Autowired
+	private ITxnsGatewaypayService txnsGatewaypayService;
 	
 	@RequestMapping("/createOrder")
 	public ModelAndView createOrder(@RequestParam String txnseqno,@RequestParam String bankcode){
-		//TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(txnseqno);
+		TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(txnseqno);
 		Map<String, Object> model = new HashMap<String, Object>();
-		
 		SingleOrderBean orderBean = new SingleOrderBean();
 		orderBean.setVersion(ConsUtil.getInstance().cons.getChanpay_version());
 		orderBean.setPartner_id(ConsUtil.getInstance().cons.getChanpay_partner_id());
 		orderBean.set_input_charset(ConsUtil.getInstance().cons.getChanpay_input_charset());
 		orderBean.setIs_anonymous("Y");
-		orderBean.setBank_code("TESTBANK");
+		orderBean.setBank_code(bankcode);
 		orderBean.setOut_trade_no((UUID.randomUUID().toString()).replace("-", ""));
 		orderBean.setPay_method("1");
 		orderBean.setPay_type("C,DC");
 		orderBean.setService("cjt_create_instant_trade");
-		orderBean.setTrade_amount("100.00");
+		orderBean.setTrade_amount(Money.valueOf(new BigDecimal(txnsLog.getAmount())).toYuan());
+		
+		ChanPayOrderBean chanPayOrderBean = new ChanPayOrderBean();
+		chanPayOrderBean.setBank_code(orderBean.getBank_code());
+		chanPayOrderBean.setOut_trade_no(orderBean.getOut_trade_no());
+		chanPayOrderBean.setPay_method(orderBean.getPay_method());
+		chanPayOrderBean.setPay_type(orderBean.getPay_type());
+		chanPayOrderBean.setTrade_amount(orderBean.getTrade_amount());
+		
 		
 		try {
 			String sign = RSA.sign(buildParamter(orderBean), 
@@ -79,6 +94,8 @@ public class ChanPayController {
 			orderBean.setSign_type(ConsUtil.getInstance().cons.getChanpay_sign_type());
 			model.put("order", orderBean);
 			model.put("url", ConsUtil.getInstance().cons.getChanpay_url());
+			//保存畅捷支付订单信息
+			txnsGatewaypayService.saveChanPayGateWay(chanPayOrderBean);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -188,7 +205,7 @@ public class ChanPayController {
 			payTradeFileBean.setPartner_id(ConsUtil.getInstance().cons.getChanpay_partner_id());
 			payTradeFileBean.set_input_charset(ConsUtil.getInstance().cons.getChanpay_input_charset());
 			payTradeFileBean.setService("cjt_refund_trade_file");
-			payTradeFileBean.setTransDate("20160429");
+			payTradeFileBean.setTransDate("20160504");
 			String sign = RSA.sign(buildParamter(payTradeFileBean), ConsUtil.getInstance().cons.getChanpay_private_key(), ConsUtil.getInstance().cons.getChanpay_input_charset());
 			payTradeFileBean.setSign(sign);
 			payTradeFileBean.setSign_type(ConsUtil.getInstance().cons.getChanpay_sign_type());
@@ -209,7 +226,7 @@ public class ChanPayController {
 			payTradeFileBean.setPartner_id(ConsUtil.getInstance().cons.getChanpay_partner_id());
 			payTradeFileBean.set_input_charset(ConsUtil.getInstance().cons.getChanpay_input_charset());
 			payTradeFileBean.setService("cjt_fee_trade_file");
-			payTradeFileBean.setTransDate("20160503");
+			payTradeFileBean.setTransDate("20160506");
 			String sign = RSA.sign(buildParamter(payTradeFileBean), ConsUtil.getInstance().cons.getChanpay_private_key(), ConsUtil.getInstance().cons.getChanpay_input_charset());
 			payTradeFileBean.setSign(sign);
 			payTradeFileBean.setSign_type(ConsUtil.getInstance().cons.getChanpay_sign_type());
@@ -244,4 +261,6 @@ public class ChanPayController {
 	        System.out.println("prestr:"+prestr);
 		return prestr;
 	}
+	
+	
 }

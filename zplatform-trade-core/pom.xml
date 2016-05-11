@@ -49,7 +49,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.zlebank.zplatform</groupId>
-			<artifactId>zplatfrom-trade-chanpay</artifactId>
+			<artifactId>zplatform-trade-chanpay</artifactId>
 			<version>1.3.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>

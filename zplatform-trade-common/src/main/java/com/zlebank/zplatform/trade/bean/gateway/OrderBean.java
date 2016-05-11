@@ -52,7 +52,7 @@ public class OrderBean implements Serializable{
     private String merId="";
     @Length(max=40,message="param.error.merName")
     private String merName="";
-    @Length(max=16,message="param.error.merAbbr")
+    @Length(max=40,message="param.error.merAbbr")
     private String merAbbr="";
     @NotEmpty(message="param.empty.orderId")
     @Length(max=32,message="param.error.orderId")

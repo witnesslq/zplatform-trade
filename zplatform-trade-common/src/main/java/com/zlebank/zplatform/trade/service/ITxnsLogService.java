@@ -117,9 +117,9 @@ public interface ITxnsLogService extends IBaseService<TxnsLogModel, String>{
     
     public List<?> getAllMemberByDate(String date);
     public List<?> getAllMemberByDateByCharge(String date);
-    public List<?> getCountExpenseAndRecharge(String memberId,String date);
+    public List<?> getSumExpense(String memberId,String date);
     public List<?>  getAllMemberDetailedByDate(String memberId,String date);
-    public List<?> getCountRefundAndPay(String memberId,String date);
+    public List<?> getSumRefund(String memberId,String date);
     public List<?> getCountSpendingAccount(String memberId,String date);
     public List<?> getCountHandPay(String memberId,String date);
     

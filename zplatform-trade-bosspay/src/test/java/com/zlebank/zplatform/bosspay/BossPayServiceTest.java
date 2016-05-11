@@ -45,7 +45,7 @@ public class BossPayServiceTest {
 
 	@Autowired
 	private BossPayService bossPayService;
-	//@Test
+	@Test
 	public void test_BossPayService(){
 		TradeBean trade = new TradeBean();
 		trade.setCardNo("6217994280006898308");
@@ -74,7 +74,7 @@ public class BossPayServiceTest {
 	public void test_insteadpayquery(){
 		bossPayService.queryRealInsteadPay("MS04201604210000000000000015");
 	}
-	@Test
+	//@Test
 	public void test_batchInsteadPay(){
 		BtchpmtItemBean itemBean = new BtchpmtItemBean(DateUtil.getCurrentDateTime()+"1",
 				"6217994280006898308", 

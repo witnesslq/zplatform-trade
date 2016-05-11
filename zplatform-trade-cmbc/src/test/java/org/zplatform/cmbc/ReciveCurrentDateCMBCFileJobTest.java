@@ -19,7 +19,7 @@ public class ReciveCurrentDateCMBCFileJobTest {
     public void init(){
         context = new ClassPathXmlApplicationContext("CmbcContextTest.xml");
         reciveCurrentDateCMBCFileJob = (ReciveCurrentDateCMBCFileJob) context.getBean("reciveCurrentDateCMBCFileJob");
-       // insteadPayAccountingJob = (InsteadPayAccountingJob) context.getBean("insteadPayAccountingJob");
+        // insteadPayAccountingJob = (InsteadPayAccountingJob) context.getBean("insteadPayAccountingJob");
     }
     @Test
     public void testJob() {
