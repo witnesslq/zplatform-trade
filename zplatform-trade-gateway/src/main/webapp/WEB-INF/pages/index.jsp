@@ -85,7 +85,7 @@ String path = request.getContextPath();
 
 					
 					<a name="a_pay_type" href="javascript:selectPay(1);" id="a_fast" class="cur"><span>快捷支付</span></a>
-					<!-- <a name="a_pay_type" href="javascript:selectPay(2);" id="a_bank"><span>网银支付</span></a> -->
+					<a name="a_pay_type" href="javascript:selectPay(2);" id="a_bank"><span>网银支付</span></a>
 					<c:if test="${memberId!=''&&memberId!='999999999999999' }">
 						<c:if test="${busitype!='2000' }">
 							<a name="a_pay_type" href="javascript:selectPay(3);" id="a_acct"><span>账户支付</span></a>
@@ -133,6 +133,20 @@ String path = request.getContextPath();
 								$("#bankpay_").show();
 								$("#fastpay_").hide();
 								$("#accountpay_").hide();
+								
+								$.ajax({
+									type: "POST",
+								  	url: "/zplatform-trade/gateway/showBankList",
+								 	dataType: "json",
+								 	success:function(json){
+								 		var html = "<option value=''>--请选择银行--</option>";
+								 		$.each(json, function(key,value){
+								   			html += '<option value="'+value.inst_code+'">'+value.inst_name+'</option>';
+										})
+								 		$("#netbank_select").html(html);
+								 	}
+								});
+								
 							}else if(num==1){
 								
 								
@@ -271,36 +285,32 @@ String path = request.getContextPath();
 						<div id="bankpay_" style="display:none;">
 						<!--网银支付 -->
 						<form method="post" action="/zplatform-trade/gateway/toNetBank.htm?txnseqno_=${txnseqno }">
+							<input type="hidden" value="0" name="balance" id="balance"/>
+								<input type="hidden" value="bindingpay" name="payFlag"/>
+							<input type="hidden" value="${orderId }" name="orderId"/>
 							<input type="hidden" value="${txnAmt }" name="amount" />
 							<input type="hidden" value="${txnseqno }" name="txnseqno"/>
 							<input type="hidden" value="${merchId }" name="merchId"/>
-							<input type="hidden" value="ZXC00001" name="cashCode"/>
+							<input type="hidden" value="ZLC00001" name="cashCode"/>
 							<input type="hidden" value="${busicode }" name="busicode"/>
+							<input type="hidden" value="${goodsName }" name="goodsName"/>
 							<input type="hidden" value="${merchName }" name="merchName"/>
 							<input type="hidden" value="${subMerName }" name="subMerName" />
+							<input type="hidden" value="${memberId }" name="merUserId" />
 							<input type="hidden" value="${busitype }" name="busitype" />
 							<input type="hidden" value="${memberIP }" name="memberIP" />
 							<input type="hidden" value="${tn }" name="tn" />
 							<ul class="mod_list">
-								<li class="pt20"><label class="mod_side">应付总价：</label> <strong class="red f14">${order.txnAmt/100.00 }</strong> 元</li>
+								<li class="pt20"><label class="mod_side">应付总价：</label> <strong class="red f14">${amount_y }</strong> 元</li>
 								<li class="checkBankInfo"><label class="mod_side2">请选择银行：</label>
 									<p class="myWay">
-										<span id="myWay"> <label class="bk china_citic bank_cur" title="中国建设银行"></label>
-										</span>
+										<select name="bankCode" id="netbank_select">
+											<option value="">--请选择银行--</option>
+											<option value="TESTBANK">测试银行</option>
+										</select>
 									</p>
                                     </li>
-									<div id="other-bank2" class="other-bank2">
-										<div class="select-banklist per">
-											<ul>
-												<li><input type="radio" name="bankCode" value="0302"
-													checked="" id="ecitic001_radio"> <label
-													id="ecitic001" for="ecitic001_radio" class="bk china_citic"
-													title="中信银行"></label>
-											</li>
-											</ul>
-											<!-- -->
-										</div>
-									</div>
+									
 								<li class="submit">
 									<button class="btn btnA" type="submit">去网上银行支付</button></li>
 							</ul>

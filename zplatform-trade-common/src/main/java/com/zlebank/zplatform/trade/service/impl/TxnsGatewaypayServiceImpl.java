@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.zlebank.zplatform.acc.pojo.Money;
 import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.chanpay.ChanPayOrderBean;
@@ -83,12 +84,13 @@ public class TxnsGatewaypayServiceImpl extends BaseServiceImpl<TxnsGatewaypayMod
 	public void saveChanPayGateWay(ChanPayOrderBean orderBean)
 			throws TradeException {
 		TxnsGatewaypayModel txnsGateway = new  TxnsGatewaypayModel();
+		txnsGateway.setId(1L);
 		txnsGateway.setInstitution(ConsUtil.getInstance().cons.getChanpay_channel_code());
 		txnsGateway.setPayorderno(orderBean.getOut_trade_no());
-		txnsGateway.setPayamt(Long.valueOf(orderBean.getTrade_amount()));
+		txnsGateway.setPayamt(Money.yuanValueOf(Double.valueOf(orderBean.getTrade_amount())).getAmount().longValue());
 		txnsGateway.setPaycommtime(DateUtil.getCurrentDateTime());
 		txnsGateway.setRelatetradetxn(orderBean.getTxnseqno());
-		txnsGateway.setFirmembername(ConsUtil.getInstance().cons.getChanpay_partner_id());
+		txnsGateway.setFirmemberno(ConsUtil.getInstance().cons.getChanpay_partner_id());
 		txnsGateway.setFirmembername(ConsUtil.getInstance().cons.getChanpay_partner_name());
 		txnsGateway.setPaynum(1L);
 		txnsGateway.setPaycode(orderBean.getPay_method());
@@ -96,7 +98,7 @@ public class TxnsGatewaypayServiceImpl extends BaseServiceImpl<TxnsGatewaypayMod
 		txnsGateway.setBankcode(orderBean.getBank_code());
 		txnsGateway.setStatus("01");//支付中
 		txnsGateway.setBankcode(orderBean.getBank_code());
-		super.update(txnsGateway);
+		save(txnsGateway);
 	}
 	
 	

@@ -10,6 +10,7 @@
  */
 package com.zlebank.zplatform.trade.controller;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,15 +19,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.acc.pojo.Money;
+import com.zlebank.zplatform.commons.utils.DateUtil;
+import com.zlebank.zplatform.trade.bean.PayPartyBean;
+import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.chanpay.ChanPayOrderBean;
+import com.zlebank.zplatform.trade.chanpay.bean.async.RefundAsyncResultBean;
+import com.zlebank.zplatform.trade.chanpay.bean.async.TradeAsyncResultBean;
 import com.zlebank.zplatform.trade.chanpay.bean.file.FeeTradeFileBean;
 import com.zlebank.zplatform.trade.chanpay.bean.file.PayTradeFileBean;
 import com.zlebank.zplatform.trade.chanpay.bean.file.ReceiptBean;
@@ -35,7 +46,10 @@ import com.zlebank.zplatform.trade.chanpay.bean.order.BatchOrderBean;
 import com.zlebank.zplatform.trade.chanpay.bean.order.OrderItemBean;
 import com.zlebank.zplatform.trade.chanpay.bean.order.SingleOrderBean;
 import com.zlebank.zplatform.trade.chanpay.utils.RSA;
+import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
+import com.zlebank.zplatform.trade.model.TxnsOrderinfoModel;
+import com.zlebank.zplatform.trade.service.ChanPayAsyncService;
 import com.zlebank.zplatform.trade.service.IGateWayService;
 import com.zlebank.zplatform.trade.service.ITxnsGatewaypayService;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
@@ -54,7 +68,9 @@ import com.zlebank.zplatform.trade.utils.ConsUtil;
 @Controller
 @RequestMapping("/chanpay")
 public class ChanPayController {
-	
+	private static final Log log =  LogFactory.getLog(ChanPayController.class);
+	@Autowired
+    private ChanPayAsyncService chanPayAsyncService;
 	@Autowired
 	private ITxnsLogService txnsLogService;
 	@Autowired
@@ -84,7 +100,7 @@ public class ChanPayController {
 		chanPayOrderBean.setPay_method(orderBean.getPay_method());
 		chanPayOrderBean.setPay_type(orderBean.getPay_type());
 		chanPayOrderBean.setTrade_amount(orderBean.getTrade_amount());
-		
+		chanPayOrderBean.setTxnseqno(txnseqno);
 		
 		try {
 			String sign = RSA.sign(buildParamter(orderBean), 
@@ -96,6 +112,19 @@ public class ChanPayController {
 			model.put("url", ConsUtil.getInstance().cons.getChanpay_url());
 			//保存畅捷支付订单信息
 			txnsGatewaypayService.saveChanPayGateWay(chanPayOrderBean);
+			//更新订单状态
+			TxnsOrderinfoModel orderinfo = gateWayService.getOrderinfoByOrderNoAndMemberId(txnsLog.getAccordno(), txnsLog.getAccfirmerno());
+			orderinfo.setStatus("02");
+			gateWayService.update(orderinfo);
+			//更新交易流水状态
+			PayPartyBean payPartyBean = new PayPartyBean();
+			payPartyBean.setTxnseqno(txnseqno);
+			payPartyBean.setPaytype("02");
+			payPartyBean.setPayordno(orderBean.getOut_trade_no());
+			payPartyBean.setPayinst(ConsUtil.getInstance().cons.getChanpay_channel_code());
+			payPartyBean.setPayfirmerno(ConsUtil.getInstance().cons.getChanpay_partner_id());
+			payPartyBean.setPayordcomtime(DateUtil.getCurrentDateTime());
+			txnsLogService.updatePayInfo_Fast(payPartyBean);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -262,5 +291,65 @@ public class ChanPayController {
 		return prestr;
 	}
 	
+	@RequestMapping("/reciveChanPay")
+    @ResponseBody
+    public String reciveChanPay(TradeAsyncResultBean tradeAsyncResultBean,HttpServletResponse response ) {
+	    try {
+			log.info("chanpay data :" + JSON.toJSONString(tradeAsyncResultBean));
+			ResultBean dealWithTradeAsync = chanPayAsyncService.dealWithTradeAsync(tradeAsyncResultBean);
+			if(dealWithTradeAsync.isResultBool()){
+				response.setContentType("text/html");
+				response.setCharacterEncoding("utf-8");
+				response.getWriter().print("success");
+				response.getWriter().flush();
+				response.getWriter().close();
+			}else{
+				
+			}
+			/*response.setContentType("text/html");
+			response.setCharacterEncoding("utf-8");
+			response.getWriter().print("success");
+			response.getWriter().flush();
+			response.getWriter().close();*/
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TradeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+   
+	    return "";
+    }
 	
+	@RequestMapping("/reciveRefundChanPay")
+    @ResponseBody
+    public String reciveRefundChanPay(RefundAsyncResultBean tradeAsyncResultBean,HttpServletResponse response ) {
+	    try {
+			log.info("chanpay data :" + JSON.toJSONString(tradeAsyncResultBean));
+			ResultBean dealWithTradeAsync = chanPayAsyncService.dealWithRefundAsync(tradeAsyncResultBean);
+			if(dealWithTradeAsync.isResultBool()){
+				response.setContentType("text/html");
+				response.setCharacterEncoding("utf-8");
+				response.getWriter().print("success");
+				response.getWriter().flush();
+				response.getWriter().close();
+			}else{
+				
+			}
+			/*response.setContentType("text/html");
+			response.setCharacterEncoding("utf-8");
+			response.getWriter().print("success");
+			response.getWriter().flush();
+			response.getWriter().close();*/
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TradeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+   
+	    return "";
+    }
 }

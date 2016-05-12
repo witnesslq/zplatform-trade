@@ -1,4 +1,4 @@
-package com.zlebank.zplatfrom.trade.chanpay;
+package com.zlebank.zplatform.trade.chanpay;
 
 import java.util.HashMap;
 import java.util.Map;

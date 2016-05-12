@@ -253,6 +253,13 @@ public class PayPartyBean implements Serializable{
     public void setCashCode(String cashCode) {
         this.cashCode = cashCode;
     }
+	/**
+	 * 
+	 */
+	public PayPartyBean() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
     
     
     

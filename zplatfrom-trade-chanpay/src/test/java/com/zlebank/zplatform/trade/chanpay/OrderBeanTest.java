@@ -8,7 +8,7 @@
  * Copyright (c) 2016,zlebank.All rights reserved.
  * 
  */
-package com.zlebank.zplatfrom.trade.chanpay;
+package com.zlebank.zplatform.trade.chanpay;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,7 +47,7 @@ public class OrderBeanTest {
 	@Autowired
 	private ChanPayService chanPayService;
 
-	//@Test
+	@Test
 	public void test_order_sign() throws Exception{
 		String privateKey = "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAKHbwQ85YEd2IhKifQEzJNHAYDj29148+6lNg81mDOJ3s8F9xmThA8e7KFKYe0seUVal8+3VXe+XOHTKUgqhrmpRDc+DzRmK1QdeBFTliiryuG3ZIeaRITx9jLViEEPCXDbmSn5lNLeBjx5i1XBlpORQTrSAlXx7/R4axTp2lEMjAgMBAAECgYABlys6fxHXIe4LyNT5ogsGlKFdbe/YWTkP3NciuZH+17ZIfHfqndtvpwMqbJ0pi864z0CqYaJerFm9rA9KU3RnSwx0H9aPQAeTlW378pMy4+qLCq9YHCNHXemKKPW4KD1ExrBqsUl5raeZz4m1DNcPcuQtWr5/T7kFf0MxPsEEYQJBAMwskKFVQUVjSCQgyTvS61vYJb3/DN9iSmKNsZZZSmFze00c39HeOd2dq6R7FMmcA6hkYU/i7+UKAGO/ZyMjdwUCQQDK8XmZ2TN3M+NlyY6e7LpgPoJzOy4sbHWbbkpa3kgaYSyCcXFgY59gpu2FTWdRQgFFeuxD1k2x2TCuzGGoZ5oHAkAts/QUCQ95RsYJQEWLXKVOg82+/+6Tul7IPMt5yjb6JW1+T25SfhoZ34diZCK9Fm1DLmUSCsyESn7X1SpzFSc5AkEAj3wrfZsTyDPnkw/uxm6ZV3LayJ4PB1mnzT0tVRHT6NLLpW6Pupa1GKDtTlJrugfw3i8K3OuoAxaMVQosAeU+AQJATuPYAz1UPBhEVLlXANsSLixcHFOh3LjXhYsB9V8kwHH8BKn5enaALeyyHMEQ5HPa+hCRxu/gI4E7+TFjHjvfSQ==";
 		
@@ -56,7 +56,7 @@ public class OrderBeanTest {
 		orderBean.setPartner_id(ConsUtil.getInstance().cons.getChanpay_partner_id());
 		orderBean.set_input_charset(ConsUtil.getInstance().cons.getChanpay_input_charset());
 		orderBean.setIs_anonymous("Y");
-		orderBean.setBank_code("ICBC");
+		orderBean.setBank_code("TESTBANK");
 		orderBean.setOut_trade_no((UUID.randomUUID().toString()).replace("-", ""));
 		orderBean.setPay_method("1");
 		orderBean.setPay_type("C,DC");
@@ -88,7 +88,7 @@ public class OrderBeanTest {
 		
 	}
 	
-	@Test
+	//@Test
 	public void test_refund(){
 		RefundOrderBean refundOrderBean = new RefundOrderBean();
 		refundOrderBean.setVersion(ConsUtil.getInstance().cons.getChanpay_version());

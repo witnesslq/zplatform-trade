@@ -10,6 +10,8 @@
  */
 package com.zlebank.zplatform.trade.bean.enums;
 
+import com.zlebank.zplatform.trade.bean.chanpay.ChanPayOrderBean;
+
 
 /**
  * Class Description
@@ -25,6 +27,7 @@ public enum ChnlTypeEnum {
     TEST("TEST"),
     CMBCWITHHOLDING("CMBC"),
     BOSSPAY("boss"),
+    CHANPAY("chanpay"),
     UNKNOW("99");
    private String tradeType;
     

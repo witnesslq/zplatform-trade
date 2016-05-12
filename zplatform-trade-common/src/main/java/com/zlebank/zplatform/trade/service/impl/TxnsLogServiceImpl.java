@@ -107,10 +107,13 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
     @Transactional(propagation=Propagation.REQUIRES_NEW)
     public ResultBean updatePayInfo_Fast(PayPartyBean payPartyBean){
         TxnsLogModel txnsLog = getTxnsLogByTxnseqno(payPartyBean.getTxnseqno());
-        Map<String, Object> cardMap = getCardInfo(payPartyBean.getCardNo());
+        Map<String, Object> cardMap = null;
+        if(StringUtil.isNotEmpty(payPartyBean.getCardNo())){
+        	cardMap = getCardInfo(payPartyBean.getCardNo());
+        }
         String hql = "update TxnsLogModel set paytype=?,payordno=?,payinst=?,payfirmerno=?,payordcomtime=?,pan=?,cardtype=?,cardinstino=?,txnfee=? where txnseqno=?";
         super.updateByHQL(hql, new Object[]{"01",payPartyBean.getPayordno(),payPartyBean.getPayinst(),payPartyBean.getPayfirmerno(),payPartyBean.getPayordcomtime(),
-                    payPartyBean.getCardNo(),cardMap.get("TYPE").toString(),cardMap.get("BANKCODE").toString(),getTxnFee(txnsLog),payPartyBean.getTxnseqno()});
+                    payPartyBean.getCardNo(),cardMap==null?"":cardMap.get("TYPE")+"",cardMap==null?"":cardMap.get("BANKCODE")+"",getTxnFee(txnsLog),payPartyBean.getTxnseqno()});
         return null;
     }
     
@@ -155,10 +158,32 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
             resultBean = new ResultBean("success");
         } catch (Exception e) {
             resultBean = new ResultBean("RC33","业务处理失败");
-            log.error(e, e);
+            e.printStackTrace();
         }
         return resultBean;
     }
+    
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+    public ResultBean updateGateWayPayResult(PayPartyBean payPartyBean){
+    	TxnsLogModel txnsLog = getTxnsLogByTxnseqno(payPartyBean.getTxnseqno());
+    	txnsLog.setPayordcomtime(payPartyBean.getPayordfintime());
+    	txnsLog.setPayrettsnseqno(payPartyBean.getPayrettsnseqno());
+    	txnsLog.setPayretcode(payPartyBean.getPayretcode());
+    	txnsLog.setPayretinfo(payPartyBean.getPayretinfo());
+    	try {
+            PojoRspmsg msg = rspmsgDAO.getRspmsgByChnlCode(ChnlTypeEnum.CHANPAY,payPartyBean.getPayretcode());
+            txnsLog.setRetinfo(msg.getRspinfo());
+            txnsLog.setRetcode(msg.getWebrspcode());
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    	updateTxnsLog(txnsLog);
+    	return null;
+    }
+    
+    
+    
     @Transactional
     public ResultBean updateRoutInfo(String txnseqno,String routId,String currentStep,String cashCode){
         ResultBean resultBean =null;

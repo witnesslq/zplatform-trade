@@ -1,4 +1,4 @@
-package com.zlebank.zplatfrom.trade.chanpay;
+package com.zlebank.zplatform.trade.chanpay;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -37,13 +37,13 @@ public class TempTest {
 		origMap.put("_input_charset", charset);
 		origMap.put("is_anonymous", "Y");
 		origMap.put("bank_code", "TESTBANK");
-		origMap.put("request_no", (UUID.randomUUID().toString()).replace("-", ""));
+		origMap.put("out_trade_no", (UUID.randomUUID().toString()).replace("-", ""));
 		origMap.put("pay_method", "1");
 		origMap.put("pay_type", "C,DC");
-		origMap.put("service", "cjt_create_batch_instant_trade");
+		origMap.put("service", "cjt_create_instant_trade");
 		origMap.put("trade_amount", "20.00");
 		
-		List<OrderItemBean> itemList = new ArrayList<OrderItemBean>();
+		/*List<OrderItemBean> itemList = new ArrayList<OrderItemBean>();
 		OrderItemBean orderItem = new OrderItemBean();
 		orderItem.setOut_trade_no((UUID.randomUUID().toString()).replace("-", ""));
 		orderItem.setOrder_amount("10.00");
@@ -54,7 +54,7 @@ public class TempTest {
 		orderItem1.setSell_id_type("MEMBER_ID");
 		itemList.add(orderItem);
 		itemList.add(orderItem1);
-		origMap.put("prodInfo_list", JSON.toJSONString(itemList));
+		origMap.put("prodInfo_list", JSON.toJSONString(itemList));*/
 		
 		
 		try {

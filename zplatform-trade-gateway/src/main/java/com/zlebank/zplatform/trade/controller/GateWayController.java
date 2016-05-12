@@ -70,6 +70,9 @@ import com.zlebank.zplatform.trade.bean.gateway.QueryBean;
 import com.zlebank.zplatform.trade.bean.gateway.QueryResultBean;
 import com.zlebank.zplatform.trade.bean.gateway.RiskRateInfoBean;
 import com.zlebank.zplatform.trade.chanpay.bean.async.TradeAsyncResultBean;
+import com.zlebank.zplatform.trade.chanpay.bean.query.BankItemBean;
+import com.zlebank.zplatform.trade.chanpay.bean.query.QueryBankBean;
+import com.zlebank.zplatform.trade.chanpay.service.ChanPayService;
 import com.zlebank.zplatform.trade.cmbc.bean.gateway.CardMessageBean;
 import com.zlebank.zplatform.trade.cmbc.bean.gateway.InsteadPayMessageBean;
 import com.zlebank.zplatform.trade.cmbc.bean.gateway.WithholdingMessageBean;
@@ -173,7 +176,7 @@ public class GateWayController {
     @Autowired
     private AccEntryService accEntryService;
     @Autowired
-    private ChanPayAsyncService chanPayAsyncService;
+    private ChanPayService chanPayService;
     
     @RequestMapping("/coporder.htm")
     public ModelAndView pay(OrderBean order,HttpSession httpSession,HttpServletRequest request) {
@@ -964,15 +967,41 @@ public class GateWayController {
 
     @RequestMapping("/toNetBank.htm")
     public ModelAndView toBank(TradeBean trade) {
-        /*Map<String, Object> model = new HashMap<String, Object>();
+        Map<String, Object> model = new HashMap<String, Object>();
+        ChannelEnmu channelEnmu = ChannelEnmu.fromValue("91000001");
+        
+        switch (channelEnmu) {
+			case CHANPAYGATEWAY:
+				model.put("txnseqno", trade.getTxnseqno());
+				model.put("bankcode", trade.getBankCode());
+				return new ModelAndView("redirect:/chanpay/createOrder", model);
+			default:
+				break;
+		}
+        
+        
+        
+        
+        
         // 网关交易路由
-        ResultBean routResultBean = routeConfigService.getTransRout(
+        /*ResultBean routResultBean = routeConfigService.getTransRout(
                 DateUtil.getCurrentDateTime(), trade.getAmount(),
                 trade.getMerchId(), trade.getBusicode(), trade.getCardNo(),
                 trade.getCashCode());
         if (routResultBean.isResultBool()) {
             String routId = routResultBean.getResultObj().toString();
-            RoutBean routBean = routeProcessService.getFirstRoutStep(routId,
+            ChannelEnmu channelEnmu = ChannelEnmu.fromValue(routId);
+            
+            switch (channelEnmu) {
+				case CHANPAYGATEWAY:
+					model.put("txnseqno", trade.getTxnseqno());
+					model.put("bankcode", trade.getBankCode());
+					return new ModelAndView("redirect:/chanpay/createOrder", model);
+				default:
+					break;
+			}*/
+         
+            /*RoutBean routBean = routeProcessService.getFirstRoutStep(routId,
                     trade.getBusicode());
             IBankGateWay gateWay = BankGateWayFactory.getInstance()
                     .getBankGateWay(routBean.getChnlcode());
@@ -989,8 +1018,8 @@ public class GateWayController {
                         routBean.getTxncode_current());
                 payPartyBean.setCashCode(trade.getCashCode());
                 txnsLogService.updatePayInfo_ecitic(payPartyBean);
-            }
-        }*/
+            }*/
+       // }
 
         // 由bankcode来判断要走的银行网关
 
@@ -1537,28 +1566,16 @@ public class GateWayController {
     
     
     
-    @RequestMapping("/reciveChanPay")
+    @RequestMapping("/showBankList")
     @ResponseBody
-    public String reciveChanPay(TradeAsyncResultBean tradeAsyncResultBean,HttpServletResponse response ) {
-	    try {
-			log.info("chanpay data :" + JSON.toJSONString(tradeAsyncResultBean));
-			
-			ResultBean dealWithTradeAsync = chanPayAsyncService.dealWithTradeAsync(tradeAsyncResultBean);
-			
-			
-			response.setContentType("text/html");
-			response.setCharacterEncoding("utf-8");
-			response.getWriter().print("success");
-			response.getWriter().flush();
-			response.getWriter().close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (TradeException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-   
-	    return "";
+    public Object showBankList() {
+    	QueryBankBean queryTradeBean = new QueryBankBean();
+		queryTradeBean.setVersion(ConsUtil.getInstance().cons.getChanpay_version());
+		queryTradeBean.setPartner_id(ConsUtil.getInstance().cons.getChanpay_partner_id());
+		queryTradeBean.set_input_charset(ConsUtil.getInstance().cons.getChanpay_input_charset());
+		queryTradeBean.setService("cjt_get_paychannel");
+		queryTradeBean.setProduct_code("20201");
+		List<BankItemBean> queryBank = chanPayService.queryBank(queryTradeBean);
+	    return queryBank;
     }
 }
