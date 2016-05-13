@@ -59,7 +59,7 @@ public class TxnsRefundModel implements java.io.Serializable {
 	public TxnsRefundModel(WapRefundBean refundBean,String oldtxnseqno,String oldamount,String reltxnseqno) {
 	    this.id = OrderNumber.getInstance().generateID();
         this.refundorderno = OrderNumber.getInstance().generateRefundOrderNo();
-        this.oldorderno = refundBean.getOrigQryId();
+        this.oldorderno = refundBean.getOrigOrderId();
         this.oldtxnseqno = oldtxnseqno;
         this.merchno = refundBean.getVirtualId();
         this.memberid = refundBean.getMemberId();
