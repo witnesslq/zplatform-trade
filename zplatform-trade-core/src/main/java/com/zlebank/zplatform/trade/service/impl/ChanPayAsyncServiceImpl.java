@@ -111,13 +111,14 @@ public class ChanPayAsyncServiceImpl implements ChanPayAsyncService{
 	 * @throws TradeException
 	 */
 	@Override
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
 	public ResultBean dealWithRefundAsync(
 			RefundAsyncResultBean refundAsyncResultBean) throws TradeException {
 		//验签
 				boolean flag = chanPayService.asyncNotifyRefund(refundAsyncResultBean);
-				if(!flag){
+				/*if(!flag){
 					throw new TradeException("");//验签失败
-				}
+				}*/
 				//更新数据 网关流水
 				String out_trade_no = refundAsyncResultBean.getOuter_trade_no();
 				RefundStatusEnum tradeStatusEnum = RefundStatusEnum.fromValue(refundAsyncResultBean.getRefund_status());

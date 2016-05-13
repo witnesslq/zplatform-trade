@@ -42,7 +42,7 @@ public class TempTest {
 		origMap.put("pay_type", "C,DC");
 		origMap.put("service", "cjt_create_instant_trade");
 		origMap.put("trade_amount", "20.00");
-		
+		origMap.put("return_url", "http://58.30.231.28:8083/zplatform-trade/gateway/reciveSyncReaPay");
 		/*List<OrderItemBean> itemList = new ArrayList<OrderItemBean>();
 		OrderItemBean orderItem = new OrderItemBean();
 		orderItem.setOut_trade_no((UUID.randomUUID().toString()).replace("-", ""));

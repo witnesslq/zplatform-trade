@@ -35,7 +35,7 @@ public class WapRefundBean {
     private String bizType;// 产品类型
     private String channelType;// 渠道类型
     private String accessType;// 接入类型
-    private String origQryId;// 原始交易流水号
+    private String origOrderId;// 原始交易流水号
     private String txnAmt;// 交易金额
     private String orderDesc;// 退款描述
     private String refundType;// 退款方式
@@ -196,19 +196,20 @@ public class WapRefundBean {
     public void setAccessType(String accessType) {
         this.accessType = accessType;
     }
+   
     /**
-     * @return the origQryId
-     */
-    public String getOrigQryId() {
-        return origQryId;
-    }
-    /**
-     * @param origQryId the origQryId to set
-     */
-    public void setOrigQryId(String origQryId) {
-        this.origQryId = origQryId;
-    }
-    /**
+	 * @return the origOrderId
+	 */
+	public String getOrigOrderId() {
+		return origOrderId;
+	}
+	/**
+	 * @param origOrderId the origOrderId to set
+	 */
+	public void setOrigOrderId(String origOrderId) {
+		this.origOrderId = origOrderId;
+	}
+	/**
      * @return the txnAmt
      */
     public String getTxnAmt() {

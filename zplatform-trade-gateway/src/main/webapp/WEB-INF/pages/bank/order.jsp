@@ -26,6 +26,8 @@
 			<input type="hidden"  name="pay_type" value="${order.pay_type }">
 			<input type="hidden"  name="service" value="${order.service }">
 			<input type="hidden"  name="trade_amount" value="${order.trade_amount }">
+			<input type="hidden"  name="return_url" value="${order.return_url }">
+			<input type="hidden"  name="notify_url" value="${order.notify_url }">
 			<input type="hidden"  name="sign" value="${order.sign}">
 			<input type="hidden"  name="sign_type" value="${order.sign_type }">
 	    </td>

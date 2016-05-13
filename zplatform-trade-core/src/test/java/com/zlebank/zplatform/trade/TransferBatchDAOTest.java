@@ -12,10 +12,12 @@ import com.zlebank.zplatform.trade.bean.enums.BankTransferBatchOpenStatusEnum;
 import com.zlebank.zplatform.trade.dao.BankTransferBatchDAO;
 import com.zlebank.zplatform.trade.dao.TransferBatchDAO;
 import com.zlebank.zplatform.trade.model.PojoTranData;
+import com.zlebank.zplatform.trade.service.ChanPayAsyncService;
 
 public class TransferBatchDAOTest {
     private TransferBatchDAO transferBatchDAO;
     private BankTransferBatchDAO bankTransferBatchDAO;
+    private ChanPayAsyncService chanPayAsyncService;
 
     @Before
     public void init() {
@@ -23,6 +25,8 @@ public class TransferBatchDAOTest {
         transferBatchDAO = (TransferBatchDAO) context
                 .getBean("transferBatchDAO");
         bankTransferBatchDAO = (BankTransferBatchDAO) context
+                .getBean("bankTransferBatchDAO");
+        chanPayAsyncService = (ChanPayAsyncService) context
                 .getBean("bankTransferBatchDAO");
     }
 
@@ -35,9 +39,14 @@ public class TransferBatchDAOTest {
     }
 
     @Test
+    @Ignore
     public void testGetByTranBatchAndOpenStatus() {
         bankTransferBatchDAO.getByTranBatchAndOpenStatus(447,
                 BankTransferBatchOpenStatusEnum.OPEN);
 
+    }
+    
+    public void test_chanpay(){
+    	
     }
 }

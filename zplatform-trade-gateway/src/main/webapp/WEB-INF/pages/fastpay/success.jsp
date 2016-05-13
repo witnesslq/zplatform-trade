@@ -9,11 +9,11 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 <head>
 <meta charset="UTF-8">
 <title>证联_收银台</title>
-<link type="text/css" rel="stylesheet" href="<%=basePath %>css/style.css">
-<script type="text/javascript" src="<%=basePath %>js/jquery-ui.js"></script>
-<script type="text/javascript" src="<%=basePath %>js/jquery-1.11.2.js"></script>
-<script type="text/javascript" src="<%=basePath %>js/jscroller-0.4.js"></script>
-<script type="text/javascript" src="<%=basePath %>js/pay-dialog.js"></script>
+<link type="text/css" rel="stylesheet" href="/zplatform-trade/css/style.css">
+<script type="text/javascript" src="/zplatform-trade/js/jquery-ui.js"></script>
+<script type="text/javascript" src="/zplatform-trade/js/jquery-1.11.2.js"></script>
+<script type="text/javascript" src="/zplatform-trade/js/jscroller-0.4.js"></script>
+<script type="text/javascript" src="/zplatform-trade/js/pay-dialog.js"></script>
 </head>
 
 <body>

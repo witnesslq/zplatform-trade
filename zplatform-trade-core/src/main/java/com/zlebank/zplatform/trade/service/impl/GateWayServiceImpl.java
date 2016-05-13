@@ -883,7 +883,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         }
         
         
-        TxnsLogModel old_txnsLog = txnsLogService.queryLogByTradeseltxn(refundBean.getOrigQryId());
+        TxnsLogModel old_txnsLog = txnsLogService.queryLogByTradeseltxn(refundBean.getOrigOrderId());
         if(old_txnsLog==null){
             throw new TradeException("GW14");
         }

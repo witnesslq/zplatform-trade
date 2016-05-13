@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -36,6 +37,7 @@ import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.trade.bean.PayPartyBean;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.chanpay.ChanPayOrderBean;
+import com.zlebank.zplatform.trade.bean.gateway.OrderRespBean;
 import com.zlebank.zplatform.trade.chanpay.bean.async.RefundAsyncResultBean;
 import com.zlebank.zplatform.trade.chanpay.bean.async.TradeAsyncResultBean;
 import com.zlebank.zplatform.trade.chanpay.bean.file.FeeTradeFileBean;
@@ -48,12 +50,15 @@ import com.zlebank.zplatform.trade.chanpay.bean.order.SingleOrderBean;
 import com.zlebank.zplatform.trade.chanpay.utils.RSA;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
+import com.zlebank.zplatform.trade.model.TxnsNotifyTaskModel;
 import com.zlebank.zplatform.trade.model.TxnsOrderinfoModel;
 import com.zlebank.zplatform.trade.service.ChanPayAsyncService;
 import com.zlebank.zplatform.trade.service.IGateWayService;
 import com.zlebank.zplatform.trade.service.ITxnsGatewaypayService;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
+import com.zlebank.zplatform.trade.service.ITxnsNotifyTaskService;
 import com.zlebank.zplatform.trade.utils.ConsUtil;
+import com.zlebank.zplatform.trade.utils.ObjectDynamic;
 
 
 
@@ -77,6 +82,8 @@ public class ChanPayController {
 	private IGateWayService gateWayService;
 	@Autowired
 	private ITxnsGatewaypayService txnsGatewaypayService;
+	@Autowired
+	private ITxnsNotifyTaskService txnsNotifyTaskService;
 	
 	@RequestMapping("/createOrder")
 	public ModelAndView createOrder(@RequestParam String txnseqno,@RequestParam String bankcode){
@@ -93,6 +100,8 @@ public class ChanPayController {
 		orderBean.setPay_type("C,DC");
 		orderBean.setService("cjt_create_instant_trade");
 		orderBean.setTrade_amount(Money.valueOf(new BigDecimal(txnsLog.getAmount())).toYuan());
+		orderBean.setNotify_url(ConsUtil.getInstance().cons.getChanpay_back_url());
+		orderBean.setReturn_url(ConsUtil.getInstance().cons.getChanpay_front_url()+"txnseqno="+txnseqno);
 		
 		ChanPayOrderBean chanPayOrderBean = new ChanPayOrderBean();
 		chanPayOrderBean.setBank_code(orderBean.getBank_code());
@@ -352,4 +361,33 @@ public class ChanPayController {
    
 	    return "";
     }
+	
+	@RequestMapping("/showChanPayResult.html")
+	public ModelAndView showChanPayResult(String txnseqno){
+		
+		Map<String, Object> model = null;
+		try {
+			model = new HashMap<String, Object>();
+			TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(txnseqno);
+			TxnsOrderinfoModel gatewayOrderBean = gateWayService
+			        .getOrderinfoByOrderNoAndMemberId(txnsLog.getAccordno(),txnsLog.getAccfirmerno());
+			ResultBean orderResp = gateWayService.generateRespMessage(txnsLog.getAccordno(),txnsLog.getAccfirmerno());
+			OrderRespBean respBean = (OrderRespBean) orderResp.getResultObj();
+			model.put("suburl", gatewayOrderBean.getFronturl() + "?"+ ObjectDynamic.generateReturnParamer(respBean, false, null));
+			model.put("errMsg", "交易完成");
+			model.put("respCode", "0000");
+			model.put("txnseqno", txnseqno);
+			// 记录同步发送的日志
+			TxnsNotifyTaskModel task = new TxnsNotifyTaskModel(
+			        gatewayOrderBean.getFirmemberno(),
+			        gatewayOrderBean.getRelatetradetxn(), 1, 1,
+			        ObjectDynamic.generateReturnParamer(respBean, false, null),
+			        "00", "200", gatewayOrderBean.getFronturl(), "2");
+			txnsNotifyTaskService.saveTask(task);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        return new ModelAndView("/fastpay/success", model);
+	}
 }
