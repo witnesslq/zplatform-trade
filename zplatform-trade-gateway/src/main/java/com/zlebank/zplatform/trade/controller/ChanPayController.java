@@ -97,7 +97,7 @@ public class ChanPayController {
 		orderBean.setIs_anonymous("Y");
 		orderBean.setBank_code(bankcode);
 		orderBean.setOut_trade_no((UUID.randomUUID().toString()).replace("-", ""));
-		orderBean.setPay_method("1");
+		orderBean.setPay_method("2");
 		orderBean.setPay_type("C,DC");
 		orderBean.setService("cjt_create_instant_trade");
 		orderBean.setTrade_amount(Money.valueOf(new BigDecimal(txnsLog.getAmount())).toYuan());
