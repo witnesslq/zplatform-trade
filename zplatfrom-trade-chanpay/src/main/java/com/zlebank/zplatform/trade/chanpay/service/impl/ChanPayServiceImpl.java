@@ -126,8 +126,14 @@ public class ChanPayServiceImpl implements ChanPayService {
 	public boolean asyncNotifyTrade(TradeAsyncResultBean tradeAsyncResultBean){
 		boolean testTrue = false;
 		try {
-			String msg = ChanPayUtil.generateParamer(tradeAsyncResultBean, true, new String[]{"sign","sign_type"});
-			testTrue = RSA.verify(msg, tradeAsyncResultBean.getSign(), ConsUtil.getInstance().cons.getChanpay_public_key(), "UTF-8");
+			
+			String sign = tradeAsyncResultBean.getSign();
+			//String sign_type = tradeAsyncResultBean.getSign_type();
+			tradeAsyncResultBean.setSign(null);
+			tradeAsyncResultBean.setSign_type(null);
+			String msg = buildParamter(tradeAsyncResultBean);
+					//ChanPayUtil.generateParamer(buildParamter(tradeAsyncResultBean), true, new String[]{"sign","sign_type"});
+			testTrue = RSA.verify(msg, sign, ConsUtil.getInstance().cons.getChanpay_public_key(), "UTF-8");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -138,8 +144,12 @@ public class ChanPayServiceImpl implements ChanPayService {
 	public boolean asyncNotifyRefund(RefundAsyncResultBean refundAsyncResultBean){
 		boolean flag = false;
 		try {
-			String msg = ChanPayUtil.generateParamer(refundAsyncResultBean, true, new String[]{"sign","sign_type"});
-			flag = RSA.verify(msg, refundAsyncResultBean.getSign(), ConsUtil.getInstance().cons.getChanpay_public_key(), "UTF-8");
+			String sign = refundAsyncResultBean.getSign();
+			//String sign_type = refundAsyncResultBean.getSign_type();
+			refundAsyncResultBean.setSign(null);
+			refundAsyncResultBean.setSign_type(null);
+			String msg = buildParamter(refundAsyncResultBean);
+			flag = RSA.verify(msg, sign, ConsUtil.getInstance().cons.getChanpay_public_key(), "UTF-8");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

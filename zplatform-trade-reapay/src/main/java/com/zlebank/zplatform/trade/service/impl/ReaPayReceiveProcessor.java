@@ -83,4 +83,15 @@ public class ReaPayReceiveProcessor implements ITradeReceiveProcessor{
             txnsLogService.updatePayInfo_Fast(payPartyBean);
             txnsLogService.updateReaPayRetInfo(tradeBean.getTxnseqno(), payResult);
     }
+	/**
+	 *
+	 * @param orderNo
+	 * @param memberId
+	 * @return
+	 */
+	@Override
+	public ResultBean generateAsyncRespMessage(String orderNo, String memberId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

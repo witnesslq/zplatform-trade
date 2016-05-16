@@ -27,7 +27,7 @@ public class RefundAsyncResultBean {
 	private String notify_type;// 通知类型
 	private String notify_time;// 通知时间
 	@JSONField(name="_input_charset")
-	private String _input_charset;// 参数字符集编码
+	private String _input_charset="UTF-8";// 参数字符集编码
 	private String sign;// 签名
 	private String sign_type;// 签名方式
 	private String version;// 版本号
@@ -38,6 +38,7 @@ public class RefundAsyncResultBean {
 	private String refund_amount;// 退款金额
 	private String refund_status;// 退款状态
 	private String gmt_refund;// 交易退款时间
+	private String extension="{}";
 	/**
 	 * @return the notify_id
 	 */
@@ -193,6 +194,18 @@ public class RefundAsyncResultBean {
 	 */
 	public void setGmt_refund(String gmt_refund) {
 		this.gmt_refund = gmt_refund;
+	}
+	/**
+	 * @return the extension
+	 */
+	public String getExtension() {
+		return extension;
+	}
+	/**
+	 * @param extension the extension to set
+	 */
+	public void setExtension(String extension) {
+		this.extension = extension;
 	}
 	
 	

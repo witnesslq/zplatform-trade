@@ -232,11 +232,13 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
              String privateKey= "";
              if("000204".equals(orderinfo.getBiztype())){
             	 privateKey = coopInstiService.getCoopInstiMK(orderinfo.getFirmemberno(), TerminalAccessType.WIRELESS).getZplatformPriKey();
-             }else if("000201".equals(orderinfo.getBiztype())){
+             }else if("000201".equals(orderinfo.getBiztype())||"000205".equals(orderinfo.getBiztype())){
             	 if("0".equals(orderinfo.getAccesstype())){
                  	privateKey = merchMKService.get(orderinfo.getSecmemberno()).getLocalPriKey().trim();
                  }else if("2".equals(orderinfo.getAccesstype())){
                  	privateKey = coopInstiService.getCoopInstiMK(orderinfo.getFirmemberno(), TerminalAccessType.MERPORTAL).getZplatformPriKey();
+                 }else if("1".equals(orderinfo.getAccesstype())){
+                	 privateKey = merchMKService.get(orderinfo.getSecmemberno()).getLocalPriKey().trim();
                  }
             	 //privateKey = merchMKService.get(orderinfo.getFirmemberno()).getLocalPriKey();
              }

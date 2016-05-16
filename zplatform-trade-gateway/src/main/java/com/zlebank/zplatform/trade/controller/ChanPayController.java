@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
@@ -101,7 +102,7 @@ public class ChanPayController {
 		orderBean.setService("cjt_create_instant_trade");
 		orderBean.setTrade_amount(Money.valueOf(new BigDecimal(txnsLog.getAmount())).toYuan());
 		orderBean.setNotify_url(ConsUtil.getInstance().cons.getChanpay_back_url());
-		orderBean.setReturn_url(ConsUtil.getInstance().cons.getChanpay_front_url()+"txnseqno="+txnseqno);
+		orderBean.setReturn_url(ConsUtil.getInstance().cons.getChanpay_front_url()+"?txnseqno="+txnseqno);
 		
 		ChanPayOrderBean chanPayOrderBean = new ChanPayOrderBean();
 		chanPayOrderBean.setBank_code(orderBean.getBank_code());
@@ -302,8 +303,10 @@ public class ChanPayController {
 	
 	@RequestMapping("/reciveChanPay")
     @ResponseBody
-    public String reciveChanPay(TradeAsyncResultBean tradeAsyncResultBean,HttpServletResponse response ) {
+    public String reciveChanPay(TradeAsyncResultBean tradeAsyncResultBean,HttpServletResponse response,HttpServletRequest request ) {
 	    try {
+	    	Map map = request.getParameterMap();
+	    	log.info("request data :" + JSON.toJSONString(map));
 			log.info("chanpay data :" + JSON.toJSONString(tradeAsyncResultBean));
 			ResultBean dealWithTradeAsync = chanPayAsyncService.dealWithTradeAsync(tradeAsyncResultBean);
 			if(dealWithTradeAsync.isResultBool()){
@@ -333,8 +336,10 @@ public class ChanPayController {
 	
 	@RequestMapping("/reciveRefundChanPay")
     @ResponseBody
-    public String reciveRefundChanPay(RefundAsyncResultBean tradeAsyncResultBean,HttpServletResponse response ) {
+    public String reciveRefundChanPay(RefundAsyncResultBean tradeAsyncResultBean,HttpServletResponse response,HttpServletRequest request ) {
 	    try {
+	    	Map map = request.getParameterMap();
+	    	log.info("request data :" + JSON.toJSONString(map));
 			log.info("chanpay data :" + JSON.toJSONString(tradeAsyncResultBean));
 			ResultBean dealWithTradeAsync = chanPayAsyncService.dealWithRefundAsync(tradeAsyncResultBean);
 			if(dealWithTradeAsync.isResultBool()){

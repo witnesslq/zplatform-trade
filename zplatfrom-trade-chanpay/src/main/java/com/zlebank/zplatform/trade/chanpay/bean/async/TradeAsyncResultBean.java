@@ -22,12 +22,13 @@ import com.alibaba.fastjson.annotation.JSONField;
  */
 public class TradeAsyncResultBean {
 
+	
 	// 基本参数
 	private String notify_id;// 通知 ID
 	private String notify_type;// 通知类型
 	private String notify_time;// 通知时间
 	@JSONField(name="_input_charset")
-	private String _input_charset;// 参数字符集编码
+	private String _input_charset="UTF-8";// 参数字符集编码
 	private String sign;// 签名
 	private String sign_type;// 签名方式
 	private String version;// 版本号
@@ -40,7 +41,7 @@ public class TradeAsyncResultBean {
 	private String gmt_create;// 交易创建时间
 	private String gmt_payment;// 交易支付时间
 	private String gmt_close;// 交易关闭时间
-	
+	private String extension="{}";
 	/**
 	 * @return the notify_id
 	 */
@@ -208,6 +209,18 @@ public class TradeAsyncResultBean {
 	 */
 	public void setGmt_close(String gmt_close) {
 		this.gmt_close = gmt_close;
+	}
+	/**
+	 * @return the extension
+	 */
+	public String getExtension() {
+		return extension;
+	}
+	/**
+	 * @param extension the extension to set
+	 */
+	public void setExtension(String extension) {
+		this.extension = extension;
 	}
 	
 	

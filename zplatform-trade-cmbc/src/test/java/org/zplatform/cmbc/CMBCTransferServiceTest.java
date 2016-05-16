@@ -8,14 +8,17 @@ import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.cmbc.service.ICMBCTransferService;
 import com.zlebank.zplatform.trade.model.PojoRealnameAuth;
+import com.zlebank.zplatform.trade.service.ITradeReceiveProcessor;
 
 public class CMBCTransferServiceTest {
     
     private ApplicationContext context;
     private ICMBCTransferService cmbcTransferService;
+    private ITradeReceiveProcessor tradeReceiveProcessor;
     public void init(){
         context = new ClassPathXmlApplicationContext("CmbcContextTest.xml");
         cmbcTransferService = (ICMBCTransferService) context.getBean("cmbcTransferService");
+        tradeReceiveProcessor = (ITradeReceiveProcessor) context.getBean("cmbcQuickReceiveProcessor");
     }
     
     public void testJob() { 
@@ -37,10 +40,17 @@ public class CMBCTransferServiceTest {
             e.printStackTrace();
         }
     }
-    @Test
+   
     public void testInnerPay(){
         init();
         ResultBean resultBean = cmbcTransferService.batchTransfer(52L);
         JSON.toJSONString(resultBean);
+    }
+    @Test
+    public void test_async(){
+    	init();
+    	//200000000000685
+    	//GoodBrother20160513185623
+    	tradeReceiveProcessor.generateAsyncRespMessage("GoodBrother20160513185623", "300000000000004");
     }
 }
