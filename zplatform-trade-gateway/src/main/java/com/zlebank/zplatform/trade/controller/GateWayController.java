@@ -13,6 +13,7 @@ package com.zlebank.zplatform.trade.controller;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.PrivateKey;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -1461,8 +1462,10 @@ public class GateWayController {
                 model.put("txnseqno", tradeBean.getTxnseqno());
                 return new ModelAndView("/erro_gw", model);
             }
+            TxnsLogModel txnsLog = txnsLogService.get(orderinfo.getRelatetradetxn());
+            
             //验证提现密码
-            if(!gateWayService.validatePayPWD(orderinfo.getSecmemberno(), tradeBean.getPay_pwd(), MemberType.ENTERPRISE)){
+            if(!gateWayService.validatePayPWD(txnsLog.getAccmemberid(), tradeBean.getPay_pwd(), MemberType.INDIVIDUAL)){
             	model.put("errMsg", "支付密码错误");
                 model.put("respCode", "ZL34");
                 model.put("txnseqno", tradeBean.getTxnseqno());
@@ -1576,6 +1579,21 @@ public class GateWayController {
 		queryTradeBean.setService("cjt_get_paychannel");
 		queryTradeBean.setProduct_code("20201");
 		List<BankItemBean> queryBank = chanPayService.queryBank(queryTradeBean);
+		
+		List<BankItemBean> b2c_bank = new ArrayList<BankItemBean>();
+		List<BankItemBean> b2b_bank = new ArrayList<BankItemBean>();
+		for(BankItemBean bankItemBean : queryBank){
+			if("QPAY".equals(bankItemBean.getPay_mode())){
+				queryBank.remove(bankItemBean);
+			}
+			if("C".equals(bankItemBean.getCard_attribute())){
+				b2c_bank.add(bankItemBean);
+			}else if("B".equals(bankItemBean.getCard_attribute())){
+				b2b_bank.add(bankItemBean);
+			}
+		}
+		
+		
 	    return queryBank;
     }
 }
