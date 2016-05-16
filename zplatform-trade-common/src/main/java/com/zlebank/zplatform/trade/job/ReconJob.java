@@ -18,6 +18,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +46,7 @@ import com.zlebank.zplatform.trade.service.ITxnsLogService;
  * @date 2016年5月12日 下午5:19:58
  * @since 
  */
+@Service
 public class ReconJob {
 	private static final Log log = LogFactory.getLog(ReconJob.class);
 	
