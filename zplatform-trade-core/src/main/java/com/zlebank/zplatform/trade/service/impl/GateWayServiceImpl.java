@@ -1436,7 +1436,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             if("0".equals(orderinfo.getAccesstype())){
             	privateKey = merchMKService.get(orderinfo.getSecmemberno()).getLocalPriKey().trim();
             }else if("2".equals(orderinfo.getAccesstype())){
-            	privateKey = coopInstiService.getCoopInstiMK(orderinfo.getFirmemberno(), TerminalAccessType.MERPORTAL).getZplatformPriKey();
+            	privateKey = coopInstiService.getCoopInstiMK(orderinfo.getFirmemberno(), TerminalAccessType.MERPORTAL).getZplatformPriKey().trim();
             }
             return GateWayTradeAnalyzer.generateOrderResult(orderRespBean, privateKey);
         } catch (Exception e) {

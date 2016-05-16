@@ -1475,8 +1475,8 @@ public class GateWayController {
             
             TxnsWithdrawModel withdraw = new TxnsWithdrawModel(tradeBean);
             Map<String, Object> cardMap = routeConfigService.getCardInfo(tradeBean.getCardNo());
-            withdraw.setBankcode(cardMap.get("BANKCODE")+"");
-            withdraw.setBankname(cardMap.get("BANKNAME")+"");
+            //withdraw.setBankcode(cardMap.get("BANKCODE")+"");
+            //withdraw.setBankname(cardMap.get("BANKNAME")+"");
             //记录提现账务
             TradeInfo tradeInfo = new TradeInfo();
             tradeInfo.setBusiCode("30000001");
@@ -1486,7 +1486,7 @@ public class GateWayController {
             tradeInfo.setCharge(new BigDecimal(0));
             tradeInfo.setTxnseqno(orderinfo.getRelatetradetxn());
             //记录分录流水
-            accEntryService.accEntryProcess(tradeInfo);
+           // accEntryService.accEntryProcess(tradeInfo);
             if (StringUtil.isNotEmpty(tradeBean.getBindCardId())) {
                 /*QuickpayCustModel card = memberBankCardService.
                         .getCardByBindId(tradeBean.getBindCardId());

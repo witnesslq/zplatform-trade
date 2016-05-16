@@ -188,7 +188,7 @@
 				<div id="payType">
 					<div id="accountpay_">
 							<!--提现 -->
-							<form method="post" action="/zplatform-trade/gateway/withdraw.htm?txnseqno_=${txnseqno }">
+							<form method="post" action="/zplatform-trade/gateway/withdraw.htm?txnseqno_=${txnseqno }" id="withdraw_form">
 								<input type="hidden" value="0" name="balance" id="balance"/>
 								<input type="hidden" value="${orderId }" name="orderId">
 								<input type="hidden" value="${txnAmt }" name="amount" id="acct_amount"/>
@@ -201,7 +201,9 @@
 								<input type="hidden" value="${subMerName }" name="subMerName" />
 								<input type="hidden" value="${memberId }" name="merUserId" id="merUserId" />
 								<input type="hidden" value="${busitype }" name="busitype" />
-								<input type="hidden" name="acctName" id="acctName_withdraw" value=""/>
+								<input type="hidden" name="bankName" id="bankName"/>
+								<input type="hidden" name="cardNo" id="cardNo"/>
+								<input type="hidden" name="acctName" id="acctName" />
 								<ul class="mod_list">
 								<li>
 								</li>
@@ -218,7 +220,7 @@
 											    	<input type="hidden" name="bankCode_" id="radio_bank_${i.index}" value="${fn:substring(card.bankcode,0, 4)}"/>
 											    	<input type="hidden" name="bankCode_" id="radio_bank_${i.index}" value="${fn:substring(card.bankcode,0, 4)}"/>
 											    	<input type="hidden" name="bankName" value="${card.bankname }"/>
-											    	<input type="hidden" name="cardNo" value="${card.cardno }"/>
+											    	<input type="hidden" id="cardNo_${i.index }"  value="${card.cardno }"/>
 											    	<input type="hidden" name="acctName_${i.index}" value="${card.accname }"/>
 											    </label>
 											</c:if>
@@ -229,7 +231,7 @@
 											    	<span class="card-number">**${fn:substring(card.cardno,fn:length(card.cardno)-4, fn:length(card.cardno))} </span>
 											    	<input type="hidden" name="bankCode_" id="radio_bank_${i.index}" value="${fn:substring(card.bankcode,0, 4)}"/>
 											    	<input type="hidden" name="bankName" value="${card.bankname }"/>
-											    	<input type="hidden" name="cardNo" value="${card.cardno }"/>
+											    	<input type="hidden" id="cardNo_${i.index }"  value="${card.cardno }"/>
 											    	<input type="hidden" name="acctName_${i.index}" value="${card.accname }"/>
 											    </label>
 											</c:if>
@@ -251,7 +253,7 @@
 										<p id="errTip" style="display:none;"><span class="onError">支付密码输入错误,再错误3次后账户将被锁定</span></p>
 									</li>
 									<li class="submit">
-										<input id="btnPay" type="submit" class="btn btnOff" value="提现"/>
+										<input id="btnPay" type="button" class="btn btnOff" value="提现"/>
 									</li>
 								</ul>
 								
@@ -578,7 +580,16 @@ $("#btn_next").click(function(){
 	}
 })
 
-
+$("#btnPay").click(function(){
+	var index=$("#bank_form input:checked ").attr("index");
+	var bankName=$("#bankName_"+index).val();
+	var cardNo=$("#cardNo_"+index).val();
+	var acctName=$("#acctName_"+index).val();
+	$("#bankName").val(bankName);
+	$("#cardNo").val(cardNo);
+	$("#acctName").val(acctName);
+	$("#withdraw_form").submit();
+})
 function initBankPic(){
 	
 		var bankcode = $("#default_bank_code").val().substring(0,4);
