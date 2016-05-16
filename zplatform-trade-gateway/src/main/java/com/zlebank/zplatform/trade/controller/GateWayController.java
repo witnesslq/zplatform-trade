@@ -1475,8 +1475,8 @@ public class GateWayController {
             
             TxnsWithdrawModel withdraw = new TxnsWithdrawModel(tradeBean);
             Map<String, Object> cardMap = routeConfigService.getCardInfo(tradeBean.getCardNo());
-            withdraw.setBankcode(cardMap.get("BANKCODE").toString());
-            withdraw.setBankname(cardMap.get("BANKNAME").toString());
+            withdraw.setBankcode(cardMap.get("BANKCODE")+"");
+            withdraw.setBankname(cardMap.get("BANKNAME")+"");
             //记录提现账务
             TradeInfo tradeInfo = new TradeInfo();
             tradeInfo.setBusiCode("30000001");

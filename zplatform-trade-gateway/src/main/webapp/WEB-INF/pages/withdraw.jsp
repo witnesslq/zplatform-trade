@@ -201,6 +201,7 @@
 								<input type="hidden" value="${subMerName }" name="subMerName" />
 								<input type="hidden" value="${memberId }" name="merUserId" id="merUserId" />
 								<input type="hidden" value="${busitype }" name="busitype" />
+								<input type="hidden" name="acctName" id="acctName_withdraw" value=""/>
 								<ul class="mod_list">
 								<li>
 								</li>
@@ -218,7 +219,7 @@
 											    	<input type="hidden" name="bankCode_" id="radio_bank_${i.index}" value="${fn:substring(card.bankcode,0, 4)}"/>
 											    	<input type="hidden" name="bankName" value="${card.bankname }"/>
 											    	<input type="hidden" name="cardNo" value="${card.cardno }"/>
-											    	<input type="hidden" name="acctName" value="${card.accname }"/>
+											    	<input type="hidden" name="acctName_${i.index}" value="${card.accname }"/>
 											    </label>
 											</c:if>
 											<c:if test="${i.index!=0 }">
@@ -229,7 +230,7 @@
 											    	<input type="hidden" name="bankCode_" id="radio_bank_${i.index}" value="${fn:substring(card.bankcode,0, 4)}"/>
 											    	<input type="hidden" name="bankName" value="${card.bankname }"/>
 											    	<input type="hidden" name="cardNo" value="${card.cardno }"/>
-											    	<input type="hidden" name="acctName" value="${card.accname }"/>
+											    	<input type="hidden" name="acctName_${i.index}" value="${card.accname }"/>
 											    </label>
 											</c:if>
 										</c:forEach>
