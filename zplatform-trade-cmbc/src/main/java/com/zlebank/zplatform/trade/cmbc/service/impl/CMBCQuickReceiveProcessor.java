@@ -29,6 +29,7 @@ import com.zlebank.zplatform.trade.bean.PayPartyBean;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.TradeBean;
 import com.zlebank.zplatform.trade.bean.enums.TradeTypeEnum;
+import com.zlebank.zplatform.trade.bean.gateway.AnonOrderAsynRespBean;
 import com.zlebank.zplatform.trade.bean.gateway.OrderAsynRespBean;
 import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
 import com.zlebank.zplatform.trade.dao.RspmsgDAO;
@@ -228,6 +229,7 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
              String payCardIssueName="";// 支付卡名称
              String bindId="";// 绑定标识号
             
+             
              OrderAsynRespBean orderRespBean = new OrderAsynRespBean(version, encoding, certId, signature, signMethod, merId, orderId, txnType, txnSubType, bizType, accessType, txnTime, txnAmt, currencyCode, reqReserved, reserved, queryId, respCode, respMsg, settleAmt, settleCurrencyCode, settleDate, traceNo, traceTime, exchangeDate, exchangeRate, accNo, payCardType, payType, payCardNo, payCardIssueName, bindId);
              String privateKey= "";
              if("000204".equals(orderinfo.getBiztype())){
@@ -241,6 +243,11 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
                 	 privateKey = merchMKService.get(orderinfo.getSecmemberno()).getLocalPriKey().trim();
                  }
             	 //privateKey = merchMKService.get(orderinfo.getFirmemberno()).getLocalPriKey();
+             }
+             
+             if("000205".equals(orderinfo.getBiztype())){
+            	 AnonOrderAsynRespBean asynRespBean = new AnonOrderAsynRespBean(version, encoding, txnType, txnSubType, bizType, "00", orderinfo.getSecmembername(), orderId, txnTime, orderinfo.getPaytimeout(), txnAmt, settleCurrencyCode, orderinfo.getOrderdesc(), reserved, orderinfo.getStatus(), orderinfo.getTn(), respCode, respMsg);
+            	 return new ResultBean(generateAsyncOrderResult(asynRespBean, privateKey.trim()));
              }
             
             resultBean = new ResultBean(generateAsyncOrderResult(orderRespBean, privateKey.trim()));
@@ -256,6 +263,14 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
         String dataMsg = ObjectDynamic.generateParamer(orderAsyncRespBean, false, unParamstring).trim();
         byte[] data =  URLEncoder.encode(dataMsg,"utf-8").getBytes();
         orderAsyncRespBean.setSignature(URLEncoder.encode(RSAUtils.sign(data, privateKey),"utf-8"));
+        return orderAsyncRespBean;
+    }
+    
+    public AnonOrderAsynRespBean generateAsyncOrderResult(AnonOrderAsynRespBean orderAsyncRespBean,String privateKey) throws Exception{   
+        String[] unParamstring = {"signature"};
+        String dataMsg = ObjectDynamic.generateParamer(orderAsyncRespBean, false, unParamstring).trim();
+        byte[] data =  URLEncoder.encode(dataMsg,"utf-8").getBytes();
+        //orderAsyncRespBean.setSignature(URLEncoder.encode(RSAUtils.sign(data, privateKey),"utf-8"));
         return orderAsyncRespBean;
     }
     

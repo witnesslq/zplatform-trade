@@ -18,7 +18,7 @@ import com.zlebank.zplatform.trade.utils.OrderNumber;
  * TTxnsRefund entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "T_TXNS_REFUND", schema = "PAYSERVICE")
+@Table(name = "T_TXNS_REFUND")
 public class TxnsRefundModel implements java.io.Serializable {
 
 	// Fields
