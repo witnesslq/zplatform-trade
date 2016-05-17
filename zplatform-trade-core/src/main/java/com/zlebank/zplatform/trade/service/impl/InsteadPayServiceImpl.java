@@ -302,6 +302,7 @@ public class InsteadPayServiceImpl
             tradeInfo.setPayMemberId(detail.getMerId());
             tradeInfo.setPayToMemberId(detail.getMerId());
             tradeInfo.setPayToParentMemberId(detail.getMerId());
+            tradeInfo.setCoopInstCode(request.getCoopInstiId());
             try {
                 accEntryService.accEntryProcess(tradeInfo,EntryEvent.AUDIT_APPLY);
             } catch (AccBussinessException e) {

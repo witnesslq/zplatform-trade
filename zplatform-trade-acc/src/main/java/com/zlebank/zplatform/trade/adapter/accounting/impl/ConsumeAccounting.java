@@ -98,6 +98,7 @@ public class ConsumeAccounting implements IAccounting{
                 }
                 txnsLogService.updateAccBusiCode(txnseqno, busiCode);
                 TradeInfo tradeInfo = new TradeInfo(txnseqno, payordno, busiCode, payMemberId, payToMemberId, payToParentMemberId, channelId, productId, amount, commission, charge, amountD, amountE, isSplit);
+                tradeInfo.setCoopInstCode(txnsLog.getAccfirmerno());
                 /*tradeInfo.setPayordno(payordno);
                 tradeInfo.setTxnseqno(txnseqno);
                 tradeInfo.setAmount(amount);;

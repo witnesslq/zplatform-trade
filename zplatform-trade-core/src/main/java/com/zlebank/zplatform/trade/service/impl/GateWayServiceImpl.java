@@ -2206,6 +2206,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         }
         if(routResultBean.isResultBool()){
             String routId = routResultBean.getResultObj().toString();
+            //resultBean.setRoutId(routId);
             IQuickPayTrade quickPayTrade = null;
             try {
                 quickPayTrade = TradeAdapterFactory.getInstance().getQuickPayTrade(routId);
@@ -2231,6 +2232,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             //Long bindId=quickpayCustService.saveQuickpayCust(trade);
             //trade.setCardId(bindId);
             resultBean = quickPayTrade.bankSign(trade);
+            resultBean.setRoutId(routId);
         }
     	return resultBean;
     }

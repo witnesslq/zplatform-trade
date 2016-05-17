@@ -515,6 +515,7 @@ public class MerchCashController {
             tradeInfo.setAmount(new BigDecimal(withdraw.getAmount()));
             tradeInfo.setCharge(new BigDecimal(0));
             tradeInfo.setTxnseqno(orderinfo.getRelatetradetxn());
+            tradeInfo.setCoopInstCode(orderinfo.getFirmemberno());
             //记录分录流水
             accEntryService.accEntryProcess(tradeInfo,EntryEvent.AUDIT_APPLY);
             if (StringUtil.isNotEmpty(tradeBean.getBindCardId())) {

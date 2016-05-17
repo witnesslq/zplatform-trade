@@ -31,6 +31,8 @@ import com.zlebank.zplatform.trade.bean.enums.TransferBusiTypeEnum;
 import com.zlebank.zplatform.trade.dao.InsteadPayBatchDAO;
 import com.zlebank.zplatform.trade.dao.InsteadPayDetailDAO;
 import com.zlebank.zplatform.trade.model.PojoInsteadPayDetail;
+import com.zlebank.zplatform.trade.model.TxnsLogModel;
+import com.zlebank.zplatform.trade.service.ITxnsLogService;
 import com.zlebank.zplatform.trade.service.NotifyInsteadURLService;
 import com.zlebank.zplatform.trade.service.ObserverListService;
 import com.zlebank.zplatform.trade.service.UpdateInsteadService;
@@ -61,6 +63,8 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
     @Autowired
     private NotifyInsteadURLService notifyInsteadURLService;
     
+    @Autowired
+    private ITxnsLogService txnsLogService;
     /**
      *  更新状态和记账
      * @param data
@@ -86,12 +90,13 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
         }
         detail.setRespMsg(data.getResultMessage());
         insteadPayDetailDAO.merge(detail);
-        
+        TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(detail.getTxnseqno());
         TradeInfo tradeInfo = new TradeInfo();
         tradeInfo.setPayMemberId(detail.getMerId());
         tradeInfo.setAmount(new BigDecimal(detail.getAmt()));
         tradeInfo.setCharge(new BigDecimal(detail.getTxnfee()));
         tradeInfo.setTxnseqno(detail.getTxnseqno());
+        tradeInfo.setCoopInstCode(txnsLog.getAccfirmerno());
         EntryEvent entryEvent = null;
         if ("00".equals(data.getResultCode())) {
             tradeInfo.setBusiCode("70000002");

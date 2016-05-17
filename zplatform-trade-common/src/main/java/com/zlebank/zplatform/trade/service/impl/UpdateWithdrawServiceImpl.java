@@ -15,7 +15,6 @@ import java.math.BigDecimal;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
@@ -23,8 +22,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zlebank.zplatform.acc.bean.TradeInfo;
-import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
-import com.zlebank.zplatform.acc.exception.AccBussinessException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.trade.bean.UpdateData;
@@ -33,9 +30,10 @@ import com.zlebank.zplatform.trade.bean.enums.TransferBusiTypeEnum;
 import com.zlebank.zplatform.trade.bean.enums.WithdrawEnum;
 import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
 import com.zlebank.zplatform.trade.dao.ITxnsWithdrawDAO;
-import com.zlebank.zplatform.trade.dao.impl.TxnsWithdrawDAOImpl;
+import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.model.TxnsOrderinfoModel;
 import com.zlebank.zplatform.trade.model.TxnsWithdrawModel;
+import com.zlebank.zplatform.trade.service.ITxnsLogService;
 import com.zlebank.zplatform.trade.service.ObserverListService;
 import com.zlebank.zplatform.trade.service.UpdateSubject;
 import com.zlebank.zplatform.trade.service.UpdateWithdrawService;
@@ -58,7 +56,8 @@ public class UpdateWithdrawServiceImpl implements UpdateWithdrawService,UpdateSu
     private AccEntryService accEntryService;
     @Autowired
     private ITxnsOrderinfoDAO txnsOrderinfoDAO;
-    
+    @Autowired
+    private ITxnsLogService txnsLogService;
     /**
      *
      * @param event
@@ -100,6 +99,7 @@ public class UpdateWithdrawServiceImpl implements UpdateWithdrawService,UpdateSu
         	orderinfo.setStatus("03");
         	entryEvent = EntryEvent.TRADE_FAIL;
         }
+        TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(data.getTxnSeqNo());
         //更新订单信息
         txnsOrderinfoDAO.update(orderinfo);
         TradeInfo tradeInfo=new TradeInfo();
@@ -109,6 +109,7 @@ public class UpdateWithdrawServiceImpl implements UpdateWithdrawService,UpdateSu
         tradeInfo.setTxnseqno(withdrawModel.getTexnseqno());
         tradeInfo.setBusiCode(businessEnum.getBusiCode());
         tradeInfo.setChannelId(data.getChannelCode());
+        tradeInfo.setCoopInstCode(txnsLog.getAccfirmerno());
         try {
             accEntryService.accEntryProcess(tradeInfo,entryEvent);
         } catch (Exception e) {

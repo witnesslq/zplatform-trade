@@ -100,6 +100,7 @@ public class ChargeAccounting implements IAccounting{
             txnsLogService.updateAccBusiCode(txnseqno, busiCode);
             TradeInfo tradeInfo = new TradeInfo(txnseqno, payordno, busiCode, payMemberId, payToMemberId, payToParentMemberId, channelId, productId, amount, commission, charge, amountD, amountE, false);
             tradeInfo.setPayordno(payordno);
+            tradeInfo.setCoopInstCode(txnsLog.getAccfirmerno());
             /*tradeInfo.setTxnseqno(txnseqno);
             tradeInfo.setAmount(amount);;
             tradeInfo.setAmountD(amountD);
