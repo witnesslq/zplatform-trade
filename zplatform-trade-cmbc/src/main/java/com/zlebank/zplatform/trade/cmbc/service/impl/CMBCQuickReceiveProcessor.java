@@ -137,13 +137,24 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
                         generateAsyncRespMessage(merchOrderNo,
                                 tradeBean.getMerchId());
                 if (orderResp.isResultBool()) {
-                    OrderAsynRespBean respBean = (OrderAsynRespBean) orderResp
-                            .getResultObj();
-                    new SynHttpRequestThread(
-                            gatewayOrderBean.getFirmemberno(),
-                            gatewayOrderBean.getRelatetradetxn(),
-                            gatewayOrderBean.getBackurl(),
-                            respBean.getNotifyParam()).start();
+                	if("000205".equals(gatewayOrderBean.getBiztype())){
+                		AnonOrderAsynRespBean respBean = (AnonOrderAsynRespBean) orderResp
+                                .getResultObj();
+                        new SynHttpRequestThread(
+                                gatewayOrderBean.getFirmemberno(),
+                                gatewayOrderBean.getRelatetradetxn(),
+                                gatewayOrderBean.getBackurl(),
+                                respBean.getNotifyParam()).start();
+                	}else{
+                		OrderAsynRespBean respBean = (OrderAsynRespBean) orderResp
+                                .getResultObj();
+                        new SynHttpRequestThread(
+                                gatewayOrderBean.getFirmemberno(),
+                                gatewayOrderBean.getRelatetradetxn(),
+                                gatewayOrderBean.getBackurl(),
+                                respBean.getNotifyParam()).start();
+                	}
+                    
                 }
                 /**异步通知处理结束 **/
             }else{
@@ -317,13 +328,24 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
 			        generateAsyncRespMessage(txnsLog.getAccordno(),
 			                txnsLog.getAccfirmerno());
 			if (orderResp.isResultBool()) {
-			    OrderAsynRespBean respBean = (OrderAsynRespBean) orderResp
-			            .getResultObj();
-			    new SynHttpRequestThread(
-			            gatewayOrderBean.getFirmemberno(),
-			            gatewayOrderBean.getRelatetradetxn(),
-			            gatewayOrderBean.getBackurl(),
-			            respBean.getNotifyParam()).start();
+				if("000205".equals(gatewayOrderBean.getBiztype())){
+            		AnonOrderAsynRespBean respBean = (AnonOrderAsynRespBean) orderResp
+                            .getResultObj();
+                    new SynHttpRequestThread(
+                            gatewayOrderBean.getFirmemberno(),
+                            gatewayOrderBean.getRelatetradetxn(),
+                            gatewayOrderBean.getBackurl(),
+                            respBean.getNotifyParam()).start();
+            	}else{
+            		OrderAsynRespBean respBean = (OrderAsynRespBean) orderResp
+                            .getResultObj();
+                    new SynHttpRequestThread(
+                            gatewayOrderBean.getFirmemberno(),
+                            gatewayOrderBean.getRelatetradetxn(),
+                            gatewayOrderBean.getBackurl(),
+                            respBean.getNotifyParam()).start();
+            	}
+			   
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

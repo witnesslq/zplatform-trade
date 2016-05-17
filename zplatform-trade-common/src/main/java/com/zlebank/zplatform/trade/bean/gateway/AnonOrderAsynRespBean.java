@@ -10,6 +10,12 @@
  */
 package com.zlebank.zplatform.trade.bean.gateway;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+
 /**
  * Class Description
  *
@@ -308,5 +314,53 @@ public class AnonOrderAsynRespBean {
 		}
 		
 		
-		
+		public List<NameValuePair> getNotifyParam() {
+			
+			this.version = version;
+			this.encoding = encoding;
+			this.txnType = txnType;
+			this.txnSubType = txnSubType;
+			this.bizType = bizType;
+			this.channelType = channelType;
+			this.merName = merName;
+			this.orderId = orderId;
+			this.txnTime = txnTime;
+			this.payTimeout = payTimeout;
+			this.txnAmt = txnAmt;
+			this.currencyCode = currencyCode;
+			this.orderDesc = orderDesc;
+			this.reserved = reserved;
+			this.orderStatus = orderStatus;
+			this.tn = tn;
+			this.respCode = respCode;
+			this.respMsg = respMsg;
+			
+			
+	        BasicNameValuePair[] pairs =  new BasicNameValuePair[] { 
+	                new BasicNameValuePair("version",version),
+	                new BasicNameValuePair("encoding",encoding),
+	                new BasicNameValuePair("txnType",txnType),
+	                new BasicNameValuePair("txnSubType",txnSubType),
+	                new BasicNameValuePair("bizType",bizType),
+	                new BasicNameValuePair("channelType",channelType),
+	                new BasicNameValuePair("merName",merName),
+	                new BasicNameValuePair("orderId",orderId),
+	                new BasicNameValuePair("txnTime",txnTime),
+	                new BasicNameValuePair("payTimeout",payTimeout),
+	                new BasicNameValuePair("txnAmt",txnAmt),
+	                new BasicNameValuePair("currencyCode",currencyCode),
+	                new BasicNameValuePair("orderDesc",orderDesc),
+	                new BasicNameValuePair("reserved",reserved),
+	                new BasicNameValuePair("orderStatus",orderStatus),
+	                new BasicNameValuePair("tn",tn),
+	                new BasicNameValuePair("respCode",respCode),
+	                new BasicNameValuePair("respMsg",respMsg)
+	               };
+	        List<NameValuePair> qparams = new ArrayList<NameValuePair>();
+	        for(int i=0;i<pairs.length;i++){
+	            qparams.add(pairs[i]);
+	        }
+
+	        return qparams;
+	    }
 }
