@@ -423,13 +423,18 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         txnsLog.setTradestatflag("00000000");//交易初始状态
         //txnsLog.setTradcomm(GateWayTradeAnalyzer.generateCommAmt(order.getReserved()));
         if(StringUtil.isNotEmpty(riskRateInfoBean.getMerUserId())){
-        	PersonManager personMemeber = personService.getPersonBeanByMemberId(riskRateInfoBean.getMerUserId());
-            //PojoMember personMemeber= memberService2.getMbmberByMemberId(riskRateInfoBean.getMerUserId(), MemberType.INDIVIDUAL);
-            if(personMemeber!=null){
-                txnsLog.setAccmemberid(riskRateInfoBean.getMerUserId());
-            }else{
-                txnsLog.setAccmemberid("999999999999999");//匿名会员号
-            }
+        	if("999999999999999".equals(riskRateInfoBean.getMerUserId())){
+        		txnsLog.setAccmemberid("999999999999999");//匿名会员号
+        	}else{
+        		PersonManager personMemeber = personService.getPersonBeanByMemberId(riskRateInfoBean.getMerUserId());
+                //PojoMember personMemeber= memberService2.getMbmberByMemberId(riskRateInfoBean.getMerUserId(), MemberType.INDIVIDUAL);
+                if(personMemeber!=null){
+                    txnsLog.setAccmemberid(riskRateInfoBean.getMerUserId());
+                }else{
+                    txnsLog.setAccmemberid("999999999999999");//匿名会员号
+                }
+        	}
+        	
         }
         //记录分账信息和交易佣金
         if("01".equals(order.getTxnType())&&"99".equals(order.getTxnSubType())){
