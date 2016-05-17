@@ -91,11 +91,11 @@ public class UpdateWithdrawServiceImpl implements UpdateWithdrawService,UpdateSu
         withdrawDao.merge(withdrawModel);
         EntryEvent entryEvent = null;
         if("00".equals(data.getResultCode())){
-        	businessEnum = BusinessEnum.WITHDRAWALS_SUCCESS;
+        	businessEnum = BusinessEnum.WITHDRAWALS;
         	orderinfo.setStatus("00");
         	entryEvent = EntryEvent.TRADE_SUCCESS;
         }else{
-        	businessEnum = BusinessEnum.WITHDRAWALS_REFUND;
+        	businessEnum = BusinessEnum.WITHDRAWALS;
         	orderinfo.setStatus("03");
         	entryEvent = EntryEvent.TRADE_FAIL;
         }

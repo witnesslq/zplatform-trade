@@ -46,7 +46,7 @@ import com.zlebank.zplatform.trade.service.ITxnsLogService;
  * @date 2016年5月12日 下午5:19:58
  * @since 
  */
-@Service
+
 public class ReconJob {
 	private static final Log log = LogFactory.getLog(ReconJob.class);
 	

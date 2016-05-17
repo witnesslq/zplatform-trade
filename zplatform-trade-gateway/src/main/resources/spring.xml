@@ -24,9 +24,11 @@
 				<!-- <ref bean="simpleTrigger3" /> 
 				<ref bean="cmbcTrigger1"/> 
 				<ref bean="reconJobTrigger"/> 
+				<ref bean="reconJobTrigger"/> 
 				<ref bean="insteadPayAccountingTrigger"/>   -->
 				<!-- <ref bean="cmbcTestTrigger"/> -->
 				
+				<ref bean="cmbcTrigger1"/> 
 			</list>
 		</property>
 	</bean>

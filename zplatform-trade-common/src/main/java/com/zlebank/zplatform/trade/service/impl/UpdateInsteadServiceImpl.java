@@ -99,11 +99,11 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
         tradeInfo.setCoopInstCode(txnsLog.getAccfirmerno());
         EntryEvent entryEvent = null;
         if ("00".equals(data.getResultCode())) {
-            tradeInfo.setBusiCode("70000002");
+            tradeInfo.setBusiCode("70000001");
             tradeInfo.setChannelId(data.getChannelCode());
             entryEvent = EntryEvent.TRADE_SUCCESS;
         } else {
-            tradeInfo.setBusiCode("70000003");
+            tradeInfo.setBusiCode("70000001");
             entryEvent = EntryEvent.TRADE_FAIL;
         }
         try {
