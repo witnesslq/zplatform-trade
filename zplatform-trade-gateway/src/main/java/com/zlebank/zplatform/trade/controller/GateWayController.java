@@ -1440,7 +1440,7 @@ public class GateWayController {
                 model.put("txnseqno", tradeBean.getTxnseqno());
                 return new ModelAndView("/erro_gw", model);
             }
-            
+            TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(orderinfo.getRelatetradetxn());
             
             TxnsWithdrawModel withdraw = new TxnsWithdrawModel(tradeBean);
             Map<String, Object> cardMap = routeConfigService.getCardInfo(tradeBean.getCardNo());
@@ -1452,7 +1452,7 @@ public class GateWayController {
             tradeInfo.setPayMemberId(withdraw.getMemberid());
             tradeInfo.setPayToMemberId(withdraw.getMemberid());
             tradeInfo.setAmount(new BigDecimal(withdraw.getAmount()));
-            tradeInfo.setCharge(new BigDecimal(0));
+            tradeInfo.setCharge(new BigDecimal(txnsLog.getTxnfee()));
             tradeInfo.setTxnseqno(orderinfo.getRelatetradetxn());
             tradeInfo.setCoopInstCode(orderinfo.getFirmemberno());
             //记录分录流水

@@ -289,9 +289,9 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+            txnsLog.setRetinfo(withholdin.getExecmsg());
+            txnsLog.setRetcode(withholdin.getExeccode());
         }
-        txnsLog.setRetinfo(withholdin.getExecmsg());
-        txnsLog.setRetcode(withholdin.getExeccode());
         super.update(txnsLog);
     }
 
