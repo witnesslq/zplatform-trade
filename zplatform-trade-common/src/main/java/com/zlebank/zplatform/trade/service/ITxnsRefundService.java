@@ -37,4 +37,11 @@ public interface ITxnsRefundService extends IBaseService<TxnsRefundModel, Long>{
     public TxnsRefundModel getRefundByRefundor(String refundorderno);
     public void updateRefund(TxnsRefundModel txnsRefundModel);
     public TxnsRefundModel getRefundByOldTxnSeqno(String itxnsCode, String string);
+    
+    /**
+     * 通过交易序列号获取退款
+     * @param txnseqno
+     * @return
+     */
+    public TxnsRefundModel getRefundByTxnseqno(String txnseqno);
 }

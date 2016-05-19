@@ -32,4 +32,6 @@ public interface ITxnsWithdrawService extends IBaseService<TxnsWithdrawModel, Lo
      * @param withdraw
      */
     public void updateWithdrawResult(TxnsWithdrawModel withdraw);
+    
+   
 }
