@@ -146,7 +146,7 @@ public class RSA {
      */
     public static byte[] decryptByPrivateKey(byte[] encryptedData, String privateKey)
                                                                                      throws Exception {
-        byte[] keyBytes = Base64.decodeBase64(privateKey);
+        byte[] keyBytes = com.alibaba.fastjson.util.Base64.decodeFast(privateKey);
         PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
         Key privateK = keyFactory.generatePrivate(pkcs8KeySpec);
@@ -186,7 +186,7 @@ public class RSA {
      */
     public static byte[] decryptByPublicKey(byte[] encryptedData, String publicKey)
                                                                                    throws Exception {
-        byte[] keyBytes = Base64.decodeBase64(publicKey);
+        byte[] keyBytes = com.alibaba.fastjson.util.Base64.decodeFast(publicKey);
         X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
         Key publicK = keyFactory.generatePublic(x509KeySpec);
@@ -225,7 +225,7 @@ public class RSA {
      * @throws Exception
      */
     public static byte[] encryptByPublicKey(byte[] data, String publicKey) throws Exception {
-        byte[] keyBytes = Base64.decodeBase64(publicKey);
+        byte[] keyBytes = com.alibaba.fastjson.util.Base64.decodeFast(publicKey);
         X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
         Key publicK = keyFactory.generatePublic(x509KeySpec);
@@ -265,7 +265,8 @@ public class RSA {
      * @throws Exception
      */
     public static byte[] encryptByPrivateKey(byte[] data, String privateKey) throws Exception {
-        byte[] keyBytes = Base64.decodeBase64(privateKey);
+    	
+        byte[] keyBytes = com.alibaba.fastjson.util.Base64.decodeFast(privateKey);
         PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
         Key privateK = keyFactory.generatePrivate(pkcs8KeySpec);
@@ -322,7 +323,8 @@ public class RSA {
      */
     public static String getPrivateKey(Map<String, Object> keyMap) throws Exception {
         Key key = (Key) keyMap.get(PRIVATE_KEY);
-        return Base64.encodeBase64String(key.getEncoded());
+        
+        return new String(Base64.encodeBase64(key.getEncoded()));
     }
 
     /**
@@ -336,6 +338,7 @@ public class RSA {
      */
     public static String getPublicKey(Map<String, Object> keyMap) throws Exception {
         Key key = (Key) keyMap.get(PUBLIC_KEY);
-        return Base64.encodeBase64String(key.getEncoded());
+        //return Base64.encodeBase64String(key.getEncoded());
+        return new String(Base64.encodeBase64(key.getEncoded()));
     }
 }

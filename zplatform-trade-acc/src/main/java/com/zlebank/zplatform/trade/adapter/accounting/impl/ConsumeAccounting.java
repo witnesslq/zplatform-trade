@@ -68,11 +68,17 @@ public class ConsumeAccounting implements IAccounting{
                 String payToParentMemberId=txnsLog.getAccfirmerno()+"";
                 /**渠道**/
                 String channelId = txnsLog.getPayinst();//支付机构代码
+                /**手续费**/
+                long txnfee = 0;
                 if("99999999".equals(channelId)){
                     busiCode = "10000002";
                     payMemberId = txnsLog.getPayfirmerno();
+                    txnfee = txnsLogService.getTxnFee(txnsLog);
                 }else {
                     busiCode = "10000001";
+                    if (txnsLog.getTxnfee() != null) {
+                        txnfee = txnsLog.getTxnfee();
+                    }
                 }
                 /**产品id**/
                 String productId = "";
@@ -80,11 +86,7 @@ public class ConsumeAccounting implements IAccounting{
                 BigDecimal amount = new BigDecimal(txnsLog.getAmount());
                 /**佣金**/
                 BigDecimal commission = new BigDecimal(txnsLog.getTradcomm());
-                /**手续费**/
-                long txnfee = 0;
-                if (txnsLog.getTxnfee() != null) {
-                    txnfee = txnsLog.getTxnfee();
-                }
+               
                 BigDecimal charge = new BigDecimal(txnfee);
                 /**金额D**/
                 BigDecimal amountD = new BigDecimal(0);
