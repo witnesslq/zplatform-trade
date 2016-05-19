@@ -303,7 +303,25 @@ public abstract class BaseServiceImpl<E extends Serializable, E_PK extends Seria
     }
 
     public List<?> executeBySQL(String queryString, Object[] paramaters) {
-        return null;
+    	log.info("queryString is " + queryString);
+        SQLQuery query = null;
+        List<?> resultList = null;
+        try {
+            Session session = getSession();
+            query = (SQLQuery) session.createSQLQuery(queryString);
+            if (paramaters != null) {
+                for (int i = 0; i < paramaters.length; i++) {
+                    query.setParameter(i, paramaters[i]);
+                }
+            }
+            query.executeUpdate();
+           
+        } catch (HibernateException e) {
+            log.error("sql query error", e);
+            throw e;
+        }
+        return resultList;
+        
     }
     public List<Map<String, Object>> executeOracleProcedure(String queryString,String[] columns, Object[] paramaters,String cursor){
         return null;

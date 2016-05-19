@@ -128,4 +128,9 @@ public interface ITxnsLogService extends IBaseService<TxnsLogModel, String>{
      * @param transferDataList
      */
     public void saveBossPayBankTransferLogs(List<PojoBankTransferData> transferDataList);
+    
+    /**
+     * 对账任务
+     */
+    public void excuteRecon();
 }
