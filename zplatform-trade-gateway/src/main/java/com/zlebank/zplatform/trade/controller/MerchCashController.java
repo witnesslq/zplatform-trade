@@ -44,7 +44,9 @@ import com.zlebank.zplatform.member.bean.CoopInsti;
 import com.zlebank.zplatform.member.bean.EnterpriseBean;
 import com.zlebank.zplatform.member.bean.QuickpayCustBean;
 import com.zlebank.zplatform.member.bean.enums.MemberType;
+import com.zlebank.zplatform.member.dao.CoopInstiDAO;
 import com.zlebank.zplatform.member.dao.EnterpriseDAO;
+import com.zlebank.zplatform.member.pojo.PojoCoopInsti;
 import com.zlebank.zplatform.member.pojo.PojoEnterpriseDeta;
 import com.zlebank.zplatform.member.pojo.PojoMember;
 import com.zlebank.zplatform.member.pojo.PojoMerchDeta;
@@ -129,6 +131,8 @@ public class MerchCashController {
 	private ITxnsWithholdingService txnsWithholdingService;
 	@Autowired
 	private ITxnsNotifyTaskService txnsNotifyTaskService;
+	@Autowired
+	private CoopInstiDAO coopInstiDAO;
 	
 	@RequestMapping("/coporder.htm")
 	public ModelAndView pay(OrderBean order, HttpSession httpSession,
@@ -273,14 +277,14 @@ public class MerchCashController {
 				model.put("errCode", msg.getWebrspcode());
 				return false;
 			}
-			if (order.getMerId().startsWith("2")) {// 对于商户会员需要进行检查
-				if (!order.getCoopInstiId().equals(subMember.getParent())) {
-					PojoRspmsg msg = rspmsgDAO.get("GW07");
-					model.put("errMsg", msg.getRspinfo());
-					model.put("errCode", msg.getWebrspcode());
-					return false;
-				}
-			}
+			PojoMember pojoMember = memberService.getMbmberByMemberId(order.getMerId(), null);
+        	PojoCoopInsti pojoCoopInsti = coopInstiDAO.get(pojoMember.getInstiId());
+            if (!order.getCoopInstiId().equals(pojoCoopInsti.getInstiCode())) {
+            	PojoRspmsg msg = rspmsgDAO.get("GW07");
+            	model.put("errMsg", msg.getRspinfo());
+                model.put("errCode", msg.getWebrspcode());
+                return false;
+            }
 
 		}
 

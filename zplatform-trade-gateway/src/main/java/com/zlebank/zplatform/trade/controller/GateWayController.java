@@ -45,7 +45,10 @@ import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.member.bean.CoopInsti;
 import com.zlebank.zplatform.member.bean.QuickpayCustBean;
 import com.zlebank.zplatform.member.bean.enums.MemberType;
+import com.zlebank.zplatform.member.dao.CoopInstiDAO;
 import com.zlebank.zplatform.member.dao.PersonDAO;
+import com.zlebank.zplatform.member.pojo.PojoCoopInsti;
+import com.zlebank.zplatform.member.pojo.PojoMember;
 import com.zlebank.zplatform.member.pojo.PojoMerchDeta;
 import com.zlebank.zplatform.member.pojo.PojoPersonDeta;
 import com.zlebank.zplatform.member.service.CoopInstiService;
@@ -175,6 +178,8 @@ public class GateWayController {
     private AccEntryService accEntryService;
     @Autowired
     private ChanPayAsyncService chanPayAsyncService;
+    @Autowired
+    private CoopInstiDAO coopInstiDAO;
     
     @RequestMapping("/coporder.htm")
     public ModelAndView pay(OrderBean order,HttpSession httpSession,HttpServletRequest request) {
@@ -259,8 +264,11 @@ public class GateWayController {
                 model.put("errCode", msg.getWebrspcode());
                 return false;
             }
+            
             if (order.getMerId().startsWith("2")) {// 对于商户会员需要进行检查
-                if (!order.getCoopInstiId().equals(subMember.getParent())) {
+            	PojoMember pojoMember = memberService2.getMbmberByMemberId(order.getMerId(), null);
+            	PojoCoopInsti pojoCoopInsti = coopInstiDAO.get(pojoMember.getInstiId());
+                if (!order.getCoopInstiId().equals(pojoCoopInsti.getInstiCode())) {
                 	PojoRspmsg msg = rspmsgDAO.get("GW07");
                 	model.put("errMsg", msg.getRspinfo());
                     model.put("errCode", msg.getWebrspcode());
@@ -1452,7 +1460,7 @@ public class GateWayController {
             tradeInfo.setPayMemberId(withdraw.getMemberid());
             tradeInfo.setPayToMemberId(withdraw.getMemberid());
             tradeInfo.setAmount(new BigDecimal(withdraw.getAmount()));
-            tradeInfo.setCharge(new BigDecimal(txnsLog.getTxnfee()));
+            tradeInfo.setCharge(new BigDecimal(txnsLogService.getTxnFee(txnsLog)));
             tradeInfo.setTxnseqno(orderinfo.getRelatetradetxn());
             tradeInfo.setCoopInstCode(orderinfo.getFirmemberno());
             //记录分录流水
