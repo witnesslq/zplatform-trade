@@ -20,6 +20,7 @@
 		<property name="triggers">
 			<list>
 				<ref bean="reconJobTrigger"/> 
+				<ref bean="cmbcTrigger1"/> 
 				<!-- <ref bean="simpleTrigger" /> -->
 				<!-- <ref bean="simpleTrigger2" />  转移到DB-->
 				<!-- <ref bean="simpleTrigger3" /> 
