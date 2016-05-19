@@ -25,6 +25,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.commons.dao.pojo.BusiTypeEnum;
 import com.zlebank.zplatform.commons.utils.StringUtil;
+import com.zlebank.zplatform.member.dao.CoopInstiDAO;
+import com.zlebank.zplatform.member.pojo.PojoCoopInsti;
+import com.zlebank.zplatform.member.pojo.PojoMember;
+import com.zlebank.zplatform.member.service.MemberService;
 import com.zlebank.zplatform.trade.bean.AccountTradeBean;
 import com.zlebank.zplatform.trade.bean.AppPartyBean;
 import com.zlebank.zplatform.trade.bean.PayPartyBean;
@@ -80,6 +84,10 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
     private IRiskTradeLogService riskTradeLogService;
     @Autowired
     private TransferDataDAO transferDataDAO;
+    @Autowired
+    private CoopInstiDAO coopInstiDAO;
+    @Autowired
+    private MemberService memberService2;
     /**
      *
      * @return
@@ -580,6 +588,9 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
                 continue;
             }
             txnsLog = new TxnsLogModel();
+            
+            PojoMember mbmberByMemberId = memberService2.getMbmberByMemberId(data.getTranData().getMemberId(), null);
+            PojoCoopInsti coopInsti = coopInstiDAO.get(mbmberByMemberId.getInstiId());
             MemberBaseModel member = memberService.get(data.getTranData().getMemberId());
             txnsLog.setTxnseqno(data.getTranData().getTxnseqno());
             txnsLog.setTxndate(DateUtil.getCurrentDate());
@@ -603,7 +614,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
             txnsLog.setCheckstandver(member.getCashver());
             txnsLog.setRoutver(member.getRoutver());
             //txnsLog.setAccordno(data.getRelatedorderno());
-            txnsLog.setAccordinst(member.getMerchinsti());
+            txnsLog.setAcccoopinstino(coopInsti.getInstiCode());
             txnsLog.setAccfirmerno(data.getTranData().getMemberId());
             txnsLog.setAccordcommitime(DateUtil.getCurrentDateTime());
             txnsLog.setTradestatflag("00000000");//交易初始状态
@@ -619,6 +630,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
             txnsLog.setCardtype(cardMap.get("TYPE").toString());
             txnsLog.setCardinstino(cardMap.get("BANKCODE").toString());
             txnsLog.setTxnfee(data.getTranData().getTranFee().longValue());*/
+            txnsLog.setTxnfee(data.getTranData().getTranFee().longValue());
             super.save(txnsLog);
         }
 	}
