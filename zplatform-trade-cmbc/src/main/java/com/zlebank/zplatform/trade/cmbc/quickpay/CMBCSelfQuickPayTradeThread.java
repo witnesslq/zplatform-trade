@@ -120,6 +120,7 @@ public class CMBCSelfQuickPayTradeThread implements IQuickPayTrade{
             }
             //更新支付方信息
             PayPartyBean payPartyBean = new PayPartyBean(trade.getTxnseqno(),"01", "", ChannelEnmu.CMBCSELFWITHHOLDING.getChnlcode(), ConsUtil.getInstance().cons.getCmbc_merid(), "", DateUtil.getCurrentDateTime(), "",trade.getCardNo());
+            payPartyBean.setPanName(trade.getAcctName());
             txnsLogService.updatePayInfo_Fast(payPartyBean);
             if(resultBean!=null){
                 txnsLogService.updatePayInfo_Fast_result(tradeBean.getTxnseqno(), resultBean.getErrCode(),resultBean.getErrMsg());

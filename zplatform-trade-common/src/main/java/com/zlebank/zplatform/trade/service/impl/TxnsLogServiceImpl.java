@@ -108,9 +108,9 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
     public ResultBean updatePayInfo_Fast(PayPartyBean payPartyBean){
         TxnsLogModel txnsLog = getTxnsLogByTxnseqno(payPartyBean.getTxnseqno());
         Map<String, Object> cardMap = getCardInfo(payPartyBean.getCardNo());
-        String hql = "update TxnsLogModel set paytype=?,payordno=?,payinst=?,payfirmerno=?,payordcomtime=?,pan=?,cardtype=?,cardinstino=?,txnfee=? where txnseqno=?";
+        String hql = "update TxnsLogModel set paytype=?,payordno=?,payinst=?,payfirmerno=?,payordcomtime=?,pan=?,cardtype=?,cardinstino=?,txnfee=?,pan_name=? where txnseqno=?";
         super.updateByHQL(hql, new Object[]{"01",payPartyBean.getPayordno(),payPartyBean.getPayinst(),payPartyBean.getPayfirmerno(),payPartyBean.getPayordcomtime(),
-                    payPartyBean.getCardNo(),cardMap.get("TYPE").toString(),cardMap.get("BANKCODE").toString(),getTxnFee(txnsLog),payPartyBean.getTxnseqno()});
+                    payPartyBean.getCardNo(),cardMap.get("TYPE").toString(),cardMap.get("BANKCODE").toString(),getTxnFee(txnsLog),payPartyBean.getPanName(),payPartyBean.getTxnseqno()});
         return null;
     }
     

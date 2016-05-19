@@ -80,6 +80,7 @@ public class ReaPayReceiveProcessor implements ITradeReceiveProcessor{
             }
             //String txnseqno, String paytype, String payordno, String payinst, String payfirmerno, String paysecmerno, String payordcomtime, String payordfintime, String cardNo, String rout, String routlvl
             PayPartyBean payPartyBean = new PayPartyBean(tradeBean.getTxnseqno(),"01", tradeBean.getOrderId(), ConsUtil.getInstance().cons.getReapay_chnl_code(), ConsUtil.getInstance().cons.getReapay_quickpay_merchant_id(), "", DateUtil.getCurrentDateTime(), "",tradeBean.getCardNo());
+            payPartyBean.setPanName(tradeBean.getAcctName());
             txnsLogService.updatePayInfo_Fast(payPartyBean);
             txnsLogService.updateReaPayRetInfo(tradeBean.getTxnseqno(), payResult);
     }

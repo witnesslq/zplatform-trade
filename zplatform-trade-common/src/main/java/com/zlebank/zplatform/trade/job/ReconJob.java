@@ -59,11 +59,11 @@ public class ReconJob {
 	
 	@Transactional(propagation = Propagation.REQUIRED)
     public void execute() throws IOException {
+		log.info("start ReconJob");
 		List<Map<String, Object>> selfTxnList = (List<Map<String, Object>>) txnsLogService.queryBySQL("SELECT * FROM T_SELF_TXN T WHERE STATUS = ? AND RESULT = ?", new Object[]{"9","02"});
 		if(selfTxnList.size()>0){
 			for(Map<String, Object> value:selfTxnList){
 				TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(value.get("TXNSEQNO")+"");
-				//txnsLog.getAcccoopinstino();
 				//通道手续费
 				Long channelFee = Long.valueOf(value.get("CFEE")+"")+Long.valueOf(value.get("DFEE")+"");
 				String payMemberId = "";
@@ -74,7 +74,6 @@ public class ReconJob {
 	            	if(businessList.size()>0){
 	            		String busiType = businessList.get(0).get("BUSITYPE")+"";
 	            		BusiTypeEnum busiTypeEnum = BusiTypeEnum.fromValue(busiType);
-	            		
 	            		switch (busiTypeEnum) {
 							case charge:
 								if(StringUtil.isEmpty(txnsLog.getAccsecmerno())){
@@ -143,6 +142,7 @@ public class ReconJob {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+	            log.info("end ReconJob");
 			}
 		}
 	}

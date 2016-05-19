@@ -143,6 +143,7 @@ public class BossPayQuickPayTradeThread implements IQuickPayTrade {
 					"01", "", PAYINSTID,
 					ConsUtil.getInstance().cons.getBosspay_user_id(), "",
 					DateUtil.getCurrentDateTime(), "", trade.getCardNo());
+			payPartyBean.setPanName(trade.getAcctName());
 			txnsLogService.updatePayInfo_Fast(payPartyBean);
 			
 			if (resultBean != null) {
@@ -228,6 +229,7 @@ public class BossPayQuickPayTradeThread implements IQuickPayTrade {
         }else{
             payPartyBean = new PayPartyBean(txnseqno,"01", responseBean.getSerialNum(),PAYINSTID, ConsUtil.getInstance().cons.getBosspay_user_id(), "", DateUtil.getCurrentDateTime(), "",responseBean.getBankAccount());
         }
+        payPartyBean.setPanName(responseBean.getAccountName());
         txnsLogService.updatePayInfo_Fast(payPartyBean);
         
         
