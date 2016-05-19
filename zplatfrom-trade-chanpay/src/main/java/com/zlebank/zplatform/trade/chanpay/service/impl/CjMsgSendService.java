@@ -9,6 +9,8 @@ import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
 
 import com.zlebank.zplatform.trade.chanpay.utils.Cj;
@@ -22,7 +24,7 @@ import com.zlebank.zplatform.trade.chanpay.utils.S;
  */
 @Service
 public class CjMsgSendService {
-	public static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(CjMsgSendService.class);
+	public static final Log LOG = LogFactory.getLog(CjMsgSendService.class);
 
 	public String sendAndGetString(String message) throws Exception {
 		HttpClient client = new HttpClient();

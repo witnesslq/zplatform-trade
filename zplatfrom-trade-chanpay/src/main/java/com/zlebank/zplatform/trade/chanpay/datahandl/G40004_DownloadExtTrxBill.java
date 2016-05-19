@@ -4,7 +4,6 @@ import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 
-import com.zlebank.zplatform.trade.chanpay.datahandl.CjMsgSendService.sendAndGetBytes_Response;
 import com.zlebank.zplatform.trade.chanpay.dto.G40004Dto_DownloadExtTrxBill;
 import com.zlebank.zplatform.trade.chanpay.utils.Cj;
 import com.zlebank.zplatform.trade.chanpay.utils.CjSignHelper;

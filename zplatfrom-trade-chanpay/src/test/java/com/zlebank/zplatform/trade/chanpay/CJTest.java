@@ -10,6 +10,8 @@
  */
 package com.zlebank.zplatform.trade.chanpay;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -25,6 +27,7 @@ import com.zlebank.zplatform.trade.chanpay.utils.Cj;
 import com.zlebank.zplatform.trade.chanpay.utils.CjSignHelper;
 import com.zlebank.zplatform.trade.chanpay.utils.CjSignHelper.VerifyResult;
 import com.zlebank.zplatform.trade.chanpay.utils.U;
+import com.zlebank.zplatform.trade.service.NotifyInsteadURLService;
 
 /**
  * Class Description
@@ -37,30 +40,51 @@ import com.zlebank.zplatform.trade.chanpay.utils.U;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/*.xml")
 public class CJTest {
-	public static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(CJTest.class);
+	public static final Log LOG = LogFactory.getLog(CJTest.class);
 	@Autowired
 	private CjMsgSendService cjMsgSendService;
 	
 	@Test
-	public G10001Bean sendMessage() {
+	public void sendMessage() {
 		G10001Bean data = new G10001Bean();
+		data.setMertid("5ee26ddb404a590");
+		data.setBusinessCode("05101");
+		data.setCorpAccNo("201407301524");
+		data.setProductCode("50010001");
+		data.setSubMertid("YS0001");
+		data.setBankGeneralName("中国工商银行");
+		data.setAccountNo("201407301524");
+		data.setAccountName("畅捷通信息技术股份有限公司");
+		data.setProvince("北京");
+		data.setCity("北京");
+		data.setBankName("中国工商银行北京海淀中关村分理处");
+		data.setBankCode("710584000001");
+		data.setDrctBankCode("710584000001");
+		data.setProtocolNo("201407301524");
+		data.setCurrency("CNY");
+		data.setAmount(99L);
+		data.setIdType("0");
+		data.setId("1234567890");
+		data.setTel("1234567890");
+		data.setCorpFlowNo("1234567890");
+		data.setSummary("测试DEMO");
+		data.setPostscript("测试DEMO");
+		data.setAccountProp("0");
+		data.setAccountType("00");
 		data.setReqSn(U.createUUID());
 		buildCjmsgAndSend(data);
-		return data;
+		
 	}//metho
 	
 	/** 组织Cj报文，并发送 */
 	private void buildCjmsgAndSend(G10001Bean data) {
 		try {
 			String cjReqmsg = buildCjmsg(data);
-
 			// 签名
 			CjSignHelper singHelper = new CjSignHelper();
 			String signMsg = singHelper.signXml$Add(cjReqmsg);
-			
 			// 发送报文
 			String cjRespmsg = cjMsgSendService.sendAndGetString(signMsg);
-
 			// 验证签名
 			VerifyResult verifyResult = singHelper.verifyCjServerXml(cjRespmsg);
 			if (!verifyResult.result) {
