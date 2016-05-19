@@ -76,9 +76,7 @@ public class CreateInsteadPayMassage {
     public static void main(String[] args) throws Exception {
         CreateInsteadPayMassage run = new CreateInsteadPayMassage();
         // 生成代付报文
-
-
-        //run.createInsteadPay();
+        run.createInsteadPay();
         // 生成代付查询结果      
         //run.createInsteadPayQuery();
 
@@ -87,7 +85,7 @@ public class CreateInsteadPayMassage {
 
         // 生成代付查询结果
 
-        run.createInsteadPayQuery();
+//        run.createInsteadPayQuery();
 
 
 //        run.createInsteadPayQuery();
@@ -95,7 +93,7 @@ public class CreateInsteadPayMassage {
         // 生成实名认证 
         //run.createRealNameAuth();
         // 生成实名认证查询
-        run.createRealNameAuthQuery();
+//        run.createRealNameAuthQuery();
         // 生成白名单添加
         //run.createMerchWhiteList();
         // 加密
@@ -342,8 +340,8 @@ public class CreateInsteadPayMassage {
         file1.setAmt(amt);
         file1.setBizType("000001");
         file1.setAccType("01");
-        file1.setAccNo(" 6226091212413815");
-        file1.setAccName("鲁大帅");
+        file1.setAccNo("6226091212413805");
+        file1.setAccName("鲁亨亨");
         file1.setBankCode("123456789012");
         file1.setIssInsProvince("");
         file1.setIssInsCity("");
@@ -397,5 +395,6 @@ public class CreateInsteadPayMassage {
         request.setTxnSubType("00");
         request.setBizType("000202");
         request.setMerId(MER_ID);
+//        request.setCoopInstiId("300000000000004");
     }
 }

@@ -41,11 +41,14 @@ import com.zlebank.zplatform.commons.service.impl.AbstractBasePageService;
 import com.zlebank.zplatform.commons.utils.BeanCopyUtil;
 import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.commons.utils.StringUtil;
+import com.zlebank.zplatform.member.bean.CoopInsti;
 import com.zlebank.zplatform.member.bean.MemberAccountBean;
 import com.zlebank.zplatform.member.bean.MemberBean;
 import com.zlebank.zplatform.member.bean.Person;
 import com.zlebank.zplatform.member.bean.enums.MemberType;
+import com.zlebank.zplatform.member.pojo.PojoMember;
 import com.zlebank.zplatform.member.pojo.PojoMerchDeta;
+import com.zlebank.zplatform.member.service.CoopInstiService;
 import com.zlebank.zplatform.member.service.MemberAccountService;
 import com.zlebank.zplatform.member.service.MemberService;
 import com.zlebank.zplatform.member.service.MerchService;
@@ -80,7 +83,6 @@ import com.zlebank.zplatform.trade.model.ConfigInfoModel;
 import com.zlebank.zplatform.trade.model.PojoInsteadPayBatch;
 import com.zlebank.zplatform.trade.model.PojoInsteadPayDetail;
 import com.zlebank.zplatform.trade.model.PojoMerchInstpayConf;
-import com.zlebank.zplatform.trade.model.PojoRealnameAuthOrder;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.service.IGateWayService;
 import com.zlebank.zplatform.trade.service.InsteadPayService;
@@ -112,6 +114,8 @@ public class InsteadPayServiceImpl
     private TransferDataDAO transdata;
     @Autowired
     private MemberService memberService;
+    @Autowired
+    private CoopInstiService coopInstiService;
     @Autowired
     private InsteadPayBatchDAO insteadPayBatchDAO;
     @Autowired
@@ -302,7 +306,16 @@ public class InsteadPayServiceImpl
             tradeInfo.setPayMemberId(detail.getMerId());
             tradeInfo.setPayToMemberId(detail.getMerId());
             tradeInfo.setPayToParentMemberId(detail.getMerId());
-            tradeInfo.setCoopInstCode(request.getCoopInstiId());
+            String instiCode = null;
+            // 取合作机构号
+            if (StringUtil.isNotEmpty(request.getCoopInstiId())) {
+                instiCode = request.getCoopInstiId();
+            } else {
+                PojoMember memberMerch = memberService.getMbmberByMemberId(detail.getMerId(), MemberType.ENTERPRISE);
+                CoopInsti insti = coopInstiService.getInstiByInstiID(memberMerch.getInstiId());
+                instiCode = insti.getInstiCode();
+            }
+            tradeInfo.setCoopInstCode(instiCode);
             try {
                 accEntryService.accEntryProcess(tradeInfo,EntryEvent.AUDIT_APPLY);
             } catch (AccBussinessException e) {
