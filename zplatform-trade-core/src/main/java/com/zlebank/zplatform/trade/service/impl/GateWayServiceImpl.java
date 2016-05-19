@@ -1922,6 +1922,11 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         }
         
         PojoQuickpayCust card = quickpayCustDAO.getById(Long.valueOf(submitPayBean.getBindId()));
+        txnsLog.setCardtype(card.getCardtype());
+        Long txnFee = txnsLogService.getTxnFee(txnsLog);
+        if(txnFee>txnsLog.getAmount()){
+        	throw new TradeException("T039");
+        }
         TradeBean trade = new TradeBean(card.getBankcode(),orderinfo.getOrderno(),orderinfo.getOrderamt()+"", card.getCardno(),card.getAccname(),card.getIdnum(), card.getPhone(),submitPayBean.getSmsCode(), "", card.getIdtype(), "", "", txnsLog.getTxnseqno(), txnsLog.getAccfirmerno(), "", "", txnsLog.getAccsecmerno(), "", txnsLog.getCheckstandver(), txnsLog.getBusicode(), txnsLog.getBusitype(), card.getCardtype(), "goods", "gooddesc", card.getCvv2(), card.getValidtime(),txnsLog.getAccmemberid(),card.getBindcardid(), "", reapayOrderNo, "", "", 0L, "", "", orderinfo.getTn(), "", "");
         ResultBean routResultBean = routeConfigService.getWapTransRout(DateUtil.getCurrentDateTime(), trade.getAmount()+"",  StringUtil.isNotEmpty(trade.getMerchId())?trade.getMerchId():trade.getSubMerchId(), trade.getBusicode(), trade.getCardNo());
         String routId = routResultBean.getResultObj().toString();
