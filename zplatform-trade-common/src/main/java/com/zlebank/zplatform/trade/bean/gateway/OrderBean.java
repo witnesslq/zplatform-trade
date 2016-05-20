@@ -34,10 +34,8 @@ public class OrderBean implements Serializable{
     @NotEmpty(message="param.empty.certId")
     @Length(max=12,message="param.error.certId")
     private String certId="";
-    @NotEmpty(message="param.empty.frontUrl")
     @Length(max=256,message="param.error.frontUrl")
     private String frontUrl="";
-    @NotEmpty(message="param.empty.backUrl")
     @Length(max=256,message="param.error.backUrl")
     private String backUrl="";
     @NotEmpty(message="param.empty.signature")
