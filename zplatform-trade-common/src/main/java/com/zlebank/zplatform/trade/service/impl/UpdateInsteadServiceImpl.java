@@ -112,10 +112,15 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
             log.error(e.getMessage(), e);
         }
 
-        // 如果批次已经全部处理完毕，则添加到通知
-        if (insteadPayDetailDAO.isBatchProcessFinished(detail.getInsteadPayBatch().getId())) {
-            notifyInsteadURLService.addInsteadPayTask(detail.getInsteadPayBatch().getId());
-        }
+        try {
+			// 如果批次已经全部处理完毕，则添加到通知
+			if (insteadPayDetailDAO.isBatchProcessFinished(detail.getInsteadPayBatch().getId())) {
+			    notifyInsteadURLService.addInsteadPayTask(detail.getInsteadPayBatch().getId());
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
 
