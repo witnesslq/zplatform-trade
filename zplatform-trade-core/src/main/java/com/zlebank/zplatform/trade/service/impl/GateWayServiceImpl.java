@@ -100,6 +100,7 @@ import com.zlebank.zplatform.trade.bean.wap.WapWithdrawBean;
 import com.zlebank.zplatform.trade.cmbc.service.ICMBCTransferService;
 import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
 import com.zlebank.zplatform.trade.dao.RspmsgDAO;
+import com.zlebank.zplatform.trade.dao.impl.RspmsgDAOImpl;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.factory.TradeAdapterFactory;
 import com.zlebank.zplatform.trade.model.CashBankModel;
@@ -1960,6 +1961,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         if(!resultBean.isResultBool()){
             throw new TradeException("T000",resultBean.getErrCode());
         }
+        
     }
     
     /**
