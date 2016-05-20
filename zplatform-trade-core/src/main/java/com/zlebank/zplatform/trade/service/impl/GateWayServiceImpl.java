@@ -1116,6 +1116,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
                 tradeInfo.setCharge(new BigDecimal(txnsLog.getTxnfee() == null ? 0L : txnsLog.getTxnfee()));
                 tradeInfo.setTxnseqno(txnsLog.getTxnseqno());
                 tradeInfo.setBusiCode(BusinessCodeEnum.WITHDRAWALS.getBusiCode());
+                tradeInfo.setCoopInstCode(txnsLog.getAcccoopinstino());
                 //记录分录流水
                 accEntryService.accEntryProcess(tradeInfo,EntryEvent.AUDIT_APPLY);
             } catch (Exception e) {

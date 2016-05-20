@@ -23,6 +23,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.alibaba.fastjson.JSON;
+import com.zlebank.zplatform.trade.chanpay.bean.ReturnMessageBean;
 import com.zlebank.zplatform.trade.chanpay.bean.order.RefundOrderBean;
 import com.zlebank.zplatform.trade.chanpay.bean.order.SingleOrderBean;
 import com.zlebank.zplatform.trade.chanpay.bean.query.QueryBankBean;
@@ -99,7 +100,7 @@ public class OrderBeanTest {
 		refundOrderBean.setService("cjt_create_refund");
 		refundOrderBean.setNotify_url("http://192.168.101.209:8081/demo/ReciveNotifyServlet");
 		refundOrderBean.setRefund_amount("100.00");
-		chanPayService.refund(refundOrderBean);
+		ReturnMessageBean refund = chanPayService.refund(refundOrderBean);
 	}
 	
 	

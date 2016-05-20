@@ -101,7 +101,7 @@ public class ConsModel {
 	private String chanpay_front_url="";
 	private String chanpay_back_url="";
 	private String chanpay_partner_name="";
-	
+	private String chanpay_refund_url="";
 	
 	public String getZlrt_url() {
 		return zlrt_url;
@@ -1173,6 +1173,20 @@ public class ConsModel {
 	 */
 	public void setChanpay_partner_name(String chanpay_partner_name) {
 		this.chanpay_partner_name = chanpay_partner_name;
+	}
+
+	/**
+	 * @return the chanpay_refund_url
+	 */
+	public String getChanpay_refund_url() {
+		return chanpay_refund_url;
+	}
+
+	/**
+	 * @param chanpay_refund_url the chanpay_refund_url to set
+	 */
+	public void setChanpay_refund_url(String chanpay_refund_url) {
+		this.chanpay_refund_url = chanpay_refund_url;
 	}
 
 	

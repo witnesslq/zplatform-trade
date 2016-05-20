@@ -127,6 +127,7 @@ public class ConsUtil {
 			cons.setChanpay_front_url(prop.getProperty("chanpay_front_url"));
 			cons.setChanpay_channel_code(prop.getProperty("chanpay_channel_code"));
 			cons.setChanpay_partner_name(prop.getProperty("chanpay_partner_name"));
+			cons.setChanpay_refund_url(prop.getProperty("chanpay_refund_url"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
