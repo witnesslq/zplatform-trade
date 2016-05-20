@@ -621,6 +621,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
             txnsLog.setCardtype(cardMap.get("TYPE").toString());
             txnsLog.setCardinstino(cardMap.get("BANKCODE").toString());
             txnsLog.setTxnfee(data.getTranData().getTranFee().longValue());*/
+            txnsLog.setTxnfee(data.getTranData().getTranFee().longValue());
             super.save(txnsLog);
         }
 	}
