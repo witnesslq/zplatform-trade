@@ -23,7 +23,6 @@ import com.zlebank.zplatform.trade.bean.PayPartyBean;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.chanpay.bean.async.RefundAsyncResultBean;
 import com.zlebank.zplatform.trade.chanpay.bean.async.TradeAsyncResultBean;
-import com.zlebank.zplatform.trade.chanpay.enums.RefundStatusEnum;
 import com.zlebank.zplatform.trade.chanpay.enums.TradeStatusEnum;
 import com.zlebank.zplatform.trade.chanpay.service.ChanPayService;
 import com.zlebank.zplatform.trade.exception.TradeException;

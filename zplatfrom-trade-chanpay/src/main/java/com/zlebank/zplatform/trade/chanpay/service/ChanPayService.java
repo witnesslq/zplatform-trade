@@ -10,7 +10,11 @@
  */
 package com.zlebank.zplatform.trade.chanpay.service;
 
+
 import java.util.List;
+
+
+import com.zlebank.zplatform.trade.chanpay.bean.ReturnMessageBean;
 
 import com.zlebank.zplatform.trade.chanpay.bean.async.RefundAsyncResultBean;
 import com.zlebank.zplatform.trade.chanpay.bean.async.TradeAsyncResultBean;
@@ -34,7 +38,7 @@ public interface ChanPayService {
 	 * @param refundOrderBean
 	 * @return
 	 */
-	public Object refund(RefundOrderBean refundOrderBean);
+	public ReturnMessageBean refund(RefundOrderBean refundOrderBean);
 	
 	/**
 	 * 交易查询

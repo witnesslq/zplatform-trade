@@ -133,6 +133,7 @@ public class CMBCQuickPayTradeThread implements IQuickPayTrade {
 					"01", "", "93000002",
 					ConsUtil.getInstance().cons.getCmbc_merid(), "",
 					DateUtil.getCurrentDateTime(), "", trade.getCardNo());
+			payPartyBean.setPanName(trade.getAcctName());
 			txnsLogService.updatePayInfo_Fast(payPartyBean);
 			if (resultBean != null) {
 				txnsLogService.updatePayInfo_Fast_result(tradeBean.getTxnseqno(), resultBean.getErrCode(),resultBean.getErrMsg());

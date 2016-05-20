@@ -10,6 +10,7 @@
  */
 package com.zlebank.zplatform.trade.service.impl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -23,12 +24,19 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
+import com.zlebank.zplatform.acc.bean.TradeInfo;
+import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
+import com.zlebank.zplatform.acc.exception.AccBussinessException;
+import com.zlebank.zplatform.acc.service.AccEntryService;
+import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.commons.dao.pojo.BusiTypeEnum;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.member.dao.CoopInstiDAO;
 import com.zlebank.zplatform.member.pojo.PojoCoopInsti;
 import com.zlebank.zplatform.member.pojo.PojoMember;
+import com.zlebank.zplatform.member.pojo.PojoMerchDeta;
 import com.zlebank.zplatform.member.service.MemberService;
+import com.zlebank.zplatform.member.service.MerchService;
 import com.zlebank.zplatform.trade.bean.AccountTradeBean;
 import com.zlebank.zplatform.trade.bean.AppPartyBean;
 import com.zlebank.zplatform.trade.bean.PayPartyBean;
@@ -84,10 +92,15 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
     private IRiskTradeLogService riskTradeLogService;
     @Autowired
     private TransferDataDAO transferDataDAO;
-    @Autowired
-    private CoopInstiDAO coopInstiDAO;
+    
+    private AccEntryService accEntryService;
     @Autowired
     private MemberService memberService2;
+    @Autowired
+    private MerchService merchService;
+    
+    @Autowired
+    private CoopInstiDAO coopInstiDAO;
     /**
      *
      * @return
@@ -115,13 +128,20 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
     @Transactional(propagation=Propagation.REQUIRES_NEW)
     public ResultBean updatePayInfo_Fast(PayPartyBean payPartyBean){
         TxnsLogModel txnsLog = getTxnsLogByTxnseqno(payPartyBean.getTxnseqno());
+
         Map<String, Object> cardMap = null;
         if(StringUtil.isNotEmpty(payPartyBean.getCardNo())){
         	cardMap = getCardInfo(payPartyBean.getCardNo());
         }
-        String hql = "update TxnsLogModel set paytype=?,payordno=?,payinst=?,payfirmerno=?,payordcomtime=?,pan=?,cardtype=?,cardinstino=?,txnfee=? where txnseqno=?";
+       
+        String hql = "update TxnsLogModel set paytype=?,payordno=?,payinst=?,payfirmerno=?,payordcomtime=?,pan=?,cardtype=?,cardinstino=?,txnfee=?,pan_name=? where txnseqno=?";
+
         super.updateByHQL(hql, new Object[]{"01",payPartyBean.getPayordno(),payPartyBean.getPayinst(),payPartyBean.getPayfirmerno(),payPartyBean.getPayordcomtime(),
-                    payPartyBean.getCardNo(),cardMap==null?"":cardMap.get("TYPE")+"",cardMap==null?"":cardMap.get("BANKCODE")+"",getTxnFee(txnsLog),payPartyBean.getTxnseqno()});
+
+        payPartyBean.getCardNo(),cardMap==null?"":cardMap.get("TYPE")+"",cardMap==null?"":cardMap.get("BANKCODE")+"",getTxnFee(txnsLog),payPartyBean.getTxnseqno()});
+
+                    
+
         return null;
     }
     
@@ -322,9 +342,9 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+            txnsLog.setRetinfo(withholdin.getExecmsg());
+            txnsLog.setRetcode(withholdin.getExeccode());
         }
-        txnsLog.setRetinfo(withholdin.getExecmsg());
-        txnsLog.setRetcode(withholdin.getExeccode());
         super.update(txnsLog);
     }
 
@@ -588,10 +608,17 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
                 continue;
             }
             txnsLog = new TxnsLogModel();
+
             
             PojoMember mbmberByMemberId = memberService2.getMbmberByMemberId(data.getTranData().getMemberId(), null);
             PojoCoopInsti coopInsti = coopInstiDAO.get(mbmberByMemberId.getInstiId());
-            MemberBaseModel member = memberService.get(data.getTranData().getMemberId());
+            //MemberBaseModel member = memberService.get(data.getTranData().getMemberId());
+
+            PojoMerchDeta member = merchService.getMerchBymemberId(data.getTranData().getMemberId());
+           // MemberBaseModel member = memberService.get(data.getTranData().getMemberId());
+            PojoMember memberPojoMember = memberService2.getMbmberByMemberId(data.getTranData().getMemberId(), null);
+            PojoCoopInsti pojoCoopInsti = coopInstiDAO.get(memberPojoMember.getInstiId());
+
             txnsLog.setTxnseqno(data.getTranData().getTxnseqno());
             txnsLog.setTxndate(DateUtil.getCurrentDate());
             txnsLog.setTxntime(DateUtil.getCurrentTime());
@@ -607,18 +634,24 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
             }
             
             txnsLog.setAmount(data.getTranAmt().longValue());
-            txnsLog.setRiskver(member.getRiskver());
-            txnsLog.setSplitver(member.getSpiltver());
-            txnsLog.setFeever(member.getFeever());
-            txnsLog.setPrdtver(member.getPrdtver());
-            txnsLog.setCheckstandver(member.getCashver());
-            txnsLog.setRoutver(member.getRoutver());
+            txnsLog.setRiskver(member.getRiskVer());
+            txnsLog.setSplitver(member.getSpiltVer());
+            txnsLog.setFeever(member.getFeeVer());
+            txnsLog.setPrdtver(member.getPrdtVer());
+           
+            txnsLog.setRoutver(member.getRoutVer());
             //txnsLog.setAccordno(data.getRelatedorderno());
+
             txnsLog.setAcccoopinstino(coopInsti.getInstiCode());
             txnsLog.setAccfirmerno(data.getTranData().getMemberId());
+
+            txnsLog.setAccordinst(pojoCoopInsti.getInstiCode());
+            txnsLog.setAccfirmerno(pojoCoopInsti.getInstiCode());
+            txnsLog.setAccsecmerno(data.getTranData().getMemberId());
+
             txnsLog.setAccordcommitime(DateUtil.getCurrentDateTime());
             txnsLog.setTradestatflag("00000000");//交易初始状态
-            txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlcycle().toString())));
+            txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlCycle().toString())));
             txnsLog.setPaytype("04"); //支付类型（01：快捷，02：网银，03：账户）
             txnsLog.setPayordno(data.getTranData().getBusiDataId()+"");//支付定单号
             txnsLog.setPayinst(ChannelEnmu.CMBCINSTEADPAY.getChnlcode());//支付所属机构
@@ -746,4 +779,97 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         String queryString="select count(*) total ,sum(t.amount) clearing   from t_txns_charge t ,t_member m where t.memberid=m.mem_id and m.MEMBER_ID=? and trunc(t.CVLEXATIME)=TO_DATE(?,'YYYYMMDD')   ";//
         return (List<?>) super.queryBySQL(queryString, new Object[]{memberId,date});//,date
     }
+    
+    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    public void excuteRecon(){
+    	log.info("start ReconJob");
+		List<Map<String, Object>> selfTxnList = (List<Map<String, Object>>) queryBySQL("SELECT * FROM T_SELF_TXN T WHERE STATUS = ? AND RESULT = ?", new Object[]{"9","02"});
+		if(selfTxnList.size()>0){
+			for(Map<String, Object> value:selfTxnList){
+				TxnsLogModel txnsLog = getTxnsLogByTxnseqno(value.get("TXNSEQNO")+"");
+				log.info("txnsLog:"+txnsLog.getTxnseqno());
+				//通道手续费
+				Long channelFee = Long.valueOf(value.get("CFEE")+"")+Long.valueOf(StringUtil.isEmpty(value.get("DFEE")+"")?"0":value.get("DFEE")+"");
+				String payMemberId = "";
+        		String payToMemberId = "";
+				 //记录提现账务
+	            try {
+	            	//List<Map<String, Object>> businessList = (List<Map<String, Object>>) txnsLogService.queryBySQL("SELECT * FROM T_BUSINESS WHERE BUSICODE = ?", new Object[]{value.get("BUSICODE").toString()});
+	            	//if(businessList.size()>0){
+	            		String busiType = txnsLog.getBusitype();
+	            		BusiTypeEnum busiTypeEnum = BusiTypeEnum.fromValue(busiType);
+	            		switch (busiTypeEnum) {
+							case charge:
+								if(StringUtil.isEmpty(txnsLog.getAccsecmerno())){
+					                payMemberId = txnsLog.getAccmemberid();//
+					                payToMemberId = txnsLog.getAccmemberid();
+					            }else{
+					                String memberId = txnsLog.getAccmemberid();
+					                if(StringUtil.isEmpty(memberId)){
+					                    break;
+					                }
+					                payMemberId = memberId;
+					                payToMemberId = memberId;
+					            }
+								break;
+							case consumption:
+								/**付款方会员ID**/
+				                payMemberId = StringUtil.isNotEmpty(txnsLog.getAccmemberid())?txnsLog.getAccmemberid():"999999999999999";
+				                /**收款方会员ID**/
+				                payToMemberId = StringUtil.isEmpty(txnsLog.getAccsecmerno())?txnsLog.getAccfirmerno():txnsLog.getAccsecmerno();
+				                /**渠道**/
+				                String channelId = txnsLog.getPayinst();//支付机构代码
+				                if("99999999".equals(channelId)){
+				                    payMemberId = txnsLog.getPayfirmerno();
+				                }else{
+				                	
+				                }
+								break;
+							case insteadPay:
+								  payMemberId = StringUtil.isEmpty(txnsLog.getAccsecmerno())?txnsLog.getAccfirmerno():txnsLog.getAccsecmerno();
+							      payToMemberId = "999999999999999";
+								break;
+							case refund:
+								break;
+							case withdrawal:
+								if(StringUtil.isEmpty(txnsLog.getAccmemberid())||"999999999999999".equals(txnsLog.getAccmemberid())){
+									payMemberId = txnsLog.getAccsecmerno();
+							        payToMemberId = txnsLog.getAccsecmerno();
+								}else{
+									payMemberId = txnsLog.getAccmemberid();
+							        payToMemberId = txnsLog.getAccmemberid();
+								}
+								break;
+							default:
+								break;
+						}
+	            	//}
+					TradeInfo tradeInfo = new TradeInfo();
+					tradeInfo.setBusiCode(txnsLog.getBusicode());
+					tradeInfo.setPayMemberId(payMemberId);
+					tradeInfo.setPayToMemberId(payToMemberId);
+					tradeInfo.setAmount(new BigDecimal(value.get("AMOUNT")+""));
+					tradeInfo.setCharge(new BigDecimal(txnsLog.getTxnfee()));
+					tradeInfo.setTxnseqno(value.get("TXNSEQNO")+"");
+					tradeInfo.setChannelId(txnsLog.getPayinst());
+					tradeInfo.setChannelFee(new BigDecimal(channelFee));
+					tradeInfo.setCoopInstCode(txnsLog.getAcccoopinstino());
+					accEntryService.accEntryProcess(tradeInfo, EntryEvent.RECON_SUCCESS);
+					
+					executeBySQL("UPDATE T_SELF_TXN SET RESULT=? WHERE TID = ?", new Object[]{"03",value.get("TID")});
+				} catch (AccBussinessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (AbstractBusiAcctException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (NumberFormatException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	            log.info("end ReconJob");
+			}
+		}
     }
+    
+}

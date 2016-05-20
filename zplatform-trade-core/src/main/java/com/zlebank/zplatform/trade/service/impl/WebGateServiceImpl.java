@@ -168,6 +168,12 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             throw new TradeException("T033");
         }
         PojoQuickpayCust card = quickpayCustDAO.getById(Long.valueOf(tradeBean.getCardId()));//quickpayCustService.getCardByBindId(tradeBean.getBindCardId());
+        txnsLog.setCardtype(card.getCardtype());
+        Long txnFee = txnsLogService.getTxnFee(txnsLog);
+        if(txnFee>txnsLog.getAmount()){
+        	throw new TradeException("T039");
+        }
+        
         ResultBean routResultBean = routeConfigService.getWapTransRout(DateUtil.getCurrentDateTime(), orderinfo.getOrderamt()+"",  StringUtil.isNotEmpty(tradeBean.getMerchId())?tradeBean.getMerchId():tradeBean.getSubMerchId(), txnsLog.getBusicode(), tradeBean.getCardNo());
         String routId = routResultBean.getResultObj().toString();
         IQuickPayTrade quickPayTrade = null;
@@ -183,6 +189,8 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        
+        
         txnsLogService.initretMsg(txnsLog.getTxnseqno());
         //交易风控
         txnsLogService.tradeRiskControl(txnsLog.getTxnseqno(),txnsLog.getAccfirmerno(),txnsLog.getAccsecmerno(),txnsLog.getAccmemberid(),txnsLog.getBusicode(),txnsLog.getAmount()+"",card.getCardtype(),card.getCardno());

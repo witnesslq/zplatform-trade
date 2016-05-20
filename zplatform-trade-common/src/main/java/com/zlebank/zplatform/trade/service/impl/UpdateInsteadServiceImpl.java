@@ -17,7 +17,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.annotation.Primary;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -25,12 +24,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.service.AccEntryService;
+import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.trade.bean.UpdateData;
 import com.zlebank.zplatform.trade.bean.enums.InsteadPayDetailStatusEnum;
 import com.zlebank.zplatform.trade.bean.enums.TransferBusiTypeEnum;
 import com.zlebank.zplatform.trade.dao.InsteadPayBatchDAO;
 import com.zlebank.zplatform.trade.dao.InsteadPayDetailDAO;
 import com.zlebank.zplatform.trade.model.PojoInsteadPayDetail;
+import com.zlebank.zplatform.trade.model.TxnsLogModel;
+import com.zlebank.zplatform.trade.service.ITxnsLogService;
 import com.zlebank.zplatform.trade.service.NotifyInsteadURLService;
 import com.zlebank.zplatform.trade.service.ObserverListService;
 import com.zlebank.zplatform.trade.service.UpdateInsteadService;
@@ -61,6 +63,8 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
     @Autowired
     private NotifyInsteadURLService notifyInsteadURLService;
     
+    @Autowired
+    private ITxnsLogService txnsLogService;
     /**
      *  更新状态和记账
      * @param data
@@ -86,21 +90,24 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
         }
         detail.setRespMsg(data.getResultMessage());
         insteadPayDetailDAO.merge(detail);
-        
+        TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(detail.getTxnseqno());
         TradeInfo tradeInfo = new TradeInfo();
         tradeInfo.setPayMemberId(detail.getMerId());
         tradeInfo.setAmount(new BigDecimal(detail.getAmt()));
         tradeInfo.setCharge(new BigDecimal(detail.getTxnfee()));
         tradeInfo.setTxnseqno(detail.getTxnseqno());
+        tradeInfo.setCoopInstCode(txnsLog.getAccfirmerno());
+        EntryEvent entryEvent = null;
         if ("00".equals(data.getResultCode())) {
-            tradeInfo.setBusiCode("70000002");
+            tradeInfo.setBusiCode("70000001");
             tradeInfo.setChannelId(data.getChannelCode());
+            entryEvent = EntryEvent.TRADE_SUCCESS;
         } else {
-            tradeInfo.setBusiCode("70000003");
+            tradeInfo.setBusiCode("70000001");
+            entryEvent = EntryEvent.TRADE_FAIL;
         }
-        
         try {
-            accEntryService.accEntryProcess(tradeInfo );
+            accEntryService.accEntryProcess(tradeInfo, entryEvent);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }

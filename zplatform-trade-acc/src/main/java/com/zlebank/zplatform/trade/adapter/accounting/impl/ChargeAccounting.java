@@ -22,6 +22,7 @@ import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
 import com.zlebank.zplatform.acc.exception.AccBussinessException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
+import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.commons.dao.pojo.AccStatusEnum;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.adapter.accounting.IAccounting;
@@ -99,6 +100,7 @@ public class ChargeAccounting implements IAccounting{
             txnsLogService.updateAccBusiCode(txnseqno, busiCode);
             TradeInfo tradeInfo = new TradeInfo(txnseqno, payordno, busiCode, payMemberId, payToMemberId, payToParentMemberId, channelId, productId, amount, commission, charge, amountD, amountE, false);
             tradeInfo.setPayordno(payordno);
+            tradeInfo.setCoopInstCode(txnsLog.getAccfirmerno());
             /*tradeInfo.setTxnseqno(txnseqno);
             tradeInfo.setAmount(amount);;
             tradeInfo.setAmountD(amountD);
@@ -112,7 +114,7 @@ public class ChargeAccounting implements IAccounting{
             tradeInfo.setPayToParentMemberId(payToParentMemberId);
             tradeInfo.setProductId(productId);*/
             log.info(JSON.toJSONString(tradeInfo));
-            accEntryService.accEntryProcess(tradeInfo);
+            accEntryService.accEntryProcess(tradeInfo,EntryEvent.TRADE_SUCCESS);
             resultBean = new ResultBean("success");
             log.info("交易:"+txnseqno+"充值入账成功");
         } catch (TradeException e) {

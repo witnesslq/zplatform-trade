@@ -78,6 +78,7 @@ public class TxnsLogModel implements java.io.Serializable {
     private String apporderinfo;
     private String accbusicode;
     private String acccoopinstino;
+    private String panName;
     // Constructors
 
     /** default constructor */
@@ -721,6 +722,21 @@ public class TxnsLogModel implements java.io.Serializable {
 	 */
 	public void setAcccoopinstino(String acccoopinstino) {
 		this.acccoopinstino = acccoopinstino;
+	}
+
+	/**
+	 * @return the panName
+	 */
+	@Column(name = "PAN_NAME")
+	public String getPanName() {
+		return panName;
+	}
+
+	/**
+	 * @param panName the panName to set
+	 */
+	public void setPanName(String panName) {
+		this.panName = panName;
 	}
 	
     

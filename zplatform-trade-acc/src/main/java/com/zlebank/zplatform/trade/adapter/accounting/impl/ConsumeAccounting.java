@@ -20,6 +20,7 @@ import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
 import com.zlebank.zplatform.acc.exception.AccBussinessException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
+import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.commons.dao.pojo.AccStatusEnum;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.adapter.accounting.IAccounting;
@@ -68,6 +69,7 @@ public class ConsumeAccounting implements IAccounting{
                 String payToParentMemberId=txnsLog.getAccfirmerno()+"";
                 /**渠道**/
                 String channelId = txnsLog.getPayinst();//支付机构代码
+
                 /**手续费**/
                 long txnfee = 0;
                 if("99999999".equals(channelId)){
@@ -86,7 +88,7 @@ public class ConsumeAccounting implements IAccounting{
                 BigDecimal amount = new BigDecimal(txnsLog.getAmount());
                 /**佣金**/
                 BigDecimal commission = new BigDecimal(txnsLog.getTradcomm());
-               
+
                 BigDecimal charge = new BigDecimal(txnfee);
                 /**金额D**/
                 BigDecimal amountD = new BigDecimal(0);
@@ -99,6 +101,7 @@ public class ConsumeAccounting implements IAccounting{
                 }
                 txnsLogService.updateAccBusiCode(txnseqno, busiCode);
                 TradeInfo tradeInfo = new TradeInfo(txnseqno, payordno, busiCode, payMemberId, payToMemberId, payToParentMemberId, channelId, productId, amount, commission, charge, amountD, amountE, isSplit);
+                tradeInfo.setCoopInstCode(txnsLog.getAccfirmerno());
                 /*tradeInfo.setPayordno(payordno);
                 tradeInfo.setTxnseqno(txnseqno);
                 tradeInfo.setAmount(amount);;
@@ -115,7 +118,7 @@ public class ConsumeAccounting implements IAccounting{
                
                 
                 log.info(JSON.toJSONString(tradeInfo));
-                accEntryService.accEntryProcess(tradeInfo);
+                accEntryService.accEntryProcess(tradeInfo,EntryEvent.TRADE_SUCCESS);
                 resultBean = new ResultBean("00","交易成功");
                 resultBean.setResultBool(true);
                 log.info("交易:"+txnseqno+"消费入账成功");

@@ -77,5 +77,15 @@ public class TxnsRefundServiceImpl extends BaseServiceImpl<TxnsRefundModel,Long>
         txnsRefundDAO.updateRefund(refundOrder);
         // TODO Auto-generated method stub
     }
+	/**
+	 *
+	 * @param txnseqno
+	 * @return
+	 */
+	@Override
+	public TxnsRefundModel getRefundByTxnseqno(String txnseqno) {
+		String hql = " from TxnsRefundModel c where c.reltxnseqno = ? ";
+        return super.getUniqueByHQL(hql, new Object[]{txnseqno});
+	}
     
 }

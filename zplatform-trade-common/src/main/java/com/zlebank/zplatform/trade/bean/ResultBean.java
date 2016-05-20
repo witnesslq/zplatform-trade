@@ -10,6 +10,7 @@ public class ResultBean implements Serializable {
 	private String errMsg;
 	private boolean resultBool;
 	private Object resultObj;
+	private String routId;
 	
 	public ResultBean(){
 		this.resultBool=false;
@@ -70,6 +71,20 @@ public class ResultBean implements Serializable {
 
 	public void setResultObj(Object resultObj) {
 		this.resultObj = resultObj;
+	}
+
+	/**
+	 * @return the routId
+	 */
+	public String getRoutId() {
+		return routId;
+	}
+
+	/**
+	 * @param routId the routId to set
+	 */
+	public void setRoutId(String routId) {
+		this.routId = routId;
 	}
 	
 	

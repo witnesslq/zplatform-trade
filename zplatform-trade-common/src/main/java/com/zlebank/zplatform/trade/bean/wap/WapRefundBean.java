@@ -196,20 +196,9 @@ public class WapRefundBean {
     public void setAccessType(String accessType) {
         this.accessType = accessType;
     }
-   
+
+    
     /**
-	 * @return the origOrderId
-	 */
-	public String getOrigOrderId() {
-		return origOrderId;
-	}
-	/**
-	 * @param origOrderId the origOrderId to set
-	 */
-	public void setOrigOrderId(String origOrderId) {
-		this.origOrderId = origOrderId;
-	}
-	/**
      * @return the txnAmt
      */
     public String getTxnAmt() {
@@ -292,6 +281,18 @@ public class WapRefundBean {
 	 */
 	public void setCoopInstiId(String coopInstiId) {
 		this.coopInstiId = coopInstiId;
+	}
+	/**
+	 * @return the origOrderId
+	 */
+	public String getOrigOrderId() {
+		return origOrderId;
+	}
+	/**
+	 * @param origOrderId the origOrderId to set
+	 */
+	public void setOrigOrderId(String origOrderId) {
+		this.origOrderId = origOrderId;
 	}
 	
     

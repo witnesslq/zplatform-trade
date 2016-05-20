@@ -26,6 +26,7 @@ import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
 import com.zlebank.zplatform.acc.exception.AccBussinessException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
+import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.commons.enums.BusinessCodeEnum;
 import com.zlebank.zplatform.commons.utils.BeanCopyUtil;
 import com.zlebank.zplatform.commons.utils.StringUtil;
@@ -178,7 +179,7 @@ public class RealNameAuthServiceImpl  implements RealNameAuthService{
         tradeInfo.setPayMemberId(order.getMerId());
         tradeInfo.setCharge(new BigDecimal(startTime.getPara()));// 手续费
         tradeInfo.setChannelId(ChannelEnmu.CMBCWITHHOLDING.getChnlcode());
-        accEntryService.accEntryProcess(tradeInfo);
+        accEntryService.accEntryProcess(tradeInfo,EntryEvent.TRADE_SUCCESS);
        
     }
 

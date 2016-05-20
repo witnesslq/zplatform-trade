@@ -60,7 +60,8 @@ public class NotifyInsteadURLServiceImpl implements NotifyInsteadURLService,  Ap
     @Autowired
     private InsteadPayDetailDAO insteadPayDetailDAO;
     
-    //@Autowired
+
+    @Autowired
     private InsteadPayService insteadPayService;
     
     @Autowired

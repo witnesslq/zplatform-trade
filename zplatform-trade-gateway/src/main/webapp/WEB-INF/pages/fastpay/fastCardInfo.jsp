@@ -264,10 +264,11 @@ $.validator.addMethod("cardNoValidator", function(value) {
 			  	url: "/zplatform-trade/gateway/getCardType",
 			  	data: "rand="+new Date().getTime()+"&cardNo="+cardNo,
 			  	async:false,
-			 	dataType: "json",
-			 	success:function(json){
+			 	dataType: "text",
+			 	success:function(text){
 			 		if(text=="carderror"){
-			 			alert("银行卡号错误，请填写正确的银行卡号");
+			 			//alert("银行卡号错误，请填写正确的银行卡号");
+			 			$("#cardNoTip").html("银行卡号错误，请填写正确的银行卡号");
 			 		}else{
 			 			
 			 			var json = eval('(' + text + ')');
@@ -277,25 +278,33 @@ $.validator.addMethod("cardNoValidator", function(value) {
 							//$("#li_cvv2").show();
 							if(json.BANKCODE.substring(0,4)==$("#bankCode").val()){
 								flag = true;
-								
-							}else{alert("该卡号不是所选银行");}
+								$("#cardNoTip").html("<img src='/zplatform-trade/images/onSuccess.gif' style='text-align: center;'/>");
+							}else{
+								$("#cardNoTip").html("该卡号不是所选银行");
+								}
 						}else if(json.TYPE=="1"){
 							//$("#li_validatetime").hide();
 							//$("#li_cvv2").hide();
 							if(json.BANKCODE.substring(0,4)==$("#bankCode").val()){
 								flag = true;
-								
-							}else{alert("该卡号不是所选银行");}
+								$("#cardNoTip").html("<img src='/zplatform-trade/images/onSuccess.gif' style='text-align: center;'/>");
+							}else{
+								$("#cardNoTip").html("该卡号不是所选银行");
+								}
 						}else{
-							alert("银行卡号错误，请填写正确的银行卡号");
+							//alert("银行卡号错误，请填写正确的银行卡号");
+							$("#cardNoTip").html("银行卡号错误，请填写正确的银行卡号");
 						}
 			 		}
+			 		
 			 		
 					
 					
 			 	}
 			});
 			return flag;
+		}else{
+			$("#cardNoTip").html("银行卡号错误,银行卡号必须为12-19位数字");
 		}
 		
 		

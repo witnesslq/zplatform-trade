@@ -40,6 +40,7 @@ import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
 import com.zlebank.zplatform.acc.exception.AccBussinessException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.AccountQueryService;
+import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.commons.bean.PagedResult;
 import com.zlebank.zplatform.commons.enums.BusinessCodeEnum;
 import com.zlebank.zplatform.commons.utils.Base64Utils;
@@ -99,6 +100,7 @@ import com.zlebank.zplatform.trade.bean.wap.WapWithdrawBean;
 import com.zlebank.zplatform.trade.cmbc.service.ICMBCTransferService;
 import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
 import com.zlebank.zplatform.trade.dao.RspmsgDAO;
+import com.zlebank.zplatform.trade.dao.impl.RspmsgDAOImpl;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.factory.TradeAdapterFactory;
 import com.zlebank.zplatform.trade.model.CashBankModel;
@@ -417,18 +419,28 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         txnsLog.setAccordno(order.getOrderId());
         txnsLog.setAccfirmerno(order.getCoopInstiId());
         txnsLog.setAcccoopinstino(order.getCoopInstiId());
-        txnsLog.setAccsecmerno(order.getMerId());
+        if("20000".equals(busiModel.getBusitype())){
+        	 txnsLog.setAccsecmerno("");
+        }else{
+        	txnsLog.setAccsecmerno(order.getMerId());
+        }
+        
         txnsLog.setAccordcommitime(DateUtil.getCurrentDateTime());
         txnsLog.setTradestatflag("00000000");//交易初始状态
         //txnsLog.setTradcomm(GateWayTradeAnalyzer.generateCommAmt(order.getReserved()));
         if(StringUtil.isNotEmpty(riskRateInfoBean.getMerUserId())){
-        	PersonManager personMemeber = personService.getPersonBeanByMemberId(riskRateInfoBean.getMerUserId());
-            //PojoMember personMemeber= memberService2.getMbmberByMemberId(riskRateInfoBean.getMerUserId(), MemberType.INDIVIDUAL);
-            if(personMemeber!=null){
-                txnsLog.setAccmemberid(riskRateInfoBean.getMerUserId());
-            }else{
-                txnsLog.setAccmemberid("999999999999999");//匿名会员号
-            }
+        	if("999999999999999".equals(riskRateInfoBean.getMerUserId())){
+        		txnsLog.setAccmemberid("999999999999999");//匿名会员号
+        	}else{
+        		PersonManager personMemeber = personService.getPersonBeanByMemberId(riskRateInfoBean.getMerUserId());
+                //PojoMember personMemeber= memberService2.getMbmberByMemberId(riskRateInfoBean.getMerUserId(), MemberType.INDIVIDUAL);
+                if(personMemeber!=null){
+                    txnsLog.setAccmemberid(riskRateInfoBean.getMerUserId());
+                }else{
+                    txnsLog.setAccmemberid("999999999999999");//匿名会员号
+                }
+        	}
+        	
         }
         //记录分账信息和交易佣金
         if("01".equals(order.getTxnType())&&"99".equals(order.getTxnSubType())){
@@ -963,7 +975,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             tradeInfo.setCharge(new BigDecimal(txnsLog.getTxnfee()));
             tradeInfo.setTxnseqno(txnsLog.getTxnseqno());
             //记录分录流水
-            accEntryService.accEntryProcess(tradeInfo);
+            accEntryService.accEntryProcess(tradeInfo,EntryEvent.AUDIT_APPLY);
         } catch (NumberFormatException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -1104,8 +1116,9 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
                 tradeInfo.setCharge(new BigDecimal(txnsLog.getTxnfee() == null ? 0L : txnsLog.getTxnfee()));
                 tradeInfo.setTxnseqno(txnsLog.getTxnseqno());
                 tradeInfo.setBusiCode(BusinessCodeEnum.WITHDRAWALS.getBusiCode());
+                tradeInfo.setCoopInstCode(txnsLog.getAcccoopinstino());
                 //记录分录流水
-                accEntryService.accEntryProcess(tradeInfo);
+                accEntryService.accEntryProcess(tradeInfo,EntryEvent.AUDIT_APPLY);
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -1911,6 +1924,11 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         }
         
         PojoQuickpayCust card = quickpayCustDAO.getById(Long.valueOf(submitPayBean.getBindId()));
+        txnsLog.setCardtype(card.getCardtype());
+        Long txnFee = txnsLogService.getTxnFee(txnsLog);
+        if(txnFee>txnsLog.getAmount()){
+        	throw new TradeException("T039");
+        }
         TradeBean trade = new TradeBean(card.getBankcode(),orderinfo.getOrderno(),orderinfo.getOrderamt()+"", card.getCardno(),card.getAccname(),card.getIdnum(), card.getPhone(),submitPayBean.getSmsCode(), "", card.getIdtype(), "", "", txnsLog.getTxnseqno(), txnsLog.getAccfirmerno(), "", "", txnsLog.getAccsecmerno(), "", txnsLog.getCheckstandver(), txnsLog.getBusicode(), txnsLog.getBusitype(), card.getCardtype(), "goods", "gooddesc", card.getCvv2(), card.getValidtime(),txnsLog.getAccmemberid(),card.getBindcardid(), "", reapayOrderNo, "", "", 0L, "", "", orderinfo.getTn(), "", "");
         ResultBean routResultBean = routeConfigService.getWapTransRout(DateUtil.getCurrentDateTime(), trade.getAmount()+"",  StringUtil.isNotEmpty(trade.getMerchId())?trade.getMerchId():trade.getSubMerchId(), trade.getBusicode(), trade.getCardNo());
         String routId = routResultBean.getResultObj().toString();
@@ -1944,6 +1962,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         if(!resultBean.isResultBool()){
             throw new TradeException("T000",resultBean.getErrCode());
         }
+        
     }
     
     /**
@@ -2205,6 +2224,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         }
         if(routResultBean.isResultBool()){
             String routId = routResultBean.getResultObj().toString();
+            //resultBean.setRoutId(routId);
             IQuickPayTrade quickPayTrade = null;
             try {
                 quickPayTrade = TradeAdapterFactory.getInstance().getQuickPayTrade(routId);
@@ -2230,6 +2250,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             //Long bindId=quickpayCustService.saveQuickpayCust(trade);
             //trade.setCardId(bindId);
             resultBean = quickPayTrade.bankSign(trade);
+            resultBean.setRoutId(routId);
         }
     	return resultBean;
     }
@@ -2427,7 +2448,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             tradeInfo.setCharge(new BigDecimal(txnsLog.getTxnfee()));
             tradeInfo.setTxnseqno(txnsLog.getTxnseqno());
             //记录分录流水
-            accEntryService.accEntryProcess(tradeInfo);
+            accEntryService.accEntryProcess(tradeInfo,EntryEvent.AUDIT_APPLY);
         } catch (NumberFormatException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

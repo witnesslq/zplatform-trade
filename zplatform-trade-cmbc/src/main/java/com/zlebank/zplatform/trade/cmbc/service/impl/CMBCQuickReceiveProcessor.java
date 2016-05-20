@@ -100,6 +100,7 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
             if(resultBean.isResultBool()){//交易成功
                 TxnsWithholdingModel withholding = (TxnsWithholdingModel) resultBean.getResultObj();
                 PayPartyBean payPartyBean = new PayPartyBean(tradeBean.getTxnseqno(),"01", tradeBean.getOrderId(), "93000002", ConsUtil.getInstance().cons.getCmbc_merid(), "", DateUtil.getCurrentDateTime(), "",tradeBean.getCardNo());
+                payPartyBean.setPanName(tradeBean.getAcctName());
                 //更新支付方信息
                 txnsLogService.updatePayInfo_Fast(payPartyBean);
                 //更新交易流水中心应答信息
@@ -296,7 +297,7 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
         }else{
             payPartyBean = new PayPartyBean(txnseqno,"01", withholding.getSerialno(), withholding.getChnlcode(), ConsUtil.getInstance().cons.getCmbc_merid(), "", DateUtil.getCurrentDateTime(), "",withholding.getAccno());
         }
-        
+        payPartyBean.setPanName(withholding.getAccname());
         txnsLogService.updatePayInfo_Fast(payPartyBean);
         
         

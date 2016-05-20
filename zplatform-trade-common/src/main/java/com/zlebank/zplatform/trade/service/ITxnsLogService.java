@@ -130,9 +130,15 @@ public interface ITxnsLogService extends IBaseService<TxnsLogModel, String>{
     public void saveBossPayBankTransferLogs(List<PojoBankTransferData> transferDataList);
     
     /**
+
      * 更新网关支付结果
      * @param payPartyBean
      * @return
      */
     public ResultBean updateGateWayPayResult(PayPartyBean payPartyBean);
+    /**
+     * 对账任务
+     */
+    public void excuteRecon();
+
 }

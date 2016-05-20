@@ -40,6 +40,8 @@ public class PayPartyBean implements Serializable{
     private String payretinfo;
     private String cashCode;
     
+    private String panName;
+    
     
     /**
      * @return the paytype
@@ -254,11 +256,23 @@ public class PayPartyBean implements Serializable{
         this.cashCode = cashCode;
     }
 	/**
+
 	 * 
 	 */
 	public PayPartyBean() {
 		super();
 		// TODO Auto-generated constructor stub
+	}
+	 
+	public String getPanName() {
+		return panName;
+	}
+	/**
+	 * @param panName the panName to set
+	 */
+	public void setPanName(String panName) {
+		this.panName = panName;
+
 	}
     
     

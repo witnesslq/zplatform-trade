@@ -10,7 +10,6 @@
  */
 package com.zlebank.zplatform.trade.controller;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.PrivateKey;
 import java.util.ArrayList;
@@ -40,12 +39,16 @@ import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.bean.enums.Usage;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.AccountQueryService;
+import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.commons.bean.PagedResult;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.member.bean.CoopInsti;
 import com.zlebank.zplatform.member.bean.QuickpayCustBean;
 import com.zlebank.zplatform.member.bean.enums.MemberType;
+import com.zlebank.zplatform.member.dao.CoopInstiDAO;
 import com.zlebank.zplatform.member.dao.PersonDAO;
+import com.zlebank.zplatform.member.pojo.PojoCoopInsti;
+import com.zlebank.zplatform.member.pojo.PojoMember;
 import com.zlebank.zplatform.member.pojo.PojoMerchDeta;
 import com.zlebank.zplatform.member.pojo.PojoPersonDeta;
 import com.zlebank.zplatform.member.service.CoopInstiService;
@@ -70,14 +73,10 @@ import com.zlebank.zplatform.trade.bean.gateway.OrderRespBean;
 import com.zlebank.zplatform.trade.bean.gateway.QueryBean;
 import com.zlebank.zplatform.trade.bean.gateway.QueryResultBean;
 import com.zlebank.zplatform.trade.bean.gateway.RiskRateInfoBean;
-import com.zlebank.zplatform.trade.chanpay.bean.async.TradeAsyncResultBean;
 import com.zlebank.zplatform.trade.chanpay.bean.query.BankItemBean;
 import com.zlebank.zplatform.trade.chanpay.bean.query.QueryBankBean;
 import com.zlebank.zplatform.trade.chanpay.service.ChanPayService;
-import com.zlebank.zplatform.trade.cmbc.bean.gateway.CardMessageBean;
 import com.zlebank.zplatform.trade.cmbc.bean.gateway.InsteadPayMessageBean;
-import com.zlebank.zplatform.trade.cmbc.bean.gateway.WithholdingMessageBean;
-import com.zlebank.zplatform.trade.cmbc.exception.CMBCTradeException;
 import com.zlebank.zplatform.trade.cmbc.service.ICMBCTransferService;
 import com.zlebank.zplatform.trade.cmbc.service.IWithholdingService;
 import com.zlebank.zplatform.trade.cmbc.service.impl.InsteadPayServiceImpl;
@@ -85,7 +84,6 @@ import com.zlebank.zplatform.trade.dao.RspmsgDAO;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.factory.AccountingAdapterFactory;
 import com.zlebank.zplatform.trade.factory.TradeAdapterFactory;
-import com.zlebank.zplatform.trade.model.PojoRealnameAuth;
 import com.zlebank.zplatform.trade.model.PojoRspmsg;
 import com.zlebank.zplatform.trade.model.TxncodeDefModel;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
@@ -177,7 +175,12 @@ public class GateWayController {
     @Autowired
     private AccEntryService accEntryService;
     @Autowired
+
     private ChanPayService chanPayService;
+
+    private ChanPayAsyncService chanPayAsyncService;
+    @Autowired
+    private CoopInstiDAO coopInstiDAO;
     
     @RequestMapping("/coporder.htm")
     public ModelAndView pay(OrderBean order,HttpSession httpSession,HttpServletRequest request) {
@@ -262,8 +265,11 @@ public class GateWayController {
                 model.put("errCode", msg.getWebrspcode());
                 return false;
             }
+            
             if (order.getMerId().startsWith("2")) {// 对于商户会员需要进行检查
-                if (!order.getCoopInstiId().equals(subMember.getParent())) {
+            	PojoMember pojoMember = memberService2.getMbmberByMemberId(order.getMerId(), null);
+            	PojoCoopInsti pojoCoopInsti = coopInstiDAO.get(pojoMember.getInstiId());
+                if (!order.getCoopInstiId().equals(pojoCoopInsti.getInstiCode())) {
                 	PojoRspmsg msg = rspmsgDAO.get("GW07");
                 	model.put("errMsg", msg.getRspinfo());
                     model.put("errCode", msg.getWebrspcode());
@@ -1471,7 +1477,7 @@ public class GateWayController {
                 model.put("txnseqno", tradeBean.getTxnseqno());
                 return new ModelAndView("/erro_gw", model);
             }
-            
+            //TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(orderinfo.getRelatetradetxn());
             
             TxnsWithdrawModel withdraw = new TxnsWithdrawModel(tradeBean);
             Map<String, Object> cardMap = routeConfigService.getCardInfo(tradeBean.getCardNo());
@@ -1483,10 +1489,14 @@ public class GateWayController {
             tradeInfo.setPayMemberId(withdraw.getMemberid());
             tradeInfo.setPayToMemberId(withdraw.getMemberid());
             tradeInfo.setAmount(new BigDecimal(withdraw.getAmount()));
-            tradeInfo.setCharge(new BigDecimal(0));
+            tradeInfo.setCharge(new BigDecimal(txnsLogService.getTxnFee(txnsLog)));
             tradeInfo.setTxnseqno(orderinfo.getRelatetradetxn());
+            tradeInfo.setCoopInstCode(orderinfo.getFirmemberno());
             //记录分录流水
+
            // accEntryService.accEntryProcess(tradeInfo);
+
+            accEntryService.accEntryProcess(tradeInfo,EntryEvent.AUDIT_APPLY);
             if (StringUtil.isNotEmpty(tradeBean.getBindCardId())) {
                 /*QuickpayCustModel card = memberBankCardService.
                         .getCardByBindId(tradeBean.getBindCardId());
@@ -1578,7 +1588,7 @@ public class GateWayController {
 		queryTradeBean.set_input_charset(ConsUtil.getInstance().cons.getChanpay_input_charset());
 		queryTradeBean.setService("cjt_get_paychannel");
 		queryTradeBean.setProduct_code("20201");
-		List<BankItemBean> queryBank = chanPayService.queryBank(queryTradeBean);
+		List<BankItemBean> queryBank = (List<BankItemBean>) chanPayService.queryBank(queryTradeBean);
 		
 		List<BankItemBean> b2c_bank = new ArrayList<BankItemBean>();
 		List<BankItemBean> b2b_bank = new ArrayList<BankItemBean>();

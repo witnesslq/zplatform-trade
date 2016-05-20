@@ -58,6 +58,7 @@ public class ChanPayServiceImpl implements ChanPayService {
 	@Override
 	public ReturnMessageBean refund(RefundOrderBean refundOrderBean) {
 		// TODO Auto-generated method stub
+		log.info("chanpay refund:"+JSON.toJSONString(refundOrderBean));
 		try {
 			String sign = RSA.sign(buildParamter(refundOrderBean),
 					ConsUtil.getInstance().cons.getChanpay_private_key(),
