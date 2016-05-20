@@ -26,12 +26,12 @@ public enum BusinessEnum {
     WITHDRAWALS("30000001"),//提现
     REFUND("40000001"),//退款
     INSTEADPAY("70000001"),//代付
-    INSTEADPAY_REFUND("70000003"),//代付退汇
+    INSTEADPAY_REFUND("70000001"),//代付退汇
     WITHDRAWALS_REFUND("30000003"),//提现退汇
     REFUND_REFUND("40000003"),//退款退汇
     
-    INSTEADPAY_SUCCESS("70000002"),//代付退汇
-    WITHDRAWALS_SUCCESS("30000002"),//提现退汇
+    INSTEADPAY_SUCCESS("70000001"),//代付退汇
+    WITHDRAWALS_SUCCESS("30000001"),//提现退汇
     REFUND_SUCCESS("40000002"),//退款退汇
     UNKNOW("");//未知
     private String busiCode;

@@ -212,7 +212,7 @@ public class InsteadBatchServiceImpl extends AbstractBasePageService<InsteadPayB
                 tradeInfo.setAmount(new BigDecimal(detail.getAmt()));
                 tradeInfo.setCharge(new BigDecimal(detail.getTxnfee()));
                 tradeInfo.setTxnseqno(detail.getTxnseqno());
-                tradeInfo.setBusiCode("70000003");
+                tradeInfo.setBusiCode("70000001");
                 try {
                     accEntryService.accEntryProcess(tradeInfo,EntryEvent.AUDIT_REJECT );
                 } catch (Exception e) {
