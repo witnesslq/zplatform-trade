@@ -24,10 +24,12 @@ import com.zlebank.zplatform.acc.exception.AccBussinessException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.commons.dao.pojo.AccStatusEnum;
+import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.adapter.accounting.impl.ChargeAccounting;
 import com.zlebank.zplatform.trade.adapter.quickpay.IRefundTrade;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.TradeBean;
+import com.zlebank.zplatform.trade.bean.enums.BusinessEnum;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.model.TxnsRefundModel;
@@ -91,9 +93,9 @@ public class AccountRefundTrade implements IRefundTrade {
         /**交易金额**/
         BigDecimal amount = new BigDecimal(txnsLog.getAmount());
         /**佣金**/
-        BigDecimal commission = new BigDecimal(txnsLog.getTradcomm());
+        BigDecimal commission = new BigDecimal(StringUtil.isNotEmpty(txnsLog.getTradcomm()+"")?txnsLog.getTradcomm():0);
         /**手续费**/
-        BigDecimal charge = new BigDecimal(txnsLog.getTxnfee());
+        BigDecimal charge = new BigDecimal(StringUtil.isNotEmpty(txnsLog.getTxnfee()+"")?txnsLog.getTxnfee():0L);
         /**金额D**/
         BigDecimal amountD = new BigDecimal(0);
         /**金额E**/
@@ -104,7 +106,8 @@ public class AccountRefundTrade implements IRefundTrade {
         
         log.info(JSON.toJSONString(tradeInfo));
         try {
-			accEntryService.accEntryProcess(tradeInfo,EntryEvent.TRADE_SUCCESS);
+			accEntryService.accEntryProcess(tradeInfo,EntryEvent.AUDIT_PASS);
+			resultBean = new ResultBean("success");
 		}  catch (AccBussinessException e) {
             resultBean = new ResultBean(e.getCode(), e.getMessage());
             e.printStackTrace();

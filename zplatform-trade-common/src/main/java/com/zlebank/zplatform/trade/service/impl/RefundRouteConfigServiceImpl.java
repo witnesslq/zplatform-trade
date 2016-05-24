@@ -101,9 +101,10 @@ public class RefundRouteConfigServiceImpl extends BaseServiceImpl<PojoRefundRout
             paramList.add(transAmt);
             sqlBuffer.append("AND t.TRADE_ROUTVER = ? ");
             paramList.add(tradeRout);
-            sqlBuffer.append("AND t.ISANONYMITY = ? ");
-            paramList.add(isanonymity);
-            
+            if (StringUtils.isNotEmpty(isanonymity)) {
+	            sqlBuffer.append("AND t.ISANONYMITY = ? ");
+	            paramList.add(isanonymity);
+            }
             sqlBuffer.append("AND t.isdef = '1' ");
            /* if (StringUtils.isNotEmpty(bankcode)) {
                 sqlBuffer.append("AND t.bankcode like ? ");

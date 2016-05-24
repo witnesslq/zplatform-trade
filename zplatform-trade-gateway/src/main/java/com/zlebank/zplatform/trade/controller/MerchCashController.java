@@ -499,6 +499,7 @@ public class MerchCashController {
             TxnsOrderinfoModel orderinfo = gateWayService
                     .getOrderinfoByOrderNoAndMemberId(tradeBean.getOrderId(),
                             tradeBean.getMerchId());
+            TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(orderinfo.getRelatetradetxn());
             if ("02".equals(orderinfo.getStatus())) {
                 model.put("errMsg", "提现正在审核中，请不要重复提交");
                 model.put("txnseqno", tradeBean.getTxnseqno());
@@ -526,7 +527,7 @@ public class MerchCashController {
             tradeInfo.setPayMemberId(withdraw.getMemberid());
             tradeInfo.setPayToMemberId(withdraw.getMemberid());
             tradeInfo.setAmount(new BigDecimal(withdraw.getAmount()));
-            tradeInfo.setCharge(new BigDecimal(0));
+            tradeInfo.setCharge(new BigDecimal(txnsLogService.getTxnFee(txnsLog)));
             tradeInfo.setTxnseqno(orderinfo.getRelatetradetxn());
             tradeInfo.setCoopInstCode(orderinfo.getFirmemberno());
             //记录分录流水

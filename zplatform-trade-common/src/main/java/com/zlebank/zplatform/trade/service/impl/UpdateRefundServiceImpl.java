@@ -48,16 +48,12 @@ import com.zlebank.zplatform.trade.bean.UpdateData;
 import com.zlebank.zplatform.trade.bean.enums.BusinessEnum;
 import com.zlebank.zplatform.trade.bean.enums.InsteadPayDetailStatusEnum;
 import com.zlebank.zplatform.trade.bean.enums.TransferBusiTypeEnum;
-import com.zlebank.zplatform.trade.dao.InsteadPayBatchDAO;
-import com.zlebank.zplatform.trade.dao.InsteadPayDetailDAO;
-import com.zlebank.zplatform.trade.model.PojoInsteadPayDetail;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.model.TxnsRefundModel;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
 import com.zlebank.zplatform.trade.service.ITxnsRefundService;
-import com.zlebank.zplatform.trade.service.NotifyInsteadURLService;
 import com.zlebank.zplatform.trade.service.ObserverListService;
-import com.zlebank.zplatform.trade.service.UpdateInsteadService;
+import com.zlebank.zplatform.trade.service.UpdateRefundService;
 import com.zlebank.zplatform.trade.service.UpdateSubject;
 
 /**
@@ -69,7 +65,7 @@ import com.zlebank.zplatform.trade.service.UpdateSubject;
  * @since 
  */
 @Service
-public class UpdateRefundServiceImpl implements UpdateInsteadService, UpdateSubject ,ApplicationListener<ContextRefreshedEvent> {
+public class UpdateRefundServiceImpl implements UpdateRefundService, UpdateSubject ,ApplicationListener<ContextRefreshedEvent> {
     
     private static final Log log = LogFactory.getLog(UpdateRefundServiceImpl.class);
    
@@ -113,7 +109,7 @@ public class UpdateRefundServiceImpl implements UpdateInsteadService, UpdateSubj
         tradeInfo.setCharge(new BigDecimal(txnsLog.getTxnfee()));
         tradeInfo.setTxnseqno(txnsLog.getTxnseqno());
         tradeInfo.setCoopInstCode(txnsLog.getAccfirmerno());
-        tradeInfo.setBusiCode(BusinessEnum.REFUND.getBusiCode());
+        tradeInfo.setBusiCode(txnsLog.getBusicode());
         EntryEvent entryEvent = null;
         if ("00".equals(data.getResultCode())) {
             tradeInfo.setChannelId(txnsLog.getPayinst());

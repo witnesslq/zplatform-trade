@@ -24,7 +24,7 @@ public enum BusinessEnum {
     CONSUMESPLIT("10000004"),//消费-分账
     RECHARGE("20000001"),//充值
     WITHDRAWALS("30000001"),//提现
-    REFUND("40000001"),//退款
+    REFUND_BANK("40000001"),//退款-银行卡
     INSTEADPAY("70000001"),//代付
     INSTEADPAY_REFUND("70000001"),//代付退汇
     WITHDRAWALS_REFUND("30000003"),//提现退汇
@@ -32,7 +32,7 @@ public enum BusinessEnum {
     
     INSTEADPAY_SUCCESS("70000001"),//代付退汇
     WITHDRAWALS_SUCCESS("30000001"),//提现退汇
-    REFUND_SUCCESS("40000002"),//退款退汇
+    REFUND_ACCOUNT("40000002"),//退款-账户
     UNKNOW("");//未知
     private String busiCode;
     

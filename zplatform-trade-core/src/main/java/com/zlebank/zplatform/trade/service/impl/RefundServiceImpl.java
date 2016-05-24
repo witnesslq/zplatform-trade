@@ -54,6 +54,7 @@ public class RefundServiceImpl implements RefundService{
 	@Override
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public ResultBean execute(String refundOrderNo,String merchNo) {
+		ResultBean resultBean = null;
 		// TODO Auto-generated method stub
 		//退款订单
 		TxnsRefundModel refundOrder = txnsRefundService.getRefundByRefundorderNo(refundOrderNo, merchNo);
@@ -85,23 +86,34 @@ public class RefundServiceImpl implements RefundService{
 				TradeBean tradeBean = new TradeBean();
 				tradeBean.setTxnseqno(txnsLog.getTxnseqno());
 				refundTrade.refund(tradeBean);
+				resultBean =new ResultBean("success");
 			} catch (TradeException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				resultBean =new ResultBean(e.getCode(),e.getMessage());
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				resultBean =new ResultBean("","无退款实现类");
+				resultBean.setResultBool(false);
 			} catch (InstantiationException e) {
 				// TODO Auto-generated catch block
+				resultBean =new ResultBean("","退款失败");
+				resultBean.setResultBool(false);
 				e.printStackTrace();
 			} catch (IllegalAccessException e) {
 				// TODO Auto-generated catch block
+				resultBean =new ResultBean("","退款失败");
+				resultBean.setResultBool(false);
 				e.printStackTrace();
 			}
+		}else{
+			resultBean = new ResultBean("此退款交易无有效路由");
+			resultBean.setResultBool(false);
 		}
 		
 		
-		return null;
+		return resultBean;
 	}
 
 }

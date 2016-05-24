@@ -122,6 +122,7 @@ import com.zlebank.zplatform.trade.service.ITxnsRefundService;
 import com.zlebank.zplatform.trade.service.ITxnsSplitAccountService;
 import com.zlebank.zplatform.trade.service.ITxnsWithdrawService;
 import com.zlebank.zplatform.trade.service.ITxnsWithholdingService;
+import com.zlebank.zplatform.trade.service.RefundRouteConfigService;
 import com.zlebank.zplatform.trade.service.base.BaseServiceImpl;
 import com.zlebank.zplatform.trade.utils.DateUtil;
 import com.zlebank.zplatform.trade.utils.OrderNumber;
@@ -184,7 +185,8 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
     private RspmsgDAO rspmsgDAO;
     @Autowired
     private MemberBankCardService memberBankCardService;
-    
+    @Autowired
+    private RefundRouteConfigService refundRouteConfigService;
     @Autowired
     private MerchService merchService;
     @Autowired
@@ -966,7 +968,34 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             txnsLog.setTradestatflag("00000000");//交易初始状态
             txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlCycle().toString())));
             txnsLog.setAccmemberid(refundBean.getMemberId());
+            
+          //匿名判断
+    		String payMember = old_txnsLog.getAccmemberid();
+    		boolean anonFlag = false;
+    		if("999999999999999".equals(payMember)){
+    			anonFlag = true;
+    		}
+    		//原交易渠道号
+    		String payChannelCode = old_txnsLog.getPayinst();
+    		//原交易类型  1000002为账户余额支付
+    		String accbusicode = old_txnsLog.getAccbusicode();
+    		//退款路由选择退款渠道或者退款的方式
+    		ResultBean refundRoutResultBean = refundRouteConfigService.getTransRout(DateUtil.getCurrentDateTime(), txnsLog.getAmount()+"", "", accbusicode, txnsLog.getPan(), payChannelCode, anonFlag?"1":"0");
+    		if(refundRoutResultBean.isResultBool()){
+    			log.info(JSON.toJSONString(refundRoutResultBean));
+    			String refundRout = refundRoutResultBean.getResultObj().toString();
+    			if("99999999".equals(refundRout)){
+    				 txnsLog.setBusicode(BusinessEnum.REFUND_ACCOUNT.getBusiCode());
+    			}else{
+    				txnsLog.setBusicode(BusinessEnum.REFUND_BANK.getBusiCode());
+    			}
+    		}
+    		txnsLog.setTxnfee(getTxnFee(txnsLog));
+    		txnsLog.setTradcomm(0L);
             txnsLogService.save(txnsLog);
+            
+            
+            
             
             //退款账务处理
             TradeInfo tradeInfo = new TradeInfo();
@@ -976,7 +1005,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             tradeInfo.setCharge(new BigDecimal(txnsLogService.getTxnFee(txnsLog)));
             tradeInfo.setTxnseqno(txnsLog.getTxnseqno());
             tradeInfo.setCoopInstCode(txnsLog.getAccfirmerno());
-            tradeInfo.setBusiCode(BusinessEnum.REFUND.getBusiCode());
+            tradeInfo.setBusiCode(txnsLog.getBusicode());
             log.info(JSON.toJSONString(tradeInfo));
             //记录分录流水
             accEntryService.accEntryProcess(tradeInfo,EntryEvent.AUDIT_APPLY);

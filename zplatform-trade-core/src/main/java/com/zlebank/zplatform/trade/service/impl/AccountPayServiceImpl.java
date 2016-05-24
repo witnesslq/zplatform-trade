@@ -150,7 +150,7 @@ public class AccountPayServiceImpl implements IAccountPayService{
 			memberBean.setInstiId(pojo.getInstiId());
 			memberBean.setPaypwd(accountTrade.getPay_pwd());
 			// 校验支付密码
-			if (memberOperationServiceImpl.verifyPayPwd(MemberType.INDIVIDUAL,
+			if (!memberOperationServiceImpl.verifyPayPwd(MemberType.INDIVIDUAL,
 			        memberBean)) {
 				 throw new TradeException("AP05");
 			}

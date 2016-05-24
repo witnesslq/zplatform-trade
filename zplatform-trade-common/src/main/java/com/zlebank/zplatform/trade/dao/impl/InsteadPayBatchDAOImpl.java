@@ -15,6 +15,7 @@ import java.sql.Date;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -100,6 +101,7 @@ public class InsteadPayBatchDAOImpl extends AbstractPagedQueryDAOImpl<PojoInstea
                 crite.add(Restrictions.in("status", query.getStatusList()));
             }
         }
+        crite.addOrder(Order.desc("intime"));
         return crite;
     }
 

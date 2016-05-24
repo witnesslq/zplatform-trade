@@ -521,7 +521,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
                 txnsLog.setBusitype(BusinessEnum.WITHDRAWALS.getBusiCode());
             }else if("02".equals(data.getBusiType())){
             	txnsLog.setBusicode(BusiTypeEnum.refund.getCode());
-                txnsLog.setBusitype(BusinessEnum.REFUND.getBusiCode());
+                txnsLog.setBusitype(BusinessEnum.REFUND_BANK.getBusiCode());
             }
             
             txnsLog.setAmount(data.getTranAmt().longValue());
@@ -592,7 +592,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
             	txnsLog.setBusicode(BusinessEnum.WITHDRAWALS.getBusiCode());
                 txnsLog.setBusitype(BusiTypeEnum.withdrawal.getCode());
             }else if("02".equals(data.getTranData().getBusiType())){
-            	txnsLog.setBusicode(BusinessEnum.REFUND.getBusiCode());
+            	txnsLog.setBusicode(BusinessEnum.REFUND_BANK.getBusiCode());
                 txnsLog.setBusitype(BusiTypeEnum.refund.getCode());
             }
             
@@ -646,7 +646,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
             	txnsLog.setBusicode(BusinessEnum.WITHDRAWALS.getBusiCode());
                 txnsLog.setBusitype(BusiTypeEnum.withdrawal.getCode());
             }else if("02".equals(data.getTranData().getBusiType())){
-            	txnsLog.setBusicode(BusinessEnum.REFUND.getBusiCode());
+            	txnsLog.setBusicode(BusinessEnum.REFUND_BANK.getBusiCode());
                 txnsLog.setBusitype(BusiTypeEnum.refund.getCode());
             }
             
@@ -829,5 +829,27 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 			}
 		}
     }
+    @Override
+    public List<?> getInsteadMemberByDate(String date){
+        String queryString="select distinct t.ACCSECMERNO, t.ACCSETTLEDATE from t_txns_log t where t.ACCSETTLEDATE=? and t.ACCSECMERNO is not null and SUBSTR (trim(t.retcode),-2) = '00' and t.busicode='70000001'";
+        List<?> result = (List<?>) super.queryBySQL(queryString, new Object[]{date});
+        return result;
+    }
+    @Override
+    public List<?> getSumInstead(String memberId, String date){
+        String queryString = "select count(*) total,"
+                + " sum (t.amount) totalAmount," + " sum(t.txnfee) totalfee"
+                + " from t_txns_log t" + " where"
+                + " t.ACCSECMERNO = ?" + " and t.ACCSETTLEDATE = ?"
+                + " and t.busicode in (70000001)"
+                + " and SUBSTR(trim(t.retcode), -2) = '00'";
+        return (List<?>) super.queryBySQL(queryString, new Object[]{memberId,
+                date});
+    }
+    @Override
+    public List<?> getInsteadMerchantDetailedByDate(String memberId, String date){
+        String queryString = "select t.ACCORDNO,t.TXNSEQNO,t.ACCORDCOMMITIME,t.ACCSETTLEDATE,t.amount,t.busicode,t.TXNFEE,t.PAYORDCOMTIME from t_txns_log t left join t_bnk_txn b on t.payordno=b.payordno where (b.status=9 or b.status is null) and t.accsecmerno=? and t.ACCSETTLEDATE=? and t.payordno is not null and SUBSTR (trim(t.retcode), -2) = '00'  and t.busicode in ('70000001')";
+        return (List<?>) super.queryBySQL(queryString, new Object[]{memberId,date});
     
+    }
 }
