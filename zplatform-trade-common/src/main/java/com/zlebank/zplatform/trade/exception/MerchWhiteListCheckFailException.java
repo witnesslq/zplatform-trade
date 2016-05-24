@@ -19,9 +19,10 @@ package com.zlebank.zplatform.trade.exception;
  * @date 2015年11月25日 下午2:10:30
  * @since 
  */
-public class MerchWhiteListCheckFailException extends AbstractTradeDescribeException {
+public class MerchWhiteListCheckFailException extends TradeException {
 
     public MerchWhiteListCheckFailException(Object... params) {
+        super("ETSIP0009");
         this.params = params;
     }
     
