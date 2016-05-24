@@ -45,13 +45,16 @@ import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.trade.bean.UpdateData;
+import com.zlebank.zplatform.trade.bean.enums.BusinessEnum;
 import com.zlebank.zplatform.trade.bean.enums.InsteadPayDetailStatusEnum;
 import com.zlebank.zplatform.trade.bean.enums.TransferBusiTypeEnum;
 import com.zlebank.zplatform.trade.dao.InsteadPayBatchDAO;
 import com.zlebank.zplatform.trade.dao.InsteadPayDetailDAO;
 import com.zlebank.zplatform.trade.model.PojoInsteadPayDetail;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
+import com.zlebank.zplatform.trade.model.TxnsRefundModel;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
+import com.zlebank.zplatform.trade.service.ITxnsRefundService;
 import com.zlebank.zplatform.trade.service.NotifyInsteadURLService;
 import com.zlebank.zplatform.trade.service.ObserverListService;
 import com.zlebank.zplatform.trade.service.UpdateInsteadService;
@@ -66,24 +69,19 @@ import com.zlebank.zplatform.trade.service.UpdateSubject;
  * @since 
  */
 @Service
-public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSubject ,ApplicationListener<ContextRefreshedEvent> {
+public class UpdateRefundServiceImpl implements UpdateInsteadService, UpdateSubject ,ApplicationListener<ContextRefreshedEvent> {
     
-    private static final Log log = LogFactory.getLog(UpdateInsteadServiceImpl.class);
-    
-    @Autowired
-    private InsteadPayBatchDAO insteadPayBatchDAO;
-    
-    @Autowired
-    private InsteadPayDetailDAO insteadPayDetailDAO;
+    private static final Log log = LogFactory.getLog(UpdateRefundServiceImpl.class);
+   
     
     @Autowired
     private AccEntryService accEntryService;
     
     @Autowired
-    private NotifyInsteadURLService notifyInsteadURLService;
+    private ITxnsLogService txnsLogService;
     
     @Autowired
-    private ITxnsLogService txnsLogService;
+    private ITxnsRefundService txnsRefundService;
     /**
      *  更新状态和记账
      * @param data
@@ -95,34 +93,32 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
         for (UpdateSubject subject : observerList) {
             System.out.println(subject.getBusiCode());
         }
-        PojoInsteadPayDetail detail = insteadPayDetailDAO.getDetailByTxnseqno(data.getTxnSeqNo());
-        if (detail == null) {
+        
+        TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(data.getTxnSeqNo());
+		TxnsRefundModel refund = txnsRefundService.getRefundByTxnseqno(data.getTxnSeqNo());
+		if (refund == null) {
             log.error("没有找到需要记账的流水");
             return;
         }
-        if ("00".equals(data.getResultCode())) {
-            detail.setRespCode(data.getResultCode());
-            detail.setStatus(InsteadPayDetailStatusEnum.TRAN_FINISH.getCode());
+		if ("00".equals(data.getResultCode())) {
+			refund.setStatus(InsteadPayDetailStatusEnum.TRAN_FINISH.getCode());
         } else {
-            detail.setRespCode("09");
-            detail.setStatus(InsteadPayDetailStatusEnum.TRAN_FAILED.getCode());
+            refund.setStatus(InsteadPayDetailStatusEnum.TRAN_FAILED.getCode());
         }
-        detail.setRespMsg(data.getResultMessage());
-        insteadPayDetailDAO.merge(detail);
-        TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(detail.getTxnseqno());
+        
         TradeInfo tradeInfo = new TradeInfo();
-        tradeInfo.setPayMemberId(detail.getMerId());
-        tradeInfo.setAmount(new BigDecimal(detail.getAmt()));
-        tradeInfo.setCharge(new BigDecimal(detail.getTxnfee()));
-        tradeInfo.setTxnseqno(detail.getTxnseqno());
+        tradeInfo.setPayMemberId(txnsLog.getAccsecmerno());
+        tradeInfo.setPayToMemberId(txnsLog.getAccmemberid());
+        tradeInfo.setAmount(new BigDecimal(txnsLog.getAmount()));
+        tradeInfo.setCharge(new BigDecimal(txnsLog.getTxnfee()));
+        tradeInfo.setTxnseqno(txnsLog.getTxnseqno());
         tradeInfo.setCoopInstCode(txnsLog.getAccfirmerno());
+        tradeInfo.setBusiCode(BusinessEnum.REFUND.getBusiCode());
         EntryEvent entryEvent = null;
         if ("00".equals(data.getResultCode())) {
-            tradeInfo.setBusiCode("70000001");
-            tradeInfo.setChannelId(data.getChannelCode());
+            tradeInfo.setChannelId(txnsLog.getPayinst());
             entryEvent = EntryEvent.TRADE_SUCCESS;
         } else {
-            tradeInfo.setBusiCode("70000001");
             entryEvent = EntryEvent.TRADE_FAIL;
         }
         try {
@@ -130,16 +126,6 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
-
-        try {
-			// 如果批次已经全部处理完毕，则添加到通知
-			if (insteadPayDetailDAO.isBatchProcessFinished(detail.getInsteadPayBatch().getId())) {
-			    notifyInsteadURLService.addInsteadPayTask(detail.getInsteadPayBatch().getId());
-			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
     }
 
 

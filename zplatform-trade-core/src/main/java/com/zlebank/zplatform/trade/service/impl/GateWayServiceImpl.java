@@ -894,15 +894,16 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             }
         }
         
-        
-        TxnsLogModel old_txnsLog = txnsLogService.queryLogByTradeseltxn(refundBean.getOrigOrderId());
-        if(old_txnsLog==null){
-            throw new TradeException("GW14");
-        }
-        TxnsOrderinfoModel old_orderInfo = getOrderinfoByOrderNo(old_txnsLog.getAccordno());
+        TxnsOrderinfoModel old_orderInfo = getOrderinfoByOrderNoAndMerch(refundBean.getOrigOrderId(),refundBean.getMerId());
         if(old_orderInfo==null){
             throw new TradeException("GW15");
         }
+        
+        TxnsLogModel old_txnsLog = txnsLogService.getTxnsLogByTxnseqno(old_orderInfo.getRelatetradetxn());
+        if(old_txnsLog==null){
+            throw new TradeException("GW14");
+        }
+        
         
         try {
             Long old_amount = old_orderInfo.getOrderamt();
@@ -911,8 +912,8 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
                 throw new TradeException("T021");
             }else if(refund_amount==old_amount){//原始订单退款(全额退款)
                 //具体的处理方法暂时不明
-            }else if(refund_amount<old_amount){//部分退款
-               //具体的处理方法暂时不明
+            }else if(refund_amount<old_amount){//部分退款 支持
+               
             }
         } catch (NumberFormatException e1) {
             // TODO Auto-generated catch block
@@ -972,8 +973,11 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             tradeInfo.setPayMemberId(refundBean.getMerId());
             tradeInfo.setPayToMemberId(refundBean.getMemberId());
             tradeInfo.setAmount(new BigDecimal(refundBean.getTxnAmt()));
-            tradeInfo.setCharge(new BigDecimal(txnsLog.getTxnfee()));
+            tradeInfo.setCharge(new BigDecimal(txnsLogService.getTxnFee(txnsLog)));
             tradeInfo.setTxnseqno(txnsLog.getTxnseqno());
+            tradeInfo.setCoopInstCode(txnsLog.getAccfirmerno());
+            tradeInfo.setBusiCode(BusinessEnum.REFUND.getBusiCode());
+            log.info(JSON.toJSONString(tradeInfo));
             //记录分录流水
             accEntryService.accEntryProcess(tradeInfo,EntryEvent.AUDIT_APPLY);
         } catch (NumberFormatException e) {
@@ -1279,6 +1283,11 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
    @Transactional(propagation=Propagation.REQUIRES_NEW)
    public TxnsOrderinfoModel getOrderinfoByOrderNoAndMemberId(String orderNo,String memberId) {
        return super.getUniqueByHQL("from TxnsOrderinfoModel where orderno = ? and  firmemberno = ?", new Object[]{orderNo,memberId});
+   }
+   
+   @Transactional(propagation=Propagation.REQUIRES_NEW)
+   public TxnsOrderinfoModel getOrderinfoByOrderNoAndMerch(String orderNo,String merchNo) {
+       return super.getUniqueByHQL("from TxnsOrderinfoModel where orderno = ? and  secmemberno = ?", new Object[]{orderNo,merchNo});
    }
     public TxnsOrderinfoModel getOrderinfoByTN(String tn) {
         return super.getUniqueByHQL("from TxnsOrderinfoModel where tn = ? ", new Object[]{tn});

@@ -26,7 +26,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.acc.pojo.Money;
+import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.trade.bean.chanpay.ChanPayOrderBean;
+import com.zlebank.zplatform.trade.bean.wap.WapRefundBean;
 import com.zlebank.zplatform.trade.chanpay.bean.file.FeeTradeFileBean;
 import com.zlebank.zplatform.trade.chanpay.bean.file.PayTradeFileBean;
 import com.zlebank.zplatform.trade.chanpay.bean.file.ReceiptBean;
@@ -35,10 +37,12 @@ import com.zlebank.zplatform.trade.chanpay.bean.order.BatchOrderBean;
 import com.zlebank.zplatform.trade.chanpay.bean.order.OrderItemBean;
 import com.zlebank.zplatform.trade.chanpay.bean.order.SingleOrderBean;
 import com.zlebank.zplatform.trade.chanpay.utils.RSA;
+import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.service.IGateWayService;
 import com.zlebank.zplatform.trade.service.ITxnsGatewaypayService;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
+import com.zlebank.zplatform.trade.service.RefundService;
 import com.zlebank.zplatform.trade.utils.ConsUtil;
 
 
@@ -61,6 +65,8 @@ public class ChanPayController {
 	private IGateWayService gateWayService;
 	@Autowired
 	private ITxnsGatewaypayService txnsGatewaypayService;
+	@Autowired
+	private RefundService refundService;
 	
 	@RequestMapping("/createOrder")
 	public ModelAndView createOrder(@RequestParam String txnseqno,@RequestParam String bankcode){
@@ -262,5 +268,28 @@ public class ChanPayController {
 		return prestr;
 	}
 	
+	
+	@RequestMapping("/test")
+	public void test(){
+		String refundOrderNo = "1605239300000122";
+		String merchNo = "200000000000597";
+		refundService.execute(refundOrderNo, merchNo);
+		/*WapRefundBean refundBean = new WapRefundBean();
+		refundBean.setOrderId(DateUtil.getCurrentDateTime());
+		refundBean.setOrigOrderId("2016051314777892");
+		refundBean.setTxnAmt("1");
+		refundBean.setTxnType("14");
+		refundBean.setTxnSubType("00");
+		refundBean.setBizType("000202");
+		refundBean.setCoopInstiId("300000000000014");
+		refundBean.setMerId("200000000000597");
+		refundBean.setMemberId("100000000000576");
+		try {
+			gateWayService.refund(JSON.toJSONString(refundBean));
+		} catch (TradeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+	}
 	
 }

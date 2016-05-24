@@ -126,8 +126,8 @@ public class TradeAdapterFactory {
         ChnlDetaModel chnlDetaModel = chnlDetaService.getChannelByCode(chnlcode);
         IRefundTrade  quickPayTrade = null;
         if(chnlDetaModel!=null){
-            if(StringUtil.isNotEmpty(chnlDetaModel.getImpl())){
-                 quickPayTrade =(IRefundTrade) Class.forName(chnlDetaModel.getImpl()).newInstance();
+            if(StringUtil.isNotEmpty(chnlDetaModel.getRefundImpl())){
+                 quickPayTrade =(IRefundTrade) Class.forName(chnlDetaModel.getRefundImpl()).newInstance();
             }
         }else{
             throw new TradeException("");

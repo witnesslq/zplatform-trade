@@ -37,6 +37,7 @@ public class ChnlDetaModel implements java.io.Serializable {
 	private String safeurl;
 	private String chnlmerchno;
 	private String impl;
+	private String refundImpl;
 	// Constructors
 
 	/** default constructor */
@@ -263,6 +264,21 @@ public class ChnlDetaModel implements java.io.Serializable {
     public void setImpl(String impl) {
         this.impl = impl;
     }
+
+	/**
+	 * @return the refundImpl
+	 */
+    @Column(name = "REFUND_IMPL", length = 512)
+	public String getRefundImpl() {
+		return refundImpl;
+	}
+
+	/**
+	 * @param refundImpl the refundImpl to set
+	 */
+	public void setRefundImpl(String refundImpl) {
+		this.refundImpl = refundImpl;
+	}
 	
 
 }

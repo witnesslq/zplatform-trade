@@ -30,6 +30,7 @@ import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.TradeBean;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
+import com.zlebank.zplatform.trade.model.TxnsRefundModel;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
 import com.zlebank.zplatform.trade.service.ITxnsRefundService;
 import com.zlebank.zplatform.trade.utils.DateUtil;
@@ -53,7 +54,7 @@ public class AccountRefundTrade implements IRefundTrade {
 
 	public AccountRefundTrade() {
 		accEntryService = (AccEntryService) SpringContext.getContext().getBean(
-				"accEntryService");
+				"accEntryServiceImpl");
 		txnsRefundService = (ITxnsRefundService) SpringContext.getContext()
 				.getBean("txnsRefundService");
 		txnsLogService = (ITxnsLogService) SpringContext.getContext().getBean(
@@ -84,7 +85,7 @@ public class AccountRefundTrade implements IRefundTrade {
         /**收款方父级会员ID**/
         String payToParentMemberId="" ;
         /**渠道**/
-        String channelId = txnsLog.getPayinst();//支付机构代码
+        String channelId = "99999999";//支付机构代码
         /**产品id**/
         String productId = "";
         /**交易金额**/
@@ -114,7 +115,7 @@ public class AccountRefundTrade implements IRefundTrade {
             resultBean = new ResultBean("T099", e.getMessage());
             e.printStackTrace();
         }
-        
+        //resultBean = new ResultBean("success");
         if(txnsLog==null){
             return resultBean;
         }
@@ -127,6 +128,10 @@ public class AccountRefundTrade implements IRefundTrade {
         }
         txnsLogService.updateAppStatus(tradeBean.getTxnseqno(), txnsLog.getApporderstatus(), txnsLog.getApporderinfo());
 		
+        TxnsRefundModel refund = txnsRefundService.getRefundByTxnseqno(tradeBean.getTxnseqno());
+        refund.setStatus("00");
+        txnsRefundService.update(refund);
+        
         log.info("交易:"+tradeBean.getTxnseqno()+"退款账务处理成功");
 		return resultBean;
 	}

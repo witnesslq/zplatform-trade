@@ -58,7 +58,7 @@ public class TempTest {
 		
 		
 		try {
-			String urlStr = "http://tpay.chanpay.com/mag/gateway/receiveOrder.do?"; 
+			String urlStr = "https://tpay.chanpay.com/mag/gateway/receiveOrder.do?"; 
 			String resultString = this.buildRequest(origMap, "RSA", MERCHANT_PRIVATE_KEY, charset, urlStr);
 			System.out.println(resultString);
 		} catch (Exception e) {

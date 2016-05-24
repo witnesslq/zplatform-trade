@@ -18,7 +18,7 @@ import com.zlebank.zplatform.trade.utils.OrderNumber;
  * TTxnsRefund entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "T_TXNS_REFUND", schema = "PAYSERVICE")
+@Table(name = "T_TXNS_REFUND")
 public class TxnsRefundModel implements java.io.Serializable {
 
 	// Fields
@@ -61,7 +61,8 @@ public class TxnsRefundModel implements java.io.Serializable {
         this.refundorderno = OrderNumber.getInstance().generateRefundOrderNo();
         this.oldorderno = refundBean.getOrigOrderId();
         this.oldtxnseqno = oldtxnseqno;
-        this.merchno = refundBean.getVirtualId();
+        this.merchno = refundBean.getCoopInstiId();
+        this.submerchno = refundBean.getMerId();
         this.memberid = refundBean.getMemberId();
         this.amount = Long.valueOf(refundBean.getTxnAmt());
         this.oldamount = Long.valueOf(oldamount);

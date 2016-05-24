@@ -134,6 +134,11 @@ public class MerchCashController {
 	@Autowired
 	private CoopInstiDAO coopInstiDAO;
 	
+	
+	
+	
+	
+	
 	@RequestMapping("/coporder.htm")
 	public ModelAndView pay(OrderBean order, HttpSession httpSession,
 			HttpServletRequest request) {
@@ -353,6 +358,9 @@ public class MerchCashController {
 	    bean.setPhone(member.getPhone());
 	    bean.setRelatememberno(txnsLog.getAccsecmerno());
 	    bean.setCardtype("1");
+	    Map<String, Object> cardInfo = routeConfigService.getCardInfo(merch.getAccNum());
+	    bean.setBankcode(cardInfo.get("BANKCODE")+"");
+	    bean.setBankname(cardInfo.get("BANKNAME")+"");
 	    long bindId = bankCardService.saveQuickPayCust(bean);
 	    trade.setBindCardId(bindId+"");
 	    try {
@@ -371,6 +379,7 @@ public class MerchCashController {
 	    tradeBean2.setCertId(trade.getCertId());
 	    tradeBean2.setValidthru(trade.getValidthru());// web收银台使用
 	    tradeBean2.setCvv2(trade.getCvv2());
+	    tradeBean2.setBankCode(bean.getBankcode());
 	    tradeBean2.setCardId(bindId);
 	    model.put("trade", tradeBean2);
 	    return new ModelAndView("/fastpay/pay_merch", model);

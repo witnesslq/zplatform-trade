@@ -56,13 +56,15 @@ public class RefundRouteConfigServiceImpl extends BaseServiceImpl<PojoRefundRout
 	public ResultBean getTransRout(String transTime,String transAmt,String merchNo,String busiCode,String cardNo,String tradeRout,String isanonymity){
         try {
         	
-            if (log.isDebugEnabled()) {
-                log.debug("transTime：" + transTime);
-                log.debug("transAmt：" + transAmt);
-                log.debug("merchNo：" + merchNo);
-                log.debug("busiCode：" + busiCode);
-                log.debug("cardNo：" + cardNo);
-            }
+            
+            log.info("transTime：" + transTime);
+            log.info("transAmt：" + transAmt);
+            log.info("merchNo：" + merchNo);
+            log.info("busiCode：" + busiCode);
+            log.info("cardNo：" + cardNo);
+            log.info("tradeRout:"+tradeRout);
+            log.info("isanonymity:"+isanonymity);
+            
             String bankcode = null;
             String cardType = null;
             if(StringUtils.isNotEmpty(cardNo)){

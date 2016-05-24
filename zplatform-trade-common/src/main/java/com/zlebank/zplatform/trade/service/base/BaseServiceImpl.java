@@ -91,7 +91,7 @@ public abstract class BaseServiceImpl<E extends Serializable, E_PK extends Seria
     public List<E> getNamedQuery(String queryName, Object[] paramaters) {
         return null;
     }
-
+    
     public E getUniqueByHQL(String queryString, Object[] paramaters) {
         log.info("queryString is " + queryString);
         Query query = null;
