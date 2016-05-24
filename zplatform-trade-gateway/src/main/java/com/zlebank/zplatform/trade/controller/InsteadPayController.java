@@ -46,6 +46,7 @@ import com.zlebank.zplatform.trade.exception.FailToInsertAccEntryException;
 import com.zlebank.zplatform.trade.exception.FailToInsertFeeException;
 import com.zlebank.zplatform.trade.exception.InconsistentMerchNoException;
 import com.zlebank.zplatform.trade.exception.InvalidCardException;
+import com.zlebank.zplatform.trade.exception.InvalidInsteadPayDataException;
 import com.zlebank.zplatform.trade.exception.MerchWhiteListCheckFailException;
 import com.zlebank.zplatform.trade.exception.MessageDecryptFailException;
 import com.zlebank.zplatform.trade.exception.NotInsteadPayWorkTimeException;
@@ -314,11 +315,15 @@ public class InsteadPayController {
         } catch (InconsistentMerchNoException e) {
             errorMsg = new ResultMessage("5B", e.getMessage());
             log.error(e.getMessage(), e);
+        } catch (InvalidInsteadPayDataException e) {
+            errorMsg = new ResultMessage("5C", e.getMessage());
+            log.error(e.getMessage(), e);
         }
         catch (Exception e) {
           errorMsg = new ResultMessage("59", "代付失败");
           log.error(e.getMessage(), e);
         }
+
 
         if (errorMsg != null) {
             responseBean.setRespCode(errorMsg.getErrorCode());
