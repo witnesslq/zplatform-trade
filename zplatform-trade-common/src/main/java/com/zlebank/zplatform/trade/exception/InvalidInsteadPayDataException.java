@@ -12,17 +12,17 @@ package com.zlebank.zplatform.trade.exception;
 
 
 /**
- * 商户白名单检查失败
+ * 批次文件不合法
  *
  * @author Luxiaoshuai
  * @version
  * @date 2015年11月25日 下午2:10:30
  * @since 
  */
-public class MerchWhiteListCheckFailException extends TradeException {
+public class InvalidInsteadPayDataException extends TradeException {
 
-    public MerchWhiteListCheckFailException(Object... params) {
-        super("ETSIP0009");
+    public InvalidInsteadPayDataException(Object... params) {
+        super("ETSIP0012");
         this.params = params;
     }
     
@@ -37,6 +37,6 @@ public class MerchWhiteListCheckFailException extends TradeException {
      */
     @Override
     public String getCode() {
-        return "ETSIP0009";
+        return "ETSIP0012";
     }
 }

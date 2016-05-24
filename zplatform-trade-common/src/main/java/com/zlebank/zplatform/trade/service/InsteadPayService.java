@@ -22,6 +22,7 @@ import com.zlebank.zplatform.trade.exception.FailToInsertAccEntryException;
 import com.zlebank.zplatform.trade.exception.FailToInsertFeeException;
 import com.zlebank.zplatform.trade.exception.InconsistentMerchNoException;
 import com.zlebank.zplatform.trade.exception.InvalidCardException;
+import com.zlebank.zplatform.trade.exception.InvalidInsteadPayDataException;
 import com.zlebank.zplatform.trade.exception.MerchWhiteListCheckFailException;
 import com.zlebank.zplatform.trade.exception.NotInsteadPayWorkTimeException;
 import com.zlebank.zplatform.trade.exception.RealNameCheckFailException;
@@ -52,8 +53,9 @@ public interface InsteadPayService  extends IBasePageService<InsteadPayDetailQue
      * @throws MerchWhiteListCheckFailException 
      * @throws RealNameCheckFailException 
      * @throws InconsistentMerchNoException 
+     * @throws InvalidInsteadPayDataException 
      */
-    public void insteadPay(InsteadPay_Request request, InsteadPayImportTypeEnum type,InsteadPayInterfaceParamBean param) throws NotInsteadPayWorkTimeException, FailToGetAccountInfoException, BalanceNotEnoughException, DuplicateOrderIdException, InvalidCardException, FailToInsertAccEntryException, MerchWhiteListCheckFailException, FailToInsertFeeException, RealNameCheckFailException, InconsistentMerchNoException;
+    public void insteadPay(InsteadPay_Request request, InsteadPayImportTypeEnum type,InsteadPayInterfaceParamBean param) throws NotInsteadPayWorkTimeException, FailToGetAccountInfoException, BalanceNotEnoughException, DuplicateOrderIdException, InvalidCardException, FailToInsertAccEntryException, MerchWhiteListCheckFailException, FailToInsertFeeException, RealNameCheckFailException, InconsistentMerchNoException, InvalidInsteadPayDataException;
     /**
      * 代付状态查询处理
      * @param requestBean
