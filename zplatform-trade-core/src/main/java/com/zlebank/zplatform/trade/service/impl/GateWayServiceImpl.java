@@ -964,7 +964,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             txnsLog.setAccsecmerno(refundBean.getMerId());
             txnsLog.setAcccoopinstino(refundBean.getCoopInstiId());
             txnsLog.setTxnseqnoOg(old_txnsLog.getTxnseqno());
-            txnsLog.setAccordcommitime(refundBean.getTxnTime());
+            txnsLog.setAccordcommitime(DateUtil.getCurrentDateTime());
             txnsLog.setTradestatflag("00000000");//交易初始状态
             txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlCycle().toString())));
             txnsLog.setAccmemberid(refundBean.getMemberId());

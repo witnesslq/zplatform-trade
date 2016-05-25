@@ -83,11 +83,11 @@ public class UpdateRefundServiceImpl implements UpdateRefundService, UpdateSubje
      * @param data
      */
     @Override
-    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
     public void update(UpdateData data) {
         List<UpdateSubject> observerList = ObserverListService.getInstance().getObserverList();
         for (UpdateSubject subject : observerList) {
-            System.out.println(subject.getBusiCode());
+            log.info(subject.getBusiCode());
         }
         
         TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(data.getTxnSeqNo());
@@ -130,7 +130,7 @@ public class UpdateRefundServiceImpl implements UpdateRefundService, UpdateSubje
      */
     @Override
     public String getBusiCode() {
-        return TransferBusiTypeEnum.INSTEAD.getCode();
+        return TransferBusiTypeEnum.REFUND.getCode();
     }
 
 

@@ -50,11 +50,13 @@ import com.zlebank.zplatform.trade.bean.enums.ChnlTypeEnum;
 import com.zlebank.zplatform.trade.bean.enums.RiskLevelEnum;
 import com.zlebank.zplatform.trade.bean.gateway.QueryBean;
 import com.zlebank.zplatform.trade.dao.ITxnsLogDAO;
+import com.zlebank.zplatform.trade.dao.InsteadPayDetailDAO;
 import com.zlebank.zplatform.trade.dao.RspmsgDAO;
 import com.zlebank.zplatform.trade.dao.TransferDataDAO;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.model.MemberBaseModel;
 import com.zlebank.zplatform.trade.model.PojoBankTransferData;
+import com.zlebank.zplatform.trade.model.PojoInsteadPayDetail;
 import com.zlebank.zplatform.trade.model.PojoRspmsg;
 import com.zlebank.zplatform.trade.model.PojoTranData;
 import com.zlebank.zplatform.trade.model.RiskTradeLogModel;
@@ -98,6 +100,8 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
     private AccEntryService accEntryService;
     @Autowired
     private MemberService memberService2;
+    @Autowired
+    private InsteadPayDetailDAO insteadPayDetailDAO;
     @Autowired
     private MerchService merchService;
     
@@ -603,6 +607,11 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
             txnsLog.setPrdtver(member.getPrdtVer());
            
             txnsLog.setRoutver(member.getRoutVer());
+            if("7000".equals(txnsLog.getBusitype())){
+            	PojoInsteadPayDetail detail = insteadPayDetailDAO.getDetailByTxnseqno(data.getTranData().getTxnseqno());
+            	txnsLog.setAccordno(detail.getOrderId());
+            }
+            
             //txnsLog.setAccordno(data.getRelatedorderno());
             txnsLog.setAccordinst(pojoCoopInsti.getInstiCode());
             txnsLog.setAccfirmerno(pojoCoopInsti.getInstiCode());

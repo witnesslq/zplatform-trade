@@ -41,9 +41,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.entry.EntryEvent;
+import com.zlebank.zplatform.member.dao.CoopInstiDAO;
+import com.zlebank.zplatform.member.pojo.PojoCoopInsti;
+import com.zlebank.zplatform.member.pojo.PojoMember;
+import com.zlebank.zplatform.member.service.MemberService;
 import com.zlebank.zplatform.trade.bean.UpdateData;
 import com.zlebank.zplatform.trade.bean.enums.InsteadPayDetailStatusEnum;
 import com.zlebank.zplatform.trade.bean.enums.TransferBusiTypeEnum;
@@ -84,16 +89,21 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
     
     @Autowired
     private ITxnsLogService txnsLogService;
+    
+    @Autowired
+    private MemberService memberService;
+    @Autowired
+    private CoopInstiDAO coopInstiDAO;
     /**
      *  更新状态和记账
      * @param data
      */
     @Override
-    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
     public void update(UpdateData data) {
         List<UpdateSubject> observerList = ObserverListService.getInstance().getObserverList();
         for (UpdateSubject subject : observerList) {
-            System.out.println(subject.getBusiCode());
+        	log.info(subject.getBusiCode());
         }
         PojoInsteadPayDetail detail = insteadPayDetailDAO.getDetailByTxnseqno(data.getTxnSeqNo());
         if (detail == null) {
@@ -103,38 +113,48 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
         if ("00".equals(data.getResultCode())) {
             detail.setRespCode(data.getResultCode());
             detail.setStatus(InsteadPayDetailStatusEnum.TRAN_FINISH.getCode());
-        } else {
+        } else if("09".equals(data.getResultCode())) {
+            detail.setRespCode("09");
+            detail.setStatus(InsteadPayDetailStatusEnum.TRAN_FAILED.getCode());
+        }else if("02".equals(data.getResultCode())) {
             detail.setRespCode("09");
             detail.setStatus(InsteadPayDetailStatusEnum.TRAN_FAILED.getCode());
         }
         detail.setRespMsg(data.getResultMessage());
         insteadPayDetailDAO.merge(detail);
-        TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(detail.getTxnseqno());
+        //TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(detail.getTxnseqno());
         TradeInfo tradeInfo = new TradeInfo();
         tradeInfo.setPayMemberId(detail.getMerId());
         tradeInfo.setAmount(new BigDecimal(detail.getAmt()));
         tradeInfo.setCharge(new BigDecimal(detail.getTxnfee()));
         tradeInfo.setTxnseqno(detail.getTxnseqno());
-        tradeInfo.setCoopInstCode(txnsLog.getAccfirmerno());
+        PojoMember member = memberService.getMbmberByMemberId(detail.getMerId(), null);
+        PojoCoopInsti pojoCoopInsti = coopInstiDAO.get(member.getInstiId());
+        tradeInfo.setCoopInstCode(pojoCoopInsti.getInstiCode());
         EntryEvent entryEvent = null;
         if ("00".equals(data.getResultCode())) {
             tradeInfo.setBusiCode("70000001");
             tradeInfo.setChannelId(data.getChannelCode());
             entryEvent = EntryEvent.TRADE_SUCCESS;
-        } else {
+        } else if("02".equals(data.getResultCode())){
+        	tradeInfo.setBusiCode("70000001");
+            entryEvent = EntryEvent.AUDIT_REJECT;
+        }else {
             tradeInfo.setBusiCode("70000001");
             entryEvent = EntryEvent.TRADE_FAIL;
         }
         try {
+        	log.info(JSON.toJSONString(tradeInfo));
             accEntryService.accEntryProcess(tradeInfo, entryEvent);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            e.printStackTrace();
         }
 
         try {
 			// 如果批次已经全部处理完毕，则添加到通知
 			if (insteadPayDetailDAO.isBatchProcessFinished(detail.getInsteadPayBatch().getId())) {
-			    notifyInsteadURLService.addInsteadPayTask(detail.getInsteadPayBatch().getId());
+			    //notifyInsteadURLService.addInsteadPayTask(detail.getInsteadPayBatch().getId());
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

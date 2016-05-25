@@ -69,7 +69,7 @@ public class AccountRefundTrade implements IRefundTrade {
 	 * @return
 	 */
 	@Override
-	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+	@Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
 	public ResultBean refund(TradeBean tradeBean) {
 		log.info("交易:"+tradeBean.getTxnseqno()+"退款账务处理开始");
 		ResultBean resultBean = null;
@@ -118,14 +118,13 @@ public class AccountRefundTrade implements IRefundTrade {
             resultBean = new ResultBean("T099", e.getMessage());
             e.printStackTrace();
         }
-        //resultBean = new ResultBean("success");
-        if(txnsLog==null){
-            return resultBean;
-        }
+        
         if(resultBean.isResultBool()){
+        	updateRefundResult( txnsLog.getTxnseqno(),"","0000","交易成功");
             txnsLog.setApporderstatus(AccStatusEnum.Finish.getCode());
             txnsLog.setApporderinfo("退款账务成功");
         }else{
+        	updateRefundResult( txnsLog.getTxnseqno(),"","0099",resultBean.getErrMsg());
             txnsLog.setApporderstatus(AccStatusEnum.AccountingFail.getCode());
             txnsLog.setApporderinfo(resultBean.getErrMsg());
         }
@@ -138,7 +137,7 @@ public class AccountRefundTrade implements IRefundTrade {
         log.info("交易:"+tradeBean.getTxnseqno()+"退款账务处理成功");
 		return resultBean;
 	}
-	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+	@Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
 	public String updateRefund(String txnseqno,String memberId){
 		TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(txnseqno);
         txnsLog.setPaytype("03"); //支付类型（01：快捷，02：网银，03：账户）
@@ -157,4 +156,26 @@ public class AccountRefundTrade implements IRefundTrade {
         return txnsLog.getPayordno();
 	}
 
+	@Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
+	public void updateRefundResult(String txnseqno,String memberId,String retCode,String retInfo){
+		TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(txnseqno);
+        txnsLog.setPayordfintime(DateUtil.getCurrentDateTime());
+        txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
+        txnsLog.setPayretcode(retCode);
+        txnsLog.setPayretinfo(retInfo);
+        txnsLog.setAppordcommitime(DateUtil.getCurrentDateTime());
+        txnsLog.setAppinst("99999999");
+        if("0000".equals(retCode)){
+        	 txnsLog.setApporderinfo("退款账务成功");
+             txnsLog.setApporderstatus("00");
+        }else{
+        	txnsLog.setApporderinfo(retInfo);
+            txnsLog.setApporderstatus("09");
+        }
+        txnsLog.setAppordfintime(DateUtil.getCurrentDateTime());
+        txnsLog.setRetcode(retCode);
+        txnsLog.setRetinfo(retInfo);
+        //支付定单完成时间
+        txnsLogService.update(txnsLog);
+	}
 }
