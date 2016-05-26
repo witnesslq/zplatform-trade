@@ -521,13 +521,14 @@ public class MerchCashController {
             withdraw.setBankcode(merch.getBankCode());
             PojoBankInfo bankNodeinfo = bankInfoDAO.getByBankNode(merch.getBankNode());
             withdraw.setBankname(bankNodeinfo.getMainBankSname());
+            txnsWithdrawService.saveWithdraw(withdraw);
             //记录提现账务
             TradeInfo tradeInfo = new TradeInfo();
             tradeInfo.setBusiCode("30000001");
             tradeInfo.setPayMemberId(withdraw.getMemberid());
             tradeInfo.setPayToMemberId(withdraw.getMemberid());
             tradeInfo.setAmount(new BigDecimal(withdraw.getAmount()));
-            tradeInfo.setCharge(new BigDecimal(txnsLogService.getTxnFee(txnsLog)));
+            tradeInfo.setCharge(new BigDecimal(withdraw.getFee()));
             tradeInfo.setTxnseqno(orderinfo.getRelatetradetxn());
             tradeInfo.setCoopInstCode(orderinfo.getFirmemberno());
             //记录分录流水
@@ -538,7 +539,7 @@ public class MerchCashController {
                 withdraw.setAcctname(card.getAccname());
                 withdraw.setAcctno(card.getCardno());*/
             }
-            txnsWithdrawService.saveWithdraw(withdraw);
+            //txnsWithdrawService.saveWithdraw(withdraw);
             gateWayService.updateOrderToStartPay(tradeBean.getOrderId());
             model.put(
                     "suburl",

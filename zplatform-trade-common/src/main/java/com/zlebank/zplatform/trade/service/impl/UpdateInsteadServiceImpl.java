@@ -43,8 +43,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.acc.bean.TradeInfo;
+import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
+import com.zlebank.zplatform.acc.exception.AccBussinessException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.entry.EntryEvent;
+import com.zlebank.zplatform.commons.dao.pojo.AccStatusEnum;
 import com.zlebank.zplatform.member.dao.CoopInstiDAO;
 import com.zlebank.zplatform.member.pojo.PojoCoopInsti;
 import com.zlebank.zplatform.member.pojo.PojoMember;
@@ -143,14 +146,31 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
             tradeInfo.setBusiCode("70000001");
             entryEvent = EntryEvent.TRADE_FAIL;
         }
-        try {
-        	log.info(JSON.toJSONString(tradeInfo));
-            accEntryService.accEntryProcess(tradeInfo, entryEvent);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            e.printStackTrace();
-        }
-
+        TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(data.getTxnSeqNo());
+       
+    	try {
+			log.info(JSON.toJSONString(tradeInfo));
+			accEntryService.accEntryProcess(tradeInfo, entryEvent);
+			txnsLog.setApporderstatus(AccStatusEnum.Finish.getCode());
+            txnsLog.setApporderinfo("代付账务成功");
+		} catch (AccBussinessException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			txnsLog.setApporderstatus(AccStatusEnum.AccountingFail.getCode());
+            txnsLog.setApporderinfo(e1.getMessage());
+		} catch (AbstractBusiAcctException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			txnsLog.setApporderstatus(AccStatusEnum.AccountingFail.getCode());
+            txnsLog.setApporderinfo(e1.getMessage());
+		} catch (NumberFormatException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			txnsLog.setApporderstatus(AccStatusEnum.AccountingFail.getCode());
+            txnsLog.setApporderinfo(e1.getMessage());
+		}
+        //更新交易流水应用方信息
+        txnsLogService.updateAppStatus(data.getTxnSeqNo(), txnsLog.getApporderstatus(), txnsLog.getApporderinfo());
         try {
 			// 如果批次已经全部处理完毕，则添加到通知
 			if (insteadPayDetailDAO.isBatchProcessFinished(detail.getInsteadPayBatch().getId())) {

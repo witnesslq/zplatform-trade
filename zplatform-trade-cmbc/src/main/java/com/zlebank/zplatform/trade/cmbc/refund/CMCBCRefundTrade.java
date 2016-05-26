@@ -85,6 +85,7 @@ public class CMCBCRefundTrade implements IRefundTrade {
 	public ResultBean refund(TradeBean tradeBean) {
 		TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(tradeBean.getTxnseqno());
 		TxnsRefundModel refund = txnsRefundService.getRefundByTxnseqno(tradeBean.getTxnseqno());
+		TxnsLogModel txnsLog_old = txnsLogService.getTxnsLogByTxnseqno(txnsLog.getTxnseqnoOg());
 		
 		//民生代扣走代付流程
 		PojoTranData pojoTranData = new PojoTranData();
@@ -94,8 +95,8 @@ public class CMCBCRefundTrade implements IRefundTrade {
                 .currentTimeMillis()));
         // pojoTranData.setTranBatch(tranBatch);
         pojoTranData.setAccType("00");
-        pojoTranData.setAccNo(txnsLog.getPan());
-        pojoTranData.setAccName(txnsLog.getPanName());
+        pojoTranData.setAccNo(txnsLog_old.getPan());
+        pojoTranData.setAccName(txnsLog_old.getPanName());
         // 划拨金额
         pojoTranData.setTranAmt(refund.getAmount());
         // pojoTranData.setBusiDataId("11111111111111");
@@ -163,6 +164,7 @@ public class CMCBCRefundTrade implements IRefundTrade {
             data.setApplyTime(new Date());
             data.setStatus(TransferDataStatusEnum.INIT.getCode());
             data.setTranBatch(batch);
+            data.setBusiType(type.getCode());
             data = tranDataDAO.merge(data);
             // 保存划拨批次统计数据
             batch.setTotalCount(addOne(batch.getTotalCount()));

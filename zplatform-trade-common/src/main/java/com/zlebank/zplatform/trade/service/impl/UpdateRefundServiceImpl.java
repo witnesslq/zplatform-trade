@@ -41,14 +41,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.acc.bean.TradeInfo;
+import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
+import com.zlebank.zplatform.acc.exception.AccBussinessException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.entry.EntryEvent;
+import com.zlebank.zplatform.commons.dao.pojo.AccStatusEnum;
 import com.zlebank.zplatform.trade.bean.UpdateData;
 import com.zlebank.zplatform.trade.bean.enums.BusinessEnum;
 import com.zlebank.zplatform.trade.bean.enums.InsteadPayDetailStatusEnum;
 import com.zlebank.zplatform.trade.bean.enums.TransferBusiTypeEnum;
+import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
+import com.zlebank.zplatform.trade.model.TxnsOrderinfoModel;
 import com.zlebank.zplatform.trade.model.TxnsRefundModel;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
 import com.zlebank.zplatform.trade.service.ITxnsRefundService;
@@ -78,6 +84,9 @@ public class UpdateRefundServiceImpl implements UpdateRefundService, UpdateSubje
     
     @Autowired
     private ITxnsRefundService txnsRefundService;
+    
+    @Autowired
+    private ITxnsOrderinfoDAO txnsOrderinfoDAO;
     /**
      *  更新状态和记账
      * @param data
@@ -89,22 +98,24 @@ public class UpdateRefundServiceImpl implements UpdateRefundService, UpdateSubje
         for (UpdateSubject subject : observerList) {
             log.info(subject.getBusiCode());
         }
-        
         TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(data.getTxnSeqNo());
 		TxnsRefundModel refund = txnsRefundService.getRefundByTxnseqno(data.getTxnSeqNo());
+		TxnsOrderinfoModel order = txnsOrderinfoDAO.getOrderByTxnseqno(data.getTxnSeqNo());
 		if (refund == null) {
             log.error("没有找到需要记账的流水");
             return;
         }
 		if ("00".equals(data.getResultCode())) {
 			refund.setStatus(InsteadPayDetailStatusEnum.TRAN_FINISH.getCode());
+			order.setStatus("00");
         } else {
             refund.setStatus(InsteadPayDetailStatusEnum.TRAN_FAILED.getCode());
+            order.setStatus("03");
         }
         
         TradeInfo tradeInfo = new TradeInfo();
-        tradeInfo.setPayMemberId(txnsLog.getAccsecmerno());
-        tradeInfo.setPayToMemberId(txnsLog.getAccmemberid());
+        tradeInfo.setPayMemberId(txnsLog.getAccmemberid());
+        tradeInfo.setPayToMemberId(txnsLog.getAccsecmerno());
         tradeInfo.setAmount(new BigDecimal(txnsLog.getAmount()));
         tradeInfo.setCharge(new BigDecimal(txnsLog.getTxnfee()));
         tradeInfo.setTxnseqno(txnsLog.getTxnseqno());
@@ -117,11 +128,30 @@ public class UpdateRefundServiceImpl implements UpdateRefundService, UpdateSubje
         } else {
             entryEvent = EntryEvent.TRADE_FAIL;
         }
+       
         try {
+        	log.info("tradeInfo:"+ JSON.toJSONString(tradeInfo));
             accEntryService.accEntryProcess(tradeInfo, entryEvent);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
+            txnsRefundService.update(refund);
+            txnsOrderinfoDAO.updateOrderinfo(order);
+        }catch (AccBussinessException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			txnsLog.setApporderstatus(AccStatusEnum.AccountingFail.getCode());
+            txnsLog.setApporderinfo(e1.getMessage());
+		} catch (AbstractBusiAcctException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			txnsLog.setApporderstatus(AccStatusEnum.AccountingFail.getCode());
+            txnsLog.setApporderinfo(e1.getMessage());
+		} catch (NumberFormatException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			txnsLog.setApporderstatus(AccStatusEnum.AccountingFail.getCode());
+            txnsLog.setApporderinfo(e1.getMessage());
+		}
+        //更新交易流水应用方信息
+        txnsLogService.updateAppStatus(data.getTxnSeqNo(), txnsLog.getApporderstatus(), txnsLog.getApporderinfo());
     }
 
 

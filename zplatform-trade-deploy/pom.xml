@@ -316,5 +316,6 @@
 		<module>../zplatform-trade-test</module>
 		<module>../zplatform-trade-bosspay</module>
 		<module>../zplatfrom-trade-chanpay</module>
+		<module>../zplatfrom-trade-wechat</module>
 	</modules>
 </project>

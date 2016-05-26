@@ -167,6 +167,11 @@ public class OrderNumber {
         return generateBatchNo("SEQ_CMBC_BATCHNO");
     }
     
+    public String generateWeChatOrderNO(){
+    	String seqNo=generateSerialNumber("SEQ_WECHAT_NO");
+        return seqNo.substring(0,6)+"90"+seqNo.substring(6);
+    }
+    
     /**
      * seq_zlpay_orderno, "seq_reapayorderno", "seq_apporderno", "seq_txnseqno", "seq_ecitiorderno", "seq_quickpay", "seq_orderinfo_tn","SEQ_ECITIORDERNO"
      */

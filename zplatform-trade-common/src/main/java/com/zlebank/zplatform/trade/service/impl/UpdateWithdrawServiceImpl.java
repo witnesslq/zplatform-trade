@@ -22,8 +22,11 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zlebank.zplatform.acc.bean.TradeInfo;
+import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
+import com.zlebank.zplatform.acc.exception.AccBussinessException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.entry.EntryEvent;
+import com.zlebank.zplatform.commons.dao.pojo.AccStatusEnum;
 import com.zlebank.zplatform.trade.bean.UpdateData;
 import com.zlebank.zplatform.trade.bean.enums.BusinessEnum;
 import com.zlebank.zplatform.trade.bean.enums.TransferBusiTypeEnum;
@@ -112,9 +115,24 @@ public class UpdateWithdrawServiceImpl implements UpdateWithdrawService,UpdateSu
         tradeInfo.setCoopInstCode(txnsLog.getAccfirmerno());
         try {
             accEntryService.accEntryProcess(tradeInfo,entryEvent);
-        } catch (Exception e) {
-            log.error(e.getMessage(),e);
-        }
+        } catch (AccBussinessException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			txnsLog.setApporderstatus(AccStatusEnum.AccountingFail.getCode());
+            txnsLog.setApporderinfo(e1.getMessage());
+		} catch (AbstractBusiAcctException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			txnsLog.setApporderstatus(AccStatusEnum.AccountingFail.getCode());
+            txnsLog.setApporderinfo(e1.getMessage());
+		} catch (NumberFormatException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			txnsLog.setApporderstatus(AccStatusEnum.AccountingFail.getCode());
+            txnsLog.setApporderinfo(e1.getMessage());
+		}
+        //更新交易流水应用方信息
+        txnsLogService.updateAppStatus(data.getTxnSeqNo(), txnsLog.getApporderstatus(), txnsLog.getApporderinfo());
     }
 
     /**

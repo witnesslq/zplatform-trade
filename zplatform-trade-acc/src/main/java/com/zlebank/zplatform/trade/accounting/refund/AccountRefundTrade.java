@@ -30,8 +30,10 @@ import com.zlebank.zplatform.trade.adapter.quickpay.IRefundTrade;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.TradeBean;
 import com.zlebank.zplatform.trade.bean.enums.BusinessEnum;
+import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
+import com.zlebank.zplatform.trade.model.TxnsOrderinfoModel;
 import com.zlebank.zplatform.trade.model.TxnsRefundModel;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
 import com.zlebank.zplatform.trade.service.ITxnsRefundService;
@@ -53,6 +55,7 @@ public class AccountRefundTrade implements IRefundTrade {
 	private AccEntryService accEntryService;
 	private ITxnsRefundService txnsRefundService;
 	private ITxnsLogService txnsLogService;
+	private ITxnsOrderinfoDAO txnsOrderinfoDAO;
 
 	public AccountRefundTrade() {
 		accEntryService = (AccEntryService) SpringContext.getContext().getBean(
@@ -61,6 +64,9 @@ public class AccountRefundTrade implements IRefundTrade {
 				.getBean("txnsRefundService");
 		txnsLogService = (ITxnsLogService) SpringContext.getContext().getBean(
 				"txnsLogService");
+		
+		txnsOrderinfoDAO = (ITxnsOrderinfoDAO) SpringContext.getContext().getBean(
+				"txnsOrderinfo");
 	}
 
 	/**
@@ -74,16 +80,20 @@ public class AccountRefundTrade implements IRefundTrade {
 		log.info("交易:"+tradeBean.getTxnseqno()+"退款账务处理开始");
 		ResultBean resultBean = null;
 		TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(tradeBean.getTxnseqno());
+		TxnsOrderinfoModel order = txnsOrderinfoDAO.getOrderByTxnseqno(tradeBean.getTxnseqno());
+		
 		//记录退款的流水
 		String payordno = updateRefund(tradeBean.getTxnseqno(),txnsLog.getAccmemberid());
+		
+		
 		/**支付订单号**/
         
         /**交易类型**/
         String busiCode = txnsLog.getBusicode();
         /**付款方会员ID**/
-        String payMemberId = txnsLog.getAccsecmerno();
+        String payMemberId =  txnsLog.getAccmemberid();
         /**收款方会员ID**/
-        String payToMemberId = txnsLog.getAccmemberid();
+        String payToMemberId = txnsLog.getAccsecmerno();
         /**收款方父级会员ID**/
         String payToParentMemberId="" ;
         /**渠道**/
@@ -123,17 +133,17 @@ public class AccountRefundTrade implements IRefundTrade {
         	updateRefundResult( txnsLog.getTxnseqno(),"","0000","交易成功");
             txnsLog.setApporderstatus(AccStatusEnum.Finish.getCode());
             txnsLog.setApporderinfo("退款账务成功");
+            order.setStatus("00");
+            TxnsRefundModel refund = txnsRefundService.getRefundByTxnseqno(tradeBean.getTxnseqno());
+            refund.setStatus("00");
+            txnsRefundService.update(refund);
         }else{
         	updateRefundResult( txnsLog.getTxnseqno(),"","0099",resultBean.getErrMsg());
             txnsLog.setApporderstatus(AccStatusEnum.AccountingFail.getCode());
             txnsLog.setApporderinfo(resultBean.getErrMsg());
         }
         txnsLogService.updateAppStatus(tradeBean.getTxnseqno(), txnsLog.getApporderstatus(), txnsLog.getApporderinfo());
-		
-        TxnsRefundModel refund = txnsRefundService.getRefundByTxnseqno(tradeBean.getTxnseqno());
-        refund.setStatus("00");
-        txnsRefundService.update(refund);
-        
+        txnsOrderinfoDAO.update(order);
         log.info("交易:"+tradeBean.getTxnseqno()+"退款账务处理成功");
 		return resultBean;
 	}

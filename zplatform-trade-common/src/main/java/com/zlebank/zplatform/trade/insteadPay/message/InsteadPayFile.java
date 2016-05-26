@@ -48,7 +48,7 @@ public class InsteadPayFile {
     @Ans(max=32)
     private String accName;
     /**开户行代码帐号类型取值为“02”时不能为空**/
-    @N(max=12, isNull=true)
+    @N(max=12, isNull=false)
     private String bankCode;
     /**开户行省**/
     @Ans(max=20, isNull=true)

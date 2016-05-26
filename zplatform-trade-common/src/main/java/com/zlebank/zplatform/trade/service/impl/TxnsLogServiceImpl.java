@@ -137,7 +137,12 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         Map<String, Object> cardMap = getCardInfo(payPartyBean.getCardNo());
         String hql = "update TxnsLogModel set paytype=?,payordno=?,payinst=?,payfirmerno=?,payordcomtime=?,pan=?,cardtype=?,cardinstino=?,txnfee=?,pan_name=? where txnseqno=?";
         super.updateByHQL(hql, new Object[]{"01",payPartyBean.getPayordno(),payPartyBean.getPayinst(),payPartyBean.getPayfirmerno(),payPartyBean.getPayordcomtime(),
-                    payPartyBean.getCardNo(),cardMap.get("TYPE").toString(),cardMap.get("BANKCODE").toString(),getTxnFee(txnsLog),payPartyBean.getPanName(),payPartyBean.getTxnseqno()});
+                    payPartyBean.getCardNo(),
+                    cardMap==null?"":cardMap.get("TYPE").toString(),
+                    cardMap==null?"":cardMap.get("BANKCODE").toString(),
+                    getTxnFee(txnsLog),
+                    payPartyBean.getPanName(),
+                    payPartyBean.getTxnseqno()});
         return null;
     }
     
@@ -579,6 +584,30 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 		for(PojoBankTransferData data : transferDataList){
         	TxnsLogModel txnsLog = getTxnsLogByTxnseqno(data.getTranData().getTxnseqno());
             if(txnsLog!=null){
+            	if("4000".equals(txnsLog.getBusitype())){
+                    txnsLog.setPaytype("04"); //支付类型（01：快捷，02：网银，03：账户）
+                    txnsLog.setPayordno(data.getBankTranDataSeqNo());//支付定单号
+                    txnsLog.setPayinst(ChannelEnmu.CMBCINSTEADPAY.getChnlcode());//支付所属机构
+                    txnsLog.setPayfirmerno(ConsUtil.getInstance().cons.getCmbc_insteadpay_merid());//支付一级商户号
+                    txnsLog.setPayordcomtime(DateUtil.getCurrentDateTime());//支付定单提交时间
+                    //卡信息
+                    txnsLog.setPan(data.getAccNo());
+                    txnsLog.setPanName(data.getAccName());
+                    txnsLog.setTxnfee(data.getTranData().getTranFee().longValue());
+                    update(txnsLog);
+            	}else if("3000".equals(txnsLog.getBusitype())){
+            		txnsLog.setPaytype("04"); //支付类型（01：快捷，02：网银，03：账户）
+                    txnsLog.setPayordno(data.getBankTranDataSeqNo());//支付定单号
+                    txnsLog.setPayinst(ChannelEnmu.CMBCINSTEADPAY.getChnlcode());//支付所属机构
+                    txnsLog.setPayfirmerno(ConsUtil.getInstance().cons.getCmbc_insteadpay_merid());//支付一级商户号
+                    txnsLog.setPayordcomtime(DateUtil.getCurrentDateTime());//支付定单提交时间
+                    //卡信息
+                    txnsLog.setPan(data.getAccNo());
+                    txnsLog.setPanName(data.getAccName());
+                    txnsLog.setTxnfee(data.getTranData().getTranFee().longValue());
+                    update(txnsLog);
+            	}
+            	
                 continue;
             }
             txnsLog = new TxnsLogModel();
@@ -620,7 +649,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
             txnsLog.setTradestatflag("00000000");//交易初始状态
             txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlCycle().toString())));
             txnsLog.setPaytype("04"); //支付类型（01：快捷，02：网银，03：账户）
-            txnsLog.setPayordno(data.getTranData().getBusiDataId()+"");//支付定单号
+            txnsLog.setPayordno(data.getBankTranDataSeqNo());//支付定单号
             txnsLog.setPayinst(ChannelEnmu.CMBCINSTEADPAY.getChnlcode());//支付所属机构
             txnsLog.setPayfirmerno(ConsUtil.getInstance().cons.getCmbc_insteadpay_merid());//支付一级商户号
             txnsLog.setPayordcomtime(DateUtil.getCurrentDateTime());//支付定单提交时间
@@ -861,4 +890,15 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         return (List<?>) super.queryBySQL(queryString, new Object[]{memberId,date});
     
     }
+
+
+	/**
+	 * 获取微信支付交易流水
+	 * @param payOrderNo
+	 * @return
+	 */
+	@Override
+	public TxnsLogModel getTxnsLogByPayOrderNo(String payOrderNo) {
+		return super.getUniqueByHQL(" from TxnsLogModel where  payordno = ? and paytype = ?", new Object[]{payOrderNo,"05"});
+	}
 }

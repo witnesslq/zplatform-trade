@@ -252,7 +252,7 @@ public class CreateInsteadPayMassage {
         InsteadPayQuery_Request request = new InsteadPayQuery_Request();
         commSetter(request, "22");
         request.setChannelType("00");
-        request.setAccessType("0");
+        //request.setAccessType("0");
         request.setBatchNo("0326");
         request.setTxnTime("20160323160326");
         
@@ -276,7 +276,7 @@ public class CreateInsteadPayMassage {
         InsteadPay_Request request = new InsteadPay_Request();
         commSetter(request, "21");
         request.setChannelType("00");
-        request.setAccessType("0");
+//        request.setAccessType("0");
         request.setBatchNo(DateUtil.getCurrentTime().substring(2));
         request.setTxnTime(DateUtil.getCurrentDateTime());
         request.setTotalQty("3");

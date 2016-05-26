@@ -105,7 +105,7 @@ public class MockController {
         InsteadPay_Request request = new InsteadPay_Request();
         commSetter(request, "21");
         request.setChannelType("00");
-        request.setAccessType("0");
+//        request.setAccessType("0");
         request.setBatchNo(DateUtil.getCurrentTime().substring(2));
         request.setTxnTime(DateUtil.getCurrentDateTime());
         request.setTotalQty("2");

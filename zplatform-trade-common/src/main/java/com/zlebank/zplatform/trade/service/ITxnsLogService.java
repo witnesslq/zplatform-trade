@@ -170,4 +170,12 @@ public interface ITxnsLogService extends IBaseService<TxnsLogModel, String>{
      * @return
      */
     public List<?> getInsteadMerchantDetailedByDate(String memberId, String date);
+    
+    /**
+     * 通过支付订单号获取微信交易流水
+     * @param payOrderNo 支付订单号
+     * @return
+     */
+    public TxnsLogModel getTxnsLogByPayOrderNo(String payOrderNo);
+    
 }
