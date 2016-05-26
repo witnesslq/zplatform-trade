@@ -10,9 +10,12 @@
  */
 package com.zlebank.zplatform.wechat.service;
 
+import java.util.List;
+
 import net.sf.json.JSONObject;
 
 import com.zlebank.zplatform.wechat.wx.bean.PayResultBean;
+import com.zlebank.zplatform.wechat.wx.bean.QueryBillBean;
 
 /**
  * Class Description
@@ -36,4 +39,11 @@ public interface WeChatService {
 	 * @param result
 	 */
 	public void asyncTradeResult(PayResultBean result);
+	
+	/**
+	 * 下载微信对账单
+	 * @param queryBillBean
+	 * @return
+	 */
+	public List<String[]> dowanWeChatBill(QueryBillBean queryBillBean );
 }

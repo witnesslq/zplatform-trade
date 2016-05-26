@@ -66,9 +66,9 @@ public class TxnsRefundServiceImpl extends BaseServiceImpl<TxnsRefundModel,Long>
     }
     
     public Long getSumAmtByOldTxnseqno(String txnseqno_old){
-    	String sql = "select sum(t.amount) totalamt from t_txns_refund t where t.oldtxnseqno=? and t.status not in(?,?,?) ";
+    	String sql = "select nvl(sum(t.amount),0) totalamt from t_txns_refund t where t.oldtxnseqno=? and t.status not in(?,?,?) ";
     	List<Map<String, Object>> queryBySQL = (List<Map<String, Object>>) queryBySQL(sql, new Object[]{txnseqno_old,"09","19","29"});
-    	return (Long) queryBySQL.get(0).get("TOTALAMT");
+    	return  Long.valueOf(queryBySQL.get(0).get("TOTALAMT")+"");
     }
     
    

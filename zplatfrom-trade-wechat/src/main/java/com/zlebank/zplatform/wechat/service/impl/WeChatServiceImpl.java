@@ -12,6 +12,7 @@ package com.zlebank.zplatform.wechat.service.impl;
 
 import java.net.URLEncoder;
 import java.util.Date;
+import java.util.List;
 
 import net.sf.json.JSONObject;
 
@@ -46,8 +47,10 @@ import com.zlebank.zplatform.trade.utils.UUIDUtil;
 import com.zlebank.zplatform.wechat.enums.ResultCodeEnum;
 import com.zlebank.zplatform.wechat.exception.WXVerifySignFailedException;
 import com.zlebank.zplatform.wechat.service.WeChatService;
+import com.zlebank.zplatform.wechat.wx.PrintBean;
 import com.zlebank.zplatform.wechat.wx.WXApplication;
 import com.zlebank.zplatform.wechat.wx.bean.PayResultBean;
+import com.zlebank.zplatform.wechat.wx.bean.QueryBillBean;
 import com.zlebank.zplatform.wechat.wx.bean.WXOrderBean;
 import com.zlebank.zplatform.wechat.wx.common.WXConfigure;
 
@@ -263,4 +266,17 @@ public class WeChatServiceImpl implements WeChatService{
         orderAsyncRespBean.setSignature(URLEncoder.encode(RSAUtils.sign(data, privateKey),"utf-8"));
         return orderAsyncRespBean;
     }
+
+
+	/**
+	 *
+	 * @param queryBillBean
+	 * @return
+	 */
+	@Override
+	public List<String[]> dowanWeChatBill(QueryBillBean queryBillBean) {
+		WXApplication ap = new WXApplication();
+        PrintBean printBean = ap.downLoadBill(queryBillBean);
+		return printBean.getContent();
+	}
 }

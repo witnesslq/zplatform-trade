@@ -366,30 +366,30 @@ public class WXApplication {
      * @param bill
      * @return
      */
-    public String downLoadBill(QueryBillBean  bill) {
+    public PrintBean downLoadBill(QueryBillBean  bill) {
         
         String xml = createDownLoadBillXml(bill);
-      String response = sendXMLData(xml,DOWN_LOAD_BILL_URL);
+        String response = sendXMLData(xml,DOWN_LOAD_BILL_URL);
+        PrintBean printBean = null;
 //        String response = "交易时间,公众账号ID,商户号,子商户号,设备号,微信订单号,商户订单号,用户标识,交易类型,交易状态,付款银行,货币种类,总金额,企业红包金额,微信退款单号,商户退款单号,退款金额,企业红包退款金额,退款类型,退款状态,商品名称,商户数据包,手续费,费率`2016-05-20 10:08:02,`wx16a0b09dbf94f380,`1345867901,`0,`,`4006652001201605206059282375,`160520000400054340,`omBzYwIpGZM3_q740Doggbcw-A_s,`APP,`SUCCESS,`CFT,`CNY,`1.00,`0.00,`0,`0,`0,`0,`,`,`160520000400054340,`支付测试,`0.01000,`0.60%`2016-05-20 17:26:42,`wx16a0b09dbf94f380,`1345867901,`0,`WEB,`4006652001201605206077277148,`160520000400054443,`omBzYwIpGZM3_q740Doggbcw-A_s,`APP,`SUCCESS,`CFT,`CNY,`0.01,`0.00,`0,`0,`0,`0,`,`,`iPad,`北京太阳宫,`0.00000,`0.60%`2016-05-20 17:26:25,`wx16a0b09dbf94f380,`1345867901,`0,`WEB,`4006652001201605206078438536,`160520000400054442,`omBzYwIpGZM3_q740Doggbcw-A_s,`APP,`SUCCESS,`CFT,`CNY,`0.01,`0.00,`0,`0,`0,`0,`,`,`iPad,`北京太阳宫,`0.00000,`0.60%总交易单数,总交易额,总退款金额,总企业红包退款金额,手续费总金额`3,`1.02,`0.00,`0.00,`0.01000";
         if ("ALL".equals(bill.getBill_type())) {
-            parseDownLoadBill(response, BillTypeEnum.ALL);    
+        	printBean = parseDownLoadBill(response, BillTypeEnum.ALL);    
         }
         if ("SUCCESS".equals(bill.getBill_type())) {
-            parseDownLoadBill(response, BillTypeEnum.SUCCESS);
+        	printBean = parseDownLoadBill(response, BillTypeEnum.SUCCESS);
         }
         if ("REFUND".equals(bill.getBill_type())) {
-            parseDownLoadBill(response, BillTypeEnum.REFUND);
+        	printBean = parseDownLoadBill(response, BillTypeEnum.REFUND);
         }
         
-        return response;
+        return printBean;
     }
     /**
      * 解析对账单
      * @param data
      * @param type
      */
-    private void parseDownLoadBill(String data, BillTypeEnum type) {
-         System.out.println("bbbaccc".indexOf("a"));
+    private PrintBean parseDownLoadBill(String data, BillTypeEnum type) {
          int index1 = data.indexOf("`");
          int index2 = data.indexOf("总交易单数,总交易额,总退款金额,总企业红包退款金额,手续费总金额");
         String bodyTitle = data.substring(0, index1);
@@ -404,6 +404,7 @@ public class WXApplication {
         print.addFootTitle(footTitle);
         print.addFootContent(footDetail);
         print.print();
+        return print;
     }
     
     private String createDownLoadBillXml(QueryBillBean  bill){

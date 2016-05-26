@@ -23,7 +23,7 @@ public enum BillTypeEnum {
     /** ALL **/
     ALL(24),
     /** SUCCESS **/
-    SUCCESS(24),
+    SUCCESS(18),
     /** REFUND **/
     REFUND(24),
     UNKNOW(99);//未知
