@@ -107,7 +107,7 @@ public class WeChatServiceImpl implements WeChatService{
 		order_wechat.setTime_expire(DateUtil.formatDateTime("yyyyMMddHHmmss",
 				DateUtil.skipDateTime(new Date(), 1)));
 		order_wechat.setGoods_tag("WXG");
-		order_wechat.setNotify_url("http://192.168.101.134/zplatform-trade/notify/wxResult.htm");
+		order_wechat.setNotify_url("http://114.242.70.196:9086/zplatform-sdk-api/interface/wxResult.htm");
 		// 下订单
 		String payrettsnseqno = null;
 		JSONObject json = null;
