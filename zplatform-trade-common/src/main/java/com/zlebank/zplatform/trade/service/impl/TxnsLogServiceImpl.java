@@ -48,11 +48,13 @@ import com.zlebank.zplatform.trade.bean.enums.ChnlTypeEnum;
 import com.zlebank.zplatform.trade.bean.enums.RiskLevelEnum;
 import com.zlebank.zplatform.trade.bean.gateway.QueryBean;
 import com.zlebank.zplatform.trade.dao.ITxnsLogDAO;
+import com.zlebank.zplatform.trade.dao.InsteadPayDetailDAO;
 import com.zlebank.zplatform.trade.dao.RspmsgDAO;
 import com.zlebank.zplatform.trade.dao.TransferDataDAO;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.model.MemberBaseModel;
 import com.zlebank.zplatform.trade.model.PojoBankTransferData;
+import com.zlebank.zplatform.trade.model.PojoInsteadPayDetail;
 import com.zlebank.zplatform.trade.model.PojoRspmsg;
 import com.zlebank.zplatform.trade.model.PojoTranData;
 import com.zlebank.zplatform.trade.model.RiskTradeLogModel;
@@ -97,6 +99,8 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
     @Autowired
     private MemberService memberService2;
     @Autowired
+    private InsteadPayDetailDAO insteadPayDetailDAO;
+    @Autowired
     private MerchService merchService;
     
     @Autowired
@@ -135,12 +139,8 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         }
        
         String hql = "update TxnsLogModel set paytype=?,payordno=?,payinst=?,payfirmerno=?,payordcomtime=?,pan=?,cardtype=?,cardinstino=?,txnfee=?,pan_name=? where txnseqno=?";
-
         super.updateByHQL(hql, new Object[]{"01",payPartyBean.getPayordno(),payPartyBean.getPayinst(),payPartyBean.getPayfirmerno(),payPartyBean.getPayordcomtime(),
-
         payPartyBean.getCardNo(),cardMap==null?"":cardMap.get("TYPE")+"",cardMap==null?"":cardMap.get("BANKCODE")+"",getTxnFee(txnsLog),payPartyBean.getTxnseqno()});
-
-                    
 
         return null;
     }
@@ -551,7 +551,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
                 txnsLog.setBusitype(BusinessEnum.WITHDRAWALS.getBusiCode());
             }else if("02".equals(data.getBusiType())){
             	txnsLog.setBusicode(BusiTypeEnum.refund.getCode());
-                txnsLog.setBusitype(BusinessEnum.REFUND.getBusiCode());
+                txnsLog.setBusitype(BusinessEnum.REFUND_BANK.getBusiCode());
             }
             
             txnsLog.setAmount(data.getTranAmt().longValue());
@@ -605,6 +605,30 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 		for(PojoBankTransferData data : transferDataList){
         	TxnsLogModel txnsLog = getTxnsLogByTxnseqno(data.getTranData().getTxnseqno());
             if(txnsLog!=null){
+            	if("4000".equals(txnsLog.getBusitype())){
+                    txnsLog.setPaytype("04"); //支付类型（01：快捷，02：网银，03：账户）
+                    txnsLog.setPayordno(data.getBankTranDataSeqNo());//支付定单号
+                    txnsLog.setPayinst(ChannelEnmu.CMBCINSTEADPAY.getChnlcode());//支付所属机构
+                    txnsLog.setPayfirmerno(ConsUtil.getInstance().cons.getCmbc_insteadpay_merid());//支付一级商户号
+                    txnsLog.setPayordcomtime(DateUtil.getCurrentDateTime());//支付定单提交时间
+                    //卡信息
+                    txnsLog.setPan(data.getAccNo());
+                    txnsLog.setPanName(data.getAccName());
+                    txnsLog.setTxnfee(data.getTranData().getTranFee().longValue());
+                    update(txnsLog);
+            	}else if("3000".equals(txnsLog.getBusitype())){
+            		txnsLog.setPaytype("04"); //支付类型（01：快捷，02：网银，03：账户）
+                    txnsLog.setPayordno(data.getBankTranDataSeqNo());//支付定单号
+                    txnsLog.setPayinst(ChannelEnmu.CMBCINSTEADPAY.getChnlcode());//支付所属机构
+                    txnsLog.setPayfirmerno(ConsUtil.getInstance().cons.getCmbc_insteadpay_merid());//支付一级商户号
+                    txnsLog.setPayordcomtime(DateUtil.getCurrentDateTime());//支付定单提交时间
+                    //卡信息
+                    txnsLog.setPan(data.getAccNo());
+                    txnsLog.setPanName(data.getAccName());
+                    txnsLog.setTxnfee(data.getTranData().getTranFee().longValue());
+                    update(txnsLog);
+            	}
+            	
                 continue;
             }
             txnsLog = new TxnsLogModel();
@@ -629,7 +653,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
             	txnsLog.setBusicode(BusinessEnum.WITHDRAWALS.getBusiCode());
                 txnsLog.setBusitype(BusiTypeEnum.withdrawal.getCode());
             }else if("02".equals(data.getTranData().getBusiType())){
-            	txnsLog.setBusicode(BusinessEnum.REFUND.getBusiCode());
+            	txnsLog.setBusicode(BusinessEnum.REFUND_BANK.getBusiCode());
                 txnsLog.setBusitype(BusiTypeEnum.refund.getCode());
             }
             
@@ -640,6 +664,11 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
             txnsLog.setPrdtver(member.getPrdtVer());
            
             txnsLog.setRoutver(member.getRoutVer());
+            if("7000".equals(txnsLog.getBusitype())){
+            	PojoInsteadPayDetail detail = insteadPayDetailDAO.getDetailByTxnseqno(data.getTranData().getTxnseqno());
+            	txnsLog.setAccordno(detail.getOrderId());
+            }
+            
             //txnsLog.setAccordno(data.getRelatedorderno());
 
             txnsLog.setAcccoopinstino(coopInsti.getInstiCode());
@@ -653,7 +682,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
             txnsLog.setTradestatflag("00000000");//交易初始状态
             txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlCycle().toString())));
             txnsLog.setPaytype("04"); //支付类型（01：快捷，02：网银，03：账户）
-            txnsLog.setPayordno(data.getTranData().getBusiDataId()+"");//支付定单号
+            txnsLog.setPayordno(data.getBankTranDataSeqNo());//支付定单号
             txnsLog.setPayinst(ChannelEnmu.CMBCINSTEADPAY.getChnlcode());//支付所属机构
             txnsLog.setPayfirmerno(ConsUtil.getInstance().cons.getCmbc_insteadpay_merid());//支付一级商户号
             txnsLog.setPayordcomtime(DateUtil.getCurrentDateTime());//支付定单提交时间
@@ -688,7 +717,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
             	txnsLog.setBusicode(BusinessEnum.WITHDRAWALS.getBusiCode());
                 txnsLog.setBusitype(BusiTypeEnum.withdrawal.getCode());
             }else if("02".equals(data.getTranData().getBusiType())){
-            	txnsLog.setBusicode(BusinessEnum.REFUND.getBusiCode());
+            	txnsLog.setBusicode(BusinessEnum.REFUND_BANK.getBusiCode());
                 txnsLog.setBusitype(BusiTypeEnum.refund.getCode());
             }
             
@@ -871,5 +900,38 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 			}
 		}
     }
+    @Override
+    public List<?> getInsteadMemberByDate(String date){
+        String queryString="select distinct t.ACCSECMERNO, t.ACCSETTLEDATE from t_txns_log t where t.ACCSETTLEDATE=? and t.ACCSECMERNO is not null and SUBSTR (trim(t.retcode),-2) = '00' and t.busicode='70000001'";
+        List<?> result = (List<?>) super.queryBySQL(queryString, new Object[]{date});
+        return result;
+    }
+    @Override
+    public List<?> getSumInstead(String memberId, String date){
+        String queryString = "select count(*) total,"
+                + " sum (t.amount) totalAmount," + " sum(t.txnfee) totalfee"
+                + " from t_txns_log t" + " where"
+                + " t.ACCSECMERNO = ?" + " and t.ACCSETTLEDATE = ?"
+                + " and t.busicode in (70000001)"
+                + " and SUBSTR(trim(t.retcode), -2) = '00'";
+        return (List<?>) super.queryBySQL(queryString, new Object[]{memberId,
+                date});
+    }
+    @Override
+    public List<?> getInsteadMerchantDetailedByDate(String memberId, String date){
+        String queryString = "select t.ACCORDNO,t.TXNSEQNO,t.ACCORDCOMMITIME,t.ACCSETTLEDATE,t.amount,t.busicode,t.TXNFEE,t.PAYORDCOMTIME from t_txns_log t left join t_bnk_txn b on t.payordno=b.payordno where (b.status=9 or b.status is null) and t.accsecmerno=? and t.ACCSETTLEDATE=? and t.payordno is not null and SUBSTR (trim(t.retcode), -2) = '00'  and t.busicode in ('70000001')";
+        return (List<?>) super.queryBySQL(queryString, new Object[]{memberId,date});
     
+    }
+
+
+	/**
+	 * 获取微信支付交易流水
+	 * @param payOrderNo
+	 * @return
+	 */
+	@Override
+	public TxnsLogModel getTxnsLogByPayOrderNo(String payOrderNo) {
+		return super.getUniqueByHQL(" from TxnsLogModel where  payordno = ? and paytype = ?", new Object[]{payOrderNo,"05"});
+	}
 }

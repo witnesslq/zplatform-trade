@@ -89,7 +89,7 @@ public class OrderBeanTest {
 		
 	}
 	
-	@Test
+	
 	public void test_refund(){
 		RefundOrderBean refundOrderBean = new RefundOrderBean();
 		refundOrderBean.setVersion(ConsUtil.getInstance().cons.getChanpay_version());
@@ -114,7 +114,7 @@ public class OrderBeanTest {
 		queryTradeBean.setService("cjt_query_trade");
 		chanPayService.queryTrade(queryTradeBean);
 	}
-	//@Test
+	@Test
 	public void test_queryBank(){
 		QueryBankBean queryTradeBean = new QueryBankBean();
 		queryTradeBean.setVersion(ConsUtil.getInstance().cons.getChanpay_version());

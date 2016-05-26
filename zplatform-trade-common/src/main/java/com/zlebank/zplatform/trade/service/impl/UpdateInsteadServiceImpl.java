@@ -1,4 +1,23 @@
 /* 
+haod	支付			
+姓名	郭佳			
+日期	2016年5月23日			
+				
+当日工作计划				
+序号	时长(时)	工作描述	优先级	备注
+1	7	集成畅捷支付代付代码	高	
+				
+当日工作总结				
+序号	时长(时)	工作描述	优先级	备注
+1	7.5	开发退款功能，测试退款，修改生成退款订单的方法，修改测试中出现的bug	中	
+				
+				
+问题情况				
+序号	问题描述		优先级	备注
+				
+次日工作计划				
+序号	时长(时)	工作描述	优先级	备注
+1	8	集成畅捷支付代付代码编写各个接口的单元测试程序	高	
  * UpdateInsteadServiceImpl.java  
  * 
  * version TODO
@@ -22,9 +41,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.acc.bean.TradeInfo;
+import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
+import com.zlebank.zplatform.acc.exception.AccBussinessException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.entry.EntryEvent;
+import com.zlebank.zplatform.commons.dao.pojo.AccStatusEnum;
+import com.zlebank.zplatform.member.dao.CoopInstiDAO;
+import com.zlebank.zplatform.member.pojo.PojoCoopInsti;
+import com.zlebank.zplatform.member.pojo.PojoMember;
+import com.zlebank.zplatform.member.service.MemberService;
 import com.zlebank.zplatform.trade.bean.UpdateData;
 import com.zlebank.zplatform.trade.bean.enums.InsteadPayDetailStatusEnum;
 import com.zlebank.zplatform.trade.bean.enums.TransferBusiTypeEnum;
@@ -65,16 +92,21 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
     
     @Autowired
     private ITxnsLogService txnsLogService;
+    
+    @Autowired
+    private MemberService memberService;
+    @Autowired
+    private CoopInstiDAO coopInstiDAO;
     /**
      *  更新状态和记账
      * @param data
      */
     @Override
-    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
     public void update(UpdateData data) {
         List<UpdateSubject> observerList = ObserverListService.getInstance().getObserverList();
         for (UpdateSubject subject : observerList) {
-            System.out.println(subject.getBusiCode());
+        	log.info(subject.getBusiCode());
         }
         PojoInsteadPayDetail detail = insteadPayDetailDAO.getDetailByTxnseqno(data.getTxnSeqNo());
         if (detail == null) {
@@ -84,38 +116,65 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
         if ("00".equals(data.getResultCode())) {
             detail.setRespCode(data.getResultCode());
             detail.setStatus(InsteadPayDetailStatusEnum.TRAN_FINISH.getCode());
-        } else {
+        } else if("09".equals(data.getResultCode())) {
+            detail.setRespCode("09");
+            detail.setStatus(InsteadPayDetailStatusEnum.TRAN_FAILED.getCode());
+        }else if("02".equals(data.getResultCode())) {
             detail.setRespCode("09");
             detail.setStatus(InsteadPayDetailStatusEnum.TRAN_FAILED.getCode());
         }
         detail.setRespMsg(data.getResultMessage());
         insteadPayDetailDAO.merge(detail);
-        TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(detail.getTxnseqno());
+        //TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(detail.getTxnseqno());
         TradeInfo tradeInfo = new TradeInfo();
         tradeInfo.setPayMemberId(detail.getMerId());
         tradeInfo.setAmount(new BigDecimal(detail.getAmt()));
         tradeInfo.setCharge(new BigDecimal(detail.getTxnfee()));
         tradeInfo.setTxnseqno(detail.getTxnseqno());
-        tradeInfo.setCoopInstCode(txnsLog.getAccfirmerno());
+        PojoMember member = memberService.getMbmberByMemberId(detail.getMerId(), null);
+        PojoCoopInsti pojoCoopInsti = coopInstiDAO.get(member.getInstiId());
+        tradeInfo.setCoopInstCode(pojoCoopInsti.getInstiCode());
         EntryEvent entryEvent = null;
         if ("00".equals(data.getResultCode())) {
             tradeInfo.setBusiCode("70000001");
             tradeInfo.setChannelId(data.getChannelCode());
             entryEvent = EntryEvent.TRADE_SUCCESS;
-        } else {
+        } else if("02".equals(data.getResultCode())){
+        	tradeInfo.setBusiCode("70000001");
+            entryEvent = EntryEvent.AUDIT_REJECT;
+        }else {
             tradeInfo.setBusiCode("70000001");
             entryEvent = EntryEvent.TRADE_FAIL;
         }
-        try {
-            accEntryService.accEntryProcess(tradeInfo, entryEvent);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-
+        TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(data.getTxnSeqNo());
+       
+    	try {
+			log.info(JSON.toJSONString(tradeInfo));
+			accEntryService.accEntryProcess(tradeInfo, entryEvent);
+			txnsLog.setApporderstatus(AccStatusEnum.Finish.getCode());
+            txnsLog.setApporderinfo("代付账务成功");
+		} catch (AccBussinessException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			txnsLog.setApporderstatus(AccStatusEnum.AccountingFail.getCode());
+            txnsLog.setApporderinfo(e1.getMessage());
+		} catch (AbstractBusiAcctException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			txnsLog.setApporderstatus(AccStatusEnum.AccountingFail.getCode());
+            txnsLog.setApporderinfo(e1.getMessage());
+		} catch (NumberFormatException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			txnsLog.setApporderstatus(AccStatusEnum.AccountingFail.getCode());
+            txnsLog.setApporderinfo(e1.getMessage());
+		}
+        //更新交易流水应用方信息
+        txnsLogService.updateAppStatus(data.getTxnSeqNo(), txnsLog.getApporderstatus(), txnsLog.getApporderinfo());
         try {
 			// 如果批次已经全部处理完毕，则添加到通知
 			if (insteadPayDetailDAO.isBatchProcessFinished(detail.getInsteadPayBatch().getId())) {
-			    notifyInsteadURLService.addInsteadPayTask(detail.getInsteadPayBatch().getId());
+			    //notifyInsteadURLService.addInsteadPayTask(detail.getInsteadPayBatch().getId());
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

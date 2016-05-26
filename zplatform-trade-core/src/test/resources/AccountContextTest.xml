@@ -15,7 +15,7 @@
 <bean id="springContext" class="com.zlebank.zplatform.trade.utils.SpringContext"></bean>
 	<bean id="sessionFactory"
 		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
-		<property name="dataSource" ref="accDataSource" />
+		<property name="dataSource" ref="accDataSource"/>
 		<property name="packagesToScan">
 			<list>
 				<value>com.zlebank.zplatform.trade.model</value>
@@ -45,11 +45,15 @@
 <!-- 		</property> -->
 		<property name="hibernateProperties">
 			<props>
-				<prop key="dialect">org.hibernate.dialect.Oracle9Dialect</prop>
-				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.dialect">org.hibernate.dialect.Oracle9Dialect</prop>
+				<!-- <prop key="hibernate.hbm2ddl.auto">validate</prop> -->
+
+				<prop key="hibernate.autoReconnect">true</prop>
+				<prop key="hibernate.show_sql">false</prop>
 				<prop key="hibernate.format_sql">true</prop>
-				<prop key="hibernate.hbm2ddl.auto">none</prop>
-				<prop key="hibernate.id.new_generator_mappings">true</prop>
+				<!-- <propery name="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</property> -->
+
+				<prop key="hibernate.temp.use_jdbc_metadata_defaults">false</prop>
 			</props>
 		</property>
 	</bean>

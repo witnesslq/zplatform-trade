@@ -61,7 +61,8 @@ public class TxnsRefundModel implements java.io.Serializable {
         this.refundorderno = OrderNumber.getInstance().generateRefundOrderNo();
         this.oldorderno = refundBean.getOrigOrderId();
         this.oldtxnseqno = oldtxnseqno;
-        this.merchno = refundBean.getVirtualId();
+        this.merchno = refundBean.getCoopInstiId();
+        this.submerchno = refundBean.getMerId();
         this.memberid = refundBean.getMemberId();
         this.amount = Long.valueOf(refundBean.getTxnAmt());
         this.oldamount = Long.valueOf(oldamount);

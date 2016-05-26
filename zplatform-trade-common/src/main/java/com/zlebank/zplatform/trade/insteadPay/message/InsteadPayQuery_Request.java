@@ -30,9 +30,6 @@ public class InsteadPayQuery_Request extends BaseMessage{
     /**渠道类型**/
     @N(max=2,isNull=false)
     private String channelType;
-    /**接入类型**/
-    @N(max=1,isNull=false)
-    private String accessType;
 
     
     public String getBatchNo() {
@@ -52,12 +49,6 @@ public class InsteadPayQuery_Request extends BaseMessage{
     }
     public void setChannelType(String channelType) {
         this.channelType = channelType;
-    }
-    public String getAccessType() {
-        return accessType;
-    }
-    public void setAccessType(String accessType) {
-        this.accessType = accessType;
     }
     
 }

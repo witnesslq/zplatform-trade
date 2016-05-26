@@ -24,12 +24,17 @@ import com.zlebank.zplatform.acc.exception.AccBussinessException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.commons.dao.pojo.AccStatusEnum;
+import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.adapter.accounting.impl.ChargeAccounting;
 import com.zlebank.zplatform.trade.adapter.quickpay.IRefundTrade;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.TradeBean;
+import com.zlebank.zplatform.trade.bean.enums.BusinessEnum;
+import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
+import com.zlebank.zplatform.trade.model.TxnsOrderinfoModel;
+import com.zlebank.zplatform.trade.model.TxnsRefundModel;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
 import com.zlebank.zplatform.trade.service.ITxnsRefundService;
 import com.zlebank.zplatform.trade.utils.DateUtil;
@@ -50,14 +55,18 @@ public class AccountRefundTrade implements IRefundTrade {
 	private AccEntryService accEntryService;
 	private ITxnsRefundService txnsRefundService;
 	private ITxnsLogService txnsLogService;
+	private ITxnsOrderinfoDAO txnsOrderinfoDAO;
 
 	public AccountRefundTrade() {
 		accEntryService = (AccEntryService) SpringContext.getContext().getBean(
-				"accEntryService");
+				"accEntryServiceImpl");
 		txnsRefundService = (ITxnsRefundService) SpringContext.getContext()
 				.getBean("txnsRefundService");
 		txnsLogService = (ITxnsLogService) SpringContext.getContext().getBean(
 				"txnsLogService");
+		
+		txnsOrderinfoDAO = (ITxnsOrderinfoDAO) SpringContext.getContext().getBean(
+				"txnsOrderinfo");
 	}
 
 	/**
@@ -66,33 +75,37 @@ public class AccountRefundTrade implements IRefundTrade {
 	 * @return
 	 */
 	@Override
-	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+	@Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
 	public ResultBean refund(TradeBean tradeBean) {
 		log.info("交易:"+tradeBean.getTxnseqno()+"退款账务处理开始");
 		ResultBean resultBean = null;
 		TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(tradeBean.getTxnseqno());
+		TxnsOrderinfoModel order = txnsOrderinfoDAO.getOrderByTxnseqno(tradeBean.getTxnseqno());
+		
 		//记录退款的流水
 		String payordno = updateRefund(tradeBean.getTxnseqno(),txnsLog.getAccmemberid());
+		
+		
 		/**支付订单号**/
         
         /**交易类型**/
         String busiCode = txnsLog.getBusicode();
         /**付款方会员ID**/
-        String payMemberId = txnsLog.getAccsecmerno();
+        String payMemberId =  txnsLog.getAccmemberid();
         /**收款方会员ID**/
-        String payToMemberId = txnsLog.getAccmemberid();
+        String payToMemberId = txnsLog.getAccsecmerno();
         /**收款方父级会员ID**/
         String payToParentMemberId="" ;
         /**渠道**/
-        String channelId = txnsLog.getPayinst();//支付机构代码
+        String channelId = "99999999";//支付机构代码
         /**产品id**/
         String productId = "";
         /**交易金额**/
         BigDecimal amount = new BigDecimal(txnsLog.getAmount());
         /**佣金**/
-        BigDecimal commission = new BigDecimal(txnsLog.getTradcomm());
+        BigDecimal commission = new BigDecimal(StringUtil.isNotEmpty(txnsLog.getTradcomm()+"")?txnsLog.getTradcomm():0);
         /**手续费**/
-        BigDecimal charge = new BigDecimal(txnsLog.getTxnfee());
+        BigDecimal charge = new BigDecimal(StringUtil.isNotEmpty(txnsLog.getTxnfee()+"")?txnsLog.getTxnfee():0L);
         /**金额D**/
         BigDecimal amountD = new BigDecimal(0);
         /**金额E**/
@@ -103,7 +116,8 @@ public class AccountRefundTrade implements IRefundTrade {
         
         log.info(JSON.toJSONString(tradeInfo));
         try {
-			accEntryService.accEntryProcess(tradeInfo,EntryEvent.TRADE_SUCCESS);
+			accEntryService.accEntryProcess(tradeInfo,EntryEvent.AUDIT_PASS);
+			resultBean = new ResultBean("success");
 		}  catch (AccBussinessException e) {
             resultBean = new ResultBean(e.getCode(), e.getMessage());
             e.printStackTrace();
@@ -115,22 +129,25 @@ public class AccountRefundTrade implements IRefundTrade {
             e.printStackTrace();
         }
         
-        if(txnsLog==null){
-            return resultBean;
-        }
         if(resultBean.isResultBool()){
+        	updateRefundResult( txnsLog.getTxnseqno(),"","0000","交易成功");
             txnsLog.setApporderstatus(AccStatusEnum.Finish.getCode());
             txnsLog.setApporderinfo("退款账务成功");
+            order.setStatus("00");
+            TxnsRefundModel refund = txnsRefundService.getRefundByTxnseqno(tradeBean.getTxnseqno());
+            refund.setStatus("00");
+            txnsRefundService.update(refund);
         }else{
+        	updateRefundResult( txnsLog.getTxnseqno(),"","0099",resultBean.getErrMsg());
             txnsLog.setApporderstatus(AccStatusEnum.AccountingFail.getCode());
             txnsLog.setApporderinfo(resultBean.getErrMsg());
         }
         txnsLogService.updateAppStatus(tradeBean.getTxnseqno(), txnsLog.getApporderstatus(), txnsLog.getApporderinfo());
-		
+        txnsOrderinfoDAO.update(order);
         log.info("交易:"+tradeBean.getTxnseqno()+"退款账务处理成功");
 		return resultBean;
 	}
-	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+	@Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
 	public String updateRefund(String txnseqno,String memberId){
 		TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(txnseqno);
         txnsLog.setPaytype("03"); //支付类型（01：快捷，02：网银，03：账户）
@@ -149,4 +166,26 @@ public class AccountRefundTrade implements IRefundTrade {
         return txnsLog.getPayordno();
 	}
 
+	@Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
+	public void updateRefundResult(String txnseqno,String memberId,String retCode,String retInfo){
+		TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(txnseqno);
+        txnsLog.setPayordfintime(DateUtil.getCurrentDateTime());
+        txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
+        txnsLog.setPayretcode(retCode);
+        txnsLog.setPayretinfo(retInfo);
+        txnsLog.setAppordcommitime(DateUtil.getCurrentDateTime());
+        txnsLog.setAppinst("99999999");
+        if("0000".equals(retCode)){
+        	 txnsLog.setApporderinfo("退款账务成功");
+             txnsLog.setApporderstatus("00");
+        }else{
+        	txnsLog.setApporderinfo(retInfo);
+            txnsLog.setApporderstatus("09");
+        }
+        txnsLog.setAppordfintime(DateUtil.getCurrentDateTime());
+        txnsLog.setRetcode(retCode);
+        txnsLog.setRetinfo(retInfo);
+        //支付定单完成时间
+        txnsLogService.update(txnsLog);
+	}
 }

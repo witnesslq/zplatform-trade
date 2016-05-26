@@ -26,7 +26,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -58,6 +57,7 @@ import com.zlebank.zplatform.trade.service.IGateWayService;
 import com.zlebank.zplatform.trade.service.ITxnsGatewaypayService;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
 import com.zlebank.zplatform.trade.service.ITxnsNotifyTaskService;
+import com.zlebank.zplatform.trade.service.RefundService;
 import com.zlebank.zplatform.trade.utils.ConsUtil;
 import com.zlebank.zplatform.trade.utils.ObjectDynamic;
 
@@ -85,6 +85,9 @@ public class ChanPayController {
 	private ITxnsGatewaypayService txnsGatewaypayService;
 	@Autowired
 	private ITxnsNotifyTaskService txnsNotifyTaskService;
+	@Autowired
+	private RefundService refundService;
+
 	
 	@RequestMapping("/createOrder")
 	public ModelAndView createOrder(@RequestParam String txnseqno,@RequestParam String bankcode){
@@ -334,8 +337,8 @@ public class ChanPayController {
 	    return "";
     }
 	
+
 	@RequestMapping("/reciveRefundChanPay")
-    @ResponseBody
     public String reciveRefundChanPay(RefundAsyncResultBean tradeAsyncResultBean,HttpServletResponse response,HttpServletRequest request ) {
 	    try {
 	    	Map map = request.getParameterMap();
@@ -394,5 +397,28 @@ public class ChanPayController {
 			e.printStackTrace();
 		}
         return new ModelAndView("/fastpay/success", model);
+	}
+
+	@RequestMapping("/test")
+	public void test(){
+		String refundOrderNo = "1605239300000122";
+		String merchNo = "200000000000597";
+		refundService.execute(refundOrderNo, merchNo);
+		/*WapRefundBean refundBean = new WapRefundBean();
+		refundBean.setOrderId(DateUtil.getCurrentDateTime());
+		refundBean.setOrigOrderId("2016051314777892");
+		refundBean.setTxnAmt("1");
+		refundBean.setTxnType("14");
+		refundBean.setTxnSubType("00");
+		refundBean.setBizType("000202");
+		refundBean.setCoopInstiId("300000000000014");
+		refundBean.setMerId("200000000000597");
+		refundBean.setMemberId("100000000000576");
+		try {
+			gateWayService.refund(JSON.toJSONString(refundBean));
+		} catch (TradeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
 	}
 }

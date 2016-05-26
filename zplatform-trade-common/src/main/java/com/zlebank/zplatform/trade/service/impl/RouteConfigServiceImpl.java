@@ -164,9 +164,11 @@ public class RouteConfigServiceImpl extends BaseServiceImpl<RouteConfigModel, Lo
                 }
             }
         } catch (Exception e) {
-            // TODO: handle exception
+            // TODO: handle exceptionInsteadBatchServiceImpl
            e.printStackTrace();
         }
+        
+        
         log.info("member "+memberId+" no find member rout!!!");
         return new ResultBean("RC99", "交易路由异常");
     }

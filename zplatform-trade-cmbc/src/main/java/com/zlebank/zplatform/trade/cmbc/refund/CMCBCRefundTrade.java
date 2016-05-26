@@ -15,6 +15,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +40,9 @@ import com.zlebank.zplatform.trade.service.ITxnsLogService;
 import com.zlebank.zplatform.trade.service.ITxnsRefundService;
 import com.zlebank.zplatform.trade.service.ITxnsWithdrawService;
 import com.zlebank.zplatform.trade.service.SeqNoService;
+import com.zlebank.zplatform.trade.utils.DateUtil;
+import com.zlebank.zplatform.trade.utils.OrderNumber;
+import com.zlebank.zplatform.trade.utils.SpringContext;
 
 /**
  * Class Description
@@ -47,6 +52,7 @@ import com.zlebank.zplatform.trade.service.SeqNoService;
  * @date 2016年5月19日 上午8:35:22
  * @since 
  */
+
 public class CMCBCRefundTrade implements IRefundTrade {
 
 	@Autowired
@@ -59,6 +65,15 @@ public class CMCBCRefundTrade implements IRefundTrade {
     private TranBatchDAO tranBatchDAO;
     @Autowired
     private SeqNoService seqNoService;
+    
+    
+    public CMCBCRefundTrade(){
+    	txnsLogService = (ITxnsLogService) SpringContext.getContext().getBean("txnsLogService");
+    	txnsRefundService = (ITxnsRefundService) SpringContext.getContext().getBean("txnsRefundService");
+    	tranDataDAO = (TranDataDAO) SpringContext.getContext().getBean("tranDataDAOImpl");
+    	tranBatchDAO = (TranBatchDAO) SpringContext.getContext().getBean("tranBatchDAOImpl");
+    	seqNoService = (SeqNoService) SpringContext.getContext().getBean("seqNoServiceImpl");
+    }
 	
 	/**
 	 *
@@ -66,9 +81,12 @@ public class CMCBCRefundTrade implements IRefundTrade {
 	 * @return
 	 */
 	@Override
+	@Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
 	public ResultBean refund(TradeBean tradeBean) {
 		TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(tradeBean.getTxnseqno());
 		TxnsRefundModel refund = txnsRefundService.getRefundByTxnseqno(tradeBean.getTxnseqno());
+		TxnsLogModel txnsLog_old = txnsLogService.getTxnsLogByTxnseqno(txnsLog.getTxnseqnoOg());
+		
 		//民生代扣走代付流程
 		PojoTranData pojoTranData = new PojoTranData();
         List<PojoTranData> pojoTranDataList = new ArrayList<PojoTranData>();
@@ -77,8 +95,8 @@ public class CMCBCRefundTrade implements IRefundTrade {
                 .currentTimeMillis()));
         // pojoTranData.setTranBatch(tranBatch);
         pojoTranData.setAccType("00");
-        pojoTranData.setAccNo(txnsLog.getAccordno());
-        pojoTranData.setAccName(txnsLog.getPanName());
+        pojoTranData.setAccNo(txnsLog_old.getPan());
+        pojoTranData.setAccName(txnsLog_old.getPanName());
         // 划拨金额
         pojoTranData.setTranAmt(refund.getAmount());
         // pojoTranData.setBusiDataId("11111111111111");
@@ -93,10 +111,11 @@ public class CMCBCRefundTrade implements IRefundTrade {
         // /** "业务流水号" **/
         pojoTranData.setBusiType("02");
         pojoTranData.setBusiDataId(refund.getId());
-        pojoTranData.setMemberId(refund.getMerchno());
+        pojoTranData.setMemberId(refund.getSubmerchno());
         // 交易手续费0
-        pojoTranData.setTranFee(0L);
+        pojoTranData.setTranFee(txnsLogService.getTxnFee(txnsLog));
         pojoTranData.setBusiType(TransferBusiTypeEnum.INSTEAD.getCode());
+        pojoTranData.setTxnseqno(tradeBean.getTxnseqno());
         //pojoTranData.setBankNo(refund.get);
         //pojoTranData.setBankName(job.get("ACCORDNO").toString());
         pojoTranDataList.add(pojoTranData);
@@ -113,9 +132,9 @@ public class CMCBCRefundTrade implements IRefundTrade {
 	}
 	
 	
-	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+	@Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
     public long saveTransferData(TransferBusiTypeEnum type, Long busiBatchId, List<PojoTranData> datas) throws RecordsAlreadyExistsException {
-        
+		
         if (datas == null || datas.size() ==0) return 0;
         
         PojoTranBatch batch = new PojoTranBatch();
@@ -145,6 +164,7 @@ public class CMCBCRefundTrade implements IRefundTrade {
             data.setApplyTime(new Date());
             data.setStatus(TransferDataStatusEnum.INIT.getCode());
             data.setTranBatch(batch);
+            data.setBusiType(type.getCode());
             data = tranDataDAO.merge(data);
             // 保存划拨批次统计数据
             batch.setTotalCount(addOne(batch.getTotalCount()));
@@ -154,6 +174,7 @@ public class CMCBCRefundTrade implements IRefundTrade {
             batch.setWaitApproveAmt(addAmount(batch.getWaitApproveAmt(), data.getTranAmt()));
         }
         // 保存划拨批次
+        //tranBatchDAO.saveA(batch);
         batch = tranBatchDAO.merge(batch);
         
         return batch.getTid().longValue();
@@ -188,4 +209,6 @@ public class CMCBCRefundTrade implements IRefundTrade {
         if (count > 0)
             throw new RecordsAlreadyExistsException();
     }
+    
+    
 }

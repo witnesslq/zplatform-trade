@@ -70,4 +70,30 @@ public class TxnsOrderinfoDAOImpl extends HibernateBaseDAOImpl<TxnsOrderinfoMode
     public void updateOrderinfo(TxnsOrderinfoModel orderinfo){
         getSession().update(orderinfo);
     }
+	/**
+	 *
+	 * @param tn
+	 * @return
+	 */
+	@Override
+	public TxnsOrderinfoModel getOrderByTN(String tn) {
+		String hql = "from TxnsOrderinfoModel where tn = ? ";
+        Session session = getSession();
+        Query query = session.createQuery(hql);
+        query.setString(0, tn);
+        return (TxnsOrderinfoModel) query.list().get(0);
+	}
+	/**
+	 *
+	 * @param txnseqno
+	 * @return
+	 */
+	@Override
+	public TxnsOrderinfoModel getOrderByTxnseqno(String txnseqno) {
+		String hql = "from TxnsOrderinfoModel where relatetradetxn = ? ";
+        Session session = getSession();
+        Query query = session.createQuery(hql);
+        query.setString(0, txnseqno);
+        return (TxnsOrderinfoModel) query.list().get(0);
+	}
 }

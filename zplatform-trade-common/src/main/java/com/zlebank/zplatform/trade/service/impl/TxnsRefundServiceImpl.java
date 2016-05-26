@@ -10,6 +10,9 @@
  */
 package com.zlebank.zplatform.trade.service.impl;
 
+import java.util.List;
+import java.util.Map;
+
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,8 +52,8 @@ public class TxnsRefundServiceImpl extends BaseServiceImpl<TxnsRefundModel,Long>
     }
     
     public TxnsRefundModel getRefundByRefundorderNo(String refundorderno,String merchno) {
-        String hql = " from TxnsRefundModel where refundorderno=? and merchno=?";
-        return super.getUniqueByHQL(hql, new Object[]{refundorderno,merchno});
+        String hql = " from TxnsRefundModel where refundorderno=? and submerchno=?";
+        return getUniqueByHQL(hql, new Object[]{refundorderno,merchno});
     }
     
     public TxnsRefundModel getRefundByOldTxnSeqno(String refundorderno,String merchno) {
@@ -60,6 +63,12 @@ public class TxnsRefundServiceImpl extends BaseServiceImpl<TxnsRefundModel,Long>
     public TxnsRefundModel getRefundByRefundor(String refundorderno) {
         String hql = " from TxnsRefundModel where refundorderno=? ";
         return super.getUniqueByHQL(hql, new Object[]{refundorderno});
+    }
+    
+    public Long getSumAmtByOldTxnseqno(String txnseqno_old){
+    	String sql = "select nvl(sum(t.amount),0) totalamt from t_txns_refund t where t.oldtxnseqno=? and t.status not in(?,?,?) ";
+    	List<Map<String, Object>> queryBySQL = (List<Map<String, Object>>) queryBySQL(sql, new Object[]{txnseqno_old,"09","19","29"});
+    	return  Long.valueOf(queryBySQL.get(0).get("TOTALAMT")+"");
     }
     
    

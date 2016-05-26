@@ -35,6 +35,7 @@ import com.zlebank.zplatform.acc.bean.BusiAcct;
 import com.zlebank.zplatform.acc.bean.BusiAcctQuery;
 import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.bean.enums.AcctStatusType;
+import com.zlebank.zplatform.acc.bean.enums.BusiType;
 import com.zlebank.zplatform.acc.bean.enums.Usage;
 import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
 import com.zlebank.zplatform.acc.exception.AccBussinessException;
@@ -42,6 +43,7 @@ import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.AccountQueryService;
 import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.commons.bean.PagedResult;
+import com.zlebank.zplatform.commons.dao.pojo.BusiTypeEnum;
 import com.zlebank.zplatform.commons.enums.BusinessCodeEnum;
 import com.zlebank.zplatform.commons.utils.Base64Utils;
 import com.zlebank.zplatform.commons.utils.RSAUtils;
@@ -122,6 +124,7 @@ import com.zlebank.zplatform.trade.service.ITxnsRefundService;
 import com.zlebank.zplatform.trade.service.ITxnsSplitAccountService;
 import com.zlebank.zplatform.trade.service.ITxnsWithdrawService;
 import com.zlebank.zplatform.trade.service.ITxnsWithholdingService;
+import com.zlebank.zplatform.trade.service.RefundRouteConfigService;
 import com.zlebank.zplatform.trade.service.base.BaseServiceImpl;
 import com.zlebank.zplatform.trade.utils.DateUtil;
 import com.zlebank.zplatform.trade.utils.OrderNumber;
@@ -184,7 +187,8 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
     private RspmsgDAO rspmsgDAO;
     @Autowired
     private MemberBankCardService memberBankCardService;
-    
+    @Autowired
+    private RefundRouteConfigService refundRouteConfigService;
     @Autowired
     private MerchService merchService;
     @Autowired
@@ -869,7 +873,11 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             orderinfo.setTn(OrderNumber.getInstance().generateTN(order.getCoopInstiId()));
             orderinfo.setReqreserved(order.getReqReserved());
             orderinfo.setReserved(order.getReserved());
-            orderinfo.setOrderdesc(order.getOrderDesc());
+            if("3000".equals(txnsLog.getBusitype())){
+            	orderinfo.setOrderdesc("提现");
+            }else{
+            	orderinfo.setOrderdesc(order.getOrderDesc());
+            }
             orderinfo.setPaytimeout(order.getPayTimeout());
             orderinfo.setMemberid(riskRateInfoBean.getMerUserId());
             orderinfo.setCurrencycode("156");
@@ -894,15 +902,16 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             }
         }
         
-        
-        TxnsLogModel old_txnsLog = txnsLogService.queryLogByTradeseltxn(refundBean.getOrigOrderId());
-        if(old_txnsLog==null){
-            throw new TradeException("GW14");
-        }
-        TxnsOrderinfoModel old_orderInfo = getOrderinfoByOrderNo(old_txnsLog.getAccordno());
+        TxnsOrderinfoModel old_orderInfo = getOrderinfoByOrderNoAndMerch(refundBean.getOrigOrderId(),refundBean.getMerId());
         if(old_orderInfo==null){
             throw new TradeException("GW15");
         }
+        
+        TxnsLogModel old_txnsLog = txnsLogService.getTxnsLogByTxnseqno(old_orderInfo.getRelatetradetxn());
+        if(old_txnsLog==null){
+            throw new TradeException("GW14");
+        }
+        
         
         try {
             Long old_amount = old_orderInfo.getOrderamt();
@@ -911,9 +920,15 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
                 throw new TradeException("T021");
             }else if(refund_amount==old_amount){//原始订单退款(全额退款)
                 //具体的处理方法暂时不明
-            }else if(refund_amount<old_amount){//部分退款
-               //具体的处理方法暂时不明
+            }else if(refund_amount<old_amount){//部分退款 支持
+               
             }
+            //部分退款时校验t_txns_refund表中的正在审核或者已经退款的交易的金额之和
+            Long sumAmt = txnsRefundService.getSumAmtByOldTxnseqno(old_txnsLog.getTxnseqno());
+            if((sumAmt+refund_amount)>refund_amount){
+            	throw new TradeException("T021");
+            }
+            
         } catch (NumberFormatException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
@@ -961,19 +976,49 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             txnsLog.setAccsecmerno(refundBean.getMerId());
             txnsLog.setAcccoopinstino(refundBean.getCoopInstiId());
             txnsLog.setTxnseqnoOg(old_txnsLog.getTxnseqno());
-            txnsLog.setAccordcommitime(refundBean.getTxnTime());
+            txnsLog.setAccordcommitime(DateUtil.getCurrentDateTime());
             txnsLog.setTradestatflag("00000000");//交易初始状态
             txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlCycle().toString())));
             txnsLog.setAccmemberid(refundBean.getMemberId());
+            
+          //匿名判断
+    		String payMember = old_txnsLog.getAccmemberid();
+    		boolean anonFlag = false;
+    		if("999999999999999".equals(payMember)){
+    			anonFlag = true;
+    		}
+    		//原交易渠道号
+    		String payChannelCode = old_txnsLog.getPayinst();
+    		//原交易类型  1000002为账户余额支付
+    		String accbusicode = old_txnsLog.getAccbusicode();
+    		//退款路由选择退款渠道或者退款的方式
+    		ResultBean refundRoutResultBean = refundRouteConfigService.getTransRout(DateUtil.getCurrentDateTime(), txnsLog.getAmount()+"", "", accbusicode, txnsLog.getPan(), payChannelCode, anonFlag?"1":"0");
+    		if(refundRoutResultBean.isResultBool()){
+    			log.info(JSON.toJSONString(refundRoutResultBean));
+    			String refundRout = refundRoutResultBean.getResultObj().toString();
+    			if("99999999".equals(refundRout)){
+    				 txnsLog.setBusicode(BusinessEnum.REFUND_ACCOUNT.getBusiCode());
+    			}else{
+    				txnsLog.setBusicode(BusinessEnum.REFUND_BANK.getBusiCode());
+    			}
+    		}
+    		txnsLog.setTxnfee(getTxnFee(txnsLog));
+    		txnsLog.setTradcomm(0L);
             txnsLogService.save(txnsLog);
+            
+            
+            
             
             //退款账务处理
             TradeInfo tradeInfo = new TradeInfo();
-            tradeInfo.setPayMemberId(refundBean.getMerId());
-            tradeInfo.setPayToMemberId(refundBean.getMemberId());
+            tradeInfo.setPayMemberId(refundBean.getMemberId());
+            tradeInfo.setPayToMemberId(refundBean.getMerId());
             tradeInfo.setAmount(new BigDecimal(refundBean.getTxnAmt()));
-            tradeInfo.setCharge(new BigDecimal(txnsLog.getTxnfee()));
+            tradeInfo.setCharge(new BigDecimal(txnsLogService.getTxnFee(txnsLog)));
             tradeInfo.setTxnseqno(txnsLog.getTxnseqno());
+            tradeInfo.setCoopInstCode(txnsLog.getAccfirmerno());
+            tradeInfo.setBusiCode(txnsLog.getBusicode());
+            log.info(JSON.toJSONString(tradeInfo));
             //记录分录流水
             accEntryService.accEntryProcess(tradeInfo,EntryEvent.AUDIT_APPLY);
         } catch (NumberFormatException e) {
@@ -1279,6 +1324,11 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
    @Transactional(propagation=Propagation.REQUIRES_NEW)
    public TxnsOrderinfoModel getOrderinfoByOrderNoAndMemberId(String orderNo,String memberId) {
        return super.getUniqueByHQL("from TxnsOrderinfoModel where orderno = ? and  firmemberno = ?", new Object[]{orderNo,memberId});
+   }
+   
+   @Transactional(propagation=Propagation.REQUIRES_NEW)
+   public TxnsOrderinfoModel getOrderinfoByOrderNoAndMerch(String orderNo,String merchNo) {
+       return super.getUniqueByHQL("from TxnsOrderinfoModel where orderno = ? and  secmemberno = ?", new Object[]{orderNo,merchNo});
    }
     public TxnsOrderinfoModel getOrderinfoByTN(String tn) {
         return super.getUniqueByHQL("from TxnsOrderinfoModel where tn = ? ", new Object[]{tn});
@@ -1960,7 +2010,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         //TradeAdapterFactory.getInstance().getThreadPool(routId).executeMission(quickPayTrade);
         ResultBean resultBean = quickPayTrade.submitPay(trade);
         if(!resultBean.isResultBool()){
-            throw new TradeException("T000",resultBean.getErrCode());
+            throw new TradeException("T000",resultBean.getErrMsg());
         }
         
     }

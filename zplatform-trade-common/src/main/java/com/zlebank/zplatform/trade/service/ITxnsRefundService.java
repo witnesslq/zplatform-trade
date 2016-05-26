@@ -44,4 +44,11 @@ public interface ITxnsRefundService extends IBaseService<TxnsRefundModel, Long>{
      * @return
      */
     public TxnsRefundModel getRefundByTxnseqno(String txnseqno);
+    
+    /**
+     * 获取退款之和
+     * @param txnseqno_old
+     * @return
+     */
+    public Long getSumAmtByOldTxnseqno(String txnseqno_old);
 }

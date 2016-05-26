@@ -26,6 +26,12 @@ import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.commons.service.impl.AbstractBasePageService;
 import com.zlebank.zplatform.commons.utils.BeanCopyUtil;
+import com.zlebank.zplatform.commons.utils.StringUtil;
+import com.zlebank.zplatform.member.bean.CoopInsti;
+import com.zlebank.zplatform.member.bean.enums.MemberType;
+import com.zlebank.zplatform.member.pojo.PojoMember;
+import com.zlebank.zplatform.member.service.CoopInstiService;
+import com.zlebank.zplatform.member.service.MemberService;
 import com.zlebank.zplatform.trade.bean.InsteadPayBatchBean;
 import com.zlebank.zplatform.trade.bean.InsteadPayBatchQuery;
 import com.zlebank.zplatform.trade.bean.enums.InsteadPayBatchStatusEnum;
@@ -66,6 +72,12 @@ public class InsteadBatchServiceImpl extends AbstractBasePageService<InsteadPayB
     
     @Autowired
     private AccEntryService accEntryService;
+    
+    @Autowired
+    private MemberService memberService;
+
+    @Autowired
+    private CoopInstiService coopInstiService;
 
 
     /**
@@ -212,7 +224,12 @@ public class InsteadBatchServiceImpl extends AbstractBasePageService<InsteadPayB
                 tradeInfo.setAmount(new BigDecimal(detail.getAmt()));
                 tradeInfo.setCharge(new BigDecimal(detail.getTxnfee()));
                 tradeInfo.setTxnseqno(detail.getTxnseqno());
-                tradeInfo.setBusiCode("70000003");
+                tradeInfo.setBusiCode("70000001");
+                // 取合作机构号
+                PojoMember memberMerch = memberService.getMbmberByMemberId(detail.getMerId(), MemberType.ENTERPRISE);
+                CoopInsti insti = coopInstiService.getInstiByInstiID(memberMerch.getInstiId());
+                String instiCode = insti.getInstiCode();
+                tradeInfo.setCoopInstCode(instiCode);
                 try {
                     accEntryService.accEntryProcess(tradeInfo,EntryEvent.AUDIT_REJECT );
                 } catch (Exception e) {

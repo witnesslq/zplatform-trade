@@ -134,6 +134,11 @@ public class MerchCashController {
 	@Autowired
 	private CoopInstiDAO coopInstiDAO;
 	
+	
+	
+	
+	
+	
 	@RequestMapping("/coporder.htm")
 	public ModelAndView pay(OrderBean order, HttpSession httpSession,
 			HttpServletRequest request) {
@@ -353,6 +358,9 @@ public class MerchCashController {
 	    bean.setPhone(member.getPhone());
 	    bean.setRelatememberno(txnsLog.getAccsecmerno());
 	    bean.setCardtype("1");
+	    Map<String, Object> cardInfo = routeConfigService.getCardInfo(merch.getAccNum());
+	    bean.setBankcode(cardInfo.get("BANKCODE")+"");
+	    bean.setBankname(cardInfo.get("BANKNAME")+"");
 	    long bindId = bankCardService.saveQuickPayCust(bean);
 	    trade.setBindCardId(bindId+"");
 	    try {
@@ -371,6 +379,7 @@ public class MerchCashController {
 	    tradeBean2.setCertId(trade.getCertId());
 	    tradeBean2.setValidthru(trade.getValidthru());// web收银台使用
 	    tradeBean2.setCvv2(trade.getCvv2());
+	    tradeBean2.setBankCode(bean.getBankcode());
 	    tradeBean2.setCardId(bindId);
 	    model.put("trade", tradeBean2);
 	    return new ModelAndView("/fastpay/pay_merch", model);
@@ -490,6 +499,7 @@ public class MerchCashController {
             TxnsOrderinfoModel orderinfo = gateWayService
                     .getOrderinfoByOrderNoAndMemberId(tradeBean.getOrderId(),
                             tradeBean.getMerchId());
+            TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(orderinfo.getRelatetradetxn());
             if ("02".equals(orderinfo.getStatus())) {
                 model.put("errMsg", "提现正在审核中，请不要重复提交");
                 model.put("txnseqno", tradeBean.getTxnseqno());
@@ -511,13 +521,14 @@ public class MerchCashController {
             withdraw.setBankcode(merch.getBankCode());
             PojoBankInfo bankNodeinfo = bankInfoDAO.getByBankNode(merch.getBankNode());
             withdraw.setBankname(bankNodeinfo.getMainBankSname());
+            txnsWithdrawService.saveWithdraw(withdraw);
             //记录提现账务
             TradeInfo tradeInfo = new TradeInfo();
             tradeInfo.setBusiCode("30000001");
             tradeInfo.setPayMemberId(withdraw.getMemberid());
             tradeInfo.setPayToMemberId(withdraw.getMemberid());
             tradeInfo.setAmount(new BigDecimal(withdraw.getAmount()));
-            tradeInfo.setCharge(new BigDecimal(0));
+            tradeInfo.setCharge(new BigDecimal(withdraw.getFee()));
             tradeInfo.setTxnseqno(orderinfo.getRelatetradetxn());
             tradeInfo.setCoopInstCode(orderinfo.getFirmemberno());
             //记录分录流水
@@ -528,7 +539,7 @@ public class MerchCashController {
                 withdraw.setAcctname(card.getAccname());
                 withdraw.setAcctno(card.getCardno());*/
             }
-            txnsWithdrawService.saveWithdraw(withdraw);
+            //txnsWithdrawService.saveWithdraw(withdraw);
             gateWayService.updateOrderToStartPay(tradeBean.getOrderId());
             model.put(
                     "suburl",

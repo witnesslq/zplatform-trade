@@ -30,4 +30,7 @@ public interface ITxnsOrderinfoDAO extends BaseDAO<TxnsOrderinfoModel>{
     public TxnsOrderinfoModel getOrderinfoByOrderNo(String orderNo,String merchId);
     public void updateOrderinfo(TxnsOrderinfoModel orderinfo);
     public TxnsOrderinfoModel getOrderinfoByOrderNoAndMemberId(String orderNo,String merchId);
+    public TxnsOrderinfoModel getOrderByTN(String tn);
+    public TxnsOrderinfoModel getOrderByTxnseqno(String txnseqno);
+    
 }

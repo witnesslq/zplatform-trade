@@ -141,4 +141,50 @@ public interface ITxnsLogService extends IBaseService<TxnsLogModel, String>{
      */
     public void excuteRecon();
 
+    
+    /**
+     * <p>
+     * 获取发生了代付业务的商户列表
+     * </p>
+     * <p>
+     * 商户对账文件生成程序需要重构，这个接口包含在内，暂时先用
+     * </p>
+     * 
+     * @param date
+     * @return
+     */
+    public List<?> getInsteadMemberByDate(String date);
+    /**
+     * <p>
+     * 获取商户代付业务对账汇总信息
+     * </p>
+     * <p>
+     * 商户对账文件生成程序需要重构，这个接口包含在内，暂时先用
+     * </p>
+     * 
+     * @param date
+     * @return
+     */
+    public List<?> getSumInstead(String memberId, String date);
+    /**
+     * <p>
+     *  获取商户代付业务对账明细信息
+     * </p>
+     * <p>
+     * 商户对账文件生成程序需要重构，这个接口包含在内，暂时先用
+     * </p>
+     * 
+     * @param date
+     * @return
+     */
+    public List<?> getInsteadMerchantDetailedByDate(String memberId, String date);
+    
+    /**
+     * 通过支付订单号获取微信交易流水
+     * @param payOrderNo 支付订单号
+     * @return
+     */
+    public TxnsLogModel getTxnsLogByPayOrderNo(String payOrderNo);
+    
+
 }

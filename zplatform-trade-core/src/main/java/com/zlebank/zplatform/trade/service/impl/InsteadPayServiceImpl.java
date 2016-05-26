@@ -71,6 +71,7 @@ import com.zlebank.zplatform.trade.exception.FailToInsertAccEntryException;
 import com.zlebank.zplatform.trade.exception.FailToInsertFeeException;
 import com.zlebank.zplatform.trade.exception.InconsistentMerchNoException;
 import com.zlebank.zplatform.trade.exception.InvalidCardException;
+import com.zlebank.zplatform.trade.exception.InvalidInsteadPayDataException;
 import com.zlebank.zplatform.trade.exception.MerchWhiteListCheckFailException;
 import com.zlebank.zplatform.trade.exception.NotInsteadPayWorkTimeException;
 import com.zlebank.zplatform.trade.exception.RealNameCheckFailException;
@@ -168,10 +169,11 @@ public class InsteadPayServiceImpl
      * @throws FailToInsertFeeException
      * @throws RealNameCheckFailException
      * @throws InconsistentMerchNoException 
+     * @throws InvalidInsteadPayDataException 
      */
     @Override
     @Transactional(propagation = Propagation.REQUIRED,rollbackFor=Throwable.class)
-    public void insteadPay(InsteadPay_Request request, InsteadPayImportTypeEnum type,InsteadPayInterfaceParamBean param) throws NotInsteadPayWorkTimeException, FailToGetAccountInfoException, BalanceNotEnoughException, DuplicateOrderIdException, InvalidCardException, FailToInsertAccEntryException, MerchWhiteListCheckFailException, FailToInsertFeeException, RealNameCheckFailException, InconsistentMerchNoException {
+    public void insteadPay(InsteadPay_Request request, InsteadPayImportTypeEnum type,InsteadPayInterfaceParamBean param) throws NotInsteadPayWorkTimeException, FailToGetAccountInfoException, BalanceNotEnoughException, DuplicateOrderIdException, InvalidCardException, FailToInsertAccEntryException, MerchWhiteListCheckFailException, FailToInsertFeeException, RealNameCheckFailException, InconsistentMerchNoException, InvalidInsteadPayDataException {
 
 
         if (log.isDebugEnabled()) {
@@ -209,12 +211,20 @@ public class InsteadPayServiceImpl
         
         // 代付明细
         List<InsteadPayFile> fileContent = request.getFileContent();
-        
+        BigDecimal total = BigDecimal.ZERO;
         // 明细检查
         for (InsteadPayFile file : fileContent) {
+            total = total.add(new BigDecimal(file.getAmt()));
             if (!file.getMerId().equals(request.getMerId())) {
                 throw new InconsistentMerchNoException();
             }
+        }
+        if (Integer.valueOf(request.getTotalQty()) != fileContent.size()) {
+            throw new InvalidInsteadPayDataException(new Object[]{"代付明细文件笔数和代付总笔数不相符"});
+        }
+        BigDecimal batchAmt = new BigDecimal(request.getTotalAmt());
+        if (batchAmt.compareTo(total) != 0) {
+            throw new InvalidInsteadPayDataException(new Object[]{"代付明细文件总金额和代付总金额不相符"});
         }
         
         // 是否要判断白名单
