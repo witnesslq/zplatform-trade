@@ -89,7 +89,7 @@ public class AccountRefundTrade implements IRefundTrade {
 		/**支付订单号**/
         
         /**交易类型**/
-        String busiCode = txnsLog.getBusicode();
+        String busiCode = BusinessEnum.REFUND_ACCOUNT.getBusiCode();
         /**付款方会员ID**/
         String payMemberId =  txnsLog.getAccmemberid();
         /**收款方会员ID**/

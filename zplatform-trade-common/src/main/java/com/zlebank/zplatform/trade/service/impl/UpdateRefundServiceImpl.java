@@ -120,7 +120,7 @@ public class UpdateRefundServiceImpl implements UpdateRefundService, UpdateSubje
         tradeInfo.setCharge(new BigDecimal(txnsLog.getTxnfee()));
         tradeInfo.setTxnseqno(txnsLog.getTxnseqno());
         tradeInfo.setCoopInstCode(txnsLog.getAccfirmerno());
-        tradeInfo.setBusiCode(txnsLog.getBusicode());
+        tradeInfo.setBusiCode(BusinessEnum.REFUND_BANK.getBusiCode());
         EntryEvent entryEvent = null;
         if ("00".equals(data.getResultCode())) {
             tradeInfo.setChannelId(txnsLog.getPayinst());

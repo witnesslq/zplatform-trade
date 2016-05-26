@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -36,6 +37,7 @@ import com.zlebank.zplatform.acc.pojo.Money;
 import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.trade.bean.PayPartyBean;
 import com.zlebank.zplatform.trade.bean.ResultBean;
+import com.zlebank.zplatform.trade.bean.UpdateData;
 import com.zlebank.zplatform.trade.bean.chanpay.ChanPayOrderBean;
 import com.zlebank.zplatform.trade.bean.gateway.OrderRespBean;
 import com.zlebank.zplatform.trade.chanpay.bean.async.RefundAsyncResultBean;
@@ -58,6 +60,7 @@ import com.zlebank.zplatform.trade.service.ITxnsGatewaypayService;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
 import com.zlebank.zplatform.trade.service.ITxnsNotifyTaskService;
 import com.zlebank.zplatform.trade.service.RefundService;
+import com.zlebank.zplatform.trade.service.UpdateSubject;
 import com.zlebank.zplatform.trade.utils.ConsUtil;
 import com.zlebank.zplatform.trade.utils.ObjectDynamic;
 
@@ -87,6 +90,9 @@ public class ChanPayController {
 	private ITxnsNotifyTaskService txnsNotifyTaskService;
 	@Autowired
 	private RefundService refundService;
+	@Autowired 
+	@Qualifier("updateRefundServiceImpl")
+	private  UpdateSubject  updateSubject;
 
 	
 	@RequestMapping("/createOrder")
@@ -100,7 +106,7 @@ public class ChanPayController {
 		orderBean.setIs_anonymous("Y");
 		orderBean.setBank_code(bankcode);
 		orderBean.setOut_trade_no((UUID.randomUUID().toString()).replace("-", ""));
-		orderBean.setPay_method("2");
+		orderBean.setPay_method("1");
 		orderBean.setPay_type("C,DC");
 		orderBean.setService("cjt_create_instant_trade");
 		orderBean.setTrade_amount(Money.valueOf(new BigDecimal(txnsLog.getAmount())).toYuan());
@@ -401,9 +407,9 @@ public class ChanPayController {
 
 	@RequestMapping("/test")
 	public void test(){
-		String refundOrderNo = "1605239300000122";
+		/*String refundOrderNo = "1605239300000122";
 		String merchNo = "200000000000597";
-		refundService.execute(refundOrderNo, merchNo);
+		refundService.execute(refundOrderNo, merchNo);*/
 		/*WapRefundBean refundBean = new WapRefundBean();
 		refundBean.setOrderId(DateUtil.getCurrentDateTime());
 		refundBean.setOrigOrderId("2016051314777892");
@@ -420,5 +426,9 @@ public class ChanPayController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}*/
+		UpdateData data = new UpdateData();
+		data.setResultCode("00");
+		data.setTxnSeqNo("1605269900058784");
+		updateSubject.update(data);
 	}
 }
