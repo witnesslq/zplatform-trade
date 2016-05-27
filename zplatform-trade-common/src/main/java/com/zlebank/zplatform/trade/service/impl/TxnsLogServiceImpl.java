@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
@@ -132,15 +133,13 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
     @Transactional(propagation=Propagation.REQUIRES_NEW)
     public ResultBean updatePayInfo_Fast(PayPartyBean payPartyBean){
         TxnsLogModel txnsLog = getTxnsLogByTxnseqno(payPartyBean.getTxnseqno());
-
         Map<String, Object> cardMap = null;
         if(StringUtil.isNotEmpty(payPartyBean.getCardNo())){
         	cardMap = getCardInfo(payPartyBean.getCardNo());
         }
-       
         String hql = "update TxnsLogModel set paytype=?,payordno=?,payinst=?,payfirmerno=?,payordcomtime=?,pan=?,cardtype=?,cardinstino=?,txnfee=?,pan_name=? where txnseqno=?";
         super.updateByHQL(hql, new Object[]{"01",payPartyBean.getPayordno(),payPartyBean.getPayinst(),payPartyBean.getPayfirmerno(),payPartyBean.getPayordcomtime(),
-        payPartyBean.getCardNo(),cardMap==null?"":cardMap.get("TYPE")+"",cardMap==null?"":cardMap.get("BANKCODE")+"",getTxnFee(txnsLog),payPartyBean.getTxnseqno()});
+        payPartyBean.getCardNo(),cardMap==null?"":cardMap.get("TYPE")+"",cardMap==null?"":cardMap.get("BANKCODE")+"",getTxnFee(txnsLog),payPartyBean.getPanName(),payPartyBean.getTxnseqno()});
 
         return null;
     }
@@ -191,13 +190,14 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         return resultBean;
     }
     
-    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
     public ResultBean updateGateWayPayResult(PayPartyBean payPartyBean){
     	TxnsLogModel txnsLog = getTxnsLogByTxnseqno(payPartyBean.getTxnseqno());
-    	txnsLog.setPayordcomtime(payPartyBean.getPayordfintime());
+    	txnsLog.setPayordcomtime(DateUtil.getCurrentDateTime());
     	txnsLog.setPayrettsnseqno(payPartyBean.getPayrettsnseqno());
     	txnsLog.setPayretcode(payPartyBean.getPayretcode());
     	txnsLog.setPayretinfo(payPartyBean.getPayretinfo());
+    	txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
     	try {
             PojoRspmsg msg = rspmsgDAO.getRspmsgByChnlCode(ChnlTypeEnum.CHANPAY,payPartyBean.getPayretcode());
             txnsLog.setRetinfo(msg.getRspinfo());

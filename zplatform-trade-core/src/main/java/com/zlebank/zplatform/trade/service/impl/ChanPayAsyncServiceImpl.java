@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.zlebank.zplatform.commons.dao.pojo.BusiTypeEnum;
 import com.zlebank.zplatform.commons.utils.DateUtil;
+import com.zlebank.zplatform.trade.bean.AppPartyBean;
 import com.zlebank.zplatform.trade.bean.PayPartyBean;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.chanpay.bean.async.RefundAsyncResultBean;
@@ -35,6 +36,7 @@ import com.zlebank.zplatform.trade.service.ChanPayAsyncService;
 import com.zlebank.zplatform.trade.service.IGateWayService;
 import com.zlebank.zplatform.trade.service.ITxnsGatewaypayService;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
+import com.zlebank.zplatform.trade.utils.UUIDUtil;
 
 /**
  * Class Description
@@ -73,7 +75,7 @@ public class ChanPayAsyncServiceImpl implements ChanPayAsyncService {
 		boolean flag = chanPayService.asyncNotifyTrade(tradeAsyncResultBean);
 		log.info("verfy data result:" + flag);
 		if (!flag) {
-			throw new TradeException("");// 验签失败
+			throw new TradeException("T000","验签失败");// 验签失败
 		}
 		String out_trade_no = tradeAsyncResultBean.getOuter_trade_no();
 		TradeStatusEnum tradeStatusEnum = TradeStatusEnum
@@ -115,8 +117,13 @@ public class ChanPayAsyncServiceImpl implements ChanPayAsyncService {
 		orderinfo.setOrderfinshtime(DateUtil.getCurrentDateTime());
 		gatewaypayService.update(gatewayOrder);
 		gateWayService.update(orderinfo);
+		//更新应用方信息
+		AppPartyBean appParty = new AppPartyBean(UUIDUtil.uuid(),"000000000000", DateUtil.getCurrentDateTime(),DateUtil.getCurrentDateTime(), txnseqno, "");
+        txnsLogService.updateAppInfo(appParty);
 		// 处理账务
-		// AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue(txnsLog.getBusitype())).accountedFor(txnseqno);
+		AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue(txnsLog.getBusitype())).accountedFor(txnseqno);
+		
+		
 		return null;
 	}
 
@@ -134,7 +141,7 @@ public class ChanPayAsyncServiceImpl implements ChanPayAsyncService {
 		boolean flag = chanPayService.asyncNotifyRefund(refundAsyncResultBean);
 		log.info("verfy data result:" + flag);
 		if (!flag) {
-			throw new TradeException("");// 验签失败
+			throw new TradeException("T000","异步通知信息验签失败");// 验签失败
 		}
 		// 更新数据 网关流水
 		String out_trade_no = refundAsyncResultBean.getOuter_trade_no();

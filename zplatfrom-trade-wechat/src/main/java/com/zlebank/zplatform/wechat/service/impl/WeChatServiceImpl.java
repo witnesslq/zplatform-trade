@@ -140,12 +140,13 @@ public class WeChatServiceImpl implements WeChatService{
 		//交易订单数据
 		TxnsOrderinfoModel order = txnsOrderinfoDAO.getOrderByTxnseqno(txnsLog.getTxnseqno());
 		if(resultCodeEnum==ResultCodeEnum.SUCCESS){//交易成功
+			txnsLog.setPayrettsnseqno(result.getTransaction_id());
 			txnsLog.setPayretcode(resultCodeEnum.getCode());
 			txnsLog.setPayretinfo("交易成功");
-			 txnsLog.setTradestatflag("00000001");//交易完成结束位
-		        txnsLog.setTradetxnflag("10000000");
-		        txnsLog.setRelate("10000000");
-		        txnsLog.setTradeseltxn(UUIDUtil.uuid());
+			txnsLog.setTradestatflag("00000001");//交易完成结束位
+		    txnsLog.setTradetxnflag("10000000");
+		    txnsLog.setRelate("10000000");
+		    txnsLog.setTradeseltxn(UUIDUtil.uuid());
 			order.setStatus(OrderStatusEnum.SUCCESS.getStatus());
 		}else if(resultCodeEnum==ResultCodeEnum.FAIL){//交易失败
 			txnsLog.setPayretcode(result.getErr_code());
