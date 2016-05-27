@@ -128,6 +128,18 @@ public class ConsUtil {
 			cons.setChanpay_channel_code(prop.getProperty("chanpay_channel_code"));
 			cons.setChanpay_partner_name(prop.getProperty("chanpay_partner_name"));
 			cons.setChanpay_refund_url(prop.getProperty("chanpay_refund_url"));
+			
+			
+			cons.setWechat_appID(prop.getProperty("wechat_appID"));
+			cons.setWechat_cerUrl(prop.getProperty("wechat_cerUrl"));
+			cons.setWechat_create_order_url(prop.getProperty("wechat_create_order_url"));
+			cons.setWechat_down_load_bill_url(prop.getProperty("wechat_down_load_bill_url"));
+			cons.setWechat_key(prop.getProperty("wechat_key"));
+			cons.setWechat_mchID(prop.getProperty("wechat_mchID"));
+			cons.setWechat_query_trade_url(prop.getProperty("wechat_query_trade_url"));
+			cons.setWechat_refund_query_url(prop.getProperty("wechat_refund_query_url"));
+			cons.setWechat_refund_url(prop.getProperty("wechat_refund_url"));
+			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

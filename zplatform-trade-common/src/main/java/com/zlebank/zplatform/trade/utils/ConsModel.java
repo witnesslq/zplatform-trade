@@ -103,6 +103,22 @@ public class ConsModel {
 	private String chanpay_partner_name="";
 	private String chanpay_refund_url="";
 	
+	/**微信支付参数**/
+	private String wechat_create_order_url="";
+	private String wechat_down_load_bill_url="";
+	private String wechat_refund_url="";
+	private String wechat_refund_query_url="";
+	private String wechat_query_trade_url="";
+	private String wechat_key="";
+	private String wechat_appID="";
+	private String wechat_mchID="";
+	private String wechat_cerUrl="";
+	private String wechat_notify_url="";
+	
+	
+	
+	
+	
 	public String getZlrt_url() {
 		return zlrt_url;
 	}
@@ -1187,6 +1203,146 @@ public class ConsModel {
 	 */
 	public void setChanpay_refund_url(String chanpay_refund_url) {
 		this.chanpay_refund_url = chanpay_refund_url;
+	}
+
+	/**
+	 * @return the wechat_create_order_url
+	 */
+	public String getWechat_create_order_url() {
+		return wechat_create_order_url;
+	}
+
+	/**
+	 * @param wechat_create_order_url the wechat_create_order_url to set
+	 */
+	public void setWechat_create_order_url(String wechat_create_order_url) {
+		this.wechat_create_order_url = wechat_create_order_url;
+	}
+
+	/**
+	 * @return the wechat_down_load_bill_url
+	 */
+	public String getWechat_down_load_bill_url() {
+		return wechat_down_load_bill_url;
+	}
+
+	/**
+	 * @param wechat_down_load_bill_url the wechat_down_load_bill_url to set
+	 */
+	public void setWechat_down_load_bill_url(String wechat_down_load_bill_url) {
+		this.wechat_down_load_bill_url = wechat_down_load_bill_url;
+	}
+
+	/**
+	 * @return the wechat_refund_url
+	 */
+	public String getWechat_refund_url() {
+		return wechat_refund_url;
+	}
+
+	/**
+	 * @param wechat_refund_url the wechat_refund_url to set
+	 */
+	public void setWechat_refund_url(String wechat_refund_url) {
+		this.wechat_refund_url = wechat_refund_url;
+	}
+
+	/**
+	 * @return the wechat_refund_query_url
+	 */
+	public String getWechat_refund_query_url() {
+		return wechat_refund_query_url;
+	}
+
+	/**
+	 * @param wechat_refund_query_url the wechat_refund_query_url to set
+	 */
+	public void setWechat_refund_query_url(String wechat_refund_query_url) {
+		this.wechat_refund_query_url = wechat_refund_query_url;
+	}
+
+	/**
+	 * @return the wechat_query_trade_url
+	 */
+	public String getWechat_query_trade_url() {
+		return wechat_query_trade_url;
+	}
+
+	/**
+	 * @param wechat_query_trade_url the wechat_query_trade_url to set
+	 */
+	public void setWechat_query_trade_url(String wechat_query_trade_url) {
+		this.wechat_query_trade_url = wechat_query_trade_url;
+	}
+
+	/**
+	 * @return the wechat_key
+	 */
+	public String getWechat_key() {
+		return wechat_key;
+	}
+
+	/**
+	 * @param wechat_key the wechat_key to set
+	 */
+	public void setWechat_key(String wechat_key) {
+		this.wechat_key = wechat_key;
+	}
+
+	/**
+	 * @return the wechat_appID
+	 */
+	public String getWechat_appID() {
+		return wechat_appID;
+	}
+
+	/**
+	 * @param wechat_appID the wechat_appID to set
+	 */
+	public void setWechat_appID(String wechat_appID) {
+		this.wechat_appID = wechat_appID;
+	}
+
+	/**
+	 * @return the wechat_mchID
+	 */
+	public String getWechat_mchID() {
+		return wechat_mchID;
+	}
+
+	/**
+	 * @param wechat_mchID the wechat_mchID to set
+	 */
+	public void setWechat_mchID(String wechat_mchID) {
+		this.wechat_mchID = wechat_mchID;
+	}
+
+	/**
+	 * @return the wechat_cerUrl
+	 */
+	public String getWechat_cerUrl() {
+		return wechat_cerUrl;
+	}
+
+	/**
+	 * @param wechat_cerUrl the wechat_cerUrl to set
+	 */
+	public void setWechat_cerUrl(String wechat_cerUrl) {
+		this.wechat_cerUrl = wechat_cerUrl;
+	}
+
+	/**
+	 * @return the wechat_notify_url
+	 */
+	public String getWechat_notify_url() {
+		return wechat_notify_url;
+	}
+
+	/**
+	 * @param wechat_notify_url the wechat_notify_url to set
+	 */
+	public void setWechat_notify_url(String wechat_notify_url) {
+		this.wechat_notify_url = wechat_notify_url;
 	}
 
 	

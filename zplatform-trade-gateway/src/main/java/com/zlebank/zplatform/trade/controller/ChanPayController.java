@@ -34,6 +34,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.acc.pojo.Money;
+import com.zlebank.zplatform.commons.dao.pojo.BusiTypeEnum;
 import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.trade.bean.PayPartyBean;
 import com.zlebank.zplatform.trade.bean.ResultBean;
@@ -51,6 +52,7 @@ import com.zlebank.zplatform.trade.chanpay.bean.order.OrderItemBean;
 import com.zlebank.zplatform.trade.chanpay.bean.order.SingleOrderBean;
 import com.zlebank.zplatform.trade.chanpay.utils.RSA;
 import com.zlebank.zplatform.trade.exception.TradeException;
+import com.zlebank.zplatform.trade.factory.AccountingAdapterFactory;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.model.TxnsNotifyTaskModel;
 import com.zlebank.zplatform.trade.model.TxnsOrderinfoModel;
@@ -426,9 +428,11 @@ public class ChanPayController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}*/
-		UpdateData data = new UpdateData();
+		/*UpdateData data = new UpdateData();
 		data.setResultCode("00");
 		data.setTxnSeqNo("1605269900058784");
-		updateSubject.update(data);
+		updateSubject.update(data);*/
+		
+		AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue("1000")).accountedFor("1605279900052511");
 	}
 }

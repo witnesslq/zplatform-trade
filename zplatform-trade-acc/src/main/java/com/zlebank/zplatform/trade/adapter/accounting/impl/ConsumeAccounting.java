@@ -121,17 +121,17 @@ public class ConsumeAccounting implements IAccounting{
                
                 
                 log.info(JSON.toJSONString(tradeInfo));
-                accEntryService.accEntryProcess(tradeInfo,EntryEvent.TRADE_SUCCESS);
+                //accEntryService.accEntryProcess(tradeInfo,EntryEvent.TRADE_SUCCESS);
                 resultBean = new ResultBean("00","交易成功");
                 resultBean.setResultBool(true);
                 log.info("交易:"+txnseqno+"消费入账成功");
-            } catch (AccBussinessException e) {
+            } /*catch (AccBussinessException e) {
                 resultBean = new ResultBean("AP05", e.getMessage());
                 e.printStackTrace();
             } catch (AbstractBusiAcctException e) {
                 resultBean = new ResultBean("AP05", e.getMessage());
                 e.printStackTrace();
-            } catch (NumberFormatException e) {
+            } */catch (NumberFormatException e) {
                 resultBean = new ResultBean("T099", e.getMessage());
                 e.printStackTrace();
             }

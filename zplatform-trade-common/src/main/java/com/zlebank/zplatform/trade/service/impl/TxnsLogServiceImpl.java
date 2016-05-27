@@ -149,6 +149,16 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         TxnsLogModel txnsLog = super.get(txnseqno);
         txnsLog.setPayretcode(retcode);
         txnsLog.setPayretinfo(retinfo);
+        txnsLog.setPayordfintime(DateUtil.getCurrentDateTime());
+        super.update(txnsLog);
+    }
+    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    public void updatePayInfo_Fast_result(String txnseqno,String payrettsnseqno,String retcode,String retinfo){
+        TxnsLogModel txnsLog = super.get(txnseqno);
+        txnsLog.setPayretcode(retcode);
+        txnsLog.setPayretinfo(retinfo);
+        txnsLog.setPayordfintime(DateUtil.getCurrentDateTime());
+        txnsLog.setPayrettsnseqno(payrettsnseqno);
         super.update(txnsLog);
     }
     @Transactional(propagation=Propagation.REQUIRES_NEW)

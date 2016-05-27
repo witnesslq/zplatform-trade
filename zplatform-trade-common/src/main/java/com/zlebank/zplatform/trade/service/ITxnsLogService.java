@@ -186,5 +186,12 @@ public interface ITxnsLogService extends IBaseService<TxnsLogModel, String>{
      */
     public TxnsLogModel getTxnsLogByPayOrderNo(String payOrderNo);
     
-
+    /**
+     * 更新交易支付方信息
+     * @param txnseqno
+     * @param payrettsnseqno
+     * @param retcode
+     * @param retinfo
+     */
+    public void updatePayInfo_Fast_result(String txnseqno,String payrettsnseqno,String retcode,String retinfo);
 }

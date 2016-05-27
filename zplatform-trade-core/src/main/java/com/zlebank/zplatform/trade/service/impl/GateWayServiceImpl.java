@@ -2433,6 +2433,10 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         TxnsOrderinfoModel old_orderInfo = getOrderinfoByOrderNo(old_txnsLog.getAccordno());
         if(old_orderInfo==null){
             throw new TradeException("GW15");
+        }else{
+        	if(!old_orderInfo.getStatus().equals("00")){//订单必须是成功的
+        		throw new TradeException("GW15");
+        	}
         }
         
         try {

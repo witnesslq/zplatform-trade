@@ -14,6 +14,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -22,6 +23,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.json.JSONObject;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
@@ -38,11 +40,19 @@ import org.dom4j.io.XMLWriter;
 import org.xml.sax.SAXException;
 
 import com.zlebank.zplatform.commons.utils.StringUtil;
+import com.zlebank.zplatform.trade.utils.ConsUtil;
 import com.zlebank.zplatform.wechat.enums.BillTypeEnum;
 import com.zlebank.zplatform.wechat.exception.WXVerifySignFailedException;
 import com.zlebank.zplatform.wechat.security.AESUtil;
 import com.zlebank.zplatform.wechat.wx.bean.PayResultBean;
 import com.zlebank.zplatform.wechat.wx.bean.QueryBillBean;
+import com.zlebank.zplatform.wechat.wx.bean.QueryOrderBean;
+import com.zlebank.zplatform.wechat.wx.bean.QueryOrderResultBean;
+import com.zlebank.zplatform.wechat.wx.bean.QueryRefundBean;
+import com.zlebank.zplatform.wechat.wx.bean.QueryRefundResultBean;
+import com.zlebank.zplatform.wechat.wx.bean.RefundBean;
+import com.zlebank.zplatform.wechat.wx.bean.RefundResultBean;
+import com.zlebank.zplatform.wechat.wx.bean.RefundSubInfo;
 import com.zlebank.zplatform.wechat.wx.bean.WXOrderBean;
 import com.zlebank.zplatform.wechat.wx.common.SignUtil;
 import com.zlebank.zplatform.wechat.wx.common.WXConfigure;
@@ -63,11 +73,11 @@ public class WXApplication {
     
 //    private static final String CREATE_ORDER_URL= "http://127.0.0.1:8080/zplatform-sdk-api/interface/wx.htm";
     /**下订单URL**/
-    private static final String CREATE_ORDER_URL= "https://api.mch.weixin.qq.com/pay/unifiedorder";
+    private static final String CREATE_ORDER_URL= ConsUtil.getInstance().cons.getWechat_create_order_url();//"https://api.mch.weixin.qq.com/pay/unifiedorder";
     /**下载对账单URL**/
-    private static final String DOWN_LOAD_BILL_URL= "https://api.mch.weixin.qq.com/pay/downloadbill";
+    private static final String DOWN_LOAD_BILL_URL= ConsUtil.getInstance().cons.getWechat_down_load_bill_url() ;//"https://api.mch.weixin.qq.com/pay/downloadbill";
     /**查询订单**/
-    private static final String QUERY_TRADE_URL= "https://api.mch.weixin.qq.com/pay/downloadbill";
+    private static final String QUERY_TRADE_URL= ConsUtil.getInstance().cons.getWechat_query_trade_url();//"https://api.mch.weixin.qq.com/pay/orderquery";
     /**
      * SUCCESS
      */
@@ -85,10 +95,8 @@ public class WXApplication {
             log.debug("【下订单】【开始】"+JSONObject.fromObject(order));
         // 下订单
         String xml  = createXML(order);
-        log.info("send xml:"+xml);
         // 发送订单
         String rtnData = sendXMLData(xml, CREATE_ORDER_URL);
-        log.info("recevie xml:"+rtnData);
         // 解析应答报文
         WXOrderResponseBean res = parseOrderXml(rtnData);
         // 验签
@@ -367,22 +375,22 @@ public class WXApplication {
      * @return
      */
     public PrintBean downLoadBill(QueryBillBean  bill) {
-        
-        String xml = createDownLoadBillXml(bill);
-        String response = sendXMLData(xml,DOWN_LOAD_BILL_URL);
-        PrintBean printBean = null;
-//        String response = "交易时间,公众账号ID,商户号,子商户号,设备号,微信订单号,商户订单号,用户标识,交易类型,交易状态,付款银行,货币种类,总金额,企业红包金额,微信退款单号,商户退款单号,退款金额,企业红包退款金额,退款类型,退款状态,商品名称,商户数据包,手续费,费率`2016-05-20 10:08:02,`wx16a0b09dbf94f380,`1345867901,`0,`,`4006652001201605206059282375,`160520000400054340,`omBzYwIpGZM3_q740Doggbcw-A_s,`APP,`SUCCESS,`CFT,`CNY,`1.00,`0.00,`0,`0,`0,`0,`,`,`160520000400054340,`支付测试,`0.01000,`0.60%`2016-05-20 17:26:42,`wx16a0b09dbf94f380,`1345867901,`0,`WEB,`4006652001201605206077277148,`160520000400054443,`omBzYwIpGZM3_q740Doggbcw-A_s,`APP,`SUCCESS,`CFT,`CNY,`0.01,`0.00,`0,`0,`0,`0,`,`,`iPad,`北京太阳宫,`0.00000,`0.60%`2016-05-20 17:26:25,`wx16a0b09dbf94f380,`1345867901,`0,`WEB,`4006652001201605206078438536,`160520000400054442,`omBzYwIpGZM3_q740Doggbcw-A_s,`APP,`SUCCESS,`CFT,`CNY,`0.01,`0.00,`0,`0,`0,`0,`,`,`iPad,`北京太阳宫,`0.00000,`0.60%总交易单数,总交易额,总退款金额,总企业红包退款金额,手续费总金额`3,`1.02,`0.00,`0.00,`0.01000";
-        if ("ALL".equals(bill.getBill_type())) {
-        	printBean = parseDownLoadBill(response, BillTypeEnum.ALL);    
-        }
-        if ("SUCCESS".equals(bill.getBill_type())) {
-        	printBean = parseDownLoadBill(response, BillTypeEnum.SUCCESS);
-        }
-        if ("REFUND".equals(bill.getBill_type())) {
-        	printBean = parseDownLoadBill(response, BillTypeEnum.REFUND);
-        }
-        
-        return printBean;
+		String xml = createDownLoadBillXml(bill);
+		String response = sendXMLData(xml, DOWN_LOAD_BILL_URL);
+		PrintBean printBean = null;
+		// String response =
+		// "交易时间,公众账号ID,商户号,子商户号,设备号,微信订单号,商户订单号,用户标识,交易类型,交易状态,付款银行,货币种类,总金额,企业红包金额,微信退款单号,商户退款单号,退款金额,企业红包退款金额,退款类型,退款状态,商品名称,商户数据包,手续费,费率`2016-05-20 10:08:02,`wx16a0b09dbf94f380,`1345867901,`0,`,`4006652001201605206059282375,`160520000400054340,`omBzYwIpGZM3_q740Doggbcw-A_s,`APP,`SUCCESS,`CFT,`CNY,`1.00,`0.00,`0,`0,`0,`0,`,`,`160520000400054340,`支付测试,`0.01000,`0.60%`2016-05-20 17:26:42,`wx16a0b09dbf94f380,`1345867901,`0,`WEB,`4006652001201605206077277148,`160520000400054443,`omBzYwIpGZM3_q740Doggbcw-A_s,`APP,`SUCCESS,`CFT,`CNY,`0.01,`0.00,`0,`0,`0,`0,`,`,`iPad,`北京太阳宫,`0.00000,`0.60%`2016-05-20 17:26:25,`wx16a0b09dbf94f380,`1345867901,`0,`WEB,`4006652001201605206078438536,`160520000400054442,`omBzYwIpGZM3_q740Doggbcw-A_s,`APP,`SUCCESS,`CFT,`CNY,`0.01,`0.00,`0,`0,`0,`0,`,`,`iPad,`北京太阳宫,`0.00000,`0.60%总交易单数,总交易额,总退款金额,总企业红包退款金额,手续费总金额`3,`1.02,`0.00,`0.00,`0.01000";
+		if ("ALL".equals(bill.getBill_type())) {
+			printBean = parseDownLoadBill(response, BillTypeEnum.ALL);
+		}
+		if ("SUCCESS".equals(bill.getBill_type())) {
+			printBean = parseDownLoadBill(response, BillTypeEnum.SUCCESS);
+		}
+		if ("REFUND".equals(bill.getBill_type())) {
+			printBean = parseDownLoadBill(response, BillTypeEnum.REFUND);
+		}
+
+		return printBean;
     }
     /**
      * 解析对账单
@@ -425,12 +433,8 @@ public class WXApplication {
         return  xml;
     }
     
-    public static void main(String[] args) {
-        WXApplication ap = new WXApplication();
-        QueryBillBean bill = new QueryBillBean();
-        bill.setBill_date("20160520");
-        bill.setBill_type("ALL");
-        ap.downLoadBill(bill);
+    public static void main(String[] args) throws WXVerifySignFailedException {
+
     }
 
     /**
@@ -490,5 +494,201 @@ public class WXApplication {
         addElement(root, "return_msg", msg);// 返回信息
         String xml = getStringXML(invokeAPI);
         return xml;
+    }
+    
+    public RefundResultBean refund(RefundBean bean) throws WXVerifySignFailedException {
+        // 生成新文档（根节点为xml）
+        Document invokeAPI = genNewDoc("xml");
+        Element root = invokeAPI.getRootElement();
+        // 添加属性
+        addElement(root, "appid", WXConfigure.getAppid());// 微信开放平台审核通过的应用APPID
+        addElement(root, "device_info", WXConfigure.getDeviceInfo());// 终端设备号
+        addElement(root, "mch_id", WXConfigure.getMchid());// 微信支付分配的商户号
+        addElement(root, "nonce_str",AESUtil.getAESKey().toUpperCase());// 随机字符串，不长于32位。推荐随机数生成算法
+        addElement(root, "op_user_id", WXConfigure.getMchid());// 操作员帐号, 默认为商户号
+        addElement(root, "out_refund_no", bean.getOut_refund_no());// 商户系统内部的退款单号，商户系统内部唯一，同一退款单号多次请求只退一笔
+        addElement(root, "out_trade_no",bean.getOut_trade_no());// 商户侧传给微信的订单号
+        addElement(root, "refund_fee",bean.getRefund_fee());// 退款总金额，订单总金额，单位为分，只能为整数，详见支付金额
+        addElement(root, "refund_fee_type", WXConfigure.getFeeType());// 货币类型，符合ISO 4217标准的三位字母代码，默认人民币：CNY，其他值列表详见货币类型
+        addElement(root, "total_fee",bean.getTotal_fee());// 订单总金额，单位为分，只能为整数，详见支付金额
+        addElement(root, "transaction_id",bean.getTransaction_id());// 微信生成的订单号，在支付通知中有返回
+        // 加签
+        String sign = sign(getStringXML(invokeAPI));
+        addElement(root, "sign", sign);// 签名
+        String xml = getStringXML(invokeAPI);
+        
+        // 发送报文
+        String rtnXml = SSLSender.sendXml(xml);
+        // 封装成Bean
+        RefundResultBean result = new RefundResultBean();
+        try {
+            Map<String,Object> map = XMLParser.getMapFromXML(rtnXml);
+            BeanUtils.populate(result, map);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        // 验签
+        String mySign = null;
+        try {
+            mySign = SignUtil.getSignFromResponseString(rtnXml);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        if (log.isDebugEnabled())
+            log.debug("【本地生成的应答报文签名】"+mySign);
+        if (SUCCESS.equals(result.getReturn_code())) {
+            if (mySign.equals(result.getSign())) {
+                if (log.isDebugEnabled())
+                    log.debug("【验签成功】");
+            } else {
+                if (log.isDebugEnabled())
+                    log.debug("【验签失败】");
+                throw new WXVerifySignFailedException();
+            }
+        }
+        return result ;
+    }
+    
+    /**
+     * 退款查询
+     * @param bean
+     * @return 返回查询结果
+     */
+    public QueryRefundResultBean refundQuery(QueryRefundBean bean) {
+        // 生成新文档（根节点为xml）
+        Document invokeAPI = genNewDoc("xml");
+        Element root = invokeAPI.getRootElement();
+        // 添加属性
+        addElement(root, "appid", WXConfigure.getAppid());// 微信开放平台审核通过的应用APPID
+        addElement(root, "device_info", WXConfigure.getDeviceInfo());// 终端设备号
+        addElement(root, "mch_id", WXConfigure.getMchid());// 微信支付分配的商户号
+        addElement(root, "nonce_str",AESUtil.getAESKey().toUpperCase());// 随机字符串，不长于32位。推荐随机数生成算法
+        if (StringUtil.isNotEmpty(bean.getOut_refund_no())) {
+            addElement(root, "out_refund_no", bean.getOut_refund_no());// 商户系统内部的退款单号，商户系统内部唯一，同一退款单号多次请求只退一笔    
+        } else if (StringUtil.isNotEmpty(bean.getOut_trade_no())) {
+            addElement(root, "out_trade_no",bean.getOut_trade_no());// 商户侧传给微信的订单号
+        } else if (StringUtil.isNotEmpty(bean.getRefund_id())) {
+            addElement(root, "refund_id",bean.getRefund_id());// 微信生成的订单号，在支付通知中有返回
+        } else if (StringUtil.isNotEmpty(bean.getTransaction_id())) {
+            addElement(root, "transaction_id",bean.getTransaction_id());// 微信生成的订单号，在支付通知中有返回
+        } else {
+            log.error("【微信订单号】【商户订单号】【商户退款单号】【微信退款单号】四选一， 不可同时为空");
+            return null;
+        }
+        
+        // 加签
+        String sign = sign(getStringXML(invokeAPI));
+        addElement(root, "sign", sign);// 签名
+        String xml = getStringXML(invokeAPI);
+        
+        // 发送报文
+        String rtnXml = sendXMLData(xml, WXConfigure.REFUND_QUERY_URL);
+        
+        // 解析报文
+        try {
+            QueryRefundResultBean result = new QueryRefundResultBean();
+            Map<String,Object> map = XMLParser.getMapFromXML(rtnXml);
+            BeanUtils.populate(result, map);
+            if (SUCCESS.equals(result.getReturn_code())) {
+                if (result.getRefundSub()==null) {
+                    result.setRefundSub(new ArrayList<RefundSubInfo>());
+                }
+                int size = Integer.parseInt(result.getRefund_count());
+                for (int i = 0; i < size; i++) {
+                    RefundSubInfo sub = new RefundSubInfo();
+                    sub.setOut_refund_no((String) map.get("out_refund_no_"+String.valueOf(i)));
+                    sub.setRefund_id((String) map.get("refund_id_"+String.valueOf(i)));
+                    sub.setRefund_channel((String) map.get("refund_channel_"+String.valueOf(i)));
+                    sub.setRefund_fee((String) map.get("refund_fee_"+String.valueOf(i)));
+                    sub.setCoupon_refund_count((String) map.get("coupon_refund_count_"+String.valueOf(i)));
+                    sub.setCoupon_refund_fee((String) map.get("coupon_refund_fee_"+String.valueOf(i)));
+                    sub.setRefund_status((String) map.get("refund_status_"+String.valueOf(i)));
+                    sub.setRefund_recv_accout((String) map.get("refund_recv_accout_"+String.valueOf(i)));
+                    result.getRefundSub().add(sub);
+                }
+            }
+            // 验签
+            String mySign = null;
+            try {
+                mySign = SignUtil.getSignFromResponseString(rtnXml);
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+            if (log.isDebugEnabled())
+                log.debug("【本地生成的应答报文签名】"+mySign);
+            if (SUCCESS.equals(result.getReturn_code())) {
+                if (mySign.equals(result.getSign())) {
+                    if (log.isDebugEnabled())
+                        log.debug("【验签成功】");
+                } else {
+                    log.error("【验签失败】");
+                    return null;
+                }
+            }
+            return result;
+        } catch (Exception e) {
+            log.error(e);
+        }
+        return null;
+    }
+    
+    /**
+     * 查询订单
+     * @param bean
+     * @return
+     */
+    public QueryOrderResultBean queryOrder(QueryOrderBean bean) {
+        // 生成新文档（根节点为xml）
+        Document invokeAPI = genNewDoc("xml");
+        Element root = invokeAPI.getRootElement();
+        // 添加属性
+        addElement(root, "appid", WXConfigure.getAppid());// 微信开放平台审核通过的应用APPID
+        addElement(root, "mch_id", WXConfigure.getMchid());// 微信支付分配的商户号
+        addElement(root, "nonce_str",AESUtil.getAESKey().toUpperCase());// 随机字符串，不长于32位。推荐随机数生成算法
+        if (StringUtil.isNotEmpty(bean.getOut_trade_no())) {
+            addElement(root, "out_trade_no",bean.getOut_trade_no());// 商户侧传给微信的订单号
+        } else if (StringUtil.isNotEmpty(bean.getTransaction_id())) {
+            addElement(root, "transaction_id",bean.getTransaction_id());// 微信生成的订单号，在支付通知中有返回
+        } else {
+            log.error("【微信订单号 】【商户订单号】二选一， 不可同时为空");
+            return null;
+        }
+
+        // 加签
+        String sign = sign(getStringXML(invokeAPI));
+        addElement(root, "sign", sign);// 签名
+        String xml = getStringXML(invokeAPI);
+        
+        // 发送报文
+        String rtnXml = sendXMLData(xml, QUERY_TRADE_URL);
+        // 解析报文
+        try {
+            QueryOrderResultBean result = new QueryOrderResultBean();
+            Map<String,Object> map = XMLParser.getMapFromXML(rtnXml);
+            BeanUtils.populate(result, map);
+            // 验签
+            String mySign = null;
+            try {
+                mySign = SignUtil.getSignFromResponseString(rtnXml);
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+            if (log.isDebugEnabled())
+                log.debug("【本地生成的应答报文签名】"+mySign);
+            if (SUCCESS.equals(result.getReturn_code())) {
+                if (mySign.equals(result.getSign())) {
+                    if (log.isDebugEnabled())
+                        log.debug("【验签成功】");
+                } else {
+                    log.error("【验签失败】");
+                    return null;
+                }
+            }
+            return result;
+        } catch (Exception e) {
+            log.error(e);
+        }
+        
+        return null;
     }
 }

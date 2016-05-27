@@ -14,6 +14,7 @@ import java.net.URLEncoder;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zlebank.zplatform.commons.dao.pojo.BusiTypeEnum;
@@ -75,7 +76,7 @@ public class TestReceiveProcessor implements ITradeReceiveProcessor{
         }
     }
     
-    @Transactional
+    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
     public void saveTestTradeResult(ResultBean resultBean,TradeBean tradeBean){
             ReaPayResultBean payResult = (ReaPayResultBean) resultBean.getResultObj();
             if("0000".equals(payResult.getResult_code())||"3006".equals(payResult.getResult_code())||"3053".equals(payResult.getResult_code())||"3054".equals(payResult.getResult_code())||
@@ -126,12 +127,12 @@ public class TestReceiveProcessor implements ITradeReceiveProcessor{
             
     }
     
-    @Transactional
+    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
     public void saveSuccessReaPayTrade(String txnseqno,String gateWayOrderNo,ReaPayResultBean payResultBean,String merchId){
         TxnsLogModel txnsLog = txnsLogService.get(txnseqno);
         //txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
         txnsLog.setPayordfintime(DateUtil.getCurrentDateTime());
-        txnsLog.setRetcode("RP00");
+        txnsLog.setRetcode("0000");
         txnsLog.setRetinfo("交易成功");
         txnsLog.setRetdatetime(DateUtil.getCurrentDateTime());
         txnsLog.setTradestatflag("00000001");//交易完成结束位
@@ -151,7 +152,7 @@ public class TestReceiveProcessor implements ITradeReceiveProcessor{
         txnsOrderinfoDAO.update(orderinfo);
         
     }
-    
+    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
     public ResultBean generateAsyncRespMessage(String orderNo,String memberId){
         ResultBean resultBean = null;
         try {
