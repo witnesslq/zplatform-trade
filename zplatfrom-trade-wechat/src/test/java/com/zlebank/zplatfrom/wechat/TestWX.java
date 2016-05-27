@@ -45,7 +45,7 @@ import com.zlebank.zplatform.wechat.wx.bean.WXOrderBean;
 public class TestWX {
 
 	private static final Log log = LogFactory.getLog(TestWX.class);
-
+	@Test
 	public void test_downbill() {
 		WXApplication instance = new WXApplication();
 		QueryBillBean bill = new QueryBillBean();
@@ -84,7 +84,7 @@ public class TestWX {
 		QueryRefundResultBean refundQuery = instance.refundQuery(qrb);
 		log.info("【退款查询返回结果】" + JSONObject.fromObject(refundQuery));
 	}
-	@Test
+	
 	public void test_refund() throws WXVerifySignFailedException {
 		WXApplication instance = new WXApplication();
 		 RefundBean rb = new RefundBean();
