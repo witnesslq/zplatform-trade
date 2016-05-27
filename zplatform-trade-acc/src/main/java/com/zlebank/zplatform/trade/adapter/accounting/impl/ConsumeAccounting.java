@@ -14,6 +14,8 @@ import java.math.BigDecimal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.acc.bean.TradeInfo;
@@ -47,6 +49,7 @@ public class ConsumeAccounting implements IAccounting{
      * @param txnseqno
      * @return
      */
+    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
     public ResultBean accountedFor(String txnseqno) {
         
         log.info("交易:"+txnseqno+"消费入账开始");
