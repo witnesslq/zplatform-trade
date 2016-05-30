@@ -109,7 +109,7 @@ public class UpdateRefundServiceImpl implements UpdateRefundService, UpdateSubje
 			refund.setStatus(InsteadPayDetailStatusEnum.TRAN_FINISH.getCode());
 			order.setStatus("00");
         } else {
-            refund.setStatus(InsteadPayDetailStatusEnum.TRAN_FAILED.getCode());
+            refund.setStatus("29");
             order.setStatus("03");
         }
         

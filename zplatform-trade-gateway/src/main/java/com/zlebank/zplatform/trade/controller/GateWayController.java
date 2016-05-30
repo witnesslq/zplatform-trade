@@ -1593,14 +1593,17 @@ public class GateWayController {
 		List<BankItemBean> b2c_bank = new ArrayList<BankItemBean>();
 		List<BankItemBean> b2b_bank = new ArrayList<BankItemBean>();
 		for(BankItemBean bankItemBean : queryBank){
-			if("QPAY".equals(bankItemBean.getPay_mode())){
+			/*if("QPAY".equals(bankItemBean.getPay_mode())){
 				queryBank.remove(bankItemBean);
+			}*/
+			if("ONLINE_BANK".equals(bankItemBean.getPay_mode())){
+				if("C".equals(bankItemBean.getCard_attribute())){
+					b2c_bank.add(bankItemBean);
+				}else if("B".equals(bankItemBean.getCard_attribute())){
+					b2b_bank.add(bankItemBean);
+				}
 			}
-			if("C".equals(bankItemBean.getCard_attribute())){
-				b2c_bank.add(bankItemBean);
-			}else if("B".equals(bankItemBean.getCard_attribute())){
-				b2b_bank.add(bankItemBean);
-			}
+			
 		}
 		
 		
