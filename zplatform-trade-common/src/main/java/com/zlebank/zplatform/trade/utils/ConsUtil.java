@@ -139,7 +139,7 @@ public class ConsUtil {
 			cons.setWechat_query_trade_url(prop.getProperty("wechat_query_trade_url"));
 			cons.setWechat_refund_query_url(prop.getProperty("wechat_refund_query_url"));
 			cons.setWechat_refund_url(prop.getProperty("wechat_refund_url"));
-			
+			cons.setWechat_notify_url(prop.getProperty("wechat_notify_url"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

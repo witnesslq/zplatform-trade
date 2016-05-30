@@ -40,6 +40,7 @@ import com.zlebank.zplatform.trade.factory.AccountingAdapterFactory;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.model.TxnsOrderinfoModel;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
+import com.zlebank.zplatform.trade.utils.ConsUtil;
 import com.zlebank.zplatform.trade.utils.ObjectDynamic;
 import com.zlebank.zplatform.trade.utils.OrderNumber;
 import com.zlebank.zplatform.trade.utils.SynHttpRequestThread;
@@ -110,7 +111,7 @@ public class WeChatServiceImpl implements WeChatService{
 		order_wechat.setTime_expire(DateUtil.formatDateTime("yyyyMMddHHmmss",
 				DateUtil.skipDateTime(new Date(), 1)));
 		order_wechat.setGoods_tag("WXG");
-		order_wechat.setNotify_url("http://114.242.70.196:9086/zplatform-sdk-api/interface/wxResult.htm");
+		order_wechat.setNotify_url(ConsUtil.getInstance().cons.getWechat_notify_url());
 		// 下订单
 		String payrettsnseqno = null;
 		JSONObject json = null;
