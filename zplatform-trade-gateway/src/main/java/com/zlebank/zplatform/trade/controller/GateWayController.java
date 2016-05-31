@@ -175,10 +175,9 @@ public class GateWayController {
     @Autowired
     private AccEntryService accEntryService;
     @Autowired
-
     private ChanPayService chanPayService;
 
-    private ChanPayAsyncService chanPayAsyncService;
+    
     @Autowired
     private CoopInstiDAO coopInstiDAO;
     

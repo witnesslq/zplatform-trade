@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.commons.dao.pojo.BusiTypeEnum;
 import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.trade.bean.AppPartyBean;
@@ -70,6 +71,7 @@ public class ChanPayAsyncServiceImpl implements ChanPayAsyncService {
 	@Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Throwable.class)
 	public ResultBean dealWithTradeAsync(
 			TradeAsyncResultBean tradeAsyncResultBean) throws TradeException {
+		ResultBean resultBean = null;
 		// 验签
 		// 更新数据 网关流水
 		boolean flag = chanPayService.asyncNotifyTrade(tradeAsyncResultBean);
@@ -77,54 +79,59 @@ public class ChanPayAsyncServiceImpl implements ChanPayAsyncService {
 		if (!flag) {
 			throw new TradeException("T000","验签失败");// 验签失败
 		}
-		String out_trade_no = tradeAsyncResultBean.getOuter_trade_no();
-		TradeStatusEnum tradeStatusEnum = TradeStatusEnum
-				.fromValue(tradeAsyncResultBean.getTrade_status());
-		TxnsGatewaypayModel gatewayOrder = gatewaypayService
-				.getOrderByOrderNo(out_trade_no);
-		String txnseqno = gatewayOrder.getRelatetradetxn();
-		TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(txnseqno);
-		TxnsOrderinfoModel orderinfo = gateWayService
-				.getOrderinfoByOrderNoAndMemberId(txnsLog.getAccordno(),
-						txnsLog.getAccfirmerno());
-		gatewayOrder.setClosetime(tradeAsyncResultBean.getGmt_close());
-		gatewayOrder.setPayfinshtime(tradeAsyncResultBean.getGmt_payment());
-		gatewayOrder
-				.setPayrettxnseqno(tradeAsyncResultBean.getInner_trade_no());
-		gatewayOrder.setPayretcode(tradeStatusEnum.getCode());
-		gatewayOrder.setPayretinfo(tradeStatusEnum.getMesssage());
-		if (tradeStatusEnum == TradeStatusEnum.PAY_FINISHED
-				|| tradeStatusEnum == TradeStatusEnum.TRADE_FINISHED
-				|| tradeStatusEnum == TradeStatusEnum.TRADE_SUCCESS) {
-			gatewayOrder.setStatus("00");// 交易成功
-			orderinfo.setStatus("00");
-		} else {
-			gatewayOrder.setStatus("03");
-			orderinfo.setStatus("03");
-		}
-		gatewaypayService.update(gatewayOrder);
-		// 更新数据 交易流水
+		try {
+			String out_trade_no = tradeAsyncResultBean.getOuter_trade_no();
+			TradeStatusEnum tradeStatusEnum = TradeStatusEnum.fromValue(tradeAsyncResultBean.getTrade_status());
+			//交易网关流水数据
+			TxnsGatewaypayModel gatewayOrder = gatewaypayService.getOrderByOrderNo(out_trade_no);
+			String txnseqno = gatewayOrder.getRelatetradetxn();
+			//交易流水数据
+			TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(txnseqno);
+			//交易订单数据
+			TxnsOrderinfoModel orderinfo = gateWayService.getOrderByTxnseqno(txnseqno);
+			gatewayOrder.setClosetime(tradeAsyncResultBean.getGmt_close());
+			gatewayOrder.setPayfinshtime(tradeAsyncResultBean.getGmt_payment());
+			gatewayOrder
+					.setPayrettxnseqno(tradeAsyncResultBean.getInner_trade_no());
+			gatewayOrder.setPayretcode(tradeStatusEnum.getCode());
+			gatewayOrder.setPayretinfo(tradeStatusEnum.getMesssage());
+			if (tradeStatusEnum == TradeStatusEnum.PAY_FINISHED
+					|| tradeStatusEnum == TradeStatusEnum.TRADE_FINISHED
+					|| tradeStatusEnum == TradeStatusEnum.TRADE_SUCCESS) {
+				gatewayOrder.setStatus("00");// 交易成功
+				orderinfo.setStatus("00");
+			} else {
+				gatewayOrder.setStatus("03");
+				orderinfo.setStatus("03");
+			}
+			gatewaypayService.update(gatewayOrder);
+			// 更新数据 交易流水
 
-		PayPartyBean payPartyBean = new PayPartyBean();
-		payPartyBean.setPayordfintime(tradeAsyncResultBean.getGmt_payment());
-		payPartyBean
-				.setPayrettsnseqno(tradeAsyncResultBean.getInner_trade_no());
-		payPartyBean.setPayretcode(tradeStatusEnum.getCode());
-		payPartyBean.setPayretinfo(tradeStatusEnum.getMesssage());
-		payPartyBean.setTxnseqno(txnseqno);
-		txnsLogService.updateGateWayPayResult(payPartyBean);
-		// 更新数据 交易订单
-		orderinfo.setOrderfinshtime(DateUtil.getCurrentDateTime());
-		gatewaypayService.update(gatewayOrder);
-		gateWayService.update(orderinfo);
-		//更新应用方信息
-		AppPartyBean appParty = new AppPartyBean(UUIDUtil.uuid(),"000000000000", DateUtil.getCurrentDateTime(),DateUtil.getCurrentDateTime(), txnseqno, "");
-        txnsLogService.updateAppInfo(appParty);
-		// 处理账务
-		AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue(txnsLog.getBusitype())).accountedFor(txnseqno);
-		
-		
-		return null;
+			PayPartyBean payPartyBean = new PayPartyBean();
+			payPartyBean.setPayordfintime(tradeAsyncResultBean.getGmt_payment());
+			payPartyBean
+					.setPayrettsnseqno(tradeAsyncResultBean.getInner_trade_no());
+			payPartyBean.setPayretcode(tradeStatusEnum.getCode());
+			payPartyBean.setPayretinfo(tradeStatusEnum.getMesssage());
+			payPartyBean.setTxnseqno(txnseqno);
+			txnsLogService.updateGateWayPayResult(payPartyBean);
+			// 更新数据 交易订单
+			orderinfo.setOrderfinshtime(DateUtil.getCurrentDateTime());
+			gatewaypayService.update(gatewayOrder);
+			gateWayService.update(orderinfo);
+			//更新应用方信息
+			AppPartyBean appParty = new AppPartyBean(UUIDUtil.uuid(),"000000000000", DateUtil.getCurrentDateTime(),DateUtil.getCurrentDateTime(), txnseqno, "");
+			txnsLogService.updateAppInfo(appParty);
+			// 处理账务
+			AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue(txnsLog.getBusitype())).accountedFor(txnseqno);
+			resultBean = new ResultBean("success");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			resultBean = new ResultBean("T000", e.getMessage());
+		}
+		log.info("chanpay notify result:"+JSON.toJSONString(resultBean));
+		return resultBean;
 	}
 
 	/**

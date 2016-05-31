@@ -188,4 +188,11 @@ public interface IGateWayService extends IBaseService<TxnsOrderinfoModel, Long>{
     public boolean validatePayPWD(String memberId,String pwd,MemberType memberType) throws TradeException;
     
     public String dealWithRefundOrder(String orderNo,String merchNo,String txnAmt) throws TradeException;
+    
+    /**
+     * 通过交易流水号获取交易订单信息
+     * @param txnseqno
+     * @return
+     */
+    public TxnsOrderinfoModel getOrderByTxnseqno(String txnseqno);
 }

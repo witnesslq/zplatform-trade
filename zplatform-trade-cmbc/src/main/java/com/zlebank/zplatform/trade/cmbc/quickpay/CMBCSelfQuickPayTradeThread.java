@@ -88,7 +88,11 @@ public class CMBCSelfQuickPayTradeThread implements IQuickPayTrade{
         	log.info("cmbc self send sms start!!!!");
             String mobile = trade.getMobile();
             String payorderNo = txnsQuickpayService.saveCMBCOuterBankSign(trade);
-            SMSThreadPool.getInstance().executeMission(new SMSUtil(mobile,"",trade.getTn(),DateUtil.getCurrentDateTime(),payorderNo,trade.getMiniCardNo(),trade.getAmount_y()));
+            if(ConsUtil.getInstance().cons.getIs_junit()==1){
+            	new SMSUtil(mobile,"",trade.getTn(),DateUtil.getCurrentDateTime(),payorderNo,trade.getMiniCardNo(),trade.getAmount_y()).sendSMS(mobile, "");
+            }else{
+            	SMSThreadPool.getInstance().executeMission(new SMSUtil(mobile,"",trade.getTn(),DateUtil.getCurrentDateTime(),payorderNo,trade.getMiniCardNo(),trade.getAmount_y()));
+            }
             resultBean = new ResultBean("success");
             log.info("cmbc self send sms end!!!!");
         } catch (Exception e) {

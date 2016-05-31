@@ -140,6 +140,8 @@ public class ConsUtil {
 			cons.setWechat_refund_query_url(prop.getProperty("wechat_refund_query_url"));
 			cons.setWechat_refund_url(prop.getProperty("wechat_refund_url"));
 			cons.setWechat_notify_url(prop.getProperty("wechat_notify_url"));
+			
+			cons.setIs_junit(Integer.valueOf(prop.getProperty("is_junit", "0")));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

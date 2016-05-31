@@ -118,6 +118,7 @@ public class TxnsOrderinfoDAOImpl extends HibernateBaseDAOImpl<TxnsOrderinfoMode
 	 * @return
 	 */
 	@Override
+	@Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
 	public TxnsOrderinfoModel getOrderByTxnseqno(String txnseqno) {
 		String hql = "from TxnsOrderinfoModel where relatetradetxn = ? ";
         Session session = getSession();

@@ -160,7 +160,7 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         TxnsOrderinfoModel orderinfo = getOrderinfoByOrderNoAndMemberId(tradeBean.getOrderId(),tradeBean.getMerchId());
         TxnsLogModel txnsLog = txnsLogService.get(orderinfo.getRelatetradetxn());
         String reapayOrderNo = txnsQuickpayService.getReapayOrderNo(txnsLog.getTxnseqno());
-        if("95000001".equals(tradeBean.getPayinstiId())){
+        if("96000001".equals(tradeBean.getPayinstiId())){
             if(StringUtil.isEmpty(reapayOrderNo)){
                 throw new TradeException("T006");
             }
@@ -208,7 +208,11 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         updateOrderToStartPay(orderinfo.getRelatetradetxn());
         quickPayTrade.setTradeType(TradeTypeEnum.SUBMITPAY);
         quickPayTrade.setTradeBean(tradeBean);
-        TradeAdapterFactory.getInstance().getThreadPool(routId).executeMission(quickPayTrade);
+        if(ConsUtil.getInstance().cons.getIs_junit()==0){
+        	quickPayTrade.submitPay(tradeBean);
+        }else{
+        	TradeAdapterFactory.getInstance().getThreadPool(routId).executeMission(quickPayTrade);
+        }
     }
     /**
      * 银行卡签约

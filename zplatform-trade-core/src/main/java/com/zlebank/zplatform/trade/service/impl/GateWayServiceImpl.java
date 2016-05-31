@@ -2575,5 +2575,14 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         }
         
     }
+	/**
+	 *
+	 * @param txnseqno
+	 * @return
+	 */
+	@Override
+	public TxnsOrderinfoModel getOrderByTxnseqno(String txnseqno) {
+		return txnsOrderinfoDAO.getOrderByTxnseqno(txnseqno);
+	}
 	
 }
