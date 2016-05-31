@@ -195,4 +195,14 @@ public interface IGateWayService extends IBaseService<TxnsOrderinfoModel, Long>{
      * @return
      */
     public TxnsOrderinfoModel getOrderByTxnseqno(String txnseqno);
+    
+    /**
+     * 获取退款手续费
+     * @param txnseqno
+     * @param merchNo
+     * @param txnAmt
+     * @param busicode
+     * @return
+     */
+    public Long getRefundFee(String txnseqno,String merchNo,String txnAmt,String busicode);
 }

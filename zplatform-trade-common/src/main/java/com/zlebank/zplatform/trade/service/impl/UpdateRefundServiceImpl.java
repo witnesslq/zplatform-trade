@@ -94,6 +94,7 @@ public class UpdateRefundServiceImpl implements UpdateRefundService, UpdateSubje
     @Override
     @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
     public void update(UpdateData data) {
+    	log.info("退款账务处理开始，交易序列号:"+data.getTxnSeqNo());
         List<UpdateSubject> observerList = ObserverListService.getInstance().getObserverList();
         for (UpdateSubject subject : observerList) {
             log.info(subject.getBusiCode());
@@ -125,12 +126,14 @@ public class UpdateRefundServiceImpl implements UpdateRefundService, UpdateSubje
         if ("00".equals(data.getResultCode())) {
             tradeInfo.setChannelId(txnsLog.getPayinst());
             entryEvent = EntryEvent.TRADE_SUCCESS;
+            log.info("退款交易成功，交易序列号:"+data.getTxnSeqNo());
         } else {
             entryEvent = EntryEvent.TRADE_FAIL;
+            log.info("退款交易失败，交易序列号:"+data.getTxnSeqNo());
         }
        
         try {
-        	log.info("tradeInfo:"+ JSON.toJSONString(tradeInfo));
+        	log.info("账务处理数据:"+ JSON.toJSONString(tradeInfo));
             accEntryService.accEntryProcess(tradeInfo, entryEvent);
             txnsRefundService.update(refund);
             txnsOrderinfoDAO.updateOrderinfo(order);
@@ -152,6 +155,7 @@ public class UpdateRefundServiceImpl implements UpdateRefundService, UpdateSubje
 		}
         //更新交易流水应用方信息
         txnsLogService.updateAppStatus(data.getTxnSeqNo(), txnsLog.getApporderstatus(), txnsLog.getApporderinfo());
+        log.info("退款账务结束，交易序列号:"+data.getTxnSeqNo());
     }
 
 

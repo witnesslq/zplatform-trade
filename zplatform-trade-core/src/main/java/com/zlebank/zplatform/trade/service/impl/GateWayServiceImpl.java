@@ -2151,9 +2151,6 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
     public String withdraw(String json) throws TradeException{
         WapWithdrawBean withdrawBean = JSON.parseObject(json, WapWithdrawBean.class);
         //判断账户余额是否充足
-        
-        
-        
         WapWithdrawAccBean accBean = null;
         if(StringUtil.isNotEmpty(withdrawBean.getBindId())){//使用已绑定的卡进行提现
         	PojoQuickpayCust custCard = quickpayCustDAO.getById(Long.valueOf(withdrawBean.getBindId()));
@@ -2585,4 +2582,21 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
 		return txnsOrderinfoDAO.getOrderByTxnseqno(txnseqno);
 	}
 	
+	
+	public Long getRefundFee(String txnseqno,String merchNo,String txnAmt,String busicode){
+		PojoMerchDeta merch = merchService.getMerchBymemberId(merchNo);
+		TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(txnseqno);
+		//扣率版本，业务类型，交易金额，会员号，原交易序列号，卡类型 
+        List<Map<String, Object>> feeList = (List<Map<String, Object>>) super.queryBySQL("select FNC_GETFEES_notxns(?,?,?,?,?,?) as fee from dual", 
+                new Object[]{merch.getFeeVer(),busicode,txnAmt,merchNo,txnseqno,txnsLog.getCardtype()});
+        if(feeList.size()>0){
+            if(StringUtil.isNull(feeList.get(0).get("FEE"))){
+                return 0L;
+            }else{
+                return Long.valueOf(feeList.get(0).get("FEE")+"");
+            }
+            
+        }
+        return 0L;
+	}
 }

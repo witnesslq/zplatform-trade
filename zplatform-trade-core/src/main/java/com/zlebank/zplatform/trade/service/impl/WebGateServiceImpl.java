@@ -433,9 +433,7 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             /*String pwd = accountPayService.encryptPWD(
                     accountTrade.getMerchId(), tradeBean.getPay_pwd());*/
             accountTrade.setPay_pwd(tradeBean.getPay_pwd());
-            TxnsOrderinfoModel orderinfo = 
-                    getOrderinfoByOrderNoAndMemberId(tradeBean.getOrderId(),
-                            tradeBean.getMerchId());
+            TxnsOrderinfoModel orderinfo = getOrderinfoByTxnseqno(tradeBean.getTxnseqno());
             if("00".equals(orderinfo.getStatus())){
                 throw new TradeException("T004");
             }    
@@ -445,6 +443,14 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             if(!orderinfo.getOrderamt().toString().equals(tradeBean.getAmount())){
                 throw new TradeException("T033");
             }
+            TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(tradeBean.getTxnseqno());
+            //计算手续费
+            Long txnFee = txnsLogService.getTxnFee(txnsLog);
+            if(txnFee>txnsLog.getAmount()){
+            	throw new TradeException("T039");
+            }
+            
+            
             accountPayService.accountPay(accountTrade);
             resultBean = new ResultBean("success");
             resultBean.setErrCode("0000");
