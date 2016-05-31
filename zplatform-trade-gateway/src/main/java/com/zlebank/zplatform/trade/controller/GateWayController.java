@@ -548,8 +548,7 @@ public class GateWayController {
     @RequestMapping("/bindPay.htm")
     public ModelAndView toBindPay(TradeBean trade, @RequestParam("txnseqno_")String txnseqno_) {
         if (StringUtil.isEmpty(trade.getTxnseqno())) {
-            return new ModelAndView("redirect:/gateway/cash.htm?txnseqno="
-                    + txnseqno_);
+            return new ModelAndView("redirect:/gateway/cash.htm?txnseqno=" + txnseqno_);
         }
         
         Map<String, Object> model = new HashMap<String, Object>();

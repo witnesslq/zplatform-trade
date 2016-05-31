@@ -24,5 +24,5 @@ import com.zlebank.zplatform.trade.bean.enums.TradeTypeEnum;
  */
 public interface ITradeReceiveProcessor {
     public void onReceive(ResultBean resultBean,TradeBean tradeBean,TradeTypeEnum tradeType);
-    public ResultBean generateAsyncRespMessage(String orderNo,String memberId);
+    public ResultBean generateAsyncRespMessage(String txnseqno);
 }

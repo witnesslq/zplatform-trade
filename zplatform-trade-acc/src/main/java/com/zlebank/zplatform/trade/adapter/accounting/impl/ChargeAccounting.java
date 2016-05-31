@@ -101,18 +101,6 @@ public class ChargeAccounting implements IAccounting{
             TradeInfo tradeInfo = new TradeInfo(txnseqno, payordno, busiCode, payMemberId, payToMemberId, payToParentMemberId, channelId, productId, amount, commission, charge, amountD, amountE, false);
             tradeInfo.setPayordno(payordno);
             tradeInfo.setCoopInstCode(txnsLog.getAccfirmerno());
-            /*tradeInfo.setTxnseqno(txnseqno);
-            tradeInfo.setAmount(amount);;
-            tradeInfo.setAmountD(amountD);
-            tradeInfo.setAmountE(amountE);
-            tradeInfo.setBusiCode(busiCode);
-            tradeInfo.setChannelId(channelId);
-            tradeInfo.setCharge(charge);
-            tradeInfo.setCommission(commission);
-            tradeInfo.setPayMemberId(payMemberId);
-            tradeInfo.setPayToMemberId(payToMemberId);
-            tradeInfo.setPayToParentMemberId(payToParentMemberId);
-            tradeInfo.setProductId(productId);*/
             log.info(JSON.toJSONString(tradeInfo));
             accEntryService.accEntryProcess(tradeInfo,EntryEvent.TRADE_SUCCESS);
             resultBean = new ResultBean("success");

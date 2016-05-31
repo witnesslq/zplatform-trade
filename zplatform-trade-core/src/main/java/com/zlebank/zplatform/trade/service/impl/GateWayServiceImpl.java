@@ -1210,12 +1210,12 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         }
     }
     
-    @Transactional
+    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor = Throwable.class)
     public void saveSuccessTrade(String txnseqno,String gateWayOrderNo,ZLPayResultBean zlPayResultBean){
         TxnsLogModel txnsLog = txnsLogService.get(txnseqno);
-        //txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
+        txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
         txnsLog.setPayordfintime(zlPayResultBean.getPnrDate()+zlPayResultBean.getPnrTime());
-        txnsLog.setRetcode("ZL00");
+        txnsLog.setRetcode("0000");
         txnsLog.setRetinfo("交易成功");
         txnsLog.setRetdatetime(DateUtil.getCurrentDateTime());
         txnsLog.setTradestatflag("00000001");//交易完成结束位
@@ -1227,12 +1227,10 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         txnsLog.setPayretcode(zlPayResultBean.getRespCode());
         txnsLog.setPayretinfo(zlPayResultBean.getRespDesc());
         txnsLogService.update(txnsLog);
-        
-        
-        TxnsOrderinfoModel orderinfo = super.findByProperty("orderno", gateWayOrderNo).get(0);
+        TxnsOrderinfoModel orderinfo = txnsOrderinfoDAO.getOrderByTxnseqno(txnseqno);
         orderinfo.setStatus("00");
         orderinfo.setOrderfinshtime(DateUtil.getCurrentDateTime());
-        super.update(orderinfo);
+        update(orderinfo);
         
     }
     @Transactional
@@ -1903,6 +1901,9 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         //verifyWapOrder(JSON.parseObject(json));
         WapSMSMessageBean smsMessageBean = JSON.parseObject(json, WapSMSMessageBean.class);
         TxnsOrderinfoModel orderinfo = getOrderinfoByTN(smsMessageBean.getTn());
+        if(orderinfo==null){
+        	throw new TradeException("GW15");
+        }
         TxnsLogModel txnsLog = txnsLogService.get(orderinfo.getRelatetradetxn());
         if("00".equals(orderinfo.getStatus())){
             throw new TradeException("T004");

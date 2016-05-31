@@ -142,7 +142,7 @@ public class TxnsQuickpayServiceImpl extends BaseServiceImpl<TxnsQuickpayModel, 
      * @param bean
      */
     @Override
-    @Transactional
+    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor = Throwable.class)
     public void updateMarginRegister(ResultBean bean) {
         // TODO Auto-generated method stub
         ZLPayResultBean zlPayResultBean = (ZLPayResultBean)bean.getResultObj();

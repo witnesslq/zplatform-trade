@@ -139,8 +139,8 @@ public class CMBCQuickPayTradeThread implements IQuickPayTrade {
 				txnsLogService.updatePayInfo_Fast_result(tradeBean.getTxnseqno(), resultBean.getErrCode(),resultBean.getErrMsg());
 				txnsLogService.updateCoreRetResult(tradeBean.getTxnseqno(),resultBean.getErrCode(), resultBean.getErrMsg());
 				log.info(JSON.toJSONString(resultBean));
-				TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(tradeBean.getTxnseqno());
-                txnsOrderinfoDAO.updateOrderToFail(txnsLog.getAccordno(), txnsLog.getAccfirmerno());
+				//TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(tradeBean.getTxnseqno());
+                txnsOrderinfoDAO.updateOrderToFail(tradeBean.getTxnseqno());
 				return resultBean;
 			}
 			trade.setPayinstiId(PAYINSTID);
@@ -165,8 +165,7 @@ public class CMBCQuickPayTradeThread implements IQuickPayTrade {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			txnsOrderinfoDAO.updateOrderToFail(tradeBean.getOrderId(),
-					tradeBean.getMerchId());
+			txnsOrderinfoDAO.updateOrderToFail(tradeBean.getTxnseqno());
 			resultBean = new ResultBean("T000", "交易失败");
 		}
 

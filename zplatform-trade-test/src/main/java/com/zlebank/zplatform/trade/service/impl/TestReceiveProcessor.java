@@ -153,10 +153,10 @@ public class TestReceiveProcessor implements ITradeReceiveProcessor{
         
     }
     @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
-    public ResultBean generateAsyncRespMessage(String orderNo,String memberId){
+    public ResultBean generateAsyncRespMessage(String txnseqno){
         ResultBean resultBean = null;
         try {
-            TxnsOrderinfoModel orderinfo = txnsOrderinfoDAO.getOrderinfoByOrderNo(orderNo,memberId);
+            TxnsOrderinfoModel orderinfo = txnsOrderinfoDAO.getOrderByTxnseqno(txnseqno);
             
             
             TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(orderinfo.getRelatetradetxn());

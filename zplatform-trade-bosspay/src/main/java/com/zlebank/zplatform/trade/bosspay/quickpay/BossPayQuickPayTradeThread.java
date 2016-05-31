@@ -153,8 +153,8 @@ public class BossPayQuickPayTradeThread implements IQuickPayTrade {
 				txnsLogService.updateCoreRetResult(tradeBean.getTxnseqno(),
 						resultBean.getErrCode(), resultBean.getErrMsg());
 				log.info(JSON.toJSONString(resultBean));
-				TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(tradeBean.getTxnseqno());
-                txnsOrderinfoDAO.updateOrderToFail(txnsLog.getAccordno(), txnsLog.getAccfirmerno());
+				//TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(tradeBean.getTxnseqno());
+                txnsOrderinfoDAO.updateOrderToFail(tradeBean.getTxnseqno());
 				return resultBean;
 			}
 			trade.setPayinstiId(PAYINSTID);
@@ -181,8 +181,7 @@ public class BossPayQuickPayTradeThread implements IQuickPayTrade {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			txnsOrderinfoDAO.updateOrderToFail(tradeBean.getOrderId(),
-					tradeBean.getMerchId());
+			txnsOrderinfoDAO.updateOrderToFail(tradeBean.getTxnseqno());
 			resultBean = new ResultBean("T000", "交易失败");
 		}
 
@@ -212,7 +211,7 @@ public class BossPayQuickPayTradeThread implements IQuickPayTrade {
         txnsLog.setPayretinfo(StatusEnum.fromValue(queryResponseBean.getStatus()).getMessage());
         txnsLogService.updateTxnsLog(txnsLog);
         //订单状态更新为失败
-        txnsOrderinfoDAO.updateOrderToFail(txnsLog.getAccordno(),txnsLog.getAccfirmerno());
+        txnsOrderinfoDAO.updateOrderToFail(txnseqno);
         
     }
 	
@@ -241,7 +240,7 @@ public class BossPayQuickPayTradeThread implements IQuickPayTrade {
         
         // 处理同步通知和异步通知
         // 根据原始订单拼接应答报文，异步通知商户
-        TxnsOrderinfoModel gatewayOrderBean = txnsOrderinfoDAO.getOrderinfoByOrderNo(txnsLog.getAccordno(),txnsLog.getAccfirmerno());
+        TxnsOrderinfoModel gatewayOrderBean = txnsOrderinfoDAO.getOrderByTxnseqno(txnseqno);//getOrderinfoByOrderNo(txnsLog.getAccordno(),txnsLog.getAccfirmerno());
         /**账务处理开始 **/
         // 应用方信息
         try {
@@ -257,8 +256,7 @@ public class BossPayQuickPayTradeThread implements IQuickPayTrade {
         /**异步通知处理开始 **/
         try {
 			ResultBean orderResp = 
-			        generateAsyncRespMessage(txnsLog.getAccordno(),
-			                txnsLog.getAccfirmerno());
+			        generateAsyncRespMessage(txnseqno);
 			if (orderResp.isResultBool()) {
 			    OrderAsynRespBean respBean = (OrderAsynRespBean) orderResp
 			            .getResultObj();
@@ -274,10 +272,10 @@ public class BossPayQuickPayTradeThread implements IQuickPayTrade {
 		}
     }
 	
-	public ResultBean generateAsyncRespMessage(String orderNo,String memberId){
+	public ResultBean generateAsyncRespMessage(String txnseqno){
         ResultBean resultBean = null;
         try {
-            TxnsOrderinfoModel orderinfo = txnsOrderinfoDAO.getOrderinfoByOrderNo(orderNo,memberId);
+            TxnsOrderinfoModel orderinfo = txnsOrderinfoDAO.getOrderByTxnseqno(txnseqno);
             if(StringUtil.isEmpty(orderinfo.getBackurl())){
             	return new ResultBean("09", "no need async");
             }else {
@@ -369,7 +367,7 @@ public class BossPayQuickPayTradeThread implements IQuickPayTrade {
         txnsLog.setRetcode("0000");
         txnsLog.setRetinfo("交易成功");
         txnsLogService.updateTxnsLog(txnsLog);
-        TxnsOrderinfoModel orderinfo = txnsOrderinfoDAO.getOrderinfoByOrderNo(gateWayOrderNo,merchId);
+        TxnsOrderinfoModel orderinfo = txnsOrderinfoDAO.getOrderByTxnseqno(txnseqno);
         orderinfo.setStatus("00");
         orderinfo.setOrderfinshtime(DateUtil.getCurrentDateTime());
         txnsOrderinfoDAO.updateOrderinfo(orderinfo);

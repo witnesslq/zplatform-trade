@@ -43,16 +43,38 @@ import com.zlebank.zplatform.trade.model.TxnsOrderinfoModel;
  * @since 
  */
 public interface IGateWayService extends IBaseService<TxnsOrderinfoModel, Long>{
+	
+	/**
+	 * 订单信息验签
+	 * @param order
+	 * @return
+	 */
     public ResultBean verifyOrder(OrderBean order);
+    
+    /**
+     * 保存订单信息和交易信息
+     * @param order
+     * @param riskRateInfoBean
+     * @return
+     * @throws TradeException
+     */
     public String dealWithOrder(OrderBean order,RiskRateInfoBean riskRateInfoBean) throws TradeException;
+    /**
+     * 
+     * @param txnseqno
+     * @param gateWayOrderNo
+     * @param zlPayResultBean
+     */
     public void saveSuccessTrade(String txnseqno,String gateWayOrderNo,ZLPayResultBean zlPayResultBean);
     public void saveErrorTrade();
+    @Deprecated
     public TxnsOrderinfoModel getOrderinfoByOrderNo(String orderNo);
     public ResultBean generateRespMessage(String orderNo,String memberId);
     public void saveFailTrade(String txnseqno,String gateWayOrderNo,ZLPayResultBean zlPayResultBean);
     public void saveSuccessReaPayTrade(String txnseqno,String gateWayOrderNo,ReaPayResultBean payResultBean);
     public void saveFailReaPayTrade(String txnseqno,String gateWayOrderNo,ReaPayResultBean payResultBean);
     public ResultBean decryptCustomerInfo(String memberId,String encryptData);
+    @Deprecated
     public void updateOrderToStartPay(String orderNo) throws TradeException;
     public ResultBean verifyQueryOrder(QueryBean queryBean);
     public ResultBean generateQueryResultBean(QueryResultBean queryResultBean);
