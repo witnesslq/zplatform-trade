@@ -10,6 +10,7 @@
  */
 package com.zlebank.zplatform.trade.insteadPay.message;
 
+import com.zlebank.zplatform.commons.validator.Scontant;
 import com.zlebank.zplatform.trade.common.validator.An;
 import com.zlebank.zplatform.trade.common.validator.Ans;
 import com.zlebank.zplatform.trade.common.validator.N;
@@ -36,10 +37,10 @@ public class InsteadPayFile {
     @N(max=12)
     private String amt;
     /**产品类型(固定：000001)**/
-    @N(min=6,max=6)
+    @Scontant(contants={"000001"})
     private String bizType;
     /**账号类型01:银行卡;02:存折**/
-    @N(min=2,max=2)
+    @Scontant(contants={"01","02"})
     private String accType;
     /**账号**/
     @N(min=12,max=60)
@@ -60,16 +61,16 @@ public class InsteadPayFile {
     @Ans(max=40, isNull=true)
     private String issInsName;
     /**证件类型**/
-    @N(max=2)
+    @Scontant(contants={"01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","99"})
     private String certifTp;
     /**证件号码**/
     @Ans(max=20)
     private String certifId;
     /**手机号**/
-    @N(max=20)
+    @N(max=11)
     private String phoneNo;
     /**账单类型**/
-    @N(max=4)
+    @Scontant(contants={"0100"})
     private String billType;
     /**附言**/
     private String notes;

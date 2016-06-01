@@ -44,7 +44,7 @@ public class ExecuteInsteadPayTaskQueue implements Runnable{
         while (true) {
             try {
                 InsteadPayNotifyTask trade = queue.take();
-                sendHttpPost(trade.getData(), trade.getUrl());
+                sendHttpPost(trade, trade.getUrl());
             } catch (InterruptedException e) {
                 log.error("取代付通知任务时发生错误！");
                 log.error(e.getMessage(), e);
@@ -54,10 +54,10 @@ public class ExecuteInsteadPayTaskQueue implements Runnable{
 
     /**
      * 发送HTTP报文
-     * @param jsonData 报文数据
+     * @param trade.getData() 报文数据
      * @param url 报文地址
      */
-    private void sendHttpPost(String jsonData, String url) {
+    private void sendHttpPost(InsteadPayNotifyTask trade, String url) {
 //        System.out.println("以下数据发送成功！");
 //        System.out.println("URL："+ url);
 //        System.out.println("Data：" + jsonData);
@@ -66,7 +66,9 @@ public class ExecuteInsteadPayTaskQueue implements Runnable{
             PostMethod post = null;
             post = new PostMethod(url);
             post.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            post.addParameter("data", jsonData);
+            post.addParameter("data", trade.getData());
+            post.addParameter("addit", trade.getAddit());
+            post.addParameter("sign", trade.getSign());
             post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET,"utf-8");  
             HttpClient client = new HttpClient();
             client.getHttpConnectionManager().getParams().setSoTimeout(10000);// 10秒过期

@@ -21,6 +21,9 @@ package com.zlebank.zplatform.trade.service.impl;
 public class InsteadPayNotifyTask {
 
     private String data;
+    private String sign;
+    private String addit;
+    
     private String url;
 
     public String getData() {
@@ -34,6 +37,18 @@ public class InsteadPayNotifyTask {
     }
     public void setUrl(String url) {
         this.url = url;
+    }
+    public String getSign() {
+        return sign;
+    }
+    public void setSign(String sign) {
+        this.sign = sign;
+    }
+    public String getAddit() {
+        return addit;
+    }
+    public void setAddit(String addit) {
+        this.addit = addit;
     }
     
 }

@@ -30,15 +30,15 @@ public class NotifyInsteadURLServiceTest {
     static NotifyInsteadURLService notifyInsteadURLService = null;
     static {
         context = ApplicationContextUtil.get();
-        notifyInsteadURLService =  (NotifyInsteadURLService) context.getBean("notifyInsteadURLServiceImpl");
+        notifyInsteadURLService =  (NotifyInsteadURLService) context.getBean("notifyInsteadURLService");
     }
     
     @Test
     public void TestNotify() throws InterruptedException {
         int sleep = 2000;
-        notifyInsteadURLService.addInsteadPayTask(186L);Thread.sleep(sleep);
-        notifyInsteadURLService.addInsteadPayTask(189L);Thread.sleep(sleep);
-        notifyInsteadURLService.addInsteadPayTask(190L);Thread.sleep(sleep);
-        notifyInsteadURLService.addInsteadPayTask(191L);Thread.sleep(sleep);
+        notifyInsteadURLService.addInsteadPayTask(997L);Thread.sleep(sleep);
+//        notifyInsteadURLService.addInsteadPayTask(189L);Thread.sleep(sleep);
+//        notifyInsteadURLService.addInsteadPayTask(190L);Thread.sleep(sleep);
+//        notifyInsteadURLService.addInsteadPayTask(191L);Thread.sleep(sleep);
     }
 }

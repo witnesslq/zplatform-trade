@@ -12,6 +12,8 @@ package com.zlebank.zplatform.trade.insteadPay.message;
 
 import org.hibernate.validator.constraints.Length;
 
+import com.zlebank.zplatform.commons.validator.S;
+import com.zlebank.zplatform.commons.validator.Scontant;
 import com.zlebank.zplatform.trade.common.validator.N;
 
 /**
@@ -24,9 +26,10 @@ import com.zlebank.zplatform.trade.common.validator.N;
  */
 public class BaseMessage {
     /**版本**/
+    @S(max=6)
     protected String version;
     /**编码方式**/
-    @Length(max=2)
+    @N(max=2)
     protected String encoding;
     /**签名**/
     @Length(max=1024)
@@ -47,6 +50,8 @@ public class BaseMessage {
     /**产品类型**/
     @N(max=6,isNull=false)
     private String bizType;
+    @Scontant(contants={"00"})
+    private String channelType;
 
     public String getVersion() {
         return version;
@@ -101,6 +106,12 @@ public class BaseMessage {
     }
     public void setCoopInstiId(String coopInstiId) {
         this.coopInstiId = coopInstiId;
+    }
+    public String getChannelType() {
+        return channelType;
+    }
+    public void setChannelType(String channelType) {
+        this.channelType = channelType;
     }
     
 }
