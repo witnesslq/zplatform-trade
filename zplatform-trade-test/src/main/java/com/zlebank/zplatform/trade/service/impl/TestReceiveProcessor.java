@@ -104,7 +104,7 @@ public class TestReceiveProcessor implements ITradeReceiveProcessor{
             // 根据原始订单拼接应答报文，异步通知商户
             //TxnsOrderinfoModel gatewayOrderBean = txnsOrderinfoDAO.getOrderinfoByOrderNo(reaPayOrderNo,tradeBean.getMerchId());
             // 应用方信息
-            AppPartyBean appParty = new AppPartyBean("123",
+            AppPartyBean appParty = new AppPartyBean("",
                     "000000000000", commiteTime,
                     DateUtil.getCurrentDateTime(), tradeBean.getTxnseqno(), "AC000000");
             txnsLogService.updateAppInfo(appParty);

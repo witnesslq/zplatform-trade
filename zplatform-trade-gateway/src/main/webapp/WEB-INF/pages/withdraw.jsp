@@ -218,7 +218,6 @@
 											    	<span title="" class="" id="bank_lab_${i.index }" ></span>
 											    	<span class="card-number">**${fn:substring(card.cardno,fn:length(card.cardno)-4, fn:length(card.cardno))} </span>
 											    	<input type="hidden" name="bankCode_" id="radio_bank_${i.index}" value="${fn:substring(card.bankcode,0, 4)}"/>
-											    	<input type="hidden" name="bankCode_" id="radio_bank_${i.index}" value="${fn:substring(card.bankcode,0, 4)}"/>
 											    	<input type="hidden" name="bankName" value="${card.bankname }"/>
 											    	<input type="hidden" id="cardNo_${i.index }"  value="${card.cardno }"/>
 											    	<input type="hidden" name="acctName_${i.index}" value="${card.accname }"/>

@@ -120,7 +120,7 @@ public class ChanPayAsyncServiceImpl implements ChanPayAsyncService {
 			gatewaypayService.update(gatewayOrder);
 			gateWayService.update(orderinfo);
 			//更新应用方信息
-			AppPartyBean appParty = new AppPartyBean(UUIDUtil.uuid(),"000000000000", DateUtil.getCurrentDateTime(),DateUtil.getCurrentDateTime(), txnseqno, "");
+			AppPartyBean appParty = new AppPartyBean("","000000000000", DateUtil.getCurrentDateTime(),DateUtil.getCurrentDateTime(), txnseqno, "");
 			txnsLogService.updateAppInfo(appParty);
 			// 处理账务
 			AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue(txnsLog.getBusitype())).accountedFor(txnseqno);

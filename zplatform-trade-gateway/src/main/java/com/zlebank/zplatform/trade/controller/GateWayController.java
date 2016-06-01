@@ -670,8 +670,7 @@ public class GateWayController {
                         TxnsOrderinfoModel gatewayOrderBean = gateWayService
                                 .getOrderinfoByOrderNoAndMemberId(
                                         gateWayOrderId, trade.getMerchId());
-                        AppPartyBean appParty = new AppPartyBean(OrderNumber
-                                .getInstance().generateAppOrderNo(),
+                        AppPartyBean appParty = new AppPartyBean("",
                                 "000000000000", commiteTime,
                                 DateUtil.getCurrentDateTime(),
                                 trade.getTxnseqno(),
@@ -1158,8 +1157,7 @@ public class GateWayController {
                             .getOrderinfoByOrderNoAndMemberId(reaPayOrderNo,
                                     txnsLog.getAccfirmerno());
                     // 应用方信息
-                    AppPartyBean appParty = new AppPartyBean(OrderNumber
-                            .getInstance().generateAppOrderNo(),
+                    AppPartyBean appParty = new AppPartyBean("",
                             "000000000000", commiteTime,
                             DateUtil.getCurrentDateTime(), txnseqno, "AC000000");
                     txnsLogService.updateAppInfo(appParty);
@@ -1478,7 +1476,6 @@ public class GateWayController {
             //TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(orderinfo.getRelatetradetxn());
             
             TxnsWithdrawModel withdraw = new TxnsWithdrawModel(tradeBean);
-            Map<String, Object> cardMap = routeConfigService.getCardInfo(tradeBean.getCardNo());
             //withdraw.setBankcode(cardMap.get("BANKCODE")+"");
             //withdraw.setBankname(cardMap.get("BANKNAME")+"");
             //记录提现账务
@@ -1491,9 +1488,6 @@ public class GateWayController {
             tradeInfo.setTxnseqno(orderinfo.getRelatetradetxn());
             tradeInfo.setCoopInstCode(orderinfo.getFirmemberno());
             //记录分录流水
-
-           // accEntryService.accEntryProcess(tradeInfo);
-
             accEntryService.accEntryProcess(tradeInfo,EntryEvent.AUDIT_APPLY);
             if (StringUtil.isNotEmpty(tradeBean.getBindCardId())) {
                 /*QuickpayCustModel card = memberBankCardService.

@@ -127,7 +127,7 @@ HibernateBaseDAOImpl<PojoBankTransferData>
             query.executeUpdate();
             
             
-            query = session.createQuery("update TxnsLogModel set payretcode=?,payretinfo=?,payordfintime=?,payrettsnseqno=?,retcode=?,retinfo=?, tradeseltxn=? where txnseqno=?");
+            query = session.createQuery("update TxnsLogModel set payretcode=?,payretinfo=?,payordfintime=?,payrettsnseqno=?,retcode=?,retinfo=?, tradeseltxn=?,accordcommitime=?,retdatetime=? where txnseqno=?");
             if("S".equalsIgnoreCase(data.getResType())){
                 query.setParameter(0, "000000");
                 query.setParameter(1, "交易成功");
@@ -142,7 +142,9 @@ HibernateBaseDAOImpl<PojoBankTransferData>
             query.setParameter(2, DateUtil.getCurrentDateTime());
             query.setParameter(3, data.getBankTranResNo());
             query.setParameter(6, UUID.randomUUID().toString().replaceAll("-", "").toUpperCase());
-            query.setParameter(7, data_old.getTranData().getTxnseqno());
+            query.setParameter(7, DateUtil.getCurrentDateTime());
+            query.setParameter(8, DateUtil.getCurrentDateTime());
+            query.setParameter(9, data_old.getTranData().getTxnseqno());
             query.executeUpdate();
             
             //更新划拨数据

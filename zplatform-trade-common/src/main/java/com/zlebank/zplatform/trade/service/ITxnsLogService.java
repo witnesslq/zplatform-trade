@@ -194,4 +194,9 @@ public interface ITxnsLogService extends IBaseService<TxnsLogModel, String>{
      * @param retinfo
      */
     public void updatePayInfo_Fast_result(String txnseqno,String payrettsnseqno,String retcode,String retinfo);
+    
+    /**
+     * 定时处理资金结算任务
+     */
+    public void excuteSetted();
 }

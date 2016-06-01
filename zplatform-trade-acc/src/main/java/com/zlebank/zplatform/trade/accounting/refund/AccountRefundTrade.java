@@ -81,11 +81,8 @@ public class AccountRefundTrade implements IRefundTrade {
 		ResultBean resultBean = null;
 		TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(tradeBean.getTxnseqno());
 		TxnsOrderinfoModel order = txnsOrderinfoDAO.getOrderByTxnseqno(tradeBean.getTxnseqno());
-		
 		//记录退款的流水
 		String payordno = updateRefund(tradeBean.getTxnseqno(),txnsLog.getAccmemberid());
-		
-		
 		/**支付订单号**/
         
         /**交易类型**/

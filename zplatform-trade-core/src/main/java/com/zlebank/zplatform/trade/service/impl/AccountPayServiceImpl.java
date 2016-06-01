@@ -93,7 +93,7 @@ public class AccountPayServiceImpl implements IAccountPayService{
 	            //更新账户支付信息
 	            txnsLogService.updateAccountTrade(accountTrade, resultBean);
 	            //应用方信息
-	            AppPartyBean appParty = new AppPartyBean(OrderNumber.getInstance().generateAppOrderNo(), "000000000000", commiteTime, DateUtil.getCurrentDateTime(), accountTrade.getTxnseqno(),"");
+	            AppPartyBean appParty = new AppPartyBean("", "000000000000", commiteTime, DateUtil.getCurrentDateTime(), accountTrade.getTxnseqno(),"");
 	            txnsLogService.updateAppInfo(appParty);
 	            if(!resultBean.isResultBool()){
 	                throw new TradeException("AP05");
@@ -126,7 +126,7 @@ public class AccountPayServiceImpl implements IAccountPayService{
             //更新账户支付信息
             txnsLogService.updateAccountTrade(accountTrade, resultBean);
             //应用方信息
-            AppPartyBean appParty = new AppPartyBean(OrderNumber.getInstance().generateAppOrderNo(), "000000000000", commiteTime, DateUtil.getCurrentDateTime(), accountTrade.getTxnseqno(),"");
+            AppPartyBean appParty = new AppPartyBean("", "000000000000", commiteTime, DateUtil.getCurrentDateTime(), accountTrade.getTxnseqno(),"");
             txnsLogService.updateAppInfo(appParty);
             if(!resultBean.isResultBool()){
                 throw new TradeException("AP05");

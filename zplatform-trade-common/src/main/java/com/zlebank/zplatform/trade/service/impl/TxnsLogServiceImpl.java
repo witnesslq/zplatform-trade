@@ -693,11 +693,12 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
             txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlCycle().toString())));
             txnsLog.setPaytype("04"); //支付类型（01：快捷，02：网银，03：账户）
             txnsLog.setPayordno(data.getBankTranDataSeqNo());//支付定单号
-            txnsLog.setPayinst(ChannelEnmu.CMBCINSTEADPAY.getChnlcode());//支付所属机构
+            txnsLog.setPayinst(ChannelEnmu.fromValue(data.getBankTranBatch().getChannel().getBankChannelCode()).getChnlcode());//支付所属机构
             txnsLog.setPayfirmerno(ConsUtil.getInstance().cons.getCmbc_insteadpay_merid());//支付一级商户号
             txnsLog.setPayordcomtime(DateUtil.getCurrentDateTime());//支付定单提交时间
             //卡信息
             txnsLog.setPan(data.getAccNo());
+            txnsLog.setPanName(data.getAccName());
             /*Map<String, Object> cardMap = getCardInfo(data.getAccNo());
             txnsLog.setCardtype(cardMap.get("TYPE").toString());
             txnsLog.setCardinstino(cardMap.get("BANKCODE").toString());
@@ -894,7 +895,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 					tradeInfo.setChannelFee(new BigDecimal(channelFee));
 					tradeInfo.setCoopInstCode(txnsLog.getAcccoopinstino());
 					accEntryService.accEntryProcess(tradeInfo, EntryEvent.RECON_SUCCESS);
-					
+				
 					executeBySQL("UPDATE T_SELF_TXN SET RESULT=? WHERE TID = ?", new Object[]{"03",value.get("TID")});
 				} catch (AccBussinessException e) {
 					// TODO Auto-generated catch block
@@ -906,10 +907,74 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-	            log.info("end ReconJob");
+	            
 			}
 		}
+		log.info("end ReconJob");
     }
+    
+    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
+    public void excuteSetted(){
+    	log.info("start excuteSetted Job");
+    	List<Map<String, Object>> selfTxnList = (List<Map<String, Object>>) queryBySQL("SELECT * FROM T_SELF_TXN T WHERE STATUS = ? AND RESULT = ?", new Object[]{"9","03"});
+    	if(selfTxnList.size()>0){
+    		for(Map<String, Object> value:selfTxnList){
+    			TxnsLogModel txnsLog = getTxnsLogByTxnseqno(value.get("TXNSEQNO")+"");
+    			
+				log.info("txnsLog:"+txnsLog.getTxnseqno());
+				//通道手续费
+				Long channelFee = Long.valueOf(value.get("CFEE")+"")+Long.valueOf(StringUtil.isEmpty(value.get("DFEE")+"")?"0":value.get("DFEE")+"");
+				String payMemberId = "";
+        		String payToMemberId = "";
+        		String busiType = txnsLog.getBusitype();
+        		BusiTypeEnum busiTypeEnum = BusiTypeEnum.fromValue(busiType);
+        		if(busiTypeEnum != BusiTypeEnum.consumption){//必须是消费交易
+        			continue;
+        		}
+        		//当前日期大于等于清算日期
+        		if(Long.valueOf(DateUtil.getCurrentDate())>=Long.valueOf(txnsLog.getAccsettledate())){
+        			/**付款方会员ID**/
+                    payMemberId = StringUtil.isNotEmpty(txnsLog.getAccmemberid())?txnsLog.getAccmemberid():"999999999999999";
+                    /**收款方会员ID**/
+                    payToMemberId = StringUtil.isEmpty(txnsLog.getAccsecmerno())?txnsLog.getAccfirmerno():txnsLog.getAccsecmerno();
+                    /**渠道**/
+                    String channelId = txnsLog.getPayinst();//支付机构代码
+                    if("99999999".equals(channelId)){
+                        payMemberId = txnsLog.getPayfirmerno();
+                    }else{
+                    	
+                    }
+                    
+                    try {
+    					TradeInfo tradeInfo = new TradeInfo();
+    					tradeInfo.setBusiCode(txnsLog.getBusicode());
+    					tradeInfo.setPayMemberId(payMemberId);
+    					tradeInfo.setPayToMemberId(payToMemberId);
+    					tradeInfo.setAmount(new BigDecimal(value.get("AMOUNT")+""));
+    					tradeInfo.setCharge(new BigDecimal(txnsLog.getTxnfee()));
+    					tradeInfo.setTxnseqno(value.get("TXNSEQNO")+"");
+    					tradeInfo.setChannelId(txnsLog.getPayinst());
+    					tradeInfo.setChannelFee(new BigDecimal(channelFee));
+    					tradeInfo.setCoopInstCode(txnsLog.getAcccoopinstino());
+    					accEntryService.accEntryProcess(tradeInfo, EntryEvent.SETTED);
+    					executeBySQL("UPDATE T_SELF_TXN SET RESULT=? WHERE TID = ?", new Object[]{"04",value.get("TID")});
+    				} catch (AccBussinessException e) {
+    					// TODO Auto-generated catch block
+    					e.printStackTrace();
+    				} catch (AbstractBusiAcctException e) {
+    					// TODO Auto-generated catch block
+    					e.printStackTrace();
+    				} catch (NumberFormatException e) {
+    					// TODO Auto-generated catch block
+    					e.printStackTrace();
+    				}
+        		}
+        		}
+        		
+    	}
+    	log.info("end excuteSetted Job");
+    }
+    
     @Override
     public List<?> getInsteadMemberByDate(String date){
         String queryString="select distinct t.ACCSECMERNO, t.ACCSETTLEDATE from t_txns_log t where t.ACCSETTLEDATE=? and t.ACCSECMERNO is not null and SUBSTR (trim(t.retcode),-2) = '00' and t.busicode='70000001'";

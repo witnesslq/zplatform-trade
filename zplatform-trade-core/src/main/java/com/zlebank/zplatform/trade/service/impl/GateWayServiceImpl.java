@@ -1072,6 +1072,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         try {
             //无异常时保存退款交易流水表，以便于以后退款审核操作
             TxnsRefundModel refundOrder = new TxnsRefundModel(refundBean,old_txnsLog.getTxnseqno(), old_txnsLog.getAmount()+"", txnsLog.getTxnseqno());
+            refundOrder.setRelorderno(refundBean.getOrderId());
             txnsRefundService.saveRefundOrder(refundOrder);
             return tn;
         } catch (Exception e) {

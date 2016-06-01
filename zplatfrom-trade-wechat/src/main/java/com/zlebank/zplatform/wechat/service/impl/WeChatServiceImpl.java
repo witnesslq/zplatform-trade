@@ -164,7 +164,7 @@ public class WeChatServiceImpl implements WeChatService{
 		/**账务处理开始 **/
         // 应用方信息
         try {
-            AppPartyBean appParty = new AppPartyBean("123",
+            AppPartyBean appParty = new AppPartyBean("",
                     "000000000000", DateUtil.getCurrentDateTime(),
                     DateUtil.getCurrentDateTime(), txnsLog.getTxnseqno(), "AC000000");
             txnsLogService.updateAppInfo(appParty);

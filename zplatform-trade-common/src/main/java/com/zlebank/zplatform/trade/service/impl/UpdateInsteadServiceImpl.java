@@ -52,6 +52,7 @@ import com.zlebank.zplatform.member.dao.CoopInstiDAO;
 import com.zlebank.zplatform.member.pojo.PojoCoopInsti;
 import com.zlebank.zplatform.member.pojo.PojoMember;
 import com.zlebank.zplatform.member.service.MemberService;
+import com.zlebank.zplatform.trade.bean.AppPartyBean;
 import com.zlebank.zplatform.trade.bean.UpdateData;
 import com.zlebank.zplatform.trade.bean.enums.InsteadPayDetailStatusEnum;
 import com.zlebank.zplatform.trade.bean.enums.TransferBusiTypeEnum;
@@ -64,6 +65,7 @@ import com.zlebank.zplatform.trade.service.NotifyInsteadURLService;
 import com.zlebank.zplatform.trade.service.ObserverListService;
 import com.zlebank.zplatform.trade.service.UpdateInsteadService;
 import com.zlebank.zplatform.trade.service.UpdateSubject;
+import com.zlebank.zplatform.trade.utils.DateUtil;
 
 /**
  * Class Description
@@ -154,27 +156,43 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
        
     	try {
 			log.info("账务处理数据："+JSON.toJSONString(tradeInfo));
+			String commiteTime = DateUtil.getCurrentDateTime();
 			accEntryService.accEntryProcess(tradeInfo, entryEvent);
-			txnsLog.setApporderstatus(AccStatusEnum.Finish.getCode());
-            txnsLog.setApporderinfo("代付账务成功");
+			if(txnsLog!=null){//审核拒绝没有交易流水，不更新交易流水数据
+				txnsLog.setApporderstatus(AccStatusEnum.Finish.getCode());
+	            txnsLog.setApporderinfo("代付账务成功");
+	            //更新应用信息
+	            AppPartyBean appParty = new AppPartyBean("",
+                        "000000000000", commiteTime,
+                        DateUtil.getCurrentDateTime(), data.getTxnSeqNo(), "AC000000");
+                txnsLogService.updateAppInfo(appParty);
+			}
 		} catch (AccBussinessException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-			txnsLog.setApporderstatus(AccStatusEnum.AccountingFail.getCode());
-            txnsLog.setApporderinfo(e1.getMessage());
+			if(txnsLog!=null){
+				txnsLog.setApporderstatus(AccStatusEnum.AccountingFail.getCode());
+	            txnsLog.setApporderinfo(e1.getMessage());
+			}
 		} catch (AbstractBusiAcctException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-			txnsLog.setApporderstatus(AccStatusEnum.AccountingFail.getCode());
-            txnsLog.setApporderinfo(e1.getMessage());
+			if(txnsLog!=null){
+				txnsLog.setApporderstatus(AccStatusEnum.AccountingFail.getCode());
+		        txnsLog.setApporderinfo(e1.getMessage());
+			}
 		} catch (NumberFormatException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-			txnsLog.setApporderstatus(AccStatusEnum.AccountingFail.getCode());
-            txnsLog.setApporderinfo(e1.getMessage());
+			if(txnsLog!=null){
+				txnsLog.setApporderstatus(AccStatusEnum.AccountingFail.getCode());
+				txnsLog.setApporderinfo(e1.getMessage());
+			}
 		}
-        //更新交易流水应用方信息
-        txnsLogService.updateAppStatus(data.getTxnSeqNo(), txnsLog.getApporderstatus(), txnsLog.getApporderinfo());
+    	if(txnsLog!=null){
+	        //更新交易流水应用方信息
+	        txnsLogService.updateAppStatus(data.getTxnSeqNo(), txnsLog.getApporderstatus(), txnsLog.getApporderinfo());
+    	}
         try {
 			// 如果批次已经全部处理完毕，则添加到通知
 			if (insteadPayDetailDAO.isBatchProcessFinished(detail.getInsteadPayBatch().getId())) {

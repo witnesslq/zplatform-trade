@@ -10,6 +10,8 @@
  */
 package com.zlebank.zplatform.trade.bean.enums;
 
+import org.apache.commons.net.chargen.CharGenTCPClient;
+
 /**
  * Class Description
  *
@@ -33,6 +35,7 @@ public enum BusinessEnum {
     INSTEADPAY_SUCCESS("70000001"),//代付退汇
     WITHDRAWALS_SUCCESS("30000001"),//提现退汇
     REFUND_ACCOUNT("40000002"),//退款-账户
+    CHARGE_OFFLINE("90000001"),//手工充值
     UNKNOW("");//未知
     private String busiCode;
     

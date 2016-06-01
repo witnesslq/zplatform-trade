@@ -48,6 +48,7 @@ public class TxnsRefundModel implements java.io.Serializable {
 	private String notes;
 	private String remarks;
 	private String stexaopt;
+	private String relorderno;
 	  /**通过还是拒绝*/
    private String flag; 
 	 //Constructors
@@ -321,6 +322,21 @@ public class TxnsRefundModel implements java.io.Serializable {
     public void setFlag(String flag) {
         this.flag = flag;
     }
+
+	/**
+	 * @return the relorderno
+	 */
+    @Column(name = "RELORDERNO")
+	public String getRelorderno() {
+		return relorderno;
+	}
+
+	/**
+	 * @param relorderno the relorderno to set
+	 */
+	public void setRelorderno(String relorderno) {
+		this.relorderno = relorderno;
+	}
     
 
 }
