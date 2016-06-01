@@ -355,6 +355,7 @@ public class InsteadPayServiceImpl
      * @param merId 一级商户号
      * @return 是否要判断白名单
      */
+    @SuppressWarnings("unused")
     private boolean isCheckWhiteList(String merId) {
         PojoMerchInstpayConf conf = merchInstpayConfDAO.getByMemberId(merId);
         if (conf != null && "1".equals( conf.getIsCheckWhiteList())){
@@ -368,6 +369,7 @@ public class InsteadPayServiceImpl
      * @param merId 一级商户号
      * @return 是否要实名认证
      */
+    @SuppressWarnings("unused")
     private boolean isCheckRealname(String merId) {
         PojoMerchInstpayConf conf = merchInstpayConfDAO.getByMemberId(merId);
         if (conf != null && "1".equals( conf.getIsCheckRealname())){

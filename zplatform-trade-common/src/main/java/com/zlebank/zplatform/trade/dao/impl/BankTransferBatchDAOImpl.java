@@ -317,9 +317,8 @@ public class BankTransferBatchDAOImpl
                 sqlCountBuffer.append(" and tranStatus = ? ");
                 parameterList.add(queryTransferBean.getTranStatus());
             }
-            
-            sqlBuffer.append(" order by applyTime desc");
 		}
+		sqlBuffer.append(" order by applyTime desc");
 		Query query = getSession().createQuery(sqlBuffer.toString());
 		Query countQuery = getSession().createQuery(sqlCountBuffer.toString());
 		int i = 0;

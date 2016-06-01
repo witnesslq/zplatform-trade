@@ -31,5 +31,17 @@ public interface TransferDataService {
      * @return long 划拨批次号
      * @throws RecordsAlreadyExistsException 
      */
-    public long saveTransferData(TransferBusiTypeEnum type, Long busiBatchId, List<PojoTranData> datas) throws RecordsAlreadyExistsException;
+    public long saveTransferData(TransferBusiTypeEnum type, List<PojoTranData> datas) throws RecordsAlreadyExistsException;
+
+    /**
+     * 保存划拨流水
+     * @param type 业务类型
+     * @param busiBatchId 业务批次ID
+     * @param merchBathcNo 商户批次号
+     * @param busiBatchNo 业务批次号
+     * @param datas 划拨流水列表
+     * @return
+     * @throws RecordsAlreadyExistsException
+     */
+    public long saveTransferData(TransferBusiTypeEnum type, Long busiBatchId,String merchBathcNo,String busiBatchNo, List<PojoTranData> datas) throws RecordsAlreadyExistsException;
 }
