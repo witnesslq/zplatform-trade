@@ -87,6 +87,9 @@ public class PojoTranData implements Serializable {
     private String memberId;
     /** 交易序列号 **/
     private String txnseqno;
+    
+    private String busiSeqNo;
+    private String merchOrderNo;
     @GenericGenerator(name = "id_gen", strategy = "enhanced-table", parameters = {
             @Parameter(name = "table_name", value = "T_C_PRIMAY_KEY"),
             @Parameter(name = "value_column_name", value = "NEXT_ID"),
@@ -238,5 +241,19 @@ public class PojoTranData implements Serializable {
     }
     public void setBankTranData(PojoBankTransferData bankTranData) {
         this.bankTranData = bankTranData;
+    }
+    @Column(name = "busi_seqno")
+    public String getBusiSeqNo() {
+        return busiSeqNo;
+    }
+    public void setBusiSeqNo(String busiSeqNo) {
+        this.busiSeqNo = busiSeqNo;
+    }
+    @Column(name = "merch_order_no")
+    public String getMerchOrderNo() {
+        return merchOrderNo;
+    }
+    public void setMerchOrderNo(String merchOrderNo) {
+        this.merchOrderNo = merchOrderNo;
     }
 }

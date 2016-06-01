@@ -26,7 +26,6 @@ import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.commons.service.impl.AbstractBasePageService;
 import com.zlebank.zplatform.commons.utils.BeanCopyUtil;
-import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.member.bean.CoopInsti;
 import com.zlebank.zplatform.member.bean.enums.MemberType;
 import com.zlebank.zplatform.member.pojo.PojoMember;
@@ -190,12 +189,16 @@ public class InsteadBatchServiceImpl extends AbstractBasePageService<InsteadPayB
                 tmp.setBusiType(TransferBusiTypeEnum.INSTEAD.getCode());
                 tmp.setBankNo(detail.getBankCode());
                 tmp.setBankName(detail.getIssInsName());
+                tmp.setBusiSeqNo(detail.getInsteadPayDataSeqNo());
+                tmp.setMerchOrderNo(detail.getOrderId());
                 tranDatas.add(tmp);
                 insteadPayDetailDAO.merge(detail);
             }
-            transferDataService.saveTransferData(TransferBusiTypeEnum.INSTEAD, batchId, tranDatas);
-            // 更新批次状态
             PojoInsteadPayBatch batch = insteadPayBatchDAO.getByBatchId(batchId);
+            
+            transferDataService.saveTransferData(TransferBusiTypeEnum.INSTEAD, batchId,String.valueOf(batch.getBatchNo()),batch.getInsteadPayBatchSeqNo(), tranDatas);
+            
+            // 更新批次状态
             for(PojoInsteadPayDetail detail : details) {
                 batch.setApproveCount(addOne(batch.getApproveCount()));
                 batch.setApproveAmt(addAmount(batch.getApproveAmt(),detail.getAmt()));
