@@ -104,6 +104,7 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
     @Override
     @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
     public void update(UpdateData data) {
+    	log.info("代付账务处理开始，交易序列号:"+data.getTxnSeqNo());
         List<UpdateSubject> observerList = ObserverListService.getInstance().getObserverList();
         for (UpdateSubject subject : observerList) {
         	log.info(subject.getBusiCode());
@@ -139,17 +140,20 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
             tradeInfo.setBusiCode("70000001");
             tradeInfo.setChannelId(data.getChannelCode());
             entryEvent = EntryEvent.TRADE_SUCCESS;
+            log.info("代付交易成功，交易序列号:"+data.getTxnSeqNo());
         } else if("02".equals(data.getResultCode())){
         	tradeInfo.setBusiCode("70000001");
             entryEvent = EntryEvent.AUDIT_REJECT;
+            log.info("代付审核拒绝，交易序列号:"+data.getTxnSeqNo());
         }else {
             tradeInfo.setBusiCode("70000001");
             entryEvent = EntryEvent.TRADE_FAIL;
+            log.info("代付交易失败，交易序列号:"+data.getTxnSeqNo());
         }
         TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(data.getTxnSeqNo());
        
     	try {
-			log.info(JSON.toJSONString(tradeInfo));
+			log.info("账务处理数据："+JSON.toJSONString(tradeInfo));
 			accEntryService.accEntryProcess(tradeInfo, entryEvent);
 			txnsLog.setApporderstatus(AccStatusEnum.Finish.getCode());
             txnsLog.setApporderinfo("代付账务成功");
@@ -180,6 +184,7 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+        log.info("代付账务处理结束，交易序列号:"+data.getTxnSeqNo());
     }
 
 

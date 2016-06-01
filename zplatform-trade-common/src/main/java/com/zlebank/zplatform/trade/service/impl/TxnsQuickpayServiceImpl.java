@@ -142,7 +142,7 @@ public class TxnsQuickpayServiceImpl extends BaseServiceImpl<TxnsQuickpayModel, 
      * @param bean
      */
     @Override
-    @Transactional
+    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor = Throwable.class)
     public void updateMarginRegister(ResultBean bean) {
         // TODO Auto-generated method stub
         ZLPayResultBean zlPayResultBean = (ZLPayResultBean)bean.getResultObj();
@@ -417,7 +417,7 @@ public class TxnsQuickpayServiceImpl extends BaseServiceImpl<TxnsQuickpayModel, 
         return txnsQuickpay.getPayorderno();
     }
     @Override
-    @Transactional
+    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
     public void updateCMBCSMSResult(String payorder,String retcode,String retinfo) {
         // TODO Auto-generated method stub
         String hql = "update TxnsQuickpayModel set payretcode=?,payretinfo=?,payfinishtime=?,status=? where payorderno=?";

@@ -51,6 +51,6 @@ public class CMBCTransferServiceTest {
     	init();
     	//200000000000685
     	//GoodBrother20160513185623
-    	tradeReceiveProcessor.generateAsyncRespMessage("GoodBrother20160513185623", "300000000000004");
+    	//tradeReceiveProcessor.generateAsyncRespMessage("GoodBrother20160513185623", "300000000000004");
     }
 }

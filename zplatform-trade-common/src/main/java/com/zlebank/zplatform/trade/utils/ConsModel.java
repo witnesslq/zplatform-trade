@@ -115,6 +115,7 @@ public class ConsModel {
 	private String wechat_cerUrl="";
 	private String wechat_notify_url="";
 	
+	private int is_junit=0;
 	
 	
 	
@@ -1343,6 +1344,20 @@ public class ConsModel {
 	 */
 	public void setWechat_notify_url(String wechat_notify_url) {
 		this.wechat_notify_url = wechat_notify_url;
+	}
+
+	/**
+	 * @return the is_junit
+	 */
+	public int getIs_junit() {
+		return is_junit;
+	}
+
+	/**
+	 * @param is_junit the is_junit to set
+	 */
+	public void setIs_junit(int is_junit) {
+		this.is_junit = is_junit;
 	}
 
 	

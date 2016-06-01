@@ -125,6 +125,11 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
     }
     
     @Transactional
+    public TxnsOrderinfoModel getOrderinfoByTxnseqno(String txnseqno) {
+        return super.getUniqueByHQL("from TxnsOrderinfoModel where relatetradetxn = ?", new Object[]{txnseqno});
+    }
+    
+    @Transactional
     public void updateOrderToStartPay(String orderNo,String memberId) throws TradeException{
         TxnsOrderinfoModel orderinfo = super.getUniqueByHQL("from TxnsOrderinfoModel where orderno=? and  firmemberno = ? and (status=? or status = ?)", new Object[]{orderNo,memberId,"01","03"});
         if(orderinfo==null){
@@ -137,20 +142,25 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         }
     }
     
-    @Transactional
-    public void updateOrderToFail(String orderNo,String memberId) {
-        TxnsOrderinfoModel orderinfo = getOrderinfoByOrderNoAndMemberId(orderNo,memberId);
-        if("02".equals(orderinfo.getStatus())){
-            int rows =  super.updateByHQL("update TxnsOrderinfoModel set status = ? where orderno=? and firmemberno = ?", new Object[]{"03",orderNo,memberId});
+    public void updateOrderToStartPay(String txnseqno) throws TradeException{
+        TxnsOrderinfoModel orderinfo = super.getUniqueByHQL("from TxnsOrderinfoModel where relatetradetxn = ? and (status=? or status = ?)", new Object[]{txnseqno,"01","03"});
+        if(orderinfo==null){
+            throw new TradeException("T010");
+        }else{
+           int rows =  super.updateByHQL("update TxnsOrderinfoModel set status = ? where relatetradetxn = ? and (status=? or status = ?)", new Object[]{"02",txnseqno,"01","03"});
+           if(rows!=1){
+               throw new TradeException("T011");
+           }
         }
     }
     
+   
     @Transactional
     public void submitPay(TradeBean tradeBean) throws TradeException{
         TxnsOrderinfoModel orderinfo = getOrderinfoByOrderNoAndMemberId(tradeBean.getOrderId(),tradeBean.getMerchId());
         TxnsLogModel txnsLog = txnsLogService.get(orderinfo.getRelatetradetxn());
         String reapayOrderNo = txnsQuickpayService.getReapayOrderNo(txnsLog.getTxnseqno());
-        if("95000001".equals(tradeBean.getPayinstiId())){
+        if("96000001".equals(tradeBean.getPayinstiId())){
             if(StringUtil.isEmpty(reapayOrderNo)){
                 throw new TradeException("T006");
             }
@@ -169,6 +179,7 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         }
         PojoQuickpayCust card = quickpayCustDAO.getById(Long.valueOf(tradeBean.getCardId()));//quickpayCustService.getCardByBindId(tradeBean.getBindCardId());
         txnsLog.setCardtype(card.getCardtype());
+        //计算手续费
         Long txnFee = txnsLogService.getTxnFee(txnsLog);
         if(txnFee>txnsLog.getAmount()){
         	throw new TradeException("T039");
@@ -194,10 +205,14 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         txnsLogService.initretMsg(txnsLog.getTxnseqno());
         //交易风控
         txnsLogService.tradeRiskControl(txnsLog.getTxnseqno(),txnsLog.getAccfirmerno(),txnsLog.getAccsecmerno(),txnsLog.getAccmemberid(),txnsLog.getBusicode(),txnsLog.getAmount()+"",card.getCardtype(),card.getCardno());
-        updateOrderToStartPay(orderinfo.getOrderno(),orderinfo.getFirmemberno());
+        updateOrderToStartPay(orderinfo.getRelatetradetxn());
         quickPayTrade.setTradeType(TradeTypeEnum.SUBMITPAY);
         quickPayTrade.setTradeBean(tradeBean);
-        TradeAdapterFactory.getInstance().getThreadPool(routId).executeMission(quickPayTrade);
+        if(ConsUtil.getInstance().cons.getIs_junit()==0){
+        	quickPayTrade.submitPay(tradeBean);
+        }else{
+        	TradeAdapterFactory.getInstance().getThreadPool(routId).executeMission(quickPayTrade);
+        }
     }
     /**
      * 银行卡签约
@@ -211,11 +226,18 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             log.debug("银行卡签约：开始");
         }
       
-        TxnsOrderinfoModel orderinfo = getOrderinfoByOrderNoAndMemberId(trade.getOrderId(),trade.getMerchId());//获取订单信息
+        TxnsOrderinfoModel orderinfo = getOrderinfoByTxnseqno(trade.getTxnseqno());//获取订单信息
+        
+        if(orderinfo==null){
+        	throw new TradeException("GW15");
+        }
         if (log.isDebugEnabled()) {
             log.debug("获取订单信息："+JSON.toJSON(orderinfo));
         }
         TxnsLogModel txnsLog = txnsLogService.get(orderinfo.getRelatetradetxn());//获取交易流水信息
+        if(txnsLog==null){
+        	throw new TradeException("GW14");
+        }
         if (log.isDebugEnabled()) {
             log.debug("获取交易流水信息："+JSON.toJSON(orderinfo));
         }
@@ -300,7 +322,6 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
     
     @Transactional
     public void bindPay(TradeBean trade) throws TradeException{
-        String bindCardId = trade.getBindCardId();
         // 直接获取短信验证码
         PojoQuickpayCust custCard = quickpayCustDAO.getById(Long.valueOf(trade.getBindCardId()));
         ResultBean routResultBean = routeConfigService.getWapTransRout(DateUtil.getCurrentDateTime(), trade.getAmount()+"", StringUtil.isNotEmpty(trade.getMerchId())?trade.getMerchId():trade.getSubMerchId(), trade.getBusicode(), trade.getCardNo());
@@ -412,9 +433,7 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             /*String pwd = accountPayService.encryptPWD(
                     accountTrade.getMerchId(), tradeBean.getPay_pwd());*/
             accountTrade.setPay_pwd(tradeBean.getPay_pwd());
-            TxnsOrderinfoModel orderinfo = 
-                    getOrderinfoByOrderNoAndMemberId(tradeBean.getOrderId(),
-                            tradeBean.getMerchId());
+            TxnsOrderinfoModel orderinfo = getOrderinfoByTxnseqno(tradeBean.getTxnseqno());
             if("00".equals(orderinfo.getStatus())){
                 throw new TradeException("T004");
             }    
@@ -424,6 +443,14 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             if(!orderinfo.getOrderamt().toString().equals(tradeBean.getAmount())){
                 throw new TradeException("T033");
             }
+            TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(tradeBean.getTxnseqno());
+            //计算手续费
+            Long txnFee = txnsLogService.getTxnFee(txnsLog);
+            if(txnFee>txnsLog.getAmount()){
+            	throw new TradeException("T039");
+            }
+            
+            
             accountPayService.accountPay(accountTrade);
             resultBean = new ResultBean("success");
             resultBean.setErrCode("0000");

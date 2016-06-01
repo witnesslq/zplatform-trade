@@ -91,7 +91,7 @@ public class ReaPayReceiveProcessor implements ITradeReceiveProcessor{
 	 * @return
 	 */
 	@Override
-	public ResultBean generateAsyncRespMessage(String orderNo, String memberId) {
+	public ResultBean generateAsyncRespMessage(String txnseqno) {
 		// TODO Auto-generated method stub
 		return null;
 	}

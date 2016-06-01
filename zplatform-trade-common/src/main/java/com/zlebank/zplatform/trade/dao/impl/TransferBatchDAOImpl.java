@@ -68,6 +68,7 @@ public class TransferBatchDAOImpl extends HibernateBaseDAOImpl<PojoTranBatch>
                 parameterList.add(queryTransferBean.getBusiType());
             }
         }
+        sqlBuffer.append(" order by applyTime desc");
         Query query = getSession().createQuery(sqlBuffer.toString());
         Query countQuery =
         getSession().createQuery(sqlCountBuffer.toString());

@@ -134,7 +134,7 @@ public class ChanPayController {
 			//保存畅捷支付订单信息
 			txnsGatewaypayService.saveChanPayGateWay(chanPayOrderBean);
 			//更新订单状态
-			TxnsOrderinfoModel orderinfo = gateWayService.getOrderinfoByOrderNoAndMemberId(txnsLog.getAccordno(), txnsLog.getAccfirmerno());
+			TxnsOrderinfoModel orderinfo = gateWayService.getOrderByTxnseqno(txnseqno);
 			orderinfo.setStatus("02");
 			gateWayService.update(orderinfo);
 			//更新交易流水状态

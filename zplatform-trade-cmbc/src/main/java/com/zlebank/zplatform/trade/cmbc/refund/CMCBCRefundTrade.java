@@ -15,8 +15,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,13 +33,9 @@ import com.zlebank.zplatform.trade.model.PojoTranBatch;
 import com.zlebank.zplatform.trade.model.PojoTranData;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.model.TxnsRefundModel;
-import com.zlebank.zplatform.trade.model.TxnsWithdrawModel;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
 import com.zlebank.zplatform.trade.service.ITxnsRefundService;
-import com.zlebank.zplatform.trade.service.ITxnsWithdrawService;
 import com.zlebank.zplatform.trade.service.SeqNoService;
-import com.zlebank.zplatform.trade.utils.DateUtil;
-import com.zlebank.zplatform.trade.utils.OrderNumber;
 import com.zlebank.zplatform.trade.utils.SpringContext;
 
 /**
@@ -115,6 +109,7 @@ public class CMCBCRefundTrade implements IRefundTrade {
         // 交易手续费0
         pojoTranData.setTranFee(txnsLogService.getTxnFee(txnsLog));
         pojoTranData.setBusiType(TransferBusiTypeEnum.INSTEAD.getCode());
+        pojoTranData.setBusiSeqNo(refund.getRefundorderno());
         pojoTranData.setTxnseqno(tradeBean.getTxnseqno());
         //pojoTranData.setBankNo(refund.get);
         //pojoTranData.setBankName(job.get("ACCORDNO").toString());
@@ -157,6 +152,8 @@ public class CMCBCRefundTrade implements IRefundTrade {
         // 循环数据
         for (PojoTranData data : datas) {
             if (data == null) continue;
+            
+            data.setBusiType(type.getCode());
             // 有效性检查
             checkDetails(data);
             // 保存划拨流水
@@ -164,7 +161,7 @@ public class CMCBCRefundTrade implements IRefundTrade {
             data.setApplyTime(new Date());
             data.setStatus(TransferDataStatusEnum.INIT.getCode());
             data.setTranBatch(batch);
-            data.setBusiType(type.getCode());
+            
             data = tranDataDAO.merge(data);
             // 保存划拨批次统计数据
             batch.setTotalCount(addOne(batch.getTotalCount()));
@@ -205,7 +202,7 @@ public class CMCBCRefundTrade implements IRefundTrade {
      */
     private void checkDetails(PojoTranData data) throws RecordsAlreadyExistsException {
         // 重复检查
-        int count = tranDataDAO.getCountByInsteadDataId(data.getBusiDataId());
+        int count = tranDataDAO.getCountByInsteadDataId(data.getBusiDataId(),data.getBusiType());
         if (count > 0)
             throw new RecordsAlreadyExistsException();
     }

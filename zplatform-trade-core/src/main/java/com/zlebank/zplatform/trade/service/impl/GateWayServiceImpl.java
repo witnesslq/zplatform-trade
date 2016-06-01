@@ -1210,12 +1210,12 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         }
     }
     
-    @Transactional
+    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor = Throwable.class)
     public void saveSuccessTrade(String txnseqno,String gateWayOrderNo,ZLPayResultBean zlPayResultBean){
         TxnsLogModel txnsLog = txnsLogService.get(txnseqno);
-        //txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
+        txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
         txnsLog.setPayordfintime(zlPayResultBean.getPnrDate()+zlPayResultBean.getPnrTime());
-        txnsLog.setRetcode("ZL00");
+        txnsLog.setRetcode("0000");
         txnsLog.setRetinfo("交易成功");
         txnsLog.setRetdatetime(DateUtil.getCurrentDateTime());
         txnsLog.setTradestatflag("00000001");//交易完成结束位
@@ -1227,12 +1227,10 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         txnsLog.setPayretcode(zlPayResultBean.getRespCode());
         txnsLog.setPayretinfo(zlPayResultBean.getRespDesc());
         txnsLogService.update(txnsLog);
-        
-        
-        TxnsOrderinfoModel orderinfo = super.findByProperty("orderno", gateWayOrderNo).get(0);
+        TxnsOrderinfoModel orderinfo = txnsOrderinfoDAO.getOrderByTxnseqno(txnseqno);
         orderinfo.setStatus("00");
         orderinfo.setOrderfinshtime(DateUtil.getCurrentDateTime());
-        super.update(orderinfo);
+        update(orderinfo);
         
     }
     @Transactional
@@ -1903,6 +1901,9 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         //verifyWapOrder(JSON.parseObject(json));
         WapSMSMessageBean smsMessageBean = JSON.parseObject(json, WapSMSMessageBean.class);
         TxnsOrderinfoModel orderinfo = getOrderinfoByTN(smsMessageBean.getTn());
+        if(orderinfo==null){
+        	throw new TradeException("GW15");
+        }
         TxnsLogModel txnsLog = txnsLogService.get(orderinfo.getRelatetradetxn());
         if("00".equals(orderinfo.getStatus())){
             throw new TradeException("T004");
@@ -2150,9 +2151,6 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
     public String withdraw(String json) throws TradeException{
         WapWithdrawBean withdrawBean = JSON.parseObject(json, WapWithdrawBean.class);
         //判断账户余额是否充足
-        
-        
-        
         WapWithdrawAccBean accBean = null;
         if(StringUtil.isNotEmpty(withdrawBean.getBindId())){//使用已绑定的卡进行提现
         	PojoQuickpayCust custCard = quickpayCustDAO.getById(Long.valueOf(withdrawBean.getBindId()));
@@ -2574,5 +2572,31 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         }
         
     }
+	/**
+	 *
+	 * @param txnseqno
+	 * @return
+	 */
+	@Override
+	public TxnsOrderinfoModel getOrderByTxnseqno(String txnseqno) {
+		return txnsOrderinfoDAO.getOrderByTxnseqno(txnseqno);
+	}
 	
+	
+	public Long getRefundFee(String txnseqno,String merchNo,String txnAmt,String busicode){
+		PojoMerchDeta merch = merchService.getMerchBymemberId(merchNo);
+		TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(txnseqno);
+		//扣率版本，业务类型，交易金额，会员号，原交易序列号，卡类型 
+        List<Map<String, Object>> feeList = (List<Map<String, Object>>) super.queryBySQL("select FNC_GETFEES_notxns(?,?,?,?,?,?) as fee from dual", 
+                new Object[]{merch.getFeeVer(),busicode,txnAmt,merchNo,txnseqno,txnsLog.getCardtype()});
+        if(feeList.size()>0){
+            if(StringUtil.isNull(feeList.get(0).get("FEE"))){
+                return 0L;
+            }else{
+                return Long.valueOf(feeList.get(0).get("FEE")+"");
+            }
+            
+        }
+        return 0L;
+	}
 }

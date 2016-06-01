@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
 import com.zlebank.zplatform.acc.exception.AccBussinessException;
@@ -77,6 +78,7 @@ public class UpdateWithdrawServiceImpl implements UpdateWithdrawService,UpdateSu
     @Override
     @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
     public void update(UpdateData data) {
+    	log.info("提现交易账务处理开始，交易序列号:"+data.getTxnSeqNo());
         TxnsWithdrawModel withdrawModel=withdrawDao.getWithdrawBySeqNo(data.getTxnSeqNo());
         if (withdrawModel==null) {
             log.error("不存在的提现信息,交易序列号："+data.getTxnSeqNo());
@@ -97,10 +99,12 @@ public class UpdateWithdrawServiceImpl implements UpdateWithdrawService,UpdateSu
         	businessEnum = BusinessEnum.WITHDRAWALS;
         	orderinfo.setStatus("00");
         	entryEvent = EntryEvent.TRADE_SUCCESS;
+        	log.info("提现交易成功，交易序列号:"+data.getTxnSeqNo());
         }else{
         	businessEnum = BusinessEnum.WITHDRAWALS;
         	orderinfo.setStatus("03");
         	entryEvent = EntryEvent.TRADE_FAIL;
+        	log.info("提现交易失败，交易序列号:"+data.getTxnSeqNo());
         }
         TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(data.getTxnSeqNo());
         //更新订单信息
@@ -114,6 +118,7 @@ public class UpdateWithdrawServiceImpl implements UpdateWithdrawService,UpdateSu
         tradeInfo.setChannelId(data.getChannelCode());
         tradeInfo.setCoopInstCode(txnsLog.getAccfirmerno());
         try {
+        	log.info("提现账务数据："+JSON.toJSONString(tradeInfo));
             accEntryService.accEntryProcess(tradeInfo,entryEvent);
         } catch (AccBussinessException e1) {
 			// TODO Auto-generated catch block
@@ -133,6 +138,7 @@ public class UpdateWithdrawServiceImpl implements UpdateWithdrawService,UpdateSu
 		}
         //更新交易流水应用方信息
         txnsLogService.updateAppStatus(data.getTxnSeqNo(), txnsLog.getApporderstatus(), txnsLog.getApporderinfo());
+        log.info("提现交易账务处理开始，交易序列号:"+data.getTxnSeqNo());
     }
 
     /**

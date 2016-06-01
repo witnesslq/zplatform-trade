@@ -113,7 +113,7 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
                 String merchOrderNo =  tradeBean.getOrderId();
                 // 处理同步通知和异步通知
                 // 根据原始订单拼接应答报文，异步通知商户
-                TxnsOrderinfoModel gatewayOrderBean = txnsOrderinfoDAO.getOrderinfoByOrderNo(merchOrderNo,tradeBean.getMerchId());
+                TxnsOrderinfoModel gatewayOrderBean = txnsOrderinfoDAO.getOrderByTxnseqno(tradeBean.getTxnseqno());
                 /**账务处理开始 **/
                 // 应用方信息
                 try {
@@ -135,8 +135,7 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
                         tradeBean.getOrderId(), withholding,tradeBean.getMerchId());
                 /**异步通知处理开始 **/
                 ResultBean orderResp = 
-                        generateAsyncRespMessage(merchOrderNo,
-                                tradeBean.getMerchId());
+                        generateAsyncRespMessage(tradeBean.getTxnseqno());
                 if (orderResp.isResultBool()) {
                 	if("000205".equals(gatewayOrderBean.getBiztype())){
                 		AnonOrderAsynRespBean respBean = (AnonOrderAsynRespBean) orderResp
@@ -165,7 +164,7 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
                     txnsLogService.updatePayInfo_Fast(payPartyBean);
                 }else{
                     //订单状态更新为失败
-                    txnsOrderinfoDAO.updateOrderToFail(tradeBean.getOrderId(),tradeBean.getMerUserId());
+                    txnsOrderinfoDAO.updateOrderToFail(tradeBean.getTxnseqno());
                     PayPartyBean payPartyBean = new PayPartyBean(tradeBean.getTxnseqno(),"01", tradeBean.getOrderId(), "93000002", ConsUtil.getInstance().cons.getCmbc_merid(), "", DateUtil.getCurrentDateTime(), "",tradeBean.getCardNo());
                     //更新支付方信息
                     txnsLogService.updatePayInfo_Fast(payPartyBean);
@@ -187,17 +186,17 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
         txnsLog.setTradeseltxn(UUIDUtil.uuid());
         txnsLog.setPayrettsnseqno(withholding.getPayserialno());
         txnsLogService.updateTxnsLog(txnsLog);
-        TxnsOrderinfoModel orderinfo = txnsOrderinfoDAO.getOrderinfoByOrderNo(gateWayOrderNo,merchId);
+        TxnsOrderinfoModel orderinfo = txnsOrderinfoDAO.getOrderByTxnseqno(txnseqno);
         orderinfo.setStatus("00");
         orderinfo.setOrderfinshtime(DateUtil.getCurrentDateTime());
         txnsOrderinfoDAO.updateOrderinfo(orderinfo);
         
     }
     
-    public ResultBean generateAsyncRespMessage(String orderNo,String memberId){
+    public ResultBean generateAsyncRespMessage(String txnseqno){
         ResultBean resultBean = null;
         try {
-            TxnsOrderinfoModel orderinfo = txnsOrderinfoDAO.getOrderinfoByOrderNo(orderNo,memberId);
+            TxnsOrderinfoModel orderinfo = txnsOrderinfoDAO.getOrderByTxnseqno(txnseqno);
             if(StringUtil.isEmpty(orderinfo.getBackurl())){
             	return new ResultBean("09", "no need async");
             }else {
@@ -310,7 +309,7 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
         
         // 处理同步通知和异步通知
         // 根据原始订单拼接应答报文，异步通知商户
-        TxnsOrderinfoModel gatewayOrderBean = txnsOrderinfoDAO.getOrderinfoByOrderNo(txnsLog.getAccordno(),txnsLog.getAccfirmerno());
+        TxnsOrderinfoModel gatewayOrderBean = txnsOrderinfoDAO.getOrderByTxnseqno(txnseqno);
         /**账务处理开始 **/
         // 应用方信息
         try {
@@ -326,8 +325,7 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
         /**异步通知处理开始 **/
         try {
 			ResultBean orderResp = 
-			        generateAsyncRespMessage(txnsLog.getAccordno(),
-			                txnsLog.getAccfirmerno());
+			        generateAsyncRespMessage(txnsLog.getTxnseqno());
 			if (orderResp.isResultBool()) {
 				if("000205".equals(gatewayOrderBean.getBiztype())){
             		AnonOrderAsynRespBean respBean = (AnonOrderAsynRespBean) orderResp
@@ -353,4 +351,6 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
 			e.printStackTrace();
 		}
     }
+
+	
 }

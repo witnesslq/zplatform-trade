@@ -85,12 +85,16 @@ public class CMBCSelfQuickPayTradeThread implements IQuickPayTrade{
     public ResultBean sendSms(TradeBean trade) {
         ResultBean resultBean = null;
         try {
-            
-           
+        	log.info("cmbc self send sms start!!!!");
             String mobile = trade.getMobile();
             String payorderNo = txnsQuickpayService.saveCMBCOuterBankSign(trade);
-            SMSThreadPool.getInstance().executeMission(new SMSUtil(mobile,"",trade.getTn(),DateUtil.getCurrentDateTime(),payorderNo,trade.getMiniCardNo(),trade.getAmount_y()));
+            if(ConsUtil.getInstance().cons.getIs_junit()==1){
+            	new SMSUtil(mobile,"",trade.getTn(),DateUtil.getCurrentDateTime(),payorderNo,trade.getMiniCardNo(),trade.getAmount_y()).sendSMS(mobile, "");
+            }else{
+            	SMSThreadPool.getInstance().executeMission(new SMSUtil(mobile,"",trade.getTn(),DateUtil.getCurrentDateTime(),payorderNo,trade.getMiniCardNo(),trade.getAmount_y()));
+            }
             resultBean = new ResultBean("success");
+            log.info("cmbc self send sms end!!!!");
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -123,11 +127,12 @@ public class CMBCSelfQuickPayTradeThread implements IQuickPayTrade{
             payPartyBean.setPanName(trade.getAcctName());
             txnsLogService.updatePayInfo_Fast(payPartyBean);
             if(resultBean!=null){
+            	//更新支付方结果 --短信验证码错误
                 txnsLogService.updatePayInfo_Fast_result(tradeBean.getTxnseqno(), resultBean.getErrCode(),resultBean.getErrMsg());
                 txnsLogService.updateCoreRetResult(tradeBean.getTxnseqno(), resultBean.getErrCode(),resultBean.getErrMsg());
-                log.info(JSON.toJSONString(resultBean));
-                TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(tradeBean.getTxnseqno());
-                txnsOrderinfoDAO.updateOrderToFail(txnsLog.getAccordno(), txnsLog.getAccfirmerno());
+                log.info("短信验证码验证失败:"+JSON.toJSONString(resultBean));
+                //TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(tradeBean.getTxnseqno());
+                txnsOrderinfoDAO.updateOrderToFail(tradeBean.getTxnseqno());
                 return resultBean;
             }
             trade.setPayinstiId(PAYINSTID);
@@ -144,7 +149,7 @@ public class CMBCSelfQuickPayTradeThread implements IQuickPayTrade{
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-            txnsOrderinfoDAO.updateOrderToFail(tradeBean.getOrderId(),tradeBean.getMerchId());
+            txnsOrderinfoDAO.updateOrderToFail(tradeBean.getTxnseqno());
             resultBean = new ResultBean("T000", "交易失败");
         }
         

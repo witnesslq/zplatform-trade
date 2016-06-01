@@ -91,6 +91,9 @@ public class PojoTranBatch implements Serializable{
     /**代付批次**/
     @JSONField(serialize = false)  
     private PojoInsteadPayBatch insteadPayBatch;
+    
+    private String merchBathcNo;
+    private String busiBatchNo;
    
     @GenericGenerator(name = "id_gen", strategy = "enhanced-table", parameters = {
             @Parameter(name = "table_name", value = "T_C_PRIMAY_KEY"),
@@ -248,6 +251,19 @@ public class PojoTranBatch implements Serializable{
         }else{
             this.tranDatas.addAll(tranDatas);
         }
-        
+    }
+    @Column(name="merch_batch_no")
+    public String getMerchBathcNo() {
+        return merchBathcNo;
+    }
+    public void setMerchBathcNo(String merchBathcNo) {
+        this.merchBathcNo = merchBathcNo;
+    }
+    @Column(name="busi_batch_no")
+    public String getBusiBatchNo() {
+        return busiBatchNo;
+    }
+    public void setBusiBatchNo(String busiBatchNo) {
+        this.busiBatchNo = busiBatchNo;
     }
 }
