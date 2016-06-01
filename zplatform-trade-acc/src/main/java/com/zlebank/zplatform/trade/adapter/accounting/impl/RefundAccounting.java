@@ -1,7 +1,5 @@
 package com.zlebank.zplatform.trade.adapter.accounting.impl;
 
-import java.math.BigDecimal;
-
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
