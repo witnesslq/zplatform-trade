@@ -174,7 +174,7 @@ public class AccountRefundTrade implements IRefundTrade {
         txnsLog.setPayretcode(retCode);
         txnsLog.setPayretinfo(retInfo);
         txnsLog.setAppordcommitime(DateUtil.getCurrentDateTime());
-        txnsLog.setAppinst("99999999");
+        txnsLog.setAppinst("000000000000");
         if("0000".equals(retCode)){
         	 txnsLog.setApporderinfo("退款账务成功");
              txnsLog.setApporderstatus("00");

@@ -35,7 +35,6 @@ import com.zlebank.zplatform.acc.bean.BusiAcct;
 import com.zlebank.zplatform.acc.bean.BusiAcctQuery;
 import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.bean.enums.AcctStatusType;
-import com.zlebank.zplatform.acc.bean.enums.BusiType;
 import com.zlebank.zplatform.acc.bean.enums.Usage;
 import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
 import com.zlebank.zplatform.acc.exception.AccBussinessException;
@@ -43,7 +42,6 @@ import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.AccountQueryService;
 import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.commons.bean.PagedResult;
-import com.zlebank.zplatform.commons.dao.pojo.BusiTypeEnum;
 import com.zlebank.zplatform.commons.enums.BusinessCodeEnum;
 import com.zlebank.zplatform.commons.utils.Base64Utils;
 import com.zlebank.zplatform.commons.utils.RSAUtils;
@@ -102,7 +100,6 @@ import com.zlebank.zplatform.trade.bean.wap.WapWithdrawBean;
 import com.zlebank.zplatform.trade.cmbc.service.ICMBCTransferService;
 import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
 import com.zlebank.zplatform.trade.dao.RspmsgDAO;
-import com.zlebank.zplatform.trade.dao.impl.RspmsgDAOImpl;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.factory.TradeAdapterFactory;
 import com.zlebank.zplatform.trade.model.CashBankModel;
@@ -889,7 +886,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             throw new TradeException("T008");
         }
     }
-    @Transactional
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public String dealWithRefundOrder(WapRefundBean refundBean) throws TradeException {
         TxnsOrderinfoModel withdrawOrderinfo =  super.getUniqueByHQL("from TxnsOrderinfoModel where orderno = ? ", new Object[]{refundBean.getOrderId()});
         if(withdrawOrderinfo!=null){
@@ -1005,10 +1002,6 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
     		txnsLog.setTxnfee(getTxnFee(txnsLog));
     		txnsLog.setTradcomm(0L);
             txnsLogService.save(txnsLog);
-            
-            
-            
-            
             //退款账务处理
             TradeInfo tradeInfo = new TradeInfo();
             tradeInfo.setPayMemberId(refundBean.getMemberId());
@@ -1028,9 +1021,11 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         } catch (AccBussinessException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			throw new TradeException("T000","账务异常");
 		} catch (AbstractBusiAcctException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			throw new TradeException("T000","账务异常");
 		}
         
        String tn = "";
@@ -2133,7 +2128,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
      * @return
      * @throws TradeException
      */
-    @Transactional
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public String refund(String json) throws TradeException{
         WapRefundBean refundBean = JSON.parseObject(json, WapRefundBean.class);
         //记录退款订单和交易流水 退款流水表

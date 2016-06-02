@@ -48,6 +48,7 @@ import com.zlebank.zplatform.acc.exception.AccBussinessException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.commons.dao.pojo.AccStatusEnum;
+import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.trade.bean.UpdateData;
 import com.zlebank.zplatform.trade.bean.enums.BusinessEnum;
 import com.zlebank.zplatform.trade.bean.enums.InsteadPayDetailStatusEnum;
@@ -136,11 +137,14 @@ public class UpdateRefundServiceImpl implements UpdateRefundService, UpdateSubje
        
         try {
         	log.info("账务处理数据:"+ JSON.toJSONString(tradeInfo));
+        	txnsLog.setAppordcommitime(DateUtil.getCurrentDateTime());
+        	txnsLog.setAppinst("000000000000");
+        	
             accEntryService.accEntryProcess(tradeInfo, entryEvent);
             txnsRefundService.update(refund);
             txnsOrderinfoDAO.updateOrderinfo(order);
             txnsLog.setApporderstatus(AccStatusEnum.Finish.getCode());
-            
+            txnsLog.setAppordfintime(DateUtil.getCurrentDateTime());
         }catch (AccBussinessException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -160,6 +164,7 @@ public class UpdateRefundServiceImpl implements UpdateRefundService, UpdateSubje
         //更新交易流水应用方信息
         txnsLogService.updateAppStatus(data.getTxnSeqNo(), txnsLog.getApporderstatus(), txnsLog.getApporderinfo());
         txnsLog.setAccbusicode(BusinessEnum.REFUND_BANK.getBusiCode());
+        txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
         txnsLogService.update(txnsLog);
         log.info("退款账务结束，交易序列号:"+data.getTxnSeqNo());
     }

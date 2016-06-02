@@ -163,10 +163,10 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
 				txnsLog.setApporderstatus(AccStatusEnum.Finish.getCode());
 	            txnsLog.setApporderinfo("代付账务成功");
 	            //更新应用信息
-	            AppPartyBean appParty = new AppPartyBean("",
-                        "000000000000", commiteTime,
-                        DateUtil.getCurrentDateTime(), data.getTxnSeqNo(), "AC000000");
-                txnsLogService.updateAppInfo(appParty);
+                txnsLog.setAppinst("000000000000");
+                txnsLog.setAppordcommitime(commiteTime);
+                txnsLog.setAppordfintime(DateUtil.getCurrentDateTime());
+                txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
 			}
 		} catch (AccBussinessException e1) {
 			// TODO Auto-generated catch block
