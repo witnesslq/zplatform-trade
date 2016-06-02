@@ -27,9 +27,6 @@ public class InsteadPayQuery_Request extends BaseMessage{
     /**订单发送时间**/
     @N(max=14,min=14)
     private String txnTime;
-    /**渠道类型**/
-    @N(max=2,isNull=false)
-    private String channelType;
 
     
     public String getBatchNo() {
@@ -44,11 +41,6 @@ public class InsteadPayQuery_Request extends BaseMessage{
     public void setTxnTime(String txnTime) {
         this.txnTime = txnTime;
     }
-    public String getChannelType() {
-        return channelType;
-    }
-    public void setChannelType(String channelType) {
-        this.channelType = channelType;
-    }
+
     
 }

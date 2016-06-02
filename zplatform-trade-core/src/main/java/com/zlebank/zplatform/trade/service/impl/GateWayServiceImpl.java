@@ -390,16 +390,13 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         TxnsLogModel txnsLog = new TxnsLogModel();
         PojoMerchDeta member = null;
         if(StringUtil.isNotEmpty(order.getMerId())){//商户为空时，取商户的各个版本信息
-        	
         	member =  merchService.getMerchBymemberId(order.getMerId());
         	//member = memberService2.getMbmberByMemberId(order.getMerId(),MemberType.);
         	txnsLog.setRiskver(member.getRiskVer());
             txnsLog.setSplitver(member.getSpiltVer());
             txnsLog.setFeever(member.getFeeVer());
             txnsLog.setPrdtver(member.getPrdtVer());
-           
             txnsLog.setRoutver(member.getRoutVer());
-            txnsLog.setAccordinst(member.getParent());
             txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlCycle().toString())));
         }else{
         	//10-产品版本,11-扣率版本,12-分润版本,13-风控版本,20-路由版本
@@ -421,7 +418,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         txnsLog.setAccfirmerno(order.getCoopInstiId());
         txnsLog.setAcccoopinstino(order.getCoopInstiId());
         if("20000".equals(busiModel.getBusitype())){
-        	 txnsLog.setAccsecmerno("");
+        	txnsLog.setAccsecmerno("");
         }else{
         	txnsLog.setAccsecmerno(order.getMerId());
         }
@@ -533,16 +530,13 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         TxnsLogModel txnsLog = new TxnsLogModel();
         PojoMerchDeta member = null;
         if(StringUtil.isNotEmpty(order.getMerId())){//商户为空时，取商户的各个版本信息
-        	
         	member =  merchService.getMerchBymemberId(order.getMerId());
         	//member = memberService2.getMbmberByMemberId(order.getMerId(),MemberType.);
         	txnsLog.setRiskver(member.getRiskVer());
             txnsLog.setSplitver(member.getSpiltVer());
             txnsLog.setFeever(member.getFeeVer());
             txnsLog.setPrdtver(member.getPrdtVer());
-           
             txnsLog.setRoutver(member.getRoutVer());
-            txnsLog.setAccordinst(member.getParent());
             txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlCycle().toString())));
         }else{
         	//10-产品版本,11-扣率版本,12-分润版本,13-风控版本,20-路由版本
@@ -664,7 +658,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             txnsLog.setPrdtver(member.getPrdtVer());
             //txnsLog.setCheckstandver(member.getCashver());
             txnsLog.setRoutver(member.getRoutVer());
-            txnsLog.setAccordinst(member.getParent());
+            //txnsLog.setAccordinst(member.getParent());
             txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlCycle().toString())));
         }else{//商户为空时，取默认的各个版本信息
         	txnsLog.setRiskver(getDefaultVerInfo(order.getCoopInstiId(),busiModel.getBusicode(),13));
@@ -783,9 +777,7 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
                 txnsLog.setSplitver(member.getSpiltVer());
                 txnsLog.setFeever(member.getFeeVer());
                 txnsLog.setPrdtver(member.getPrdtVer());
-               // txnsLog.setCheckstandver(member.getCashver());
                 txnsLog.setRoutver(member.getRoutVer());
-                txnsLog.setAccordinst(member.getParent());
                 txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlCycle().toString())));
             }else{
             	txnsLog.setRiskver(getDefaultVerInfo(order.getCoopInstiId(),busiModel.getBusicode(),13));
@@ -804,12 +796,15 @@ public class GateWayServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             txnsLog.setAmount(Long.valueOf(order.getTxnAmt()));
             txnsLog.setAccordno(order.getOrderId());
             txnsLog.setAccfirmerno(order.getCoopInstiId());
-            txnsLog.setAccsecmerno(order.getMerId());
+            if("20000".equals(busiModel.getBusitype())){
+            	txnsLog.setAccsecmerno("");
+            }else{
+            	txnsLog.setAccsecmerno(order.getMerId());
+            }
             txnsLog.setAcccoopinstino(order.getCoopInstiId());
             txnsLog.setAccordcommitime(DateUtil.getCurrentDateTime());
             txnsLog.setTradestatflag("00000000");//交易初始状态
-            
-          //txnsLog.setTradcomm(GateWayTradeAnalyzer.generateCommAmt(order.getReserved()));
+            //txnsLog.setTradcomm(GateWayTradeAnalyzer.generateCommAmt(order.getReserved()));
             if(StringUtil.isNotEmpty(riskRateInfoBean.getMerUserId())){
                 PojoMember personMemeber= memberService2.getMbmberByMemberId(riskRateInfoBean.getMerUserId(), MemberType.INDIVIDUAL);
                 if(personMemeber!=null){

@@ -41,9 +41,6 @@ public class InsteadPay_Request extends BaseMessage{
     private List<InsteadPayFile> fileContent;
     /**保留域**/
     private String reserved;
-    /**渠道类型**/
-    @N(max=2,isNull=false)
-    private String channelType;
     @NotEmpty
     private String backUrl;
     
@@ -83,12 +80,6 @@ public class InsteadPay_Request extends BaseMessage{
     }
     public void setReserved(String reserved) {
         this.reserved = reserved;
-    }
-    public String getChannelType() {
-        return channelType;
-    }
-    public void setChannelType(String channelType) {
-        this.channelType = channelType;
     }
     public String getBackUrl() {
         return backUrl;

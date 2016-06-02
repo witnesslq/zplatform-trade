@@ -23,9 +23,6 @@ import com.zlebank.zplatform.trade.common.validator.N;
  */
 public class RealnameAuth_Request extends BaseMessage{
 
-    /**渠道类型**/
-    @N(max=2,isNull=false)
-    private String channelType;
     /**接入类型**/
     @N(max=1,isNull=false)
     private String accessType;
@@ -38,12 +35,6 @@ public class RealnameAuth_Request extends BaseMessage{
     /**加密信息域**/
     private String encryptData;
 
-    public String getChannelType() {
-        return channelType;
-    }
-    public void setChannelType(String channelType) {
-        this.channelType = channelType;
-    }
     public String getAccessType() {
         return accessType;
     }

@@ -15,6 +15,8 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.zlebank.zplatform.acc.bean.BusiAcct;
 import com.zlebank.zplatform.acc.bean.BusiAcctQuery;
@@ -75,6 +77,7 @@ public class AccountPayServiceImpl implements IAccountPayService{
     @Autowired
     private CoopInstiDAO coopInstiDAO;
     
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void accountPay(AccountTradeBean accountTrade) throws TradeException{
         if(validateBalance(accountTrade.getMemberId(),Long.valueOf(accountTrade.getAmount()))<0){
             throw new TradeException("T025");

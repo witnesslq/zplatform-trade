@@ -52,13 +52,13 @@ public class InsteadPayFile {
     @N(max=12, isNull=false)
     private String bankCode;
     /**开户行省**/
-    @Ans(max=20, isNull=true)
+    @Ans(max=10, isNull=true)
     private String issInsProvince;
     /**开户行市**/
-    @Ans(max=20, isNull=true)
+    @Ans(max=10, isNull=true)
     private String issInsCity;
     /**开户行名称**/
-    @Ans(max=40, isNull=true)
+    @Ans(max=20, isNull=true)
     private String issInsName;
     /**证件类型**/
     @Scontant(contants={"01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","99"})

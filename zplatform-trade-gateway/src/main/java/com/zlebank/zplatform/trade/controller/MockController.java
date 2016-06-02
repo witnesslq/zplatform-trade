@@ -34,10 +34,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.zlebank.zplatform.commons.utils.Base64Utils;
 import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.commons.utils.RSAUtils;
 import com.zlebank.zplatform.member.service.MerchMKService;
-import com.zlebank.zplatform.specification.utils.Base64Utils;
+//import com.zlebank.zplatform.specification.utils.Base64Utils;
 import com.zlebank.zplatform.trade.insteadPay.message.BaseMessage;
 import com.zlebank.zplatform.trade.insteadPay.message.InsteadPayFile;
 import com.zlebank.zplatform.trade.insteadPay.message.InsteadPay_Request;
@@ -56,8 +57,8 @@ import com.zlebank.zplatform.trade.service.RealNameAuthService;
  * @date 2015年11月20日 下午12:24:50
  * @since
  */
-@Controller
-@RequestMapping("mock")
+/*@Controller
+@RequestMapping("mock")*/
 public class MockController {
 
     @SuppressWarnings("unused")

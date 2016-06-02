@@ -113,6 +113,7 @@ public class NotifyInsteadURLServiceImpl implements NotifyInsteadURLService,  Ap
         requestBean.setTxnSubType("01");
         requestBean.setEncoding("1");
         requestBean.setBizType("000205");
+        requestBean.setChannelType("00");
         
         // 响应报文
         InsteadPayQuery_Response responseBean = BeanCopyUtil.copyBean(InsteadPayQuery_Response.class, requestBean);

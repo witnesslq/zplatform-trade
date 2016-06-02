@@ -32,12 +32,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.zlebank.zplatform.commons.utils.Base64Utils;
 import com.zlebank.zplatform.commons.utils.BeanCopyUtil;
 import com.zlebank.zplatform.commons.utils.RSAUtils;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.member.bean.MerchMK;
 import com.zlebank.zplatform.member.service.MerchMKService;
-import com.zlebank.zplatform.specification.utils.Base64Utils;
+//import com.zlebank.zplatform.specification.utils.Base64Utils;
 import com.zlebank.zplatform.trade.bean.enums.InsteadPayImportTypeEnum;
 import com.zlebank.zplatform.trade.exception.BalanceNotEnoughException;
 import com.zlebank.zplatform.trade.exception.DuplicateOrderIdException;
@@ -80,8 +81,8 @@ import com.zlebank.zplatform.trade.utils.HibernateValidatorUtil;
  * @date 2015年11月20日 下午12:24:50
  * @since
  */
-@Controller
-@RequestMapping("interface")
+/*@Controller
+@RequestMapping("interface")*/
 public class InsteadPayController {
 
     private static final Log log = LogFactory.getLog(InsteadPayController.class);
@@ -140,7 +141,7 @@ public class InsteadPayController {
     }
 
     // 地址路由
-    @RequestMapping("/insteadPayIndex.htm")
+//    @RequestMapping("/insteadPayIndex.htm")
     public ModelAndView index(String data, HttpSession httpSession, HttpServletResponse response){
         PrintWriter responseStream = getPrintWriter(response);
         if (log.isDebugEnabled()) {

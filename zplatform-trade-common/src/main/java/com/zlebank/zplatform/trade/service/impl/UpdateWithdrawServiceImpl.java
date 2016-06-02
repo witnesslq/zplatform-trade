@@ -92,7 +92,7 @@ public class UpdateWithdrawServiceImpl implements UpdateWithdrawService,UpdateSu
         if (wdEnum.getCode().equals(data.getResultCode())) {
             withdrawModel.setStatus(wdEnum.getCode());
         }else{
-            withdrawModel.setStatus(WithdrawEnum.UNKNOW.getCode());
+            withdrawModel.setStatus(WithdrawEnum.STOP.getCode());
         }
         withdrawModel.setTxntime(DateUtil.getCurrentDateTime());
         withdrawModel.setFinishtime(DateUtil.getCurrentDateTime());

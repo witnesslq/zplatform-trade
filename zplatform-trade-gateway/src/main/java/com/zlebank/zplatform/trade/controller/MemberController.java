@@ -25,14 +25,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.zlebank.zplatform.specification.RequestType;
+/*import com.zlebank.zplatform.specification.RequestType;
 import com.zlebank.zplatform.specification.SpecificationProcessor;
 import com.zlebank.zplatform.specification.SpecificationProcessorFactory;
 import com.zlebank.zplatform.specification.exception.SpecificationException;
 import com.zlebank.zplatform.specification.message.Message;
 import com.zlebank.zplatform.specification.message.Response;
 import com.zlebank.zplatform.specification.parser.SpecificationParser;
-import com.zlebank.zplatform.specification.utils.LogUtil;
+import com.zlebank.zplatform.specification.utils.LogUtil;*/
 /**
  * Class Description
  *
@@ -41,11 +41,11 @@ import com.zlebank.zplatform.specification.utils.LogUtil;
  * @date 2015年9月22日 上午11:14:52
  * @since 
  */
-@Controller
+/*@Controller*/
 public class MemberController {
 private final static Log log = LogFactory.getLog(MemberController.class);
     
-    @Autowired
+   /* @Autowired
     private SpecificationParser specificationParser;
     private final static String FILED_REQUEST_TYPE = "requestType";
     private  final static String ENCODE_CHARSET="utf-8";
@@ -99,5 +99,5 @@ private final static Log log = LogFactory.getLog(MemberController.class);
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-    }
+    }*/
 }

@@ -95,7 +95,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
     private IRiskTradeLogService riskTradeLogService;
     @Autowired
     private TransferDataDAO transferDataDAO;
-    
+    @Autowired
     private AccEntryService accEntryService;
     @Autowired
     private MemberService memberService2;
@@ -893,6 +893,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 					tradeInfo.setChannelId(txnsLog.getPayinst());
 					tradeInfo.setChannelFee(new BigDecimal(channelFee));
 					tradeInfo.setCoopInstCode(txnsLog.getAcccoopinstino());
+					log.info(JSON.toJSONString(tradeInfo));
 					accEntryService.accEntryProcess(tradeInfo, EntryEvent.RECON_SUCCESS);
 				
 					executeBySQL("UPDATE T_SELF_TXN SET RESULT=? WHERE TID = ?", new Object[]{"03",value.get("TID")});
@@ -943,6 +944,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
                     }else{
                     	
                     }
+                    
     					TradeInfo tradeInfo = new TradeInfo();
     					tradeInfo.setBusiCode(txnsLog.getBusicode());
     					tradeInfo.setPayMemberId(payMemberId);
