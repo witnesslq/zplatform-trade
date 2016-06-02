@@ -54,6 +54,7 @@ import com.zlebank.zplatform.member.pojo.PojoMember;
 import com.zlebank.zplatform.member.service.MemberService;
 import com.zlebank.zplatform.trade.bean.AppPartyBean;
 import com.zlebank.zplatform.trade.bean.UpdateData;
+import com.zlebank.zplatform.trade.bean.enums.BusinessEnum;
 import com.zlebank.zplatform.trade.bean.enums.InsteadPayDetailStatusEnum;
 import com.zlebank.zplatform.trade.bean.enums.TransferBusiTypeEnum;
 import com.zlebank.zplatform.trade.dao.InsteadPayBatchDAO;
@@ -192,6 +193,8 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
     	if(txnsLog!=null){
 	        //更新交易流水应用方信息
 	        txnsLogService.updateAppStatus(data.getTxnSeqNo(), txnsLog.getApporderstatus(), txnsLog.getApporderinfo());
+	        txnsLog.setAccbusicode(BusinessEnum.INSTEADPAY.getBusiCode());
+	        txnsLogService.update(txnsLog);
     	}
         try {
 			// 如果批次已经全部处理完毕，则添加到通知

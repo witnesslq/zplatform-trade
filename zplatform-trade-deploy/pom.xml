@@ -31,6 +31,10 @@
 			<artifactId>zplatform-member</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.zlebank.zplatform</groupId>
+			<artifactId>zplatform-commons</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 		</dependency>
@@ -109,7 +113,12 @@
 			<dependency>
 				<groupId>com.zlebank.zplatform</groupId>
 				<artifactId>zplatform-member</artifactId>
-				<version>1.6.0-SNAPSHOT</version>
+				<version>1.5.4</version>
+			</dependency>
+			<dependency>
+			<groupId>com.zlebank.zplatform</groupId>
+				<artifactId>zplatform-commons</artifactId>
+				<version>1.4.0</version>
 			</dependency>
 			<dependency>
 				<groupId>junit</groupId>

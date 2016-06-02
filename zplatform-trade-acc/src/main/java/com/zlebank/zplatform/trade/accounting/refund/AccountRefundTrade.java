@@ -39,6 +39,7 @@ import com.zlebank.zplatform.trade.service.ITxnsRefundService;
 import com.zlebank.zplatform.trade.utils.DateUtil;
 import com.zlebank.zplatform.trade.utils.OrderNumber;
 import com.zlebank.zplatform.trade.utils.SpringContext;
+import com.zlebank.zplatform.trade.utils.UUIDUtil;
 
 /**
  * Class Description
@@ -156,7 +157,10 @@ public class AccountRefundTrade implements IRefundTrade {
         //更新交易流水表交易位
         txnsLog.setRelate("01000000");
         txnsLog.setTradetxnflag("01000000");
-        txnsLog.setCashcode("");
+        txnsLog.setTradestatflag("00000001");
+        txnsLog.setRetdatetime(DateUtil.getCurrentDateTime());
+        txnsLog.setAccbusicode(BusinessEnum.REFUND_ACCOUNT.getBusiCode());
+        txnsLog.setTradeseltxn(UUIDUtil.uuid());
         //支付定单完成时间
         txnsLogService.update(txnsLog);
         return txnsLog.getPayordno();

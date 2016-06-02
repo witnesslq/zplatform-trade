@@ -10,17 +10,20 @@
  */
 package com.zlebank.zplatform.trade.utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpException;
 import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 
 import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.model.TxnsNotifyTaskModel;
 import com.zlebank.zplatform.trade.service.ITxnsNotifyTaskService;
+import com.zlebank.zplatform.trade.service.impl.InsteadPayNotifyTask;
 
 /**
  * Class Description
@@ -50,6 +53,24 @@ public class SynHttpRequestThread extends Thread{
         this.txnseqno = txnseqno;
         this.sendUrl = sendUrl;
         this.params = list;
+        txnsNotifyTaskService = (ITxnsNotifyTaskService) SpringContext.getContext().getBean("txnsNotifyTaskService");
+    }
+    
+    public SynHttpRequestThread(String memberId,String txnseqno,String sendUrl, InsteadPayNotifyTask task) {
+        super();
+        this.memberId = memberId;
+        this.txnseqno = txnseqno;
+        this.sendUrl = sendUrl;
+        BasicNameValuePair[] pairs =  new BasicNameValuePair[] { 
+                new BasicNameValuePair("data",task.getData()),
+                new BasicNameValuePair("addit",task.getAddit()),
+                new BasicNameValuePair("sign",task.getSign())
+                };
+        List<NameValuePair> qparams = new ArrayList<NameValuePair>();
+        for(int i=0;i<pairs.length;i++){
+            qparams.add(pairs[i]);
+        }
+        this.params = qparams;
         txnsNotifyTaskService = (ITxnsNotifyTaskService) SpringContext.getContext().getBean("txnsNotifyTaskService");
     }
     public void run(){

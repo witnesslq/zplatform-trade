@@ -12,9 +12,9 @@ package com.zlebank.zplatform.trade.insteadPay.message;
 
 import org.hibernate.validator.constraints.Length;
 
-import com.zlebank.zplatform.commons.validator.S;
 import com.zlebank.zplatform.commons.validator.Scontant;
 import com.zlebank.zplatform.trade.common.validator.N;
+import com.zlebank.zplatform.trade.common.validator.S;
 
 /**
  * 响应基类

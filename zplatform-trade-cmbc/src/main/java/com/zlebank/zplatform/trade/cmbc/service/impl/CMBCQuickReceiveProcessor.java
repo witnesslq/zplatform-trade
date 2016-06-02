@@ -11,7 +11,13 @@
 package com.zlebank.zplatform.trade.cmbc.service.impl;
 
 import java.net.URLEncoder;
+import java.util.Map;
+import java.util.TreeMap;
 
+import net.sf.json.JSONObject;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -20,6 +26,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.zlebank.zplatform.commons.dao.pojo.BusiTypeEnum;
 import com.zlebank.zplatform.commons.utils.RSAUtils;
 import com.zlebank.zplatform.commons.utils.StringUtil;
+import com.zlebank.zplatform.commons.utils.security.AESHelper;
+import com.zlebank.zplatform.commons.utils.security.AESUtil;
+import com.zlebank.zplatform.commons.utils.security.RSAHelper;
+import com.zlebank.zplatform.member.bean.MerchMK;
 import com.zlebank.zplatform.member.bean.enums.TerminalAccessType;
 import com.zlebank.zplatform.member.service.CoopInstiService;
 import com.zlebank.zplatform.member.service.MerchMKService;
@@ -34,6 +44,7 @@ import com.zlebank.zplatform.trade.bean.gateway.OrderAsynRespBean;
 import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
 import com.zlebank.zplatform.trade.dao.RspmsgDAO;
 import com.zlebank.zplatform.trade.factory.AccountingAdapterFactory;
+import com.zlebank.zplatform.trade.insteadPay.message.BaseMessage;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.model.TxnsOrderinfoModel;
 import com.zlebank.zplatform.trade.model.TxnsWithholdingModel;
@@ -42,6 +53,7 @@ import com.zlebank.zplatform.trade.service.ITradeReceiveProcessor;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
 import com.zlebank.zplatform.trade.service.ITxnsQuickpayService;
 import com.zlebank.zplatform.trade.service.ITxnsWithholdingService;
+import com.zlebank.zplatform.trade.service.impl.InsteadPayNotifyTask;
 import com.zlebank.zplatform.trade.utils.ConsUtil;
 import com.zlebank.zplatform.trade.utils.DateUtil;
 import com.zlebank.zplatform.trade.utils.ObjectDynamic;
@@ -59,6 +71,7 @@ import com.zlebank.zplatform.trade.utils.UUIDUtil;
  */
 @Service("cmbcQuickReceiveProcessor")
 public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
+	private static final Log log = LogFactory.getLog(CMBCQuickReceiveProcessor.class);
     @Autowired
     private ITxnsLogService txnsLogService;
     @Autowired
@@ -328,18 +341,21 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
 			        generateAsyncRespMessage(txnsLog.getTxnseqno());
 			if (orderResp.isResultBool()) {
 				if("000205".equals(gatewayOrderBean.getBiztype())){
-            		AnonOrderAsynRespBean respBean = (AnonOrderAsynRespBean) orderResp
-                            .getResultObj();
-                    new SynHttpRequestThread(
-                            gatewayOrderBean.getFirmemberno(),
+            		AnonOrderAsynRespBean respBean = (AnonOrderAsynRespBean) orderResp.getResultObj();
+            		
+            		InsteadPayNotifyTask task = new InsteadPayNotifyTask();
+            		//对匿名支付订单数据进行加密加签
+            		responseData(respBean, txnsLog.getAccfirmerno(), txnsLog.getAccsecmerno(), task);
+            		new SynHttpRequestThread(
+                            StringUtil.isNotEmpty(gatewayOrderBean.getSecmemberno())?gatewayOrderBean.getSecmemberno():gatewayOrderBean.getFirmemberno(),
                             gatewayOrderBean.getRelatetradetxn(),
                             gatewayOrderBean.getBackurl(),
-                            respBean.getNotifyParam()).start();
+                            task).start();
             	}else{
             		OrderAsynRespBean respBean = (OrderAsynRespBean) orderResp
                             .getResultObj();
                     new SynHttpRequestThread(
-                            gatewayOrderBean.getFirmemberno(),
+                    		StringUtil.isNotEmpty(gatewayOrderBean.getSecmemberno())?gatewayOrderBean.getSecmemberno():gatewayOrderBean.getFirmemberno(),
                             gatewayOrderBean.getRelatetradetxn(),
                             gatewayOrderBean.getBackurl(),
                             respBean.getNotifyParam()).start();
@@ -353,4 +369,58 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
     }
 
 	
+    private void responseData(AnonOrderAsynRespBean respBean, String coopInstCode,String merchNo,InsteadPayNotifyTask task) {
+        if (log.isDebugEnabled()) {
+            log.debug("【入参responseData】"+JSONObject.fromObject(respBean));
+        }
+        JSONObject jsonData = JSONObject.fromObject(respBean);
+        // 排序
+        Map<String, Object> map = new TreeMap<String, Object>();
+        map =(Map<String, Object>) JSONObject.toBean(jsonData, TreeMap.class);
+        jsonData = JSONObject.fromObject(map);
+        
+        JSONObject addit = new JSONObject();
+        addit.put("accessType", "1");
+        addit.put("coopInstiId", coopInstCode);
+        addit.put("merId", merchNo);
+        MerchMK merchMk = merchMKService.get(addit.getString("merId"));
+        RSAHelper rsa = new RSAHelper(merchMk.getMemberPubKey(), merchMk.getLocalPriKey());
+        String aesKey = null;
+        try {
+            aesKey = AESUtil.getAESKey();
+            if (log.isDebugEnabled()) {
+                log.debug("【AES KEY】" + aesKey);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        addit.put("encryKey", rsa.encrypt(aesKey));
+        addit.put("encryMethod", "01");
+
+        // 加签名
+        StringBuffer originData = new StringBuffer(addit.toString());//业务数据
+        originData.append(jsonData.toString());// 附加数据
+        if (log.isDebugEnabled()) {
+            log.debug("【应答报文】加签用字符串：" + originData.toString());
+        }
+        // 加签
+        String sign = rsa.sign(originData.toString());
+        AESHelper packer = new AESHelper(aesKey);
+        JSONObject rtnSign = new JSONObject();
+        rtnSign.put("signature", sign);
+        rtnSign.put("signMethod", "01");
+        
+        // 业务数据
+        task.setData(packer.pack(jsonData.toString()));
+        // 附加数据
+        task.setAddit(addit.toString());
+        // 签名数据
+        task.setSign(rtnSign.toString());
+        if (log.isDebugEnabled()) {
+            log.debug("【发送报文数据】【业务数据】："+task.getData());
+            log.debug("【发送报文数据】【附加数据】："+task.getAddit());
+            log.debug("【发送报文数据】【签名数据】："+ task.getSign());
+        }
+    }
+    
 }

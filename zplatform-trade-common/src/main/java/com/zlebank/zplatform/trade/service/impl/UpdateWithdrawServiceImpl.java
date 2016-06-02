@@ -125,7 +125,12 @@ public class UpdateWithdrawServiceImpl implements UpdateWithdrawService,UpdateSu
         tradeInfo.setCoopInstCode(txnsLog.getAccfirmerno());
         try {
         	log.info("提现账务数据："+JSON.toJSONString(tradeInfo));
+        	txnsLog.setAppordcommitime(DateUtil.getCurrentDateTime());
+        	txnsLog.setAppinst("000000000000");
+        	
             accEntryService.accEntryProcess(tradeInfo,entryEvent);
+            txnsLog.setApporderstatus("00");
+            txnsLog.setApporderinfo("提现账务处理成功");
         } catch (AccBussinessException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -144,6 +149,9 @@ public class UpdateWithdrawServiceImpl implements UpdateWithdrawService,UpdateSu
 		}
         //更新交易流水应用方信息
         txnsLogService.updateAppStatus(data.getTxnSeqNo(), txnsLog.getApporderstatus(), txnsLog.getApporderinfo());
+        txnsLog.setAppordfintime(DateUtil.getCurrentDateTime());
+        txnsLog.setAccbusicode(BusinessEnum.WITHDRAWALS.getBusiCode());
+        txnsLogService.update(txnsLog);
         log.info("提现交易账务处理开始，交易序列号:"+data.getTxnSeqNo());
     }
 

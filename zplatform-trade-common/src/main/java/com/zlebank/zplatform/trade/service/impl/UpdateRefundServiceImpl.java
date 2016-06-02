@@ -159,6 +159,8 @@ public class UpdateRefundServiceImpl implements UpdateRefundService, UpdateSubje
 		}
         //更新交易流水应用方信息
         txnsLogService.updateAppStatus(data.getTxnSeqNo(), txnsLog.getApporderstatus(), txnsLog.getApporderinfo());
+        txnsLog.setAccbusicode(BusinessEnum.REFUND_BANK.getBusiCode());
+        txnsLogService.update(txnsLog);
         log.info("退款账务结束，交易序列号:"+data.getTxnSeqNo());
     }
 
