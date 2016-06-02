@@ -28,6 +28,7 @@ import com.zlebank.zplatform.acc.exception.AccBussinessException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.commons.dao.pojo.AccStatusEnum;
+import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.trade.bean.UpdateData;
 import com.zlebank.zplatform.trade.bean.enums.BusinessEnum;
 import com.zlebank.zplatform.trade.bean.enums.TransferBusiTypeEnum;
@@ -84,7 +85,7 @@ public class UpdateWithdrawServiceImpl implements UpdateWithdrawService,UpdateSu
             log.error("不存在的提现信息,交易序列号："+data.getTxnSeqNo());
             return;
         }
-        TxnsOrderinfoModel orderinfo = txnsOrderinfoDAO.getOrderinfoByOrderNoAndMemberId(withdrawModel.getGatewayorderno(), withdrawModel.getMemberid());
+        TxnsOrderinfoModel orderinfo = txnsOrderinfoDAO.getOrderByTxnseqno(data.getTxnSeqNo());
         WithdrawEnum wdEnum=WithdrawEnum.fromValue(data.getResultCode());
         BusinessEnum businessEnum = null;
         
@@ -93,6 +94,11 @@ public class UpdateWithdrawServiceImpl implements UpdateWithdrawService,UpdateSu
         }else{
             withdrawModel.setStatus(WithdrawEnum.UNKNOW.getCode());
         }
+        withdrawModel.setTxntime(DateUtil.getCurrentDateTime());
+        withdrawModel.setFinishtime(DateUtil.getCurrentDateTime());
+        withdrawModel.setRetcode(data.getResultCode());
+        withdrawModel.setRetinfo(data.getResultMessage());
+        withdrawModel.setWithdrawinstid(data.getChannelCode());
         withdrawDao.merge(withdrawModel);
         EntryEvent entryEvent = null;
         if("00".equals(data.getResultCode())){

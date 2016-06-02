@@ -220,7 +220,7 @@
 											    	<input type="hidden" name="bankCode_" id="radio_bank_${i.index}" value="${fn:substring(card.bankcode,0, 4)}"/>
 											    	<input type="hidden" name="bankName" value="${card.bankname }"/>
 											    	<input type="hidden" id="cardNo_${i.index }"  value="${card.cardno }"/>
-											    	<input type="hidden" name="acctName_${i.index}" value="${card.accname }"/>
+											    	<input type="hidden" id="acctName_${i.index}" value="${card.accname }"/>
 											    </label>
 											</c:if>
 											<c:if test="${i.index!=0 }">
@@ -231,7 +231,7 @@
 											    	<input type="hidden" name="bankCode_" id="radio_bank_${i.index}" value="${fn:substring(card.bankcode,0, 4)}"/>
 											    	<input type="hidden" name="bankName" value="${card.bankname }"/>
 											    	<input type="hidden" id="cardNo_${i.index }"  value="${card.cardno }"/>
-											    	<input type="hidden" name="acctName_${i.index}" value="${card.accname }"/>
+											    	<input type="hidden" id="acctName_${i.index}" value="${card.accname }"/>
 											    </label>
 											</c:if>
 										</c:forEach>
@@ -580,7 +580,7 @@ $("#btn_next").click(function(){
 })
 
 $("#btnPay").click(function(){
-	var index=$("#bank_form input:checked ").attr("index");
+	var index=$("#withdraw_form input:checked ").attr("index");
 	var bankName=$("#bankName_"+index).val();
 	var cardNo=$("#cardNo_"+index).val();
 	var acctName=$("#acctName_"+index).val();
@@ -588,6 +588,7 @@ $("#btnPay").click(function(){
 	$("#cardNo").val(cardNo);
 	$("#acctName").val(acctName);
 	$("#withdraw_form").submit();
+	
 })
 function initBankPic(){
 	

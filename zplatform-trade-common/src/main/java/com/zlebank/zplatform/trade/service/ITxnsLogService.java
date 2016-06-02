@@ -13,6 +13,8 @@ package com.zlebank.zplatform.trade.service;
 import java.util.List;
 import java.util.Map;
 
+import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
+import com.zlebank.zplatform.acc.exception.AccBussinessException;
 import com.zlebank.zplatform.trade.bean.AccountTradeBean;
 import com.zlebank.zplatform.trade.bean.AppPartyBean;
 import com.zlebank.zplatform.trade.bean.PayPartyBean;
@@ -198,5 +200,5 @@ public interface ITxnsLogService extends IBaseService<TxnsLogModel, String>{
     /**
      * 定时处理资金结算任务
      */
-    public void excuteSetted();
+    public void excuteSetted() throws AccBussinessException, AbstractBusiAcctException, NumberFormatException;
 }

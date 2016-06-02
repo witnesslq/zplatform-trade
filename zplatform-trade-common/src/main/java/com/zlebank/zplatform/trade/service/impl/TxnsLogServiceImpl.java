@@ -679,7 +679,6 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
             	txnsLog.setAccordno(detail.getOrderId());
             }
             
-            //txnsLog.setAccordno(data.getRelatedorderno());
 
             txnsLog.setAcccoopinstino(coopInsti.getInstiCode());
             txnsLog.setAccfirmerno(data.getTranData().getMemberId());
@@ -914,7 +913,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
     }
     
     @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
-    public void excuteSetted(){
+    public void excuteSetted() throws AccBussinessException, AbstractBusiAcctException, NumberFormatException{
     	log.info("start excuteSetted Job");
     	List<Map<String, Object>> selfTxnList = (List<Map<String, Object>>) queryBySQL("SELECT * FROM T_SELF_TXN T WHERE STATUS = ? AND RESULT = ?", new Object[]{"9","03"});
     	if(selfTxnList.size()>0){
@@ -944,8 +943,6 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
                     }else{
                     	
                     }
-                    
-                    try {
     					TradeInfo tradeInfo = new TradeInfo();
     					tradeInfo.setBusiCode(txnsLog.getBusicode());
     					tradeInfo.setPayMemberId(payMemberId);
@@ -958,16 +955,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
     					tradeInfo.setCoopInstCode(txnsLog.getAcccoopinstino());
     					accEntryService.accEntryProcess(tradeInfo, EntryEvent.SETTED);
     					executeBySQL("UPDATE T_SELF_TXN SET RESULT=? WHERE TID = ?", new Object[]{"04",value.get("TID")});
-    				} catch (AccBussinessException e) {
-    					// TODO Auto-generated catch block
-    					e.printStackTrace();
-    				} catch (AbstractBusiAcctException e) {
-    					// TODO Auto-generated catch block
-    					e.printStackTrace();
-    				} catch (NumberFormatException e) {
-    					// TODO Auto-generated catch block
-    					e.printStackTrace();
-    				}
+    				
         		}
         		}
         		
