@@ -44,8 +44,8 @@ public class InsteadPay_Request extends BaseMessage{
     /**渠道类型**/
     @N(max=2,isNull=false)
     private String channelType;
+    @NotEmpty
     private String backUrl;
-
     
     public String getBatchNo() {
         return batchNo;
