@@ -81,8 +81,8 @@ import com.zlebank.zplatform.trade.utils.HibernateValidatorUtil;
  * @date 2015年11月20日 下午12:24:50
  * @since
  */
-/*@Controller
-@RequestMapping("interface")*/
+@Controller
+@RequestMapping("interface")
 public class InsteadPayController {
 
     private static final Log log = LogFactory.getLog(InsteadPayController.class);
@@ -141,7 +141,7 @@ public class InsteadPayController {
     }
 
     // 地址路由
-//    @RequestMapping("/insteadPayIndex.htm")
+    @RequestMapping("/insteadPayIndex.htm")
     public ModelAndView index(String data, HttpSession httpSession, HttpServletResponse response){
         PrintWriter responseStream = getPrintWriter(response);
         if (log.isDebugEnabled()) {
@@ -263,6 +263,9 @@ public class InsteadPayController {
        // 检查代付明细
        StringBuilder errorMsgDetail = new StringBuilder();
        for (InsteadPayFile file : requestBean.getFileContent()) {
+           if (StringUtil.isEmpty(file.getBankCode())) {
+               file.setBankCode("000000000000");
+           }
            // 校验报文bean数据
            String error = HibernateValidatorUtil.validateBeans(file);
            if (StringUtil.isNotEmpty(error)) {
