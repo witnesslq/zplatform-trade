@@ -11,6 +11,8 @@
 package com.zlebank.zplatform.trade.dao.impl;
 
 
+import java.util.List;
+
 import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
@@ -50,4 +52,17 @@ public class ConfigInfoDAOImpl extends HibernateBaseDAOImpl<ConfigInfoModel> imp
         long maxId = (long)(query.addScalar("nextvalue", StandardBasicTypes.LONG) ).uniqueResult();
          return  maxId;
        }
+
+    /**
+     *  根据参数名称得到配置信息列表
+     * @param paraName
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<ConfigInfoModel> getConfigListByParaName(String paraName) {
+        Criteria crite= this.getSession().createCriteria(ConfigInfoModel.class);
+        crite.add(Restrictions.eq("paraname", paraName));
+        return crite.list();
+    }
 }

@@ -18,6 +18,8 @@ import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.zlebank.zplatform.commons.utils.StringUtil;
+
 /**
  * 执行代付任务
  *
@@ -59,16 +61,19 @@ public class ExecuteInsteadPayTaskQueue implements Runnable{
      */
     private void sendHttpPost(InsteadPayNotifyTask trade, String url) {
 //        System.out.println("以下数据发送成功！");
-//        System.out.println("URL："+ url);
-//        System.out.println("Data：" + jsonData);
+        System.out.println("URL："+ url);
+        System.out.println("Data：" + trade.getData());
 //        url = "http://localhost:8080/zplatform-merportal-api/mock/notify.htm";
         try {
+            
             PostMethod post = null;
             post = new PostMethod(url);
             post.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
             post.addParameter("data", trade.getData());
-            post.addParameter("addit", trade.getAddit());
-            post.addParameter("sign", trade.getSign());
+            if(StringUtil.isNotEmpty(trade.getAddit()))
+                post.addParameter("addit", trade.getAddit());
+            if(StringUtil.isNotEmpty(trade.getSign()))
+                post.addParameter("sign", trade.getSign());
             post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET,"utf-8");  
             HttpClient client = new HttpClient();
             client.getHttpConnectionManager().getParams().setSoTimeout(10000);// 10秒过期

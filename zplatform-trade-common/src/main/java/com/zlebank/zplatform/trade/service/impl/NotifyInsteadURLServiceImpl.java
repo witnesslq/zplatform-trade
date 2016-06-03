@@ -10,6 +10,7 @@
  */
 package com.zlebank.zplatform.trade.service.impl;
 
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.BlockingQueue;
@@ -41,11 +42,13 @@ import com.zlebank.zplatform.member.pojo.PojoMember;
 import com.zlebank.zplatform.member.service.CoopInstiService;
 import com.zlebank.zplatform.member.service.MemberService;
 import com.zlebank.zplatform.member.service.MerchMKService;
+import com.zlebank.zplatform.trade.dao.ConfigInfoDAO;
 import com.zlebank.zplatform.trade.dao.InsteadPayBatchDAO;
 import com.zlebank.zplatform.trade.dao.InsteadPayDetailDAO;
 import com.zlebank.zplatform.trade.insteadPay.message.BaseMessage;
 import com.zlebank.zplatform.trade.insteadPay.message.InsteadPayQuery_Request;
 import com.zlebank.zplatform.trade.insteadPay.message.InsteadPayQuery_Response;
+import com.zlebank.zplatform.trade.model.ConfigInfoModel;
 import com.zlebank.zplatform.trade.model.PojoInsteadPayBatch;
 import com.zlebank.zplatform.trade.service.InsteadPayService;
 import com.zlebank.zplatform.trade.service.NotifyInsteadURLService;
@@ -80,6 +83,9 @@ public class NotifyInsteadURLServiceImpl implements NotifyInsteadURLService,  Ap
     
     @Autowired
     private MerchMKService merchMKService;
+    
+    @Autowired
+    private ConfigInfoDAO configInfoDAO;
     
     // 线程数量
     private static final int THREAD_NUM = 1;
@@ -125,8 +131,22 @@ public class NotifyInsteadURLServiceImpl implements NotifyInsteadURLService,  Ap
         if (StringUtil.isEmpty(batch.getNotifyUrl()) || RegExpValidatorUtil.IsUrl(batch.getNotifyUrl())) {
             // 添加一个代付任务
             InsteadPayNotifyTask task = new InsteadPayNotifyTask();
-            responseData(responseBean,task);
-//            task.setData(data);
+            // 组织报文 TODO: 旧版本兼容
+            List<ConfigInfoModel> configList = configInfoDAO.getConfigListByParaName("INSTEAD_PAY_NOTIFY_MER_NO_V1");
+            boolean isOld = false;
+            for (ConfigInfoModel model : configList) {
+                if (requestBean.getMerId().equals(model.getPara())) {
+                    isOld = true;
+                }
+            }
+            if (isOld) {
+                // 旧版本异步通知
+                responseData_V1(responseBean, task);
+            } else {
+                // 新版本异步通知
+                responseData(responseBean,task);    
+            }
+            
             task.setUrl(batch.getNotifyUrl());
             taskQueue.add(task);
         } else {
@@ -194,6 +214,35 @@ public class NotifyInsteadURLServiceImpl implements NotifyInsteadURLService,  Ap
             log.debug("【发送报文数据】【附加数据】："+task.getAddit());
             log.debug("【发送报文数据】【签名数据】："+ task.getSign());
         }
+    }
+    
+    /**
+     * 返回数据（同步response）【旧版本】
+     * @param responseStream
+     * @param bean
+     */
+    @SuppressWarnings("unchecked")
+    private void responseData_V1(BaseMessage bean, InsteadPayNotifyTask task) {
+        JSONObject jsonData = JSONObject.fromObject(bean);
+        jsonData.put("signature", "");
+        // 排序
+        Map<String, Object> map = new TreeMap<String, Object>();
+        map =(Map<String, Object>) JSONObject.toBean(jsonData, TreeMap.class);
+        jsonData = JSONObject.fromObject(map);
+
+        // 加签名
+        if (log.isDebugEnabled()) {
+            log.debug("【应答报文】加签用ID：" + bean.getMerId());
+            log.debug("【应答报文】加签原数据：" + jsonData.toString());
+        }
+        String signature  = merchMKService.sign(bean.getMerId(), jsonData.toString());
+        jsonData.put("signature", signature);
+        // 返回数据
+        if (log.isDebugEnabled()) {
+            log.debug("【应答报文】返回数据："+jsonData.toString());
+        }
+        // 业务数据
+        task.setData(jsonData.toString());
     }
 
     /**
