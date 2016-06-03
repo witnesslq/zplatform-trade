@@ -89,4 +89,12 @@ public interface BankTransferDataDAO  extends BaseDAO<PojoBankTransferData>{
      * @param transferDataList
      */
     public void batchUpdateBossPayTransData(List<PojoBankTransferData> transferDataList) ;
+    
+    
+    /**
+     * 更新转账数据的状态
+     * @param bankTranBatchId
+     * @param status
+     */
+    public void updateBankTransferStatus(String bankTranBatchId,String status);
 }

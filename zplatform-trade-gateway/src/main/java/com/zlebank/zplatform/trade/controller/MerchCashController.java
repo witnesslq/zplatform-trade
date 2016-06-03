@@ -540,7 +540,7 @@ public class MerchCashController {
                 withdraw.setAcctno(card.getCardno());*/
             }
             //txnsWithdrawService.saveWithdraw(withdraw);
-            gateWayService.updateOrderToStartPay(tradeBean.getOrderId());
+            gateWayService.updateOrderToStartPay(tradeBean.getTxnseqno());
             model.put(
                     "suburl",
                     orderinfo.getFronturl()

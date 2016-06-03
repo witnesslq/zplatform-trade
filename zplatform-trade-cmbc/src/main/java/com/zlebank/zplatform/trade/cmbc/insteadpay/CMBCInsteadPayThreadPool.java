@@ -20,7 +20,7 @@ public class CMBCInsteadPayThreadPool implements IInsteadPayTrade{
 	}
 
 	@Override
-	@Transactional(propagation=Propagation.REQUIRED)
+	@Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
 	public ResultBean batchPay(String batchNo) {
 		return transferService.batchTransfer(Long.valueOf(batchNo));
 	}

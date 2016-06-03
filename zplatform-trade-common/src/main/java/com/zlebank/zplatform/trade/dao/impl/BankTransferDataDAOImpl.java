@@ -382,6 +382,20 @@ HibernateBaseDAOImpl<PojoBankTransferData>
 	}
 	
 	
-
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+	public void updateBankTransferStatus(String bankTranBatchId,String status) {
+		
+		 try {
+	            String hql = "update PojoBankTransferData set status = ? where bankTranBatch.tid = ?";
+	            Session session = getSession();
+	            Query query = session.createQuery(hql);
+	            query.setParameter(0, status);
+	            query.setParameter(1, Long.valueOf(bankTranBatchId));
+	            query.executeUpdate();
+	        } catch (HibernateException e) {
+	            // TODO Auto-generated catch block
+	            e.printStackTrace();
+	        }
+	}
 	
 }

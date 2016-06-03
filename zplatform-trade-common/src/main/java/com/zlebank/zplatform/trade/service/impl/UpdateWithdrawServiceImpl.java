@@ -150,6 +150,7 @@ public class UpdateWithdrawServiceImpl implements UpdateWithdrawService,UpdateSu
         //更新交易流水应用方信息
         txnsLogService.updateAppStatus(data.getTxnSeqNo(), txnsLog.getApporderstatus(), txnsLog.getApporderinfo());
         txnsLog.setAppordfintime(DateUtil.getCurrentDateTime());
+        txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
         txnsLog.setAccbusicode(BusinessEnum.WITHDRAWALS.getBusiCode());
         txnsLogService.update(txnsLog);
         log.info("提现交易账务处理开始，交易序列号:"+data.getTxnSeqNo());

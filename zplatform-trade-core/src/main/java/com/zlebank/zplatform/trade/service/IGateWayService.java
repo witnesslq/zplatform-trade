@@ -74,8 +74,7 @@ public interface IGateWayService extends IBaseService<TxnsOrderinfoModel, Long>{
     public void saveSuccessReaPayTrade(String txnseqno,String gateWayOrderNo,ReaPayResultBean payResultBean);
     public void saveFailReaPayTrade(String txnseqno,String gateWayOrderNo,ReaPayResultBean payResultBean);
     public ResultBean decryptCustomerInfo(String memberId,String encryptData);
-    @Deprecated
-    public void updateOrderToStartPay(String orderNo) throws TradeException;
+    public void updateOrderToStartPay(String txnseqno) throws TradeException;
     public ResultBean verifyQueryOrder(QueryBean queryBean);
     public ResultBean generateQueryResultBean(QueryResultBean queryResultBean);
     public String dealWithWebOrder(OrderBean order,RiskRateInfoBean riskRateInfoBean) throws TradeException;

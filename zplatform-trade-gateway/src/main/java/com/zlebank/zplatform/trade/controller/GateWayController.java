@@ -1499,11 +1499,7 @@ public class GateWayController {
                 model.put("txnseqno", tradeBean.getTxnseqno());
                 return new ModelAndView("/erro_gw", model);
             }
-            //TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(orderinfo.getRelatetradetxn());
-            
             TxnsWithdrawModel withdraw = new TxnsWithdrawModel(tradeBean);
-            //withdraw.setBankcode(cardMap.get("BANKCODE")+"");
-            //withdraw.setBankname(cardMap.get("BANKNAME")+"");
             //记录提现账务
             TradeInfo tradeInfo = new TradeInfo();
             tradeInfo.setBusiCode("30000001");
@@ -1522,7 +1518,7 @@ public class GateWayController {
                 withdraw.setAcctno(card.getCardno());*/
             }
             txnsWithdrawService.saveWithdraw(withdraw);
-            gateWayService.updateOrderToStartPay(tradeBean.getOrderId());
+            gateWayService.updateOrderToStartPay(tradeBean.getTxnseqno());
             model.put(
                     "suburl",
                     orderinfo.getFronturl()
