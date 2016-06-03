@@ -52,6 +52,7 @@ import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.trade.bean.UpdateData;
 import com.zlebank.zplatform.trade.bean.enums.BusinessEnum;
 import com.zlebank.zplatform.trade.bean.enums.InsteadPayDetailStatusEnum;
+import com.zlebank.zplatform.trade.bean.enums.RefundStatusEnum;
 import com.zlebank.zplatform.trade.bean.enums.TransferBusiTypeEnum;
 import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
@@ -110,8 +111,14 @@ public class UpdateRefundServiceImpl implements UpdateRefundService, UpdateSubje
 		if ("00".equals(data.getResultCode())) {
 			refund.setStatus(InsteadPayDetailStatusEnum.TRAN_FINISH.getCode());
 			order.setStatus("00");
-        } else {
-            refund.setStatus("29");
+        } else if("01".equals(data.getResultCode())) {//划拨拒绝
+            refund.setStatus(RefundStatusEnum.TRAN_REFUSE.getCode());
+            order.setStatus("03");
+        }else if("02".equals(data.getResultCode())){//
+        	refund.setStatus(RefundStatusEnum.BANK_TRAN_REFUSE.getCode());
+            order.setStatus("03");
+        }else if("03".equals(data.getResultCode())){
+        	refund.setStatus(RefundStatusEnum.FAILED.getCode());
             order.setStatus("03");
         }
         

@@ -118,6 +118,9 @@ HibernateBaseDAOImpl<PojoBankTransferData>
         for (PojoBankTransferData data : transferDataList) {
             Query query = session.createQuery(hqlBuffer.toString());
             PojoBankTransferData data_old = getTransferDataByTranId(data.getBankTranDataSeqNo());
+            if(data_old==null){
+            	continue;
+            }
             query.setParameter(0, data.getBankTranResNo());
             query.setParameter(1, data.getResType());
             query.setParameter(2, data.getResCode());
@@ -299,11 +302,13 @@ HibernateBaseDAOImpl<PojoBankTransferData>
         Criteria crite = this.getSession().createCriteria(
                 PojoBankTransferData.class);
         crite.add(Restrictions.eq("bankTranDataSeqNo", bankTranDataSeqNo));
+        
        return  (PojoBankTransferData) crite.uniqueResult();
     }
     
     public static void main(String[] args) {
-        System.out.println(UUID.randomUUID());
+    	Object object = null;
+        System.out.println((String)object);
     }
     
     /**
@@ -397,5 +402,7 @@ HibernateBaseDAOImpl<PojoBankTransferData>
 	            e.printStackTrace();
 	        }
 	}
+	
+	
 	
 }

@@ -830,7 +830,7 @@ public class GateWayController {
         tradeBean.setOrderId(orderNo);
         tradeBean.setReaPayOrderNo(reapayOrderNo);
         model.put("trade", tradeBean);
-         return new ModelAndView("/fastpay/pay_jump", model);
+        return new ModelAndView("/fastpay/pay_jump", model);
     }
     @RequestMapping("/payment.htm")
     public ModelAndView payJumpCMBC(String orderNo, String txnseqno,String reapayOrderNo ){
@@ -846,7 +846,7 @@ public class GateWayController {
     
     @RequestMapping("/queryReaPayTrade")
     @ResponseBody
-    public Object queryReaPayTrade(String orderNo) {
+    public Object queryReaPayTrade(String orderNo,String txnseqno) {
         IQuickPayTrade quickPayTrade = null;
         try {
             quickPayTrade = TradeAdapterFactory.getInstance()
@@ -872,6 +872,19 @@ public class GateWayController {
         int[] timeArray = new int[]{1000, 2000, 8000, 16000, 32000};
         try {
             for (int i = 0; i < 5; i++) {
+            	
+            	//先查询交易流水表
+            	TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(txnseqno);
+            	if("0000".equals(txnsLog.getPayretcode())||"3006".equals(txnsLog.getPayretcode())||"3053".equals(txnsLog.getPayretcode())||"3054".equals(txnsLog.getPayretcode())||
+                        "3056".equals(txnsLog.getPayretcode())||"3083".equals(txnsLog.getPayretcode())||"3081".equals(txnsLog.getPayretcode())){
+                    //返回这些信息时，表示融宝已经接受到交易请求，但是没有同步处理，等待异步通知
+                    
+                   
+                }else{
+                    //订单状态更新为失败
+                	return "failed";
+                }
+            	
                 Thread.sleep(timeArray[i]);
                 queryResultBean = quickPayTrade.queryTrade(trade);
                 payResult = (ReaPayResultBean) queryResultBean.getResultObj();

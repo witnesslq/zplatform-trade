@@ -210,6 +210,9 @@ public class InsteadBatchServiceImpl extends AbstractBasePageService<InsteadPayB
             } else {
                 batch.setStatus(InsteadPayBatchStatusEnum.PART_APPROVED.getCode());
             }
+            if (insteadPayDetailDAO.isBatchProcessFinished(batch.getId())) {
+            	batch.setStatus(InsteadPayBatchStatusEnum.ALL_FINISH.getCode());
+            }
             insteadPayBatchDAO.merge(batch);
         } else {
             // 审核拒绝时
@@ -252,6 +255,9 @@ public class InsteadBatchServiceImpl extends AbstractBasePageService<InsteadPayB
                 batch.setStatus(InsteadPayBatchStatusEnum.ALL_APPROVED.getCode());
             } else {
                 batch.setStatus(InsteadPayBatchStatusEnum.PART_APPROVED.getCode());
+            }
+            if (insteadPayDetailDAO.isBatchProcessFinished(batch.getId())) {
+            	batch.setStatus(InsteadPayBatchStatusEnum.ALL_FINISH.getCode());
             }
             insteadPayBatchDAO.merge(batch);
             

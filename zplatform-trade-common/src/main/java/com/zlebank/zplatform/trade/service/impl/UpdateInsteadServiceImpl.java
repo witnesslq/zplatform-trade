@@ -55,10 +55,12 @@ import com.zlebank.zplatform.member.service.MemberService;
 import com.zlebank.zplatform.trade.bean.AppPartyBean;
 import com.zlebank.zplatform.trade.bean.UpdateData;
 import com.zlebank.zplatform.trade.bean.enums.BusinessEnum;
+import com.zlebank.zplatform.trade.bean.enums.InsteadPayBatchStatusEnum;
 import com.zlebank.zplatform.trade.bean.enums.InsteadPayDetailStatusEnum;
 import com.zlebank.zplatform.trade.bean.enums.TransferBusiTypeEnum;
 import com.zlebank.zplatform.trade.dao.InsteadPayBatchDAO;
 import com.zlebank.zplatform.trade.dao.InsteadPayDetailDAO;
+import com.zlebank.zplatform.trade.model.PojoInsteadPayBatch;
 import com.zlebank.zplatform.trade.model.PojoInsteadPayDetail;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
@@ -117,15 +119,18 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
             log.error("没有找到需要记账的流水");
             return;
         }
-        if ("00".equals(data.getResultCode())) {
+        if ("00".equals(data.getResultCode())) {//交易成功
             detail.setRespCode(data.getResultCode());
             detail.setStatus(InsteadPayDetailStatusEnum.TRAN_FINISH.getCode());
-        } else if("09".equals(data.getResultCode())) {
-            detail.setRespCode("09");
+        } else if("03".equals(data.getResultCode())) {//交易失败
+            detail.setRespCode("03");
             detail.setStatus(InsteadPayDetailStatusEnum.TRAN_FAILED.getCode());
-        }else if("02".equals(data.getResultCode())) {
-            detail.setRespCode("09");
-            detail.setStatus(InsteadPayDetailStatusEnum.TRAN_FAILED.getCode());
+        }else if("01".equals(data.getResultCode())) {//划拨拒绝
+            detail.setRespCode("01");
+            detail.setStatus(InsteadPayDetailStatusEnum.TRAN_REFUSE.getCode());
+        }else if("02".equals(data.getResultCode())){//转账拒绝
+        	detail.setRespCode("02");
+            detail.setStatus(InsteadPayDetailStatusEnum.BANK_TRAN_REFUSE.getCode());
         }
         detail.setRespMsg(data.getResultMessage());
         insteadPayDetailDAO.merge(detail);
@@ -200,6 +205,9 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
 			// 如果批次已经全部处理完毕，则添加到通知
 			if (insteadPayDetailDAO.isBatchProcessFinished(detail.getInsteadPayBatch().getId())) {
 			    notifyInsteadURLService.addInsteadPayTask(detail.getInsteadPayBatch().getId());
+			    PojoInsteadPayBatch batch = insteadPayBatchDAO.getByBatchId(detail.getInsteadPayBatch().getId());
+			    batch.setStatus(InsteadPayBatchStatusEnum.ALL_FINISH.getCode());
+			    insteadPayBatchDAO.merge(batch);
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

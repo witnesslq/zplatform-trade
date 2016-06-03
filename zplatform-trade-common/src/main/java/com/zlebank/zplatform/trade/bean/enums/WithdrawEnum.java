@@ -10,6 +10,12 @@ package com.zlebank.zplatform.trade.bean.enums;
  * @since
  */
 public enum WithdrawEnum {
+	
+	/**
+	 * 状态(01:待初审，09初审未过，11：待复审，19：复审未过，21：等待批处理，29：批处理失败，00：提现成功,39：划拨拒绝,49:转账拒绝)
+	 */
+	
+	
     /**待初审**/
     FIRSTTRIAL("01",""),
     /**初审未过**/
@@ -24,8 +30,11 @@ public enum WithdrawEnum {
     BATCHFAILURE("29",""),
     /**提现成功**/
     SUCCESS("00",""),
-    /**自行终止**/
-    STOP("39",""),
+    /**划拨拒绝**/
+    TRAN_REFUSED("39",""),
+    /**转账拒绝**/
+    BANK_TRAN_REFUSED("49",""),
+    
     /**未知代码**/
     UNKNOW("99","");
     private String code;

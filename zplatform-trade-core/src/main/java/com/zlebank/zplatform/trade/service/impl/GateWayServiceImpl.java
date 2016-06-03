@@ -1414,6 +1414,7 @@ public class GateWayServiceImpl extends
 		txnsLog.setPayrettsnseqno(payResultBean.getTrade_no());
 		txnsLog.setPayretcode(payResultBean.getResult_code());
 		txnsLog.setPayretinfo(payResultBean.getResult_msg());
+		txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
 		txnsLogService.update(txnsLog);
 
 		TxnsOrderinfoModel orderinfo = super.findByProperty("orderno",

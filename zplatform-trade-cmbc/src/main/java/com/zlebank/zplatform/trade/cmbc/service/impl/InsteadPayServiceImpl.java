@@ -435,6 +435,9 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
             //更新对应业务的数据，调用业务处理接口
             dealWithBusiData(resultList);
             PojoTxnsInsteadPay txnsInsteadPay = txnsInsteadPayDAO.getByResponseFileName(fileName);
+            if(txnsInsteadPay==null){
+            	return ;
+            }
             //更新转账批次数据
             PojoBankTransferBatch transferBatch = bankTransferBatchDAO.getByBankTranBatchNo(Long.valueOf(txnsInsteadPay.getInsteadPayNo()));
             if(transferBatch!=null){
@@ -465,6 +468,9 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
     public void dealWithBusiData(List<PojoBankTransferData> transferDataList){
     	for (PojoBankTransferData data : transferDataList) {
             PojoBankTransferData transferData = bankTransferDataDAO.getTransferDataByTranId(data.getBankTranDataSeqNo());
+            if(transferData==null){
+            	continue;
+            }
             UpdateData updateData = new UpdateData();
             updateData.setTxnSeqNo(transferData.getTranData().getTxnseqno());
             updateData.setResultCode("S".equalsIgnoreCase(data.getResType())? "00": "03");

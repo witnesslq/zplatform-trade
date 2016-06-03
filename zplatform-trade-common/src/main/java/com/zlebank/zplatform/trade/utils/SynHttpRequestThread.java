@@ -20,6 +20,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
 import com.alibaba.fastjson.JSON;
+import com.zlebank.zplatform.commons.utils.HibernateValidatorUtil;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.model.TxnsNotifyTaskModel;
 import com.zlebank.zplatform.trade.service.ITxnsNotifyTaskService;
@@ -109,7 +110,7 @@ public class SynHttpRequestThread extends Thread{
                     }
                     http.closeConnection();
                     if(i==0){
-                        TxnsNotifyTaskModel task = new TxnsNotifyTaskModel( memberId, txnseqno, (i+1), 5, JSON.toJSONString(params), sendStatus, resultBean.getErrCode(), sendUrl,"1");
+                        TxnsNotifyTaskModel task = new TxnsNotifyTaskModel( memberId, txnseqno, (i+1), 5, "", sendStatus, resultBean.getErrCode(), sendUrl,"1");
                         txnsNotifyTaskService.saveTask(task);
                     }else {
                         TxnsNotifyTaskModel task = new TxnsNotifyTaskModel();

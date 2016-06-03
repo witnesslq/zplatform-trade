@@ -86,32 +86,41 @@ public class UpdateWithdrawServiceImpl implements UpdateWithdrawService,UpdateSu
             return;
         }
         TxnsOrderinfoModel orderinfo = txnsOrderinfoDAO.getOrderByTxnseqno(data.getTxnSeqNo());
-        WithdrawEnum wdEnum=WithdrawEnum.fromValue(data.getResultCode());
         BusinessEnum businessEnum = null;
         
-        if (wdEnum.getCode().equals(data.getResultCode())) {
-            withdrawModel.setStatus(wdEnum.getCode());
-        }else{
-            withdrawModel.setStatus(WithdrawEnum.STOP.getCode());
+        EntryEvent entryEvent = null;
+        if("00".equals(data.getResultCode())){
+        	businessEnum = BusinessEnum.WITHDRAWALS;
+        	orderinfo.setStatus("00");
+        	entryEvent = EntryEvent.TRADE_SUCCESS;
+        	withdrawModel.setStatus(WithdrawEnum.SUCCESS.getCode());
+        	log.info("提现交易成功，交易序列号:"+data.getTxnSeqNo());
+        }else if("01".equals(data.getResultCode())){
+        	businessEnum = BusinessEnum.WITHDRAWALS;
+        	orderinfo.setStatus("03");
+        	entryEvent = EntryEvent.TRADE_FAIL;
+        	withdrawModel.setStatus(WithdrawEnum.TRAN_REFUSED.getCode());
+        	log.info("提现交易划拨拒绝，交易序列号:"+data.getTxnSeqNo());
+        }else if("02".equals(data.getResultCode())){
+        	businessEnum = BusinessEnum.WITHDRAWALS;
+        	orderinfo.setStatus("03");
+        	entryEvent = EntryEvent.TRADE_FAIL;
+        	withdrawModel.setStatus(WithdrawEnum.BANK_TRAN_REFUSED.getCode());
+        	log.info("提现交易转账拒绝，交易序列号:"+data.getTxnSeqNo());
+        }else if("03".equals(data.getResultCode())){
+        	businessEnum = BusinessEnum.WITHDRAWALS;
+        	orderinfo.setStatus("03");
+        	entryEvent = EntryEvent.TRADE_FAIL;
+        	withdrawModel.setStatus(WithdrawEnum.BATCHFAILURE.getCode());
         }
+        
         withdrawModel.setTxntime(DateUtil.getCurrentDateTime());
         withdrawModel.setFinishtime(DateUtil.getCurrentDateTime());
         withdrawModel.setRetcode(data.getResultCode());
         withdrawModel.setRetinfo(data.getResultMessage());
         withdrawModel.setWithdrawinstid(data.getChannelCode());
         withdrawDao.merge(withdrawModel);
-        EntryEvent entryEvent = null;
-        if("00".equals(data.getResultCode())){
-        	businessEnum = BusinessEnum.WITHDRAWALS;
-        	orderinfo.setStatus("00");
-        	entryEvent = EntryEvent.TRADE_SUCCESS;
-        	log.info("提现交易成功，交易序列号:"+data.getTxnSeqNo());
-        }else{
-        	businessEnum = BusinessEnum.WITHDRAWALS;
-        	orderinfo.setStatus("03");
-        	entryEvent = EntryEvent.TRADE_FAIL;
-        	log.info("提现交易失败，交易序列号:"+data.getTxnSeqNo());
-        }
+        
         TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(data.getTxnSeqNo());
         //更新订单信息
         txnsOrderinfoDAO.update(orderinfo);
