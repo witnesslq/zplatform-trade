@@ -1359,9 +1359,9 @@ public class GateWayServiceImpl extends
 			throw new TradeException("T018");
 		}
 		try {
-			TxnsWithdrawModel withdraw = new TxnsWithdrawModel(withdrawBean,
-					withdrawAccBean);
+			TxnsWithdrawModel withdraw = new TxnsWithdrawModel(withdrawBean,withdrawAccBean);
 			withdraw.setTexnseqno(txnsLog.getTxnseqno());
+			withdraw.setFee(txnsLog.getTxnfee());
 			txnsWithdrawService.saveEntity(withdraw);
 			return orderinfo.getTn();
 		} catch (Exception e) {
