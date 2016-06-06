@@ -1309,6 +1309,7 @@ public class GateWayServiceImpl extends
 			txnsLog.setAccordcommitime(withdrawBean.getTxnTime());
 			txnsLog.setTradestatflag("00000000");// 交易初始状态
 			txnsLog.setAccmemberid(withdrawBean.getMemberId());
+			txnsLog.setTxnfee(txnsLogService.getTxnFee(txnsLog));
 			txnsLogService.save(txnsLog);
 
 			// 提现账务处理
