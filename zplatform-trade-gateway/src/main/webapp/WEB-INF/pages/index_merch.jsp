@@ -87,7 +87,7 @@ String path = request.getContextPath();
 
 					
 					<a name="a_pay_type" href="javascript:selectPay(1);" id="a_fast" class="cur"><span>快捷支付</span></a>
-					<a name="a_pay_type" href="javascript:selectPay(2);" id="a_bank"><span>网银支付</span></a>
+					<!-- <a name="a_pay_type" href="javascript:selectPay(2);" id="a_bank"><span>网银支付</span></a> -->
 					<!--<a name="a_pay_type" href="javascript:selectPay(4);"><span>提现</span></a> -->
 					<script type="text/javascript">
 						$(function() {

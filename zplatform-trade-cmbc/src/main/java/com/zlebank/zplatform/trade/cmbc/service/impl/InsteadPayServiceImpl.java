@@ -107,7 +107,7 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
         List<PojoBankTransferData> transferDataList =  bankTransferDataDAO.findTransDataByBatchNo(batchNo);
         //判断代付交易流水中师傅已经上传过文件
         if(txnsInsteadPayDAO.isUpload(batchNo+"")){
-        	throw new TradeException("");
+        	throw new TradeException("T000","代付流水文件已上传");
         }
         Long sumAmt = 0L;
         Long sumItem = 0L;
@@ -181,7 +181,7 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
 			e.printStackTrace();
 			PojoTxnsInsteadPay txnsInsteadPay = new PojoTxnsInsteadPay(batchNo+"", transferBatch.getChannel().getBankChannelCode(), "01", fileName, resFileName, new Date(), null, "01", "");
 	        txnsInsteadPayDAO.saveA(txnsInsteadPay);
-	        return ;
+	        throw new TradeException("T000","FTP客户连接失败");
 		}
         //修改批次状态为正在支付
         bankTransferBatchDAO.updateBatchTranStatus(batchNo, "05");

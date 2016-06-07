@@ -72,11 +72,13 @@ public class CMBCQuickPayServiceImpl implements ICMBCQuickPayService{
         } catch (TradeException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+            resultBean = new ResultBean(e.getCode(), e.getMessage());
         } catch (CMBCTradeException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+            resultBean = new ResultBean(e.getCode(), e.getMessage());
         }
-        return new ResultBean("success");
+        return resultBean;
     }
     
     @SuppressWarnings("unchecked")
@@ -113,6 +115,7 @@ public class CMBCQuickPayServiceImpl implements ICMBCQuickPayService{
         } catch (InterruptedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+            resultBean = new ResultBean("09", e.getMessage());
         }
         
         return resultBean;

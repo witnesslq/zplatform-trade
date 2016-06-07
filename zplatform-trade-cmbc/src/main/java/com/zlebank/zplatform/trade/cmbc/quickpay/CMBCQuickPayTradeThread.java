@@ -154,13 +154,13 @@ public class CMBCQuickPayTradeThread implements IQuickPayTrade {
 					.saveCMBCOuterWithholding(trade);
 			resultBean = cmbcQuickPayService.crossLineWithhold(trade);
 			if (resultBean.isResultBool()) {
-				TxnsWithholdingModel withholding = (TxnsWithholdingModel) resultBean
-						.getResultObj();
+				TxnsWithholdingModel withholding = (TxnsWithholdingModel) resultBean.getResultObj();
 				// 更新快捷交易流水
 				txnsQuickpayService.updateCMBCWithholdingResult(withholding,
 						payorderno);
 			} else {// 交易失败
-
+				txnsOrderinfoDAO.updateOrderToFail(tradeBean.getTxnseqno());
+				resultBean = new ResultBean("T000", "交易失败");
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
