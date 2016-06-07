@@ -1,0 +1,8 @@
+/target/
+
+/.settings/
+/*.bat
+/bin/
+.classpath
+/target/
+/target/

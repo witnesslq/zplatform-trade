@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context-3.0.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.1.xsd">
+	<!--启用注解 -->
+	<context:annotation-config />
+	<aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+	<!-- 引入属性文件Hibernate属性配置 -->
+	<context:property-placeholder location="classpath:*.properties" />
+	<context:component-scan base-package="com.zlebank.zplatform"></context:component-scan>
+	<bean id="springContext" class="com.zlebank.zplatform.trade.utils.SpringContext"></bean>
+
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<ref bean="reconJobTrigger"/> 
+				<ref bean="cmbcTrigger1"/> 
+				<!-- <ref bean="simpleTrigger" /> -->
+				<!-- <ref bean="simpleTrigger2" />  转移到DB-->
+				<!-- <ref bean="simpleTrigger3" /> 
+				<ref bean="cmbcTrigger1"/> 
+				
+				<ref bean="insteadPayAccountingTrigger"/>   -->
+				<!-- <ref bean="cmbcTestTrigger"/> -->
+				
+			</list>
+		</property>
+	</bean>
+	<!-- 冻结时间任务触发器
+	<bean id="simpleTrigger3"
+		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="jobDetail3" />
+		
+		<property name="startDelay" value="0" />
+		
+		<property name="repeatInterval" value="20000" />
+	</bean>
+	 -->
+	<!-- <bean id="jobDetail3"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="notifyTask" />
+		<property name="targetMethod" value="execute" />
+		对于相同的JobDetail，当指定多个Trigger时, 很可能第一个job完成之前，第二个job就开始了。指定concurrent设为false，多个job不会并发运行，第二个job将会被推迟。
+		<property name="concurrent" value="false" />
+	</bean>
+	 
+	注册Job
+	<bean id="notifyTask" class="com.zlebank.zplatform.specification.notify.jobs.NotifyTask" />  -->
+
+		<!-- 让spring管理quartz -->
+
+	<!-- 冻结时间任务触发器 -->
+	<bean id="simpleTrigger"
+		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="jobDetail" />
+		<!-- 启动延迟10秒 -->
+		<property name="startDelay" value="0" />
+		<!-- 每N秒执行一次任务 -->
+		<property name="repeatInterval" value="${run_cycle}000" />
+	</bean>
+	<!-- 冻结时间任务任务设定 -->
+	<bean id="jobDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="unfrozenJob" />
+		<property name="targetMethod" value="execute" />
+		<!-- 对于相同的JobDetail，当指定多个Trigger时, 很可能第一个job完成之前，第二个job就开始了。指定concurrent设为false，多个job不会并发运行，第二个job将会被推迟。 -->
+		<property name="concurrent" value="false" />
+	</bean>
+	<!-- 异步计账触发器 -->
+	<bean id="simpleTrigger2"
+		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="jobDetail2" />
+		<!-- 启动延迟10秒 -->
+		<property name="startDelay" value="0" />
+		<!-- 每N秒执行一次任务 -->
+		<property name="repeatInterval" value="${run_cycle}000" />
+	</bean>
+
+	<!-- 异步计账任务设定 -->
+	<bean id="jobDetail2"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="accountJob" />
+		<property name="targetMethod" value="execute" />
+		<!-- 对于相同的JobDetail，当指定多个Trigger时, 很可能第一个job完成之前，第二个job就开始了。指定concurrent设为false，多个job不会并发运行，第二个job将会被推迟。 -->
+		<property name="concurrent" value="false" />
+	</bean>
+	<!-- 注册Job -->
+	<bean id="unfrozenJob" class="com.zlebank.zplatform.acc.jobs.UnfrozenJob" />
+	<bean id="accountJob" class="com.zlebank.zplatform.acc.jobs.AccountJob" />
+	
+	
+	
+	<!-- 获取当前日期回盘文件触发器 -->
+	<bean id="currentDateCMBCFileJob" class="com.zlebank.zplatform.trade.cmbc.job.ReciveCurrentDateCMBCFileJob" />
+	<bean id="cmbcTrigger1"
+		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="cmbcJobDetail" />
+		<!-- 启动延迟10秒 -->
+		<property name="startDelay" value="0" />
+		<!-- 每300秒执行一次任务 -->
+		<property name="repeatInterval" value="300000" />
+	</bean>
+	<!-- 当前日期回盘文件任务任务设定 -->
+	<bean id="cmbcJobDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="currentDateCMBCFileJob" />
+		<property name="targetMethod" value="execute" />
+		<!-- 对于相同的JobDetail，当指定多个Trigger时, 很可能第一个job完成之前，第二个job就开始了。指定concurrent设为false，多个job不会并发运行，第二个job将会被推迟。 -->
+		<property name="concurrent" value="false" />
+	</bean>
+	
+	<!-- 划拨批次账务触发器 -->
+	<bean id="insteadPayAccountingJob" class="com.zlebank.zplatform.trade.cmbc.job.InsteadPayAccountingJob" />
+	<bean id="insteadPayAccountingTrigger"
+		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="insteadPayAccountingJobDetail" />
+		<!-- 启动延迟10秒 -->
+		<property name="startDelay" value="0" />
+		<!-- 每600秒执行一次任务 -->
+		<property name="repeatInterval" value="600000" />
+	</bean>
+	<!-- 当前日期回盘文件任务任务设定 -->
+	<bean id="insteadPayAccountingJobDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="insteadPayAccountingJob" />
+		<property name="targetMethod" value="execute" />
+		<!-- 对于相同的JobDetail，当指定多个Trigger时, 很可能第一个job完成之前，第二个job就开始了。指定concurrent设为false，多个job不会并发运行，第二个job将会被推迟。 -->
+		<property name="concurrent" value="false" />
+	</bean>
+	
+	
+	
+	<!-- 划拨批次账务触发器 -->
+	<bean id="cmbcTestJob" class="com.zlebank.zplatform.trade.cmbc.job.CMBCTestJob" />
+	<bean id="cmbcTestTrigger"
+		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="cmbcTestJobDetail" />
+		<!-- 启动延迟10秒 -->
+		<property name="startDelay" value="0" />
+		<!-- 每600秒执行一次任务 -->
+		<property name="repeatInterval" value="120000" />
+	</bean>
+	<!-- 当前日期回盘文件任务任务设定 -->
+	<bean id="cmbcTestJobDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="cmbcTestJob" />
+		<property name="targetMethod" value="execute" />
+		<!-- 对于相同的JobDetail，当指定多个Trigger时, 很可能第一个job完成之前，第二个job就开始了。指定concurrent设为false，多个job不会并发运行，第二个job将会被推迟。 -->
+		<property name="concurrent" value="false" />
+	</bean>
+	
+	
+	<bean id="reconJob" class="com.zlebank.zplatform.trade.job.ReconJob" />
+	<bean id="reconJobTrigger"
+		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="reconJobDetail" />
+		<!-- 启动延迟10秒 -->
+		<property name="startDelay" value="0" />
+		<!-- 每600秒执行一次任务 -->
+		<property name="repeatInterval" value="120000" />
+	</bean>
+	<bean id="reconJobDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="reconJob" />
+		<property name="targetMethod" value="execute" />
+		<!-- 对于相同的JobDetail，当指定多个Trigger时, 很可能第一个job完成之前，第二个job就开始了。指定concurrent设为false，多个job不会并发运行，第二个job将会被推迟。 -->
+		<property name="concurrent" value="false" />
+	</bean>
+</beans>

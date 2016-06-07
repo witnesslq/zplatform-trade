@@ -1,0 +1,699 @@
+@charset "UTF-8";
+/* CSS Document */
+
+body {
+	font: 12px/1.5 tahoma, arial, Hiragino Sans GB, WenQuanYi Micro Hei, 微软雅黑, 宋体, sans-serif;
+	color: #333;
+	background-color: #fff;
+	min-width: 1000px;
+	overflow-x: auto;
+}
+blockquote, body, button, code, dd, div, dl, dt, fieldset, figure, form, h1, h2, h3, h4, h5, h6, input, legend, li, ol, p, pre, td, textarea, th, ul {
+	margin: 0px;
+	padding: 0px;
+}
+li, ol, ul {
+	list-style: outside none none;
+}
+
+/*----------------- header -----------------------*/
+
+.g-hd {
+	height: 88px;
+	border-bottom: 2px solid #d80c18;
+	background-color: #FFF;
+	margin-bottom: 25px;
+}
+.g-row {
+	margin-right: auto;
+	margin-left: auto;
+	width: 1000px;
+}
+.g-t {
+	background-color: #F9F9F9;
+}
+.logo {
+	float: left;
+	width: 152px;
+	height: 78px;
+	margin-top: 10px;
+	background: url(../images/weblogo.png) no-repeat;
+}
+.hd-logo-nav {
+	width: 93px;
+	margin-left: 180px;
+	padding: 30px 0 9px 10px;
+	font-weight: 700;
+	font-size: 22px;
+	color: #666;
+}
+
+/*----------------- steps -----------------------*/
+
+.wrapper {
+padding:20px 0;
+}
+.flow-steps {
+	position: relative;
+	height: 30px;
+	list-style: none;
+	font-size: 14px;
+	overflow: hidden;
+}
+.flow-steps li {
+	float: left;
+	height: 30px;
+	margin-right: -32px;
+	background: #d7d7d7;
+	line-height: 30px;
+	overflow: hidden;
+}
+.flow-steps a {
+	display: block;
+	float: left;
+	width: 180px;
+	padding: 0 20px 0 0;
+	text-align: center;
+	color: #333;
+	text-decoration: none;
+}
+.flow-steps b {
+	float: left;
+	width: 0px;
+	height: 0px;
+	margin-top: -6px;
+	border: 21px solid #d7d7d7;
+	border-left-color: #fff;
+	font-size: 0;
+	line-height: 0;
+	z-index: 9;
+}
+.flow-steps s {
+	position: relative;
+	float: left;
+	width: 0px;
+	height: 0px;
+	margin-top: -2px;
+	border: 17px solid transparent; /*For IE6*/
+	_border-color: snow;
+	_filter: chroma(color=snow);/*For IE6*/
+	border-left-color: #d7d7d7;
+	font-size: 0;
+	line-height: 0;
+	z-index: 99;
+}
+.flow-steps .on {
+	background: #d80c18;
+}
+.flow-steps .on a {
+	color: #fff;
+}
+.flow-steps .on b {
+	border-color: #d80c18;
+	border-left-color: #fff;
+}
+.flow-steps .on s {
+	border-left-color: #d80c18;
+}
+.flow-steps .f {
+	border-color: #d7d7d7!important;
+}
+
+/*----------------- order -----------------------*/
+
+.orders-hd {
+	height: 44px;
+	border-left: 1px solid #d80c18;
+	border-right: 1px solid #d80c18;
+	background-color: #F9F9F9;
+}
+.orders-hd ul {
+	border-top: 1px solid #D8D8D8;
+	border-bottom: 1px solid #D8D8D8;
+	height: 42px;
+	line-height: 42px;
+}
+.orders-hd .product-item {
+	padding-left: 20px;
+	width: 410px;
+	color: #333;
+	font-size: 14px;
+}
+.inline-block-item {
+	display: inline-block;
+	vertical-align: top;
+	word-spacing: normal;
+	letter-spacing: normal;
+	font-size: 12px;
+}
+.product-item-desc {
+	padding: 10px 0px 11px;
+	line-height: 21px;
+	color: #F10180;
+	font-weight: 700;
+}
+table.f {
+	margin: 25px 0 25px 0;
+	font-size: 12px;
+	text-align:center;
+	color: #333333;
+	border: 1px solid #D8D8D8;
+	border-collapse: collapse;
+}
+table.f th {
+	border-width: 1px;
+	padding: 8px;
+	border: 1px solid #D8D8D8;
+	background-color: #efefef;
+}
+table.f td {
+	border: 1px solid #D8D8D8;
+	padding: 8px;
+}
+
+/*----------------- tab -----------------------*/
+
+.mod_box {
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-bottom: 1px solid #e2e2e2;
+}
+
+.mod_box .pd10 {
+    padding: 20px 2px 10px;
+}
+.mod_box .bd {
+    background: #fafafa;
+}
+
+.mode_tab {
+    height: 37px;
+    border-bottom: 1px solid #ddd;
+    line-height: 34px;
+}
+.mt20 {
+    margin-top: 20px;
+}
+
+.mode_tab a.cur {
+    position: relative;
+    text-decoration: none;
+    border-top: 2px solid #d80c18;
+    background: #fafafa;
+    font-weight: 700;
+}
+.mode_tab a {
+    height: 36px;
+    margin: 0 2px 0 0;
+    padding: 0 15px;
+    display: inline;
+    float: left;
+    line-height: 36px;
+    border: 1px solid #ddd;
+    border-bottom: 0;
+    color: #333;
+    font-size: 14px;
+	 background: #f6f6f6 url(../images/t_bg.png) repeat-x;
+}
+a {
+    outline: none;
+}
+user agent stylesheeta:-webkit-any-link {
+    cursor: auto;
+}
+
+#scroller_container {
+    position: relative;
+    width: 600px;
+    height: 30px;
+    overflow: hidden;
+    float: right;
+    color: #FF6600;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#scroller {
+    white-space: nowrap;
+    left: 600px;
+}
+
+user agent stylesheetform {
+    display: block;
+    margin-top: 0em;
+}
+
+input, select, textarea {
+    padding: 4px 5px;
+    font: 12px Tahoma, Arial, simsun;
+    vertical-align: middle;
+}
+
+.mt10 {
+    margin-top: 10px;
+}
+
+user agent stylesheetul, menu, dir {
+    display: block;
+    list-style-type: disc;
+    -webkit-margin-before: 1em;
+    -webkit-margin-after: 1em;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+    -webkit-padding-start: 40px;
+}
+
+.ov_hid {
+    overflow: hidden;
+}
+.checkBankInfo {
+    /*background: #eef3f5;*/
+    padding-bottom: 10px;
+    padding-top: 30px;
+}
+
+user agent stylesheetli {
+    display: list-item;
+    text-align: -webkit-match-parent;
+}
+
+fieldset, img {
+    border: 0;
+}
+/*img[Attributes Style] {
+    width: 360px;
+    height: 35px;
+}*/
+
+.fast_pay {
+    overflow: hidden;
+    margin: 20px 0 0;
+}
+.clearfix {
+    display: block;
+}
+
+.clearfix:after {
+    content: ".";
+    height: 0;
+    visibility: hidden;
+    display: block;
+    clear: both;
+    font-size: 0;
+    line-height: 0;
+}
+
+.other-bank {
+    width: 1000px;
+    padding-top: 18px;
+    border-top: 2px dotted #ccc;
+}
+
+.other-bank2 {
+    width: 805px;
+    padding-top: 18px;
+    border-top: 2px dotted #ccc;
+}
+
+.select-banklist {
+    padding: 0 0 5px 20px;
+    overflow: hidden;
+    zoom: 1;
+}
+
+.select-banklist li {
+    width: 180px;
+    float: left;
+    padding: 0 0 8px;
+    margin: 0 6px 0 0;
+    position: relative;
+}
+
+.select-banklist li input {
+    margin-top: 8px;
+    float: left;
+    width: 15px;
+    padding: 4px 0;
+    overflow: hidden;
+}
+
+.select-banklist label {
+    float: left;
+    cursor: pointer;
+}
+
+
+.bk {
+    background: url(../images/bank_logo4_20141230.png) no-repeat;
+    display: inline-block;
+    width: 128px;
+    height: 28px;
+    font-size: 0;
+    line-height: 0;
+    vertical-align: middle;
+    overflow: hidden;
+    zoom: 1;
+    border: 1px solid #d7d7d7;
+    cursor: pointer;
+    position: relative;
+	margin-left: 2px;
+}
+
+/* .icbc {
+    background-position: 0 0;
+}
+.merchants {
+    background-position: 0 -62px;
+
+}
+.minsheng {
+    background-position: 0 -124px;
+}
+.china_citic {
+    background-position: 0 -186px;
+}
+.guangfa {
+    background-position: 0 -248px;
+}
+
+.construction {
+    background-position: 0 -310px;
+}
+
+.agricultural {
+    background-position: 0 -372px;
+}
+.china {
+    background-position: 0 -434px;
+}
+.communications {
+    background-position: 0 -496px;
+}
+.huaxia {
+    background-position: 0 -558px;
+} */
+.icbc { background-position: 0 -3px }/*工商*/
+.icbc_corp { background-position: 0 -961px }/*工商*/
+.cmb { background-position: 0 -43px }/*招商*/
+.merchants { background-position: 0 -43px }/*招商*/
+.cmbc { background-position: 0 -83px }/*民生*/
+.minsheng { background-position: 0 -83px }/*民生*/
+.bea { background-position: 0 -120px }/*东亚*/
+.citic { background-position: 0 -163px }/*中信*/
+.china_citic { background-position: 0 -163px }/*中信*/
+.sdb { background-position: 0 -200px }/*深圳发展*/
+.development { background-position: 0 -200px }/*深圳发展*/
+.development_corp { background-position: 0 -1121px }/*深圳发展*/
+.gdb { background-position: 0 -243px }/*广东发展*/
+.guangfa { background-position: 0 -243px }/*广东发展*/
+.ccb { background-position: 0 -283px }/*建设*/
+.construction { background-position: 0 -283px }/*建设*/
+.construction_corp { background-position: 0 -921px }/*建设*/
+.spdb { background-position: 0 -323px }/*浦东发展*/
+.spd { background-position: 0 -323px }/*浦东发展*/
+.nbb { background-position: 0 -360px }/*宁波*/
+.ceb { background-position: 0 -403px }/*光大*/
+.everbright { background-position: 0 -403px }/*光大*/
+.abc { background-position: 0 -443px }/*农业*/
+.agricultural { background-position: 0 -443px }/*农业*/
+.agricultural_corp { background-position: 0 -1041px }/*农业*/
+.boc { background-position: 0 -483px }/*中国*/
+.china { background-position: 0 -483px }/*中国*/
+.china_corp { background-position: 0 -1001px }/*中国*/
+.bjb { background-position: 0 -520px }/*北京*/
+.bocom { background-position: 0 -563px }/*交通*/
+.communications { background-position: 0 -563px }/*交通*/
+.communications_corp { background-position: 0 -1081px }/*交通*/
+.cib { background-position: 0 -603px }/*兴业*/
+.industrial { background-position: 0 -603px }/*兴业*/
+.hxbc { background-position: 0 -643px }/*华夏*/
+.huaxia { background-position: 0 -643px }/*华夏*/
+.visa { background-position: 0 -920px }/*visa*/
+.hangzhou { background-position: 0 -720px }/*杭州*/
+.gongzhong { background-position: 0 -760px }/*公众城市一卡通*/
+.shanghai { background-position: 0 -800px }/*上海*/
+.hsbank { background-position: 0 -805px }/*徽商*/
+.pingan { background-position: 0 -923px }/*平安*/
+.unionpay { background-position: 0 -680px }/*银联*/
+.bohai { background-position: 0 -841px }/*渤海*/
+.dzb { background-position: 0 -1000px }/*德州*/
+.gzb { background-position: 0 -1080px }/*广州*/
+.hkb { background-position: 0 -1120px }/*汉口*/
+.jcb { background-position: 0 -1160px }/*晋城*/
+.psbc { background-position: 0 -883px }/*邮政*/
+.post { background-position: 0 -883px }/*邮政*/
+.sdnb { background-position: 0 -1240px }/*顺德农商*/
+.wzcb { background-position: 0 -963px }/*温州*/
+.ydb { background-position: 0 -1321px }/*尧都*/
+.zhb { background-position: 0 -1361px }/*珠海市农村信用*/
+.srcb { background-position: 0 -1401px }/*上海农村商业银行*/
+.mock { background-position: 0 -721px }/*mock*/
+.gyccb { background-position: 0 -761px }/*贵阳*/
+.jsbc { background-position: 0 -1003px }/*江苏*/
+.ltd { background-position: 0 -1043px }/*金华*/
+.bon { background-position: 0 -1083px }/*南京*/
+.pay_info .mod_list {
+    margin-top: -1px;
+}
+.mod_list {
+    line-height: 28px;
+}
+
+.mod_list li {
+    min-height: 20px;
+    _height: 20px;
+    margin-bottom: 15px;
+	padding-left:140px;
+}
+
+.pt20 {
+    padding-top: 20px;
+}
+
+.mod_list .mod_side, .mod_list .mod_side2 {
+    width: 140px;
+	 margin-left: -140px;
+    padding-right: 10px;
+    display: inline;
+    float: left;
+    text-align: right;
+    color: #333;
+    font-size: 14px;
+}
+label {
+    vertical-align: middle;
+}
+
+user agent stylesheetlabel {
+    cursor: default;
+}
+
+.red, .red a, a.red, .reds, .reds a, a.reds {
+    color: #f00;
+}
+
+.f14, .f14b {
+    font-size: 14px;
+}
+
+user agent stylesheetstrong, b {
+    font-weight: bold;
+}
+
+.mod_list .mod_side2 {
+    padding-top: 2px;
+}
+
+.myWay {
+    height: 50px;
+    margin-bottom: 15px;
+    padding-bottom: 5px;
+}
+
+user agent stylesheetp {
+    display: block;
+    -webkit-margin-before: 1em;
+    -webkit-margin-after: 1em;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+}
+
+.another_payment_list label:hover, label.bank_cur {
+    border: 1px solid #f90;
+}
+.select-banklist label:hover, label.bank_cur {
+    border: 1px solid #f90;
+}
+
+.bank_cur {
+    border: 1px solid #f60;
+}
+
+.mod_form .mod_list .submit, .mod_list .submit {
+    padding-bottom: 50px;
+}
+
+.ml50 {
+    margin-left: 50px;
+}
+
+li {
+    display: list-item;
+    text-align: -webkit-match-parent;
+}
+
+.mod_list .submit .btn {
+    vertical-align: text-bottom;
+}
+
+button.btn, input.btn {
+    height: 34px;
+    line-height: normal;
+}
+.btnA {
+    cursor: pointer;
+}
+
+.btn:hover {
+    border: 1px solid #f60;
+    background: #d41c19;
+    text-decoration: none;
+    color: #fff;
+}
+
+.btn, .btn_disabled {
+    height: 32px;
+    line-height: 32px;
+    padding: 0 20px;
+    display: inline-block;
+    border: 1px solid #f60;
+    border-radius: 2px;
+    background: #f70;
+    vertical-align: middle;
+    white-space: normal;
+    outline: none;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    overflow: visible;
+    font-family: microsoft yahei;
+}
+
+.btn_off, .btn_off:hover {
+    border: 1px solid #ccc;
+    background: #f3f3f3;
+    color: #bbb;
+    cursor: default;
+}
+/*----------------- 2-container -----------------------*/
+
+.ov_hid {
+    overflow: hidden;
+}
+
+.onFocus {
+    color: #666;
+}
+
+.mt30 {
+    margin-top: 30px;
+}
+
+/*----------------- finish -----------------------*/
+
+.mod_box .hd .title {
+    float: left;
+    color: #000;
+    margin-right: 10px;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+
+.mod_box .bd {
+    padding: 5px;
+    background: #fafafa;
+}
+.txtC {
+    text-align: center;
+}
+
+.result_tips {
+    margin: 40px auto;
+    padding-bottom: 15px;
+    text-align: left;
+    display: inline-block;
+}
+
+.result_tips .set_height {
+    margin-right: 50px;
+    float: left;
+    padding: 25px 0 25px 100px;
+    position: relative;
+}
+.clearfix {
+    display: block;
+}
+
+.pop_s, .pop_fail, .pop_war, .pop_tip {
+    width: 678px;
+    height: 60px;
+    background: url(../images/last_tips_ico.png) no-repeat;
+    display: inline-block;
+    text-indent: 99em;
+    overflow: hidden;
+    position: absolute;
+    top: 25px;
+    left: 20px;
+}
+.pop_fail { background-position: 0 -60px }
+.pop_war { background-position: 0 -120px }
+.pop_tip { background-position: 0 -180px }
+.result_tips .words {
+    padding: 0 0 5px;
+}
+.f12b, .f14b, .f16b {
+    font-weight: 700;
+}
+.f16, .f16b {
+    font-size: 16px;
+}
+.words { padding: 0 0 5px }
+/*----------------- footer -----------------------*/
+
+.footer {
+    width: 100%;
+    margin-top: 15px;
+    padding: 0 0 10px;
+    border-top: 1px solid #eee;
+    /* background: #fafafa; */
+    clear: both;
+}
+
+.footer .foot_nav {
+    padding-top: 15px;
+    border-top: 1px solid #f6f6f6;
+}
+
+.footer .foot_nav a {
+    padding: 0 10px;
+}
+
+a {
+    text-decoration: none;
+    color: #333;
+    outline: none;
+}
+
+.footer .foot_nav, .footer .contact_info, .footer .copyright {
+    margin: 0 auto;
+    text-align: center;
+    color: #666;
+}
+
+.icp, .licence {
+    text-align: center;
+}
+.w180{
+	width: 180px;
+}
