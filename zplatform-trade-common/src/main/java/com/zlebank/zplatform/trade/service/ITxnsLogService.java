@@ -201,4 +201,13 @@ public interface ITxnsLogService extends IBaseService<TxnsLogModel, String>{
      * 定时处理资金结算任务
      */
     public void excuteSetted() throws AccBussinessException, AbstractBusiAcctException, NumberFormatException;
+    
+    /**
+     * 
+     * @param txnseqno
+     * @param payrettsnseqno
+     * @param retcode
+     * @param retinfo
+     */
+    public void updateWeChatRefundResult(String txnseqno,String payrettsnseqno,String retcode,String retinfo);
 }

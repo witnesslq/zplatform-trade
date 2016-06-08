@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.commons.dao.pojo.BusiTypeEnum;
 import com.zlebank.zplatform.commons.utils.DateUtil;
+import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.bean.AppPartyBean;
 import com.zlebank.zplatform.trade.bean.PayPartyBean;
 import com.zlebank.zplatform.trade.bean.ResultBean;
@@ -87,6 +88,10 @@ public class ChanPayAsyncServiceImpl implements ChanPayAsyncService {
 			String txnseqno = gatewayOrder.getRelatetradetxn();
 			//交易流水数据
 			TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(txnseqno);
+			if(StringUtil.isNotEmpty(txnsLog.getApporderstatus())&&StringUtil.isNotEmpty(txnsLog.getApporderinfo())){//交易账务信息都不为空，说明账务已完成
+				return new ResultBean("success");
+			}
+			
 			//交易订单数据
 			TxnsOrderinfoModel orderinfo = gateWayService.getOrderByTxnseqno(txnseqno);
 			gatewayOrder.setClosetime(tradeAsyncResultBean.getGmt_close());

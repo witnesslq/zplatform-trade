@@ -134,7 +134,11 @@ public class ConsumeAccounting implements IAccounting{
             } catch (NumberFormatException e) {
                 resultBean = new ResultBean("T099", e.getMessage());
                 e.printStackTrace();
-            }
+            }catch (RuntimeException e) {
+				// TODO: handle exception
+            	e.printStackTrace();
+            	resultBean = new ResultBean("T000", e.getMessage());
+			}
         
         if(txnsLog==null){
             return resultBean;

@@ -70,6 +70,7 @@ import com.zlebank.zplatform.trade.service.base.BaseServiceImpl;
 import com.zlebank.zplatform.trade.utils.ConsUtil;
 import com.zlebank.zplatform.trade.utils.DateUtil;
 import com.zlebank.zplatform.trade.utils.OrderNumber;
+import com.zlebank.zplatform.trade.utils.UUIDUtil;
 
 /**
  * Class Description
@@ -203,11 +204,16 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
     @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
     public ResultBean updateGateWayPayResult(PayPartyBean payPartyBean){
     	TxnsLogModel txnsLog = getTxnsLogByTxnseqno(payPartyBean.getTxnseqno());
-    	txnsLog.setPayordcomtime(DateUtil.getCurrentDateTime());
+    	txnsLog.setPayordfintime(DateUtil.getCurrentDateTime());
     	txnsLog.setPayrettsnseqno(payPartyBean.getPayrettsnseqno());
     	txnsLog.setPayretcode(payPartyBean.getPayretcode());
     	txnsLog.setPayretinfo(payPartyBean.getPayretinfo());
     	txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
+    	
+    	txnsLog.setTradeseltxn(UUIDUtil.uuid());
+    	txnsLog.setTradetxnflag("10000000");
+    	txnsLog.setRelate("10000000");
+    	txnsLog.setRetdatetime(DateUtil.getCurrentDateTime());
     	try {
             PojoRspmsg msg = rspmsgDAO.getRspmsgByChnlCode(ChnlTypeEnum.CHANPAY,payPartyBean.getPayretcode());
             txnsLog.setRetinfo(msg.getRspinfo());
@@ -998,5 +1004,37 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 	@Override
 	public TxnsLogModel getTxnsLogByPayOrderNo(String payOrderNo) {
 		return super.getUniqueByHQL(" from TxnsLogModel where  payordno = ? and paytype = ?", new Object[]{payOrderNo,"05"});
+	}
+
+
+	/**
+	 *
+	 * @param txnseqno
+	 * @param payrettsnseqno
+	 * @param retcode
+	 * @param retinfo
+	 */
+	@Override
+	@Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
+	public void updateWeChatRefundResult(String txnseqno,
+			String payrettsnseqno, String retcode, String retinfo) {
+		TxnsLogModel txnsLog = super.get(txnseqno);
+        txnsLog.setPayretcode(retcode);
+        txnsLog.setPayretinfo(retinfo);
+        txnsLog.setPayordfintime(DateUtil.getCurrentDateTime());
+        txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
+        txnsLog.setTradeseltxn(UUIDUtil.uuid());
+    	txnsLog.setTradetxnflag("10000000");
+    	txnsLog.setRelate("10000000");
+    	txnsLog.setRetdatetime(DateUtil.getCurrentDateTime());
+    	try {
+            PojoRspmsg msg = rspmsgDAO.getRspmsgByChnlCode(ChnlTypeEnum.WECHAT,retcode);
+            txnsLog.setRetinfo(msg.getRspinfo());
+            txnsLog.setRetcode(msg.getWebrspcode());
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        super.update(txnsLog);
 	}
 }

@@ -359,6 +359,11 @@ public class MerchCashController {
 	    bean.setRelatememberno(txnsLog.getAccsecmerno());
 	    bean.setCardtype("1");
 	    Map<String, Object> cardInfo = routeConfigService.getCardInfo(merch.getAccNum());
+	    if(cardInfo==null){//商户收银台测试个人银行卡时，没有获取到卡bin信息，则跳转至宜昌页面
+	    	model.put("errMsg", "银行卡信息错误");
+	        model.put("txnseqno", txnseqno_);
+	        return new ModelAndView("/erro", model);
+	    }
 	    bean.setBankcode(cardInfo.get("BANKCODE")+"");
 	    bean.setBankname(cardInfo.get("BANKNAME")+"");
 	    long bindId = bankCardService.saveQuickPayCust(bean);
