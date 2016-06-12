@@ -28,6 +28,7 @@ import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
 import com.zlebank.zplatform.acc.exception.AccBussinessException;
+import com.zlebank.zplatform.acc.exception.IllegalEntryRequestException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.commons.dao.pojo.BusiTypeEnum;
@@ -912,6 +913,9 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 				} catch (NumberFormatException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+				} catch (IllegalEntryRequestException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 	            
 			}
@@ -920,7 +924,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
     }
     
     @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
-    public void excuteSetted() throws AccBussinessException, AbstractBusiAcctException, NumberFormatException{
+    public void excuteSetted() throws AccBussinessException, AbstractBusiAcctException, NumberFormatException, IllegalEntryRequestException{
     	log.info("start excuteSetted Job");
     	List<Map<String, Object>> selfTxnList = (List<Map<String, Object>>) queryBySQL("SELECT * FROM T_SELF_TXN T WHERE STATUS = ? AND RESULT = ?", new Object[]{"9","03"});
     	if(selfTxnList.size()>0){

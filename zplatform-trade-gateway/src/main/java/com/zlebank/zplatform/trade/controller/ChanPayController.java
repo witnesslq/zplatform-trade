@@ -316,38 +316,21 @@ public class ChanPayController {
     @ResponseBody
     public String reciveChanPay(TradeAsyncResultBean tradeAsyncResultBean,HttpServletResponse response,HttpServletRequest request ) {
 	    //try {
-	    	Map map = request.getParameterMap();
-	    	log.info("request data :" + JSON.toJSONString(map));
-			log.info("chanpay data :" + JSON.toJSONString(tradeAsyncResultBean));
-			ResultBean dealWithTradeAsync = null;
-			try {
-				dealWithTradeAsync = chanPayAsyncService.dealWithTradeAsync(tradeAsyncResultBean);
-			} catch (TradeException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			if(dealWithTradeAsync.isResultBool()){
-				/*response.setContentType("text/html");
-				response.setCharacterEncoding("utf-8");
-				response.getWriter().print("success");
-				response.getWriter().flush();
-				response.getWriter().close();*/
-			}else{
-				
-			}
-			/*response.setContentType("text/html");
-			response.setCharacterEncoding("utf-8");
-			response.getWriter().print("success");
-			response.getWriter().flush();
-			response.getWriter().close();*/
-		/*} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+    	Map map = request.getParameterMap();
+    	log.info("request data :" + JSON.toJSONString(map));
+		log.info("chanpay data :" + JSON.toJSONString(tradeAsyncResultBean));
+		ResultBean dealWithTradeAsync = null;
+		try {
+			dealWithTradeAsync = chanPayAsyncService.dealWithTradeAsync(tradeAsyncResultBean);
 		} catch (TradeException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}*/
-   
+		}
+		if(dealWithTradeAsync.isResultBool()){
+			return "success";
+		}else{
+			
+		}
 	    return "success";
     }
 	

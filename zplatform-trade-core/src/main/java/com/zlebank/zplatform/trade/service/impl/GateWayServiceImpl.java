@@ -38,6 +38,7 @@ import com.zlebank.zplatform.acc.bean.enums.AcctStatusType;
 import com.zlebank.zplatform.acc.bean.enums.Usage;
 import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
 import com.zlebank.zplatform.acc.exception.AccBussinessException;
+import com.zlebank.zplatform.acc.exception.IllegalEntryRequestException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.AccountQueryService;
 import com.zlebank.zplatform.acc.service.entry.EntryEvent;
@@ -1155,11 +1156,15 @@ public class GateWayServiceImpl extends
 		} catch (AccBussinessException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			throw new TradeException("T000", "账务异常");
+			throw new TradeException("T000", "账务异常:"+e.getMessage());
 		} catch (AbstractBusiAcctException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			throw new TradeException("T000", "账务异常");
+			throw new TradeException("T000", "账务异常:"+e.getMessage());
+		} catch (IllegalEntryRequestException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new TradeException("T000", "账务异常:"+e.getMessage());
 		}
 
 		String tn = "";
@@ -2890,6 +2895,9 @@ public class GateWayServiceImpl extends
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (AbstractBusiAcctException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalEntryRequestException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

@@ -47,6 +47,7 @@ import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
 import com.zlebank.zplatform.acc.exception.AccBussinessException;
+import com.zlebank.zplatform.acc.exception.IllegalEntryRequestException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.commons.dao.pojo.AccStatusEnum;
@@ -196,6 +197,13 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
 			if(txnsLog!=null){
 				txnsLog.setApporderstatus(AccStatusEnum.AccountingFail.getCode());
 				txnsLog.setApporderinfo(e1.getMessage());
+			}
+		} catch (IllegalEntryRequestException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			if(txnsLog!=null){
+				txnsLog.setApporderstatus(AccStatusEnum.AccountingFail.getCode());
+				txnsLog.setApporderinfo(e.getMessage());
 			}
 		}
     	if(txnsLog!=null){

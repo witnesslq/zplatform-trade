@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
 import com.zlebank.zplatform.acc.exception.AccBussinessException;
+import com.zlebank.zplatform.acc.exception.IllegalEntryRequestException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.commons.enums.BusinessCodeEnum;
@@ -152,7 +153,11 @@ public class RealNameAuthServiceImpl  implements RealNameAuthService{
             log.error(e.getMessage(),e);
         } catch (NumberFormatException e) {
             log.error(e.getMessage(),e);
-        } 
+        } catch (IllegalEntryRequestException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			 log.error(e.getMessage(),e);
+		} 
         return true;
     }
     
@@ -164,9 +169,10 @@ public class RealNameAuthServiceImpl  implements RealNameAuthService{
      * @throws NumberFormatException 
      * @throws AbstractBusiAcctException 
      * @throws AccBussinessException 
+     * @throws IllegalEntryRequestException 
      */
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Throwable.class)
-    private void accEntryInsert(PojoRealnameAuthOrder order, BusinessCodeEnum busiCode) throws AccBussinessException, AbstractBusiAcctException, NumberFormatException {
+    private void accEntryInsert(PojoRealnameAuthOrder order, BusinessCodeEnum busiCode) throws AccBussinessException, AbstractBusiAcctException, NumberFormatException, IllegalEntryRequestException {
         ConfigInfoModel startTime = configInfoDAO.getConfigByParaName("REALNAME_AUTH_PRICE");
         // 记录分录流水
         TradeInfo tradeInfo = new TradeInfo();
