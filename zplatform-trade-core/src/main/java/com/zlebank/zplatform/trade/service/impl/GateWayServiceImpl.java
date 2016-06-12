@@ -13,6 +13,7 @@ package com.zlebank.zplatform.trade.service.impl;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -77,6 +78,7 @@ import com.zlebank.zplatform.trade.bean.enums.BusinessEnum;
 import com.zlebank.zplatform.trade.bean.enums.ChannelEnmu;
 import com.zlebank.zplatform.trade.bean.enums.ChnlTypeEnum;
 import com.zlebank.zplatform.trade.bean.enums.TradeTypeEnum;
+import com.zlebank.zplatform.trade.bean.gateway.AnonOrderAsynRespBean;
 import com.zlebank.zplatform.trade.bean.gateway.OrderAsynRespBean;
 import com.zlebank.zplatform.trade.bean.gateway.OrderBean;
 import com.zlebank.zplatform.trade.bean.gateway.OrderRespBean;
@@ -124,6 +126,7 @@ import com.zlebank.zplatform.trade.service.ITxnsWithholdingService;
 import com.zlebank.zplatform.trade.service.RefundRouteConfigService;
 import com.zlebank.zplatform.trade.service.base.BaseServiceImpl;
 import com.zlebank.zplatform.trade.utils.DateUtil;
+import com.zlebank.zplatform.trade.utils.ObjectDynamic;
 import com.zlebank.zplatform.trade.utils.OrderNumber;
 import com.zlebank.zplatform.trade.utils.SynHttpRequestThread;
 import com.zlebank.zplatform.trade.utils.UUIDUtil;
@@ -2209,6 +2212,8 @@ public class GateWayServiceImpl extends
 			trade.setTn(smsMessageBean.getTn());
 			trade.setBindCardId(card.getBindcardid());
 			trade.setCardId(card.getId());
+			trade.setReaPayOrderNo(OrderNumber.getInstance()
+	                .generateReaPayOrderId());
 			IQuickPayTrade quickPayTrade = null;
 			try {
 				quickPayTrade = TradeAdapterFactory.getInstance()
@@ -2627,7 +2632,7 @@ public class GateWayServiceImpl extends
 			log.debug("获取路由信息：" + JSON.toJSON(cardBean));
 		}
 		if (routResultBean.isResultBool()) {
-			String routId = routResultBean.getResultObj().toString();
+			String routId = ChannelEnmu.CMBCWITHHOLDING.getChnlcode();//routResultBean.getResultObj().toString();
 			// resultBean.setRoutId(routId);
 			IQuickPayTrade quickPayTrade = null;
 			try {
@@ -2656,6 +2661,8 @@ public class GateWayServiceImpl extends
 			trade.setTradeType("01");// 实名认证交易，不发送绑卡短信
 			trade.setMerUserId(personMemberId);
 			trade.setPayinstiId(routId);
+			trade.setReaPayOrderNo(OrderNumber.getInstance()
+	                .generateReaPayOrderId());
 			quickPayTrade.setTradeBean(trade);
 			quickPayTrade.setTradeType(TradeTypeEnum.BANKSIGN);
 			// Long bindId=quickpayCustService.saveQuickpayCust(trade);
@@ -2988,4 +2995,102 @@ public class GateWayServiceImpl extends
 		}
 		return 0L;
 	}
+
+	/**
+	 *
+	 * @param txnseqno
+	 * @return
+	 */
+	@Override
+	public ResultBean generateAsyncRespMessage(String txnseqno) {
+		ResultBean resultBean = null;
+        try {
+            TxnsOrderinfoModel orderinfo = txnsOrderinfoDAO.getOrderByTxnseqno(txnseqno);
+            if(StringUtil.isEmpty(orderinfo.getBackurl())){
+            	return new ResultBean("09", "no need async");
+            }else {
+				if(orderinfo.getBackurl().indexOf("http")<0){
+					return new ResultBean("09", "no need async");
+				}
+			}
+            
+            
+            TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(orderinfo.getRelatetradetxn());
+             String version="v1.0";// 网关版本
+             String encoding="1";// 编码方式
+             String certId="";// 证书 ID
+             String signature="";// 签名
+             String signMethod="01";// 签名方法
+             String merId=txnsLog.getAccfirmerno();// 商户代码
+             String orderId=txnsLog.getAccordno();// 商户订单号
+             String txnType=orderinfo.getTxntype();// 交易类型
+             String txnSubType=orderinfo.getTxnsubtype();// 交易子类
+             String bizType=orderinfo.getBiztype();// 产品类型
+             String accessType="2";// 接入类型
+             String txnTime=orderinfo.getOrdercommitime();// 订单发送时间
+             String txnAmt=orderinfo.getOrderamt()+"";// 交易金额
+             String currencyCode="156";// 交易币种
+             String reqReserved=orderinfo.getReqreserved();// 请求方保留域
+             String reserved="";// 保留域
+             String queryId=txnsLog.getTradeseltxn();// 交易查询流水号
+             String respCode=txnsLog.getRetcode();// 响应码
+             String respMsg=txnsLog.getRetinfo();// 应答信息
+             String settleAmt="";// 清算金额
+             String settleCurrencyCode="";// 清算币种
+             String settleDate=txnsLog.getAccsettledate();// 清算日期
+             String traceNo=txnsLog.getTradeseltxn();// 系统跟踪号
+             String traceTime=DateUtil.getCurrentDateTime();// 交易传输时间
+             String exchangeDate="";// 兑换日期
+             String exchangeRate="";// 汇率
+             String accNo="";// 账号
+             String payCardType="";// 支付卡类型
+             String payType="";// 支付方式
+             String payCardNo="";// 支付卡标识
+             String payCardIssueName="";// 支付卡名称
+             String bindId="";// 绑定标识号
+            
+             
+             OrderAsynRespBean orderRespBean = new OrderAsynRespBean(version, encoding, certId, signature, signMethod, merId, orderId, txnType, txnSubType, bizType, accessType, txnTime, txnAmt, currencyCode, reqReserved, reserved, queryId, respCode, respMsg, settleAmt, settleCurrencyCode, settleDate, traceNo, traceTime, exchangeDate, exchangeRate, accNo, payCardType, payType, payCardNo, payCardIssueName, bindId);
+             String privateKey= "";
+             if("000204".equals(orderinfo.getBiztype())){
+            	 privateKey = coopInstiService.getCoopInstiMK(orderinfo.getFirmemberno(), TerminalAccessType.WIRELESS).getZplatformPriKey();
+             }else if("000201".equals(orderinfo.getBiztype())||"000205".equals(orderinfo.getBiztype())){
+            	 if("0".equals(orderinfo.getAccesstype())){
+                 	privateKey = merchMKService.get(orderinfo.getSecmemberno()).getLocalPriKey().trim();
+                 }else if("2".equals(orderinfo.getAccesstype())){
+                 	privateKey = coopInstiService.getCoopInstiMK(orderinfo.getFirmemberno(), TerminalAccessType.MERPORTAL).getZplatformPriKey();
+                 }else if("1".equals(orderinfo.getAccesstype())){
+                	 privateKey = merchMKService.get(orderinfo.getSecmemberno()).getLocalPriKey().trim();
+                 }
+            	 //privateKey = merchMKService.get(orderinfo.getFirmemberno()).getLocalPriKey();
+             }
+             
+             if("000205".equals(orderinfo.getBiztype())){
+            	 AnonOrderAsynRespBean asynRespBean = new AnonOrderAsynRespBean(version, encoding, txnType, txnSubType, bizType, "00", orderinfo.getSecmembername(), orderId, txnTime, orderinfo.getPaytimeout(), txnAmt, settleCurrencyCode, orderinfo.getOrderdesc(), reserved, orderinfo.getStatus(), orderinfo.getTn(), respCode, respMsg);
+            	 return new ResultBean(generateAsyncOrderResult(asynRespBean, privateKey.trim()));
+             }
+            
+            resultBean = new ResultBean(generateAsyncOrderResult(orderRespBean, privateKey.trim()));
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            resultBean = new ResultBean("RC99", "系统异常");
+        }
+        return resultBean;
+	}
+	public AnonOrderAsynRespBean generateAsyncOrderResult(AnonOrderAsynRespBean orderAsyncRespBean,String privateKey) throws Exception{   
+        String[] unParamstring = {"signature"};
+        String dataMsg = ObjectDynamic.generateParamer(orderAsyncRespBean, false, unParamstring).trim();
+        byte[] data =  URLEncoder.encode(dataMsg,"utf-8").getBytes();
+        //orderAsyncRespBean.setSignature(URLEncoder.encode(RSAUtils.sign(data, privateKey),"utf-8"));
+        return orderAsyncRespBean;
+    }
+	
+	public OrderAsynRespBean generateAsyncOrderResult(OrderAsynRespBean orderAsyncRespBean,String privateKey) throws Exception{   
+        String[] unParamstring = {"signature"};
+        String dataMsg = ObjectDynamic.generateParamer(orderAsyncRespBean, false, unParamstring).trim();
+        byte[] data =  URLEncoder.encode(dataMsg,"utf-8").getBytes();
+        orderAsyncRespBean.setSignature(URLEncoder.encode(RSAUtils.sign(data, privateKey),"utf-8"));
+        return orderAsyncRespBean;
+    }
 }

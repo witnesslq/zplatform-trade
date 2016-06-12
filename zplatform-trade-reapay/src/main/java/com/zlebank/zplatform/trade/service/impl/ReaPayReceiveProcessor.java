@@ -76,7 +76,7 @@ public class ReaPayReceiveProcessor implements ITradeReceiveProcessor{
             }else{
                 //订单状态更新为失败
                 
-                txnsOrderinfoDAO.updateOrderToFail(tradeBean.getOrderId(),tradeBean.getMerchId());
+                txnsOrderinfoDAO.updateOrderToFail(tradeBean.getTxnseqno());
             }
             //String txnseqno, String paytype, String payordno, String payinst, String payfirmerno, String paysecmerno, String payordcomtime, String payordfintime, String cardNo, String rout, String routlvl
             PayPartyBean payPartyBean = new PayPartyBean(tradeBean.getTxnseqno(),"01", tradeBean.getOrderId(), ConsUtil.getInstance().cons.getReapay_chnl_code(), ConsUtil.getInstance().cons.getReapay_quickpay_merchant_id(), "", DateUtil.getCurrentDateTime(), "",tradeBean.getCardNo());

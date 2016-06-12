@@ -136,8 +136,11 @@ public class UpdateWithdrawServiceImpl implements UpdateWithdrawService,UpdateSu
         	log.info("提现账务数据："+JSON.toJSONString(tradeInfo));
         	txnsLog.setAppordcommitime(DateUtil.getCurrentDateTime());
         	txnsLog.setAppinst("000000000000");
-        	
             accEntryService.accEntryProcess(tradeInfo,entryEvent);
+            if ("00".equals(data.getResultCode())) {
+            	tradeInfo.setChannelFee(new BigDecimal(0));
+            	accEntryService.accEntryProcess(tradeInfo, EntryEvent.RECON_SUCCESS);
+            }
             txnsLog.setApporderstatus("00");
             txnsLog.setApporderinfo("提现账务处理成功");
         } catch (AccBussinessException e1) {

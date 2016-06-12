@@ -148,6 +148,10 @@ public class UpdateRefundServiceImpl implements UpdateRefundService, UpdateSubje
         	txnsLog.setAppinst("000000000000");
         	
             accEntryService.accEntryProcess(tradeInfo, entryEvent);
+            if ("00".equals(data.getResultCode())) {
+            	tradeInfo.setChannelFee(new BigDecimal(0));
+            	accEntryService.accEntryProcess(tradeInfo, EntryEvent.RECON_SUCCESS);
+            }
             txnsRefundService.update(refund);
             txnsOrderinfoDAO.updateOrderinfo(order);
             txnsLog.setApporderstatus(AccStatusEnum.Finish.getCode());

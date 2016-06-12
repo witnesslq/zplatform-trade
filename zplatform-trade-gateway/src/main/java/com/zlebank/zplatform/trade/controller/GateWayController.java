@@ -1142,25 +1142,27 @@ public class GateWayController {
         try {
             log.info("reapay data :" + data);
             log.info("encryptkey  :" + encryptkey);
-            PrivateKey pvkformPfx = RSA
+            /*PrivateKey pvkformPfx = RSA
                     .getPvkformPfx(ConsUtil.getInstance().cons
                             .getReapay_quickpay_prikey(), ConsUtil
                             .getInstance().cons.getReapay_quickpay_prikey_pwd());
             String decryptData = RSA.decrypt(encryptkey, pvkformPfx);
             String respMsg = AES.decryptFromBase64(data, decryptData);
-            log.info("reapay ansyc message :" + respMsg);
+            log.info("reapay ansyc message :" + respMsg);*/
+            String respMsg = "{\"sign\":\"45b0ca182f193fd49c1b9bc4fc479d83\",\"trade_no\":\"101606089267124\",\"status\":\"TRADE_FINISHED\",\"total_fee\":\"130\",\"notify_id\":\"398b982f9d814a9482f3c51bba5ab44d\",\"order_no\":\"1606089600003006\"}";
             ReaPayResultBean reaPayResult = ReaPayTradeAnalyzer
                     .generateAsyncResultBean(respMsg);
             // 查询快捷交易数据获取交易序列号
             List<TxnsQuickpayModel> quickPayList = txnsQuickpayService
                     .queryTxnsByOrderNo(reaPayResult.getOrder_no());
+            
             if ("TRADE_FINISHED".equalsIgnoreCase(reaPayResult.getStatus()
                     .trim())) {// 交易成功
                 if (quickPayList.size() > 0) {
                     String txnseqno = quickPayList.get(0)
                             .getRelatetradetxnseqno();
                     TxnsLogModel txnsLog = txnsLogService.get(txnseqno);
-                    if ("00".equals(txnsLog.getApporderstatus())) {
+                    /*if ("00".equals(txnsLog.getApporderstatus())) {
                         log.info("账务处理成功");
                         response.setContentType("text/html");
                         response.setCharacterEncoding("utf-8");
@@ -1168,7 +1170,7 @@ public class GateWayController {
                         response.getWriter().flush();
                         response.getWriter().close();
                         return "";
-                    }
+                    }*/
                     // 完成核心交易的记录和网关交易记录的更新
                     gateWayService.saveSuccessReaPayTrade(txnseqno,
                             txnsLog.getAccordno(), reaPayResult);
@@ -1186,9 +1188,8 @@ public class GateWayController {
                             "000000000000", commiteTime,
                             DateUtil.getCurrentDateTime(), txnseqno, "AC000000");
                     txnsLogService.updateAppInfo(appParty);
-                    ResultBean orderResp = gateWayService
-                            .generateAsyncRespMessage(reaPayOrderNo,
-                                    txnsLog.getAccfirmerno());
+                    /*ResultBean orderResp = gateWayService
+                            .generateAsyncRespMessage(txnsLog.getTxnseqno());
                     if (orderResp.isResultBool()) {
                     	if("000205".equals(gatewayOrderBean.getBiztype())){
                     		AnonOrderAsynRespBean respBean = (AnonOrderAsynRespBean) orderResp
@@ -1212,7 +1213,39 @@ public class GateWayController {
                                     respBean.getNotifyParam()).start();
                     	}
                         
-                    }
+                    }*/
+                    
+                    /**异步通知处理开始 **/
+                    try {
+            			ResultBean orderResp = 
+            					gateWayService.generateAsyncRespMessage(txnsLog.getTxnseqno());
+            			if (orderResp.isResultBool()) {
+            				if("000205".equals(gatewayOrderBean.getBiztype())){
+                        		AnonOrderAsynRespBean respBean = (AnonOrderAsynRespBean) orderResp.getResultObj();
+                        		
+                        		InsteadPayNotifyTask task = new InsteadPayNotifyTask();
+                        		//对匿名支付订单数据进行加密加签
+                        		responseData(respBean, txnsLog.getAccfirmerno(), txnsLog.getAccsecmerno(), task);
+                        		new SynHttpRequestThread(
+                                        StringUtil.isNotEmpty(gatewayOrderBean.getSecmemberno())?gatewayOrderBean.getSecmemberno():gatewayOrderBean.getFirmemberno(),
+                                        gatewayOrderBean.getRelatetradetxn(),
+                                        gatewayOrderBean.getBackurl(),
+                                        task).start();
+                        	}else{
+                        		OrderAsynRespBean respBean = (OrderAsynRespBean) orderResp
+                                        .getResultObj();
+                                new SynHttpRequestThread(
+                                		StringUtil.isNotEmpty(gatewayOrderBean.getSecmemberno())?gatewayOrderBean.getSecmemberno():gatewayOrderBean.getFirmemberno(),
+                                        gatewayOrderBean.getRelatetradetxn(),
+                                        gatewayOrderBean.getBackurl(),
+                                        respBean.getNotifyParam()).start();
+                        	}
+            			   
+            			}
+            		} catch (Exception e) {
+            			// TODO Auto-generated catch block
+            			e.printStackTrace();
+            		}
                     accounting.accountedFor(txnseqno);
 
                     /*

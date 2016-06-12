@@ -98,6 +98,7 @@ public interface IGateWayService extends IBaseService<TxnsOrderinfoModel, Long>{
     public String withdraw(String json) throws TradeException;
     public String refund(String json) throws TradeException;
     public ResultBean generateAsyncRespMessage(String orderNo,String memberId);
+    public ResultBean generateAsyncRespMessage(String txnseqno);
     public void updateOrderToFail(String orderNo);
     public OrderRespBean generateWithdrawRespMessage(String orderNo);
     /**

@@ -175,6 +175,10 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
                 txnsLog.setAppordcommitime(commiteTime);
                 txnsLog.setAppordfintime(DateUtil.getCurrentDateTime());
                 txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
+                if ("00".equals(data.getResultCode())) {
+                	tradeInfo.setChannelFee(new BigDecimal(0));
+                	accEntryService.accEntryProcess(tradeInfo, EntryEvent.RECON_SUCCESS);
+                }
 			}
 		} catch (AccBussinessException e1) {
 			// TODO Auto-generated catch block
