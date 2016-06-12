@@ -131,6 +131,8 @@ public class ChanPayAsyncServiceImpl implements ChanPayAsyncService {
 				// 处理账务
 				AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue(txnsLog.getBusitype())).accountedFor(txnseqno);
 				resultBean = new ResultBean("success");
+			}else if(tradeStatusEnum == TradeStatusEnum.TRADE_FINISHED){
+				resultBean = new ResultBean("success");
 			}
 			
 		} catch (Exception e) {

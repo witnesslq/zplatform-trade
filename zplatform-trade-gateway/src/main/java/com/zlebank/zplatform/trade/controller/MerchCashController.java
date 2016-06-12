@@ -34,6 +34,9 @@ import com.zlebank.zplatform.acc.bean.BusiAcct;
 import com.zlebank.zplatform.acc.bean.BusiAcctQuery;
 import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.bean.enums.Usage;
+import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
+import com.zlebank.zplatform.acc.exception.AccBussinessException;
+import com.zlebank.zplatform.acc.exception.IllegalEntryRequestException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.AccountQueryService;
 import com.zlebank.zplatform.acc.service.entry.EntryEvent;
@@ -499,7 +502,31 @@ public class MerchCashController {
  	
  	@RequestMapping("/withdraw.htm")
     public ModelAndView withdraw(TradeBean tradeBean) {
-        Map<String, Object> model = new HashMap<String, Object>();
+        Map<String, Object> model = null;
+		try {
+			model = webGateWayService.Withdraw(tradeBean);
+		} catch (AccBussinessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return new ModelAndView("/erro_merch_withdraw", model);
+		} catch (IllegalEntryRequestException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return new ModelAndView("/erro_merch_withdraw", model);
+		} catch (AbstractBusiAcctException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return new ModelAndView("/erro_merch_withdraw", model);
+		} catch (NumberFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return new ModelAndView("/erro_merch_withdraw", model);
+		} catch (TradeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return new ModelAndView("/erro_merch_withdraw", model);
+		}
+        		/*new HashMap<String, Object>();
         try {
             TxnsOrderinfoModel orderinfo = gateWayService
                     .getOrderinfoByOrderNoAndMemberId(tradeBean.getOrderId(),
@@ -526,7 +553,7 @@ public class MerchCashController {
             withdraw.setBankcode(merch.getBankCode());
             PojoBankInfo bankNodeinfo = bankInfoDAO.getByBankNode(merch.getBankNode());
             withdraw.setBankname(bankNodeinfo.getMainBankSname());
-            txnsWithdrawService.saveWithdraw(withdraw);
+            //txnsWithdrawService.saveWithdraw(withdraw);
             //记录提现账务
             TradeInfo tradeInfo = new TradeInfo();
             tradeInfo.setBusiCode("30000001");
@@ -538,22 +565,9 @@ public class MerchCashController {
             tradeInfo.setCoopInstCode(orderinfo.getFirmemberno());
             //记录分录流水
             accEntryService.accEntryProcess(tradeInfo,EntryEvent.AUDIT_APPLY);
-            if (StringUtil.isNotEmpty(tradeBean.getBindCardId())) {
-                /*QuickpayCustModel card = memberBankCardService.
-                        .getCardByBindId(tradeBean.getBindCardId());
-                withdraw.setAcctname(card.getAccname());
-                withdraw.setAcctno(card.getCardno());*/
-            }
-            //txnsWithdrawService.saveWithdraw(withdraw);
+            txnsWithdrawService.saveWithdraw(withdraw);
             gateWayService.updateOrderToStartPay(tradeBean.getTxnseqno());
-            model.put(
-                    "suburl",
-                    orderinfo.getFronturl()
-                            + "?"
-                            + ObjectDynamic.generateReturnParamer(
-                                    gateWayService
-                                            .generateWithdrawRespMessage(tradeBean
-                                                    .getOrderId()), false, null));
+            model.put("suburl", orderinfo.getFronturl() + "?" + ObjectDynamic.generateReturnParamer(gateWayService.generateWithdrawRespMessage(tradeBean.getOrderId()), false, null));
         } catch (Exception e) {
             // TODO: handle exception
             e.printStackTrace();
@@ -562,8 +576,8 @@ public class MerchCashController {
             model.put("txnseqno", tradeBean.getTxnseqno());
             return new ModelAndView("/erro_merch_withdraw", model);
         }
-        model.put("errMsg", "提现申请成功");
-        return new ModelAndView("/fastpay/success", model);
+        model.put("errMsg", "提现申请成功");*/
+        return new ModelAndView(model.get("url")+"", model);
     }
  	
  	@RequestMapping("/showAccount")

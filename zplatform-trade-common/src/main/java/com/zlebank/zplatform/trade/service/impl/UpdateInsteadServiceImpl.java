@@ -1,23 +1,4 @@
 /* 
-haod	支付			
-姓名	郭佳			
-日期	2016年5月23日			
-				
-当日工作计划				
-序号	时长(时)	工作描述	优先级	备注
-1	7	集成畅捷支付代付代码	高	
-				
-当日工作总结				
-序号	时长(时)	工作描述	优先级	备注
-1	7.5	开发退款功能，测试退款，修改生成退款订单的方法，修改测试中出现的bug	中	
-				
-				
-问题情况				
-序号	问题描述		优先级	备注
-				
-次日工作计划				
-序号	时长(时)	工作描述	优先级	备注
-1	8	集成畅捷支付代付代码编写各个接口的单元测试程序	高	
  * UpdateInsteadServiceImpl.java  
  * 
  * version TODO
@@ -176,6 +157,10 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
                 txnsLog.setAppordcommitime(commiteTime);
                 txnsLog.setAppordfintime(DateUtil.getCurrentDateTime());
                 txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
+                if ("00".equals(data.getResultCode())) {
+                	tradeInfo.setChannelFee(new BigDecimal(0));
+                	accEntryService.accEntryProcess(tradeInfo, EntryEvent.RECON_SUCCESS);
+                }
 			}
 		} catch (AccBussinessException e1) {
 			// TODO Auto-generated catch block

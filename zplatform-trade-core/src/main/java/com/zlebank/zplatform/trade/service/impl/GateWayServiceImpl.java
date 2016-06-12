@@ -43,6 +43,8 @@ import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.AccountQueryService;
 import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.commons.bean.PagedResult;
+import com.zlebank.zplatform.commons.dao.BankInfoDAO;
+import com.zlebank.zplatform.commons.dao.pojo.PojoBankInfo;
 import com.zlebank.zplatform.commons.enums.BusinessCodeEnum;
 import com.zlebank.zplatform.commons.utils.Base64Utils;
 import com.zlebank.zplatform.commons.utils.RSAUtils;
@@ -125,6 +127,7 @@ import com.zlebank.zplatform.trade.service.ITxnsWithholdingService;
 import com.zlebank.zplatform.trade.service.RefundRouteConfigService;
 import com.zlebank.zplatform.trade.service.base.BaseServiceImpl;
 import com.zlebank.zplatform.trade.utils.DateUtil;
+import com.zlebank.zplatform.trade.utils.ObjectDynamic;
 import com.zlebank.zplatform.trade.utils.OrderNumber;
 import com.zlebank.zplatform.trade.utils.SynHttpRequestThread;
 import com.zlebank.zplatform.trade.utils.UUIDUtil;
@@ -198,7 +201,9 @@ public class GateWayServiceImpl extends
 	private MemberOperationService memberOperationService;
 	@Autowired
 	private MemberDAO memberDAO;
-
+	
+    @Autowired
+	private BankInfoDAO bankInfoDAO;
 	/**
 	 *
 	 * @return
@@ -1222,7 +1227,7 @@ public class GateWayServiceImpl extends
 
 	}
 
-	@Transactional
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
 	public String dealWithWithdrawOrder(WapWithdrawBean withdrawBean,
 			WapWithdrawAccBean withdrawAccBean) throws TradeException {
 		TxnsOrderinfoModel withdrawOrderinfo = super.getUniqueByHQL(
@@ -2661,6 +2666,8 @@ public class GateWayServiceImpl extends
 			trade.setTradeType("01");// 实名认证交易，不发送绑卡短信
 			trade.setMerUserId(personMemberId);
 			trade.setPayinstiId(routId);
+			trade.setReaPayOrderNo(OrderNumber.getInstance()
+					.generateReaPayOrderId());
 			quickPayTrade.setTradeBean(trade);
 			quickPayTrade.setTradeType(TradeTypeEnum.BANKSIGN);
 			// Long bindId=quickpayCustService.saveQuickpayCust(trade);
@@ -2996,4 +3003,64 @@ public class GateWayServiceImpl extends
 		}
 		return 0L;
 	}
+	
+	@Transactional(propagation = Propagation.REQUIRED,rollbackFor = Throwable.class)
+    public Map<String, Object> withdraw(TradeBean tradeBean) throws AccBussinessException, IllegalEntryRequestException, AbstractBusiAcctException, NumberFormatException, TradeException{
+    	Map<String, Object> model = new HashMap<String, Object>();
+    	TxnsWithdrawModel withdraw = null;
+
+		TxnsOrderinfoModel orderinfo = getOrderByTxnseqno(tradeBean.getTxnseqno());
+		TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(orderinfo
+				.getRelatetradetxn());
+		if ("02".equals(orderinfo.getStatus())) {
+			model.put("errMsg", "提现正在审核中，请不要重复提交");
+			model.put("txnseqno", tradeBean.getTxnseqno());
+			model.put("url", "/erro_gw");
+			// return new ModelAndView("/erro_gw", model);
+			return model;
+		}
+		// 验证提现密码
+		if (!validatePayPWD(orderinfo.getSecmemberno(),
+				tradeBean.getPay_pwd(), MemberType.ENTERPRISE)) {
+			orderinfo.setStatus("05");// 支付密码错误
+			update(orderinfo);
+			model.put("errMsg", "支付密码错误");
+			model.put("respCode", "ZL34");
+			model.put("txnseqno", tradeBean.getTxnseqno());
+			model.put("url", "/erro_merch_withdraw");
+			return model;
+			// return new ModelAndView("/erro_merch_withdraw", model);
+		}
+		PojoMerchDeta merch = merchService.getMerchBymemberId(orderinfo
+				.getSecmemberno());
+		withdraw = new TxnsWithdrawModel(tradeBean);
+		withdraw.setAcctno(merch.getAccNum());
+		withdraw.setAcctname(merch.getAccName());
+		withdraw.setBankcode(merch.getBankCode());
+		PojoBankInfo bankNodeinfo = bankInfoDAO.getByBankNode(merch
+				.getBankNode());
+		withdraw.setBankname(bankNodeinfo.getMainBankSname());
+		txnsWithdrawService.saveWithdraw(withdraw);
+		// 记录提现账务
+		TradeInfo tradeInfo = new TradeInfo();
+		tradeInfo.setBusiCode("30000001");
+		tradeInfo.setPayMemberId(withdraw.getMemberid());
+		tradeInfo.setPayToMemberId(withdraw.getMemberid());
+		tradeInfo.setAmount(new BigDecimal(withdraw.getAmount()));
+		tradeInfo.setCharge(new BigDecimal(withdraw.getFee()));
+		tradeInfo.setTxnseqno(orderinfo.getRelatetradetxn());
+		tradeInfo.setCoopInstCode(orderinfo.getFirmemberno());
+		// 记录分录流水
+		accEntryService.accEntryProcess(tradeInfo, EntryEvent.AUDIT_APPLY);
+		updateOrderToStartPay(tradeBean.getTxnseqno());
+		try {
+			model.put( "suburl", orderinfo.getFronturl() + "?" + ObjectDynamic.generateReturnParamer(generateWithdrawRespMessage(tradeBean .getOrderId()), false, null));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        model.put("errMsg", "提现申请成功");
+        model.put("url", "/fastpay/success");
+    	return model;
+    }
 }
