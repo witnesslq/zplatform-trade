@@ -15,6 +15,7 @@ import java.util.Map;
 
 import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
 import com.zlebank.zplatform.acc.exception.AccBussinessException;
+import com.zlebank.zplatform.acc.exception.IllegalEntryRequestException;
 import com.zlebank.zplatform.trade.bean.AccountTradeBean;
 import com.zlebank.zplatform.trade.bean.AppPartyBean;
 import com.zlebank.zplatform.trade.bean.PayPartyBean;
@@ -200,5 +201,5 @@ public interface ITxnsLogService extends IBaseService<TxnsLogModel, String>{
     /**
      * 定时处理资金结算任务
      */
-    public void excuteSetted() throws AccBussinessException, AbstractBusiAcctException, NumberFormatException;
+    public void excuteSetted() throws AccBussinessException, AbstractBusiAcctException, NumberFormatException, IllegalEntryRequestException;
 }

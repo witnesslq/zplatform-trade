@@ -1,23 +1,4 @@
 /* 
-haod	支付			
-姓名	郭佳			
-日期	2016年5月23日			
-				
-当日工作计划				
-序号	时长(时)	工作描述	优先级	备注
-1	7	集成畅捷支付代付代码	高	
-				
-当日工作总结				
-序号	时长(时)	工作描述	优先级	备注
-1	7.5	开发退款功能，测试退款，修改生成退款订单的方法，修改测试中出现的bug	中	
-				
-				
-问题情况				
-序号	问题描述		优先级	备注
-				
-次日工作计划				
-序号	时长(时)	工作描述	优先级	备注
-1	8	集成畅捷支付代付代码编写各个接口的单元测试程序	高	
  * UpdateInsteadServiceImpl.java  
  * 
  * version TODO
@@ -47,6 +28,7 @@ import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
 import com.zlebank.zplatform.acc.exception.AccBussinessException;
+import com.zlebank.zplatform.acc.exception.IllegalEntryRequestException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.commons.dao.pojo.AccStatusEnum;
@@ -200,6 +182,13 @@ public class UpdateInsteadServiceImpl implements UpdateInsteadService, UpdateSub
 			if(txnsLog!=null){
 				txnsLog.setApporderstatus(AccStatusEnum.AccountingFail.getCode());
 				txnsLog.setApporderinfo(e1.getMessage());
+			}
+		} catch (IllegalEntryRequestException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			if(txnsLog!=null){
+				txnsLog.setApporderstatus(AccStatusEnum.AccountingFail.getCode());
+				txnsLog.setApporderinfo(e.getMessage());
 			}
 		}
     	if(txnsLog!=null){
