@@ -123,12 +123,9 @@ public class ReaPayQuickTradeThread implements IQuickPayTrade{
             //已绑卡支付
             if(StringUtil.isNotEmpty(trade.getBindCardId())){
                 log.info("ReaPay bindcard sign start!");
-                //
-                
-                
-                
                 //使用已绑定的卡进行支付
                 BindBean bindBean = ReaPayTradeAnalyzer.generateBindBean(trade);
+                bindBean.setMember_ip("219.234.83.141");
                 if(log.isDebugEnabled()){
                     log.debug(JSON.toJSONString(bindBean));
                 }
@@ -149,6 +146,7 @@ public class ReaPayQuickTradeThread implements IQuickPayTrade{
                 log.info("ReaPay debitcard sign start!");
                 //String accOrderNo = trade.getOrderId();//受理订单号
                 DebitBean debitBean = ReaPayTradeAnalyzer.generateDebitBean(trade);//生成借记卡签约bean
+                debitBean.setMember_ip("219.234.83.141");
                 if(log.isDebugEnabled()){
                     log.debug(JSON.toJSONString(debitBean));
                 }
@@ -164,6 +162,7 @@ public class ReaPayQuickTradeThread implements IQuickPayTrade{
                     trade.setValidthru(trade.getMonth()+trade.getYear());//web收银台使用
                 }
                 CreditBean creditBean = ReaPayTradeAnalyzer.generateCreditBean(trade);
+                creditBean.setMember_ip("219.234.83.141");
                 if(log.isDebugEnabled()){
                     log.debug(JSON.toJSONString(creditBean));
                 }
@@ -187,7 +186,7 @@ public class ReaPayQuickTradeThread implements IQuickPayTrade{
                     trade.setBindCardId("");
                 }
             }else{
-                quickpayCustService.deleteCard(trade.getCardId());
+                //quickpayCustService.deleteCard(trade.getCardId());
             }
             log.info("ReaPay bank card sign end!");
         } catch (Exception e) {

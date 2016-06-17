@@ -37,24 +37,99 @@ import com.zlebank.zplatform.trade.model.TxnsWithholdingModel;
  * @since 
  */
 public interface ITxnsLogService extends IBaseService<TxnsLogModel, String>{
+	/**
+	 * 校验订单重复性
+	 * @param orderId
+	 * @return
+	 */
     public ResultBean verifyRepeatOrder(String orderId);
+    /**
+     * 更新支付方信息
+     * @param payPartyBean
+     * @return
+     */
     public ResultBean updatePayInfo_Fast(PayPartyBean payPartyBean);
+    /**
+     * 更新路由层次信息
+     * @param txnseqno
+     * @param routId
+     * @param currentStep
+     * @param cashCode
+     * @return
+     */
+    @Deprecated
     public ResultBean updateRoutInfo(String txnseqno,String routId,String currentStep,String cashCode);
+    /**
+     * 更新应用方信息（账务信息）
+     * @param appParty
+     * @return
+     */
     public ResultBean updateAppInfo(AppPartyBean appParty);
     
+    /**
+     * 通过交易流水号获取交易信息
+     * @param txnseqno
+     * @return
+     */
     public TxnsLogModel getTxnsLogByTxnseqno(String txnseqno);
+    /**
+     * 获取交易手续费
+     * @param txnsLog
+     * @return
+     */
     public Long getTxnFee(TxnsLogModel txnsLog);
+    @Deprecated
     public ResultBean updatePayInfo_ecitic(PayPartyBean payPartyBean);
     
+    /**
+     * 更新融宝交易应答信息
+     * @param txnseqno
+     * @param payResult
+     */
     public void updateReaPayRetInfo(String txnseqno,ReaPayResultBean payResult);
     
     public TxnsLogModel queryTrade(QueryBean queryBean);
+    /**
+     * 保存账户支付交易数据
+     * @param accountTrade
+     * @throws TradeException
+     */
     public void saveAccountTrade(AccountTradeBean accountTrade) throws TradeException;
+    /**
+     * 更新账户支付交易结果
+     * @param accountTrade
+     * @param resultBean
+     * @throws TradeException
+     */
     public void updateAccountTrade(AccountTradeBean accountTrade,ResultBean resultBean) throws TradeException;
+    @Deprecated
     public void updateWapRoutInfo(String txnseqno,String routId) throws TradeException;
     public TxnsLogModel queryLogByTradeseltxn(String queryId);
+    /**
+     * 更新应用方（账务）处理结果信息
+     * @param txnseqno
+     * @param appOrderStatus
+     * @param appOrderinfo
+     */
     public void updateAppStatus(String txnseqno,String appOrderStatus,String appOrderinfo);
+    /**
+     * 交易风控
+     * @param txnseqno
+     * @param merchId
+     * @param subMerchId
+     * @param memberId
+     * @param busiCode
+     * @param txnAmt
+     * @param cardType
+     * @param cardNo
+     * @throws TradeException
+     */
     public void tradeRiskControl(String txnseqno,String merchId,String subMerchId,String memberId,String busiCode,String txnAmt,String cardType,String cardNo)throws TradeException;
+    /**
+     * 更新实际业务代码
+     * @param txnseqno
+     * @param busicode
+     */
     public void updateAccBusiCode(String txnseqno,String busicode);
     
     /**

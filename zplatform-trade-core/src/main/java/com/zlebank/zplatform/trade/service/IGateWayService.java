@@ -15,9 +15,13 @@ import java.util.List;
 import java.util.Map;
 
 import com.alibaba.fastjson.JSONObject;
+import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
+import com.zlebank.zplatform.acc.exception.AccBussinessException;
+import com.zlebank.zplatform.acc.exception.IllegalEntryRequestException;
 import com.zlebank.zplatform.member.bean.enums.MemberType;
 import com.zlebank.zplatform.trade.bean.ReaPayResultBean;
 import com.zlebank.zplatform.trade.bean.ResultBean;
+import com.zlebank.zplatform.trade.bean.TradeBean;
 import com.zlebank.zplatform.trade.bean.ZLPayResultBean;
 import com.zlebank.zplatform.trade.bean.gateway.OrderBean;
 import com.zlebank.zplatform.trade.bean.gateway.OrderRespBean;
@@ -205,4 +209,16 @@ public interface IGateWayService extends IBaseService<TxnsOrderinfoModel, Long>{
      * @return
      */
     public Long getRefundFee(String txnseqno,String merchNo,String txnAmt,String busicode);
+    
+    /**
+     * 个人提现
+     * @param tradeBean
+     * @return
+     * @throws AccBussinessException
+     * @throws IllegalEntryRequestException
+     * @throws AbstractBusiAcctException
+     * @throws NumberFormatException
+     * @throws TradeException
+     */
+    public Map<String, Object> withdraw(TradeBean tradeBean) throws AccBussinessException, IllegalEntryRequestException, AbstractBusiAcctException, NumberFormatException, TradeException;
 }

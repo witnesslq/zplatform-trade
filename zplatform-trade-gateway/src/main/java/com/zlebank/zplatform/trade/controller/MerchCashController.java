@@ -10,7 +10,6 @@
  */
 package com.zlebank.zplatform.trade.controller;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,18 +31,17 @@ import org.springframework.web.servlet.ModelAndView;
 import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.acc.bean.BusiAcct;
 import com.zlebank.zplatform.acc.bean.BusiAcctQuery;
-import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.bean.enums.Usage;
+import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
+import com.zlebank.zplatform.acc.exception.AccBussinessException;
+import com.zlebank.zplatform.acc.exception.IllegalEntryRequestException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.AccountQueryService;
-import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.commons.dao.BankInfoDAO;
-import com.zlebank.zplatform.commons.dao.pojo.PojoBankInfo;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.member.bean.CoopInsti;
 import com.zlebank.zplatform.member.bean.EnterpriseBean;
 import com.zlebank.zplatform.member.bean.QuickpayCustBean;
-import com.zlebank.zplatform.member.bean.enums.MemberType;
 import com.zlebank.zplatform.member.dao.CoopInstiDAO;
 import com.zlebank.zplatform.member.dao.EnterpriseDAO;
 import com.zlebank.zplatform.member.pojo.PojoCoopInsti;
@@ -67,7 +65,6 @@ import com.zlebank.zplatform.trade.model.PojoRspmsg;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.model.TxnsNotifyTaskModel;
 import com.zlebank.zplatform.trade.model.TxnsOrderinfoModel;
-import com.zlebank.zplatform.trade.model.TxnsWithdrawModel;
 import com.zlebank.zplatform.trade.model.TxnsWithholdingModel;
 import com.zlebank.zplatform.trade.service.IGateWayService;
 import com.zlebank.zplatform.trade.service.IProdCaseService;
@@ -494,7 +491,41 @@ public class MerchCashController {
  	
  	@RequestMapping("/withdraw.htm")
     public ModelAndView withdraw(TradeBean tradeBean) {
-        Map<String, Object> model = new HashMap<String, Object>();
+ 		Map<String, Object> model = new HashMap<String, Object>();
+		try {
+			model = webGateWayService.Withdraw(tradeBean);
+		} catch (AccBussinessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			model.put("errMsg", "提现申请失败");
+			model.put("txnseqno", tradeBean.getTxnseqno());
+			return new ModelAndView("/erro_merch_withdraw", model);
+		} catch (IllegalEntryRequestException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			model.put("errMsg", "提现申请失败");
+			model.put("txnseqno", tradeBean.getTxnseqno());
+			return new ModelAndView("/erro_merch_withdraw", model);
+		} catch (AbstractBusiAcctException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			model.put("errMsg", "提现申请失败");
+			model.put("txnseqno", tradeBean.getTxnseqno());
+			return new ModelAndView("/erro_merch_withdraw", model);
+		} catch (NumberFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			model.put("errMsg", "提现申请失败");
+			model.put("txnseqno", tradeBean.getTxnseqno());
+			return new ModelAndView("/erro_merch_withdraw", model);
+		} catch (TradeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			model.put("errMsg", "提现申请失败");
+			model.put("txnseqno", tradeBean.getTxnseqno());
+			return new ModelAndView("/erro_merch_withdraw", model);
+		}
+       /* Map<String, Object> model = new HashMap<String, Object>();
         try {
             TxnsOrderinfoModel orderinfo = gateWayService
                     .getOrderinfoByOrderNoAndMemberId(tradeBean.getOrderId(),
@@ -534,10 +565,10 @@ public class MerchCashController {
             //记录分录流水
             accEntryService.accEntryProcess(tradeInfo,EntryEvent.AUDIT_APPLY);
             if (StringUtil.isNotEmpty(tradeBean.getBindCardId())) {
-                /*QuickpayCustModel card = memberBankCardService.
+                QuickpayCustModel card = memberBankCardService.
                         .getCardByBindId(tradeBean.getBindCardId());
                 withdraw.setAcctname(card.getAccname());
-                withdraw.setAcctno(card.getCardno());*/
+                withdraw.setAcctno(card.getCardno());
             }
             //txnsWithdrawService.saveWithdraw(withdraw);
             gateWayService.updateOrderToStartPay(tradeBean.getTxnseqno());
@@ -557,8 +588,8 @@ public class MerchCashController {
             model.put("txnseqno", tradeBean.getTxnseqno());
             return new ModelAndView("/erro_merch_withdraw", model);
         }
-        model.put("errMsg", "提现申请成功");
-        return new ModelAndView("/fastpay/success", model);
+        model.put("errMsg", "提现申请成功");*/
+		return new ModelAndView(model.get("url")+"", model);
     }
  	
  	@RequestMapping("/showAccount")

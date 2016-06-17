@@ -68,7 +68,7 @@ public class ChanPayAsyncServiceImpl implements ChanPayAsyncService {
 	 * @throws TradeException
 	 */
 	@Override
-	@Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Throwable.class)
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Throwable.class)
 	public ResultBean dealWithTradeAsync(
 			TradeAsyncResultBean tradeAsyncResultBean) throws TradeException {
 		ResultBean resultBean = null;
@@ -117,12 +117,12 @@ public class ChanPayAsyncServiceImpl implements ChanPayAsyncService {
 			txnsLogService.updateGateWayPayResult(payPartyBean);
 			// 更新数据 交易订单
 			orderinfo.setOrderfinshtime(DateUtil.getCurrentDateTime());
-			gatewaypayService.update(gatewayOrder);
+			//gatewaypayService.update(gatewayOrder);
 			gateWayService.update(orderinfo);
 			//更新应用方信息
 			AppPartyBean appParty = new AppPartyBean("","000000000000", DateUtil.getCurrentDateTime(),DateUtil.getCurrentDateTime(), txnseqno, "");
 			txnsLogService.updateAppInfo(appParty);
-			// 处理账务
+			//处理账务
 			AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue(txnsLog.getBusitype())).accountedFor(txnseqno);
 			resultBean = new ResultBean("success");
 		} catch (Exception e) {

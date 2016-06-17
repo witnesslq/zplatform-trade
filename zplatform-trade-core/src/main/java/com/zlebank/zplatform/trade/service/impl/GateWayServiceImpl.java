@@ -44,6 +44,8 @@ import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.AccountQueryService;
 import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.commons.bean.PagedResult;
+import com.zlebank.zplatform.commons.dao.BankInfoDAO;
+import com.zlebank.zplatform.commons.dao.pojo.PojoBankInfo;
 import com.zlebank.zplatform.commons.enums.BusinessCodeEnum;
 import com.zlebank.zplatform.commons.utils.Base64Utils;
 import com.zlebank.zplatform.commons.utils.RSAUtils;
@@ -201,7 +203,8 @@ public class GateWayServiceImpl extends
 	private MemberOperationService memberOperationService;
 	@Autowired
 	private MemberDAO memberDAO;
-
+	@Autowired
+	private BankInfoDAO bankInfoDAO;
 	/**
 	 *
 	 * @return
@@ -1406,14 +1409,23 @@ public class GateWayServiceImpl extends
 
 	}
 
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Throwable.class)
 	public void saveSuccessReaPayTrade(String txnseqno, String gateWayOrderNo,
 			ReaPayResultBean payResultBean) {
 		TxnsLogModel txnsLog = txnsLogService.get(txnseqno);
 		// txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
 		txnsLog.setPayordfintime(DateUtil.getCurrentDateTime());
-		txnsLog.setRetcode("0000");
-		txnsLog.setRetinfo("交易成功");
+		if("TRADE_FINISHED".equals(payResultBean.getStatus())){
+			txnsLog.setRetcode("0000");
+			txnsLog.setRetinfo("交易成功");
+		}else{
+			PojoRspmsg rspmsg = rspmsgDAO.getRspmsgByChnlCode(ChnlTypeEnum.REAPAY, payResultBean.getResult_code());
+			if(rspmsg!=null){
+				txnsLog.setRetcode(rspmsg.getWebrspcode());
+				txnsLog.setRetinfo(rspmsg.getRspinfo());
+			}
+			
+		}
 		txnsLog.setRetdatetime(DateUtil.getCurrentDateTime());
 		txnsLog.setTradestatflag("00000001");// 交易完成结束位
 		txnsLog.setTradetxnflag("10000000");// 证联支付快捷（基金交易）
@@ -1421,11 +1433,15 @@ public class GateWayServiceImpl extends
 		txnsLog.setTxnfee(getTxnFee(txnsLog));
 		txnsLog.setTradeseltxn(UUIDUtil.uuid());
 		txnsLog.setPayrettsnseqno(payResultBean.getTrade_no());
-		txnsLog.setPayretcode(payResultBean.getResult_code());
-		txnsLog.setPayretinfo(payResultBean.getResult_msg());
+		if("TRADE_FINISHED".equals(payResultBean.getStatus())){//交易成功
+			txnsLog.setPayretcode(payResultBean.getStatus());
+			txnsLog.setPayretinfo("支付成功");
+		}else{//交易失败
+			txnsLog.setPayretcode(payResultBean.getResult_code());
+			txnsLog.setPayretinfo(payResultBean.getResult_msg());
+		}
 		txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
 		txnsLogService.update(txnsLog);
-
 		TxnsOrderinfoModel orderinfo = super.findByProperty("orderno",
 				gateWayOrderNo).get(0);
 		orderinfo.setStatus("00");
@@ -2198,7 +2214,7 @@ public class GateWayServiceImpl extends
 					txnsLog.getAccsecmerno(), "", txnsLog.getCheckstandver(),
 					txnsLog.getBusicode(), txnsLog.getBusitype(),
 					card.getCardtype(), "goods", "gooddesc", card.getCvv2(),
-					card.getValidtime(), txnsLog.getAccmemberid(),
+					card.getValidtime(), card.getRelatememberno(),
 					card.getBindcardid(), "", reaPayOrderNo, "", "", 0L, "",
 					"", orderinfo.getTn(), "", "");
 			String routId = null;
@@ -2323,11 +2339,14 @@ public class GateWayServiceImpl extends
 				txnsLog.getAccfirmerno(), txnsLog.getAccsecmerno(),
 				txnsLog.getAccmemberid(), txnsLog.getBusicode(),
 				txnsLog.getAmount() + "", card.getCardtype(), card.getCardno());
+		//检查资金账户
+		checkBusiAcct(txnsLog.getAccsecmerno(), txnsLog.getAccmemberid());
 		updateOrderToStartPay(orderinfo.getRelatetradetxn());
 		txnsLogService.initretMsg(txnsLog.getTxnseqno());
 		quickPayTrade.setTradeBean(trade);
 		quickPayTrade.setTradeType(TradeTypeEnum.SUBMITPAY);
 		// TradeAdapterFactory.getInstance().getThreadPool(routId).executeMission(quickPayTrade);
+		
 		ResultBean resultBean = quickPayTrade.submitPay(trade);
 		if (!resultBean.isResultBool()) {
 			throw new TradeException("T000", resultBean.getErrMsg());
@@ -2751,27 +2770,28 @@ public class GateWayServiceImpl extends
 	@Override
 	public void checkBusiAcct(String merchNo, String memberId)
 			throws TradeException {
-
-		if ("999999999999999".equals(memberId)) {
-			return;
-		}
 		BusiAcct fundAcct = null;
 		List<BusiAcct> busiAccList = null;
-		if (StringUtil.isNotEmpty(memberId)) {
-			busiAccList = accountQueryService.getBusiACCByMid(memberId);
-			// 取得资金账户
-			for (BusiAcct busiAcct : busiAccList) {
-				if (Usage.BASICPAY == busiAcct.getUsage()) {
-					fundAcct = busiAcct;
+		if (!"999999999999999".equals(memberId)) {
+			if (StringUtil.isNotEmpty(memberId)) {
+				busiAccList = accountQueryService.getBusiACCByMid(memberId);
+				// 取得资金账户
+				for (BusiAcct busiAcct : busiAccList) {
+					if (Usage.BASICPAY == busiAcct.getUsage()) {
+						fundAcct = busiAcct;
+					}
+				}
+				BusiAcctQuery memberAcct = accountQueryService
+						.getMemberQueryByID(fundAcct.getBusiAcctCode());
+				if (memberAcct.getStatus() != AcctStatusType.NORMAL) {
+					throw new TradeException("GW19");
 				}
 			}
-			BusiAcctQuery memberAcct = accountQueryService
-					.getMemberQueryByID(fundAcct.getBusiAcctCode());
-			if (memberAcct.getStatus() != AcctStatusType.NORMAL) {
-				throw new TradeException("GW19");
-			}
 		}
-
+		
+		if(StringUtil.isEmpty(merchNo)){
+			return ;
+		}
 		busiAccList = accountQueryService.getBusiACCByMid(merchNo);
 		// 取得资金账户
 		for (BusiAcct busiAcct : busiAccList) {
@@ -2780,8 +2800,8 @@ public class GateWayServiceImpl extends
 			}
 		}
 		BusiAcctQuery merchAcct = accountQueryService
-				.getMemberQueryByID(fundAcct.getBusiAcctCode());
-		if (merchAcct.getStatus() != AcctStatusType.NORMAL) {
+				.getMemberQueryByID(fundAcct.getBusiAcctCode()); 
+		if (merchAcct.getStatus() == AcctStatusType.FREEZE||merchAcct.getStatus() == AcctStatusType.STOP_IN) {
 			throw new TradeException("GW05");
 		}
 	}
@@ -3100,5 +3120,65 @@ public class GateWayServiceImpl extends
         byte[] data =  URLEncoder.encode(dataMsg,"utf-8").getBytes();
         orderAsyncRespBean.setSignature(URLEncoder.encode(RSAUtils.sign(data, privateKey),"utf-8"));
         return orderAsyncRespBean;
+    }
+	
+	@Transactional(propagation = Propagation.REQUIRED,rollbackFor = Throwable.class)
+    public Map<String, Object> withdraw(TradeBean tradeBean) throws AccBussinessException, IllegalEntryRequestException, AbstractBusiAcctException, NumberFormatException, TradeException{
+    	Map<String, Object> model = new HashMap<String, Object>();
+    	TxnsWithdrawModel withdraw = null;
+
+		TxnsOrderinfoModel orderinfo = getOrderByTxnseqno(tradeBean.getTxnseqno());
+		TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(orderinfo
+				.getRelatetradetxn());
+		if ("02".equals(orderinfo.getStatus())) {
+			model.put("errMsg", "提现正在审核中，请不要重复提交");
+			model.put("txnseqno", tradeBean.getTxnseqno());
+			model.put("url", "/erro_gw");
+			// return new ModelAndView("/erro_gw", model);
+			return model;
+		}
+		// 验证提现密码
+		if (!validatePayPWD(orderinfo.getSecmemberno(),
+				tradeBean.getPay_pwd(), MemberType.ENTERPRISE)) {
+			orderinfo.setStatus("05");// 支付密码错误
+			update(orderinfo);
+			model.put("errMsg", "支付密码错误");
+			model.put("respCode", "ZL34");
+			model.put("txnseqno", tradeBean.getTxnseqno());
+			model.put("url", "/erro_merch_withdraw");
+			return model;
+			// return new ModelAndView("/erro_merch_withdraw", model);
+		}
+		PojoMerchDeta merch = merchService.getMerchBymemberId(orderinfo
+				.getSecmemberno());
+		withdraw = new TxnsWithdrawModel(tradeBean);
+		withdraw.setAcctno(merch.getAccNum());
+		withdraw.setAcctname(merch.getAccName());
+		withdraw.setBankcode(merch.getBankCode());
+		PojoBankInfo bankNodeinfo = bankInfoDAO.getByBankNode(merch
+				.getBankNode());
+		withdraw.setBankname(bankNodeinfo.getMainBankSname());
+		txnsWithdrawService.saveWithdraw(withdraw);
+		// 记录提现账务
+		TradeInfo tradeInfo = new TradeInfo();
+		tradeInfo.setBusiCode("30000001");
+		tradeInfo.setPayMemberId(withdraw.getMemberid());
+		tradeInfo.setPayToMemberId(withdraw.getMemberid());
+		tradeInfo.setAmount(new BigDecimal(withdraw.getAmount()));
+		tradeInfo.setCharge(new BigDecimal(withdraw.getFee()));
+		tradeInfo.setTxnseqno(orderinfo.getRelatetradetxn());
+		tradeInfo.setCoopInstCode(orderinfo.getFirmemberno());
+		// 记录分录流水
+		accEntryService.accEntryProcess(tradeInfo, EntryEvent.AUDIT_APPLY);
+		updateOrderToStartPay(tradeBean.getTxnseqno());
+		try {
+			model.put( "suburl", orderinfo.getFronturl() + "?" + ObjectDynamic.generateReturnParamer(generateWithdrawRespMessage(tradeBean .getOrderId()), false, null));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        model.put("errMsg", "提现申请成功");
+        model.put("url", "/fastpay/success");
+    	return model;
     }
 }

@@ -95,8 +95,6 @@ public class WeChatRefundTrade implements IRefundTrade {
 				retinfo = refund.getErr_code_des();
 			}
 			txnsLogService.updatePayInfo_Fast_result(tradeBean.getTxnseqno(),refund.getTransaction_id(),retcode, retinfo);
-			
-			
 		} catch (WXVerifySignFailedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
