@@ -57,7 +57,7 @@ public class ReaPayReceiveProcessor implements ITradeReceiveProcessor{
             TradeBean tradeBean,
             TradeTypeEnum tradeType) {
         
-     // TODO Auto-generated method stub
+    	// TODO Auto-generated method stub
         if(tradeType==TradeTypeEnum.SUBMITPAY){//确认支付（第三方快捷支付渠道）
             saveReaPayTradeResult(resultBean,tradeBean);
         }else if(tradeType==TradeTypeEnum.BANKSIGN){//交易查询

@@ -224,6 +224,8 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         txnsLogService.initretMsg(txnsLog.getTxnseqno());
         //交易风控
         txnsLogService.tradeRiskControl(txnsLog.getTxnseqno(),txnsLog.getAccfirmerno(),txnsLog.getAccsecmerno(),txnsLog.getAccmemberid(),txnsLog.getBusicode(),txnsLog.getAmount()+"",card.getCardtype(),card.getCardno());
+        //检查资金账户
+      	gateWayService.checkBusiAcct(txnsLog.getAccsecmerno(), txnsLog.getAccmemberid());
         updateOrderToStartPay(orderinfo.getRelatetradetxn());
         quickPayTrade.setTradeType(TradeTypeEnum.SUBMITPAY);
         quickPayTrade.setTradeBean(tradeBean);
@@ -504,6 +506,7 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         return "";
     }
     
+
     @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Throwable.class)
     public Map<String, Object> Withdraw(TradeBean tradeBean) throws AccBussinessException, IllegalEntryRequestException, AbstractBusiAcctException, NumberFormatException, TradeException{
     	Map<String, Object> model = new HashMap<String, Object>();
@@ -565,7 +568,6 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         model.put("url", "/fastpay/success");
     	return model;
     }
-    
     
     /**
      *

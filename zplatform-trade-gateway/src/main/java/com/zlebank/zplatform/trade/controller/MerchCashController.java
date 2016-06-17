@@ -10,7 +10,6 @@
  */
 package com.zlebank.zplatform.trade.controller;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,21 +31,17 @@ import org.springframework.web.servlet.ModelAndView;
 import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.acc.bean.BusiAcct;
 import com.zlebank.zplatform.acc.bean.BusiAcctQuery;
-import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.bean.enums.Usage;
 import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
 import com.zlebank.zplatform.acc.exception.AccBussinessException;
 import com.zlebank.zplatform.acc.exception.IllegalEntryRequestException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.AccountQueryService;
-import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.commons.dao.BankInfoDAO;
-import com.zlebank.zplatform.commons.dao.pojo.PojoBankInfo;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.member.bean.CoopInsti;
 import com.zlebank.zplatform.member.bean.EnterpriseBean;
 import com.zlebank.zplatform.member.bean.QuickpayCustBean;
-import com.zlebank.zplatform.member.bean.enums.MemberType;
 import com.zlebank.zplatform.member.dao.CoopInstiDAO;
 import com.zlebank.zplatform.member.dao.EnterpriseDAO;
 import com.zlebank.zplatform.member.pojo.PojoCoopInsti;
@@ -70,7 +65,6 @@ import com.zlebank.zplatform.trade.model.PojoRspmsg;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.model.TxnsNotifyTaskModel;
 import com.zlebank.zplatform.trade.model.TxnsOrderinfoModel;
-import com.zlebank.zplatform.trade.model.TxnsWithdrawModel;
 import com.zlebank.zplatform.trade.model.TxnsWithholdingModel;
 import com.zlebank.zplatform.trade.service.IGateWayService;
 import com.zlebank.zplatform.trade.service.IProdCaseService;
@@ -502,6 +496,7 @@ public class MerchCashController {
  	
  	@RequestMapping("/withdraw.htm")
     public ModelAndView withdraw(TradeBean tradeBean) {
+
         Map<String, Object> model = null;
 		try {
 			model = webGateWayService.Withdraw(tradeBean);
@@ -526,57 +521,6 @@ public class MerchCashController {
 			e.printStackTrace();
 			return new ModelAndView("/erro_merch_withdraw", model);
 		}
-        		/*new HashMap<String, Object>();
-        try {
-            TxnsOrderinfoModel orderinfo = gateWayService
-                    .getOrderinfoByOrderNoAndMemberId(tradeBean.getOrderId(),
-                            tradeBean.getMerchId());
-            TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(orderinfo.getRelatetradetxn());
-            if ("02".equals(orderinfo.getStatus())) {
-                model.put("errMsg", "提现正在审核中，请不要重复提交");
-                model.put("txnseqno", tradeBean.getTxnseqno());
-                return new ModelAndView("/erro_gw", model);
-            }
-            //验证提现密码
-            if(!gateWayService.validatePayPWD(orderinfo.getSecmemberno(), tradeBean.getPay_pwd(), MemberType.ENTERPRISE)){
-            	orderinfo.setStatus("05");//支付密码错误
-            	gateWayService.update(orderinfo);
-            	model.put("errMsg", "支付密码错误");
-                model.put("respCode", "ZL34");
-                model.put("txnseqno", tradeBean.getTxnseqno());
-                return new ModelAndView("/erro_merch_withdraw", model);
-            }
-            PojoMerchDeta merch = merchService.getMerchBymemberId(orderinfo.getSecmemberno());
-            TxnsWithdrawModel withdraw = new TxnsWithdrawModel(tradeBean);
-            withdraw.setAcctno(merch.getAccNum());
-            withdraw.setAcctname(merch.getAccName());
-            withdraw.setBankcode(merch.getBankCode());
-            PojoBankInfo bankNodeinfo = bankInfoDAO.getByBankNode(merch.getBankNode());
-            withdraw.setBankname(bankNodeinfo.getMainBankSname());
-            //txnsWithdrawService.saveWithdraw(withdraw);
-            //记录提现账务
-            TradeInfo tradeInfo = new TradeInfo();
-            tradeInfo.setBusiCode("30000001");
-            tradeInfo.setPayMemberId(withdraw.getMemberid());
-            tradeInfo.setPayToMemberId(withdraw.getMemberid());
-            tradeInfo.setAmount(new BigDecimal(withdraw.getAmount()));
-            tradeInfo.setCharge(new BigDecimal(withdraw.getFee()));
-            tradeInfo.setTxnseqno(orderinfo.getRelatetradetxn());
-            tradeInfo.setCoopInstCode(orderinfo.getFirmemberno());
-            //记录分录流水
-            accEntryService.accEntryProcess(tradeInfo,EntryEvent.AUDIT_APPLY);
-            txnsWithdrawService.saveWithdraw(withdraw);
-            gateWayService.updateOrderToStartPay(tradeBean.getTxnseqno());
-            model.put("suburl", orderinfo.getFronturl() + "?" + ObjectDynamic.generateReturnParamer(gateWayService.generateWithdrawRespMessage(tradeBean.getOrderId()), false, null));
-        } catch (Exception e) {
-            // TODO: handle exception
-            e.printStackTrace();
-            model.put("errMsg", "提现申请失败");
-            model.put("respCode", "ZL34");
-            model.put("txnseqno", tradeBean.getTxnseqno());
-            return new ModelAndView("/erro_merch_withdraw", model);
-        }
-        model.put("errMsg", "提现申请成功");*/
         return new ModelAndView(model.get("url")+"", model);
     }
  	

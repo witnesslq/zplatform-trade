@@ -13,6 +13,7 @@ package com.zlebank.zplatform.trade.service.impl;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -80,6 +81,7 @@ import com.zlebank.zplatform.trade.bean.enums.BusinessEnum;
 import com.zlebank.zplatform.trade.bean.enums.ChannelEnmu;
 import com.zlebank.zplatform.trade.bean.enums.ChnlTypeEnum;
 import com.zlebank.zplatform.trade.bean.enums.TradeTypeEnum;
+import com.zlebank.zplatform.trade.bean.gateway.AnonOrderAsynRespBean;
 import com.zlebank.zplatform.trade.bean.gateway.OrderAsynRespBean;
 import com.zlebank.zplatform.trade.bean.gateway.OrderBean;
 import com.zlebank.zplatform.trade.bean.gateway.OrderRespBean;
@@ -201,8 +203,7 @@ public class GateWayServiceImpl extends
 	private MemberOperationService memberOperationService;
 	@Autowired
 	private MemberDAO memberDAO;
-	
-    @Autowired
+	@Autowired
 	private BankInfoDAO bankInfoDAO;
 	/**
 	 *
@@ -1408,14 +1409,23 @@ public class GateWayServiceImpl extends
 
 	}
 
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Throwable.class)
 	public void saveSuccessReaPayTrade(String txnseqno, String gateWayOrderNo,
 			ReaPayResultBean payResultBean) {
 		TxnsLogModel txnsLog = txnsLogService.get(txnseqno);
 		// txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
 		txnsLog.setPayordfintime(DateUtil.getCurrentDateTime());
-		txnsLog.setRetcode("0000");
-		txnsLog.setRetinfo("交易成功");
+		if("TRADE_FINISHED".equals(payResultBean.getStatus())){
+			txnsLog.setRetcode("0000");
+			txnsLog.setRetinfo("交易成功");
+		}else{
+			PojoRspmsg rspmsg = rspmsgDAO.getRspmsgByChnlCode(ChnlTypeEnum.REAPAY, payResultBean.getResult_code());
+			if(rspmsg!=null){
+				txnsLog.setRetcode(rspmsg.getWebrspcode());
+				txnsLog.setRetinfo(rspmsg.getRspinfo());
+			}
+			
+		}
 		txnsLog.setRetdatetime(DateUtil.getCurrentDateTime());
 		txnsLog.setTradestatflag("00000001");// 交易完成结束位
 		txnsLog.setTradetxnflag("10000000");// 证联支付快捷（基金交易）
@@ -1423,11 +1433,15 @@ public class GateWayServiceImpl extends
 		txnsLog.setTxnfee(getTxnFee(txnsLog));
 		txnsLog.setTradeseltxn(UUIDUtil.uuid());
 		txnsLog.setPayrettsnseqno(payResultBean.getTrade_no());
-		txnsLog.setPayretcode(payResultBean.getResult_code());
-		txnsLog.setPayretinfo(payResultBean.getResult_msg());
+		if("TRADE_FINISHED".equals(payResultBean.getStatus())){//交易成功
+			txnsLog.setPayretcode(payResultBean.getStatus());
+			txnsLog.setPayretinfo("支付成功");
+		}else{//交易失败
+			txnsLog.setPayretcode(payResultBean.getResult_code());
+			txnsLog.setPayretinfo(payResultBean.getResult_msg());
+		}
 		txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
 		txnsLogService.update(txnsLog);
-
 		TxnsOrderinfoModel orderinfo = super.findByProperty("orderno",
 				gateWayOrderNo).get(0);
 		orderinfo.setStatus("00");
@@ -2200,7 +2214,7 @@ public class GateWayServiceImpl extends
 					txnsLog.getAccsecmerno(), "", txnsLog.getCheckstandver(),
 					txnsLog.getBusicode(), txnsLog.getBusitype(),
 					card.getCardtype(), "goods", "gooddesc", card.getCvv2(),
-					card.getValidtime(), txnsLog.getAccmemberid(),
+					card.getValidtime(), card.getRelatememberno(),
 					card.getBindcardid(), "", reaPayOrderNo, "", "", 0L, "",
 					"", orderinfo.getTn(), "", "");
 			String routId = null;
@@ -2219,6 +2233,8 @@ public class GateWayServiceImpl extends
 			trade.setTn(smsMessageBean.getTn());
 			trade.setBindCardId(card.getBindcardid());
 			trade.setCardId(card.getId());
+			trade.setReaPayOrderNo(OrderNumber.getInstance()
+	                .generateReaPayOrderId());
 			IQuickPayTrade quickPayTrade = null;
 			try {
 				quickPayTrade = TradeAdapterFactory.getInstance()
@@ -2323,11 +2339,14 @@ public class GateWayServiceImpl extends
 				txnsLog.getAccfirmerno(), txnsLog.getAccsecmerno(),
 				txnsLog.getAccmemberid(), txnsLog.getBusicode(),
 				txnsLog.getAmount() + "", card.getCardtype(), card.getCardno());
+		//检查资金账户
+		checkBusiAcct(txnsLog.getAccsecmerno(), txnsLog.getAccmemberid());
 		updateOrderToStartPay(orderinfo.getRelatetradetxn());
 		txnsLogService.initretMsg(txnsLog.getTxnseqno());
 		quickPayTrade.setTradeBean(trade);
 		quickPayTrade.setTradeType(TradeTypeEnum.SUBMITPAY);
 		// TradeAdapterFactory.getInstance().getThreadPool(routId).executeMission(quickPayTrade);
+		
 		ResultBean resultBean = quickPayTrade.submitPay(trade);
 		if (!resultBean.isResultBool()) {
 			throw new TradeException("T000", resultBean.getErrMsg());
@@ -2637,7 +2656,7 @@ public class GateWayServiceImpl extends
 			log.debug("获取路由信息：" + JSON.toJSON(cardBean));
 		}
 		if (routResultBean.isResultBool()) {
-			String routId = routResultBean.getResultObj().toString();
+			String routId = ChannelEnmu.CMBCWITHHOLDING.getChnlcode();//routResultBean.getResultObj().toString();
 			// resultBean.setRoutId(routId);
 			IQuickPayTrade quickPayTrade = null;
 			try {
@@ -2667,7 +2686,7 @@ public class GateWayServiceImpl extends
 			trade.setMerUserId(personMemberId);
 			trade.setPayinstiId(routId);
 			trade.setReaPayOrderNo(OrderNumber.getInstance()
-					.generateReaPayOrderId());
+	                .generateReaPayOrderId());
 			quickPayTrade.setTradeBean(trade);
 			quickPayTrade.setTradeType(TradeTypeEnum.BANKSIGN);
 			// Long bindId=quickpayCustService.saveQuickpayCust(trade);
@@ -2751,27 +2770,28 @@ public class GateWayServiceImpl extends
 	@Override
 	public void checkBusiAcct(String merchNo, String memberId)
 			throws TradeException {
-
-		if ("999999999999999".equals(memberId)) {
-			return;
-		}
 		BusiAcct fundAcct = null;
 		List<BusiAcct> busiAccList = null;
-		if (StringUtil.isNotEmpty(memberId)) {
-			busiAccList = accountQueryService.getBusiACCByMid(memberId);
-			// 取得资金账户
-			for (BusiAcct busiAcct : busiAccList) {
-				if (Usage.BASICPAY == busiAcct.getUsage()) {
-					fundAcct = busiAcct;
+		if (!"999999999999999".equals(memberId)) {
+			if (StringUtil.isNotEmpty(memberId)) {
+				busiAccList = accountQueryService.getBusiACCByMid(memberId);
+				// 取得资金账户
+				for (BusiAcct busiAcct : busiAccList) {
+					if (Usage.BASICPAY == busiAcct.getUsage()) {
+						fundAcct = busiAcct;
+					}
+				}
+				BusiAcctQuery memberAcct = accountQueryService
+						.getMemberQueryByID(fundAcct.getBusiAcctCode());
+				if (memberAcct.getStatus() != AcctStatusType.NORMAL) {
+					throw new TradeException("GW19");
 				}
 			}
-			BusiAcctQuery memberAcct = accountQueryService
-					.getMemberQueryByID(fundAcct.getBusiAcctCode());
-			if (memberAcct.getStatus() != AcctStatusType.NORMAL) {
-				throw new TradeException("GW19");
-			}
 		}
-
+		
+		if(StringUtil.isEmpty(merchNo)){
+			return ;
+		}
 		busiAccList = accountQueryService.getBusiACCByMid(merchNo);
 		// 取得资金账户
 		for (BusiAcct busiAcct : busiAccList) {
@@ -2780,8 +2800,8 @@ public class GateWayServiceImpl extends
 			}
 		}
 		BusiAcctQuery merchAcct = accountQueryService
-				.getMemberQueryByID(fundAcct.getBusiAcctCode());
-		if (merchAcct.getStatus() != AcctStatusType.NORMAL) {
+				.getMemberQueryByID(fundAcct.getBusiAcctCode()); 
+		if (merchAcct.getStatus() == AcctStatusType.FREEZE||merchAcct.getStatus() == AcctStatusType.STOP_IN) {
 			throw new TradeException("GW05");
 		}
 	}
@@ -3003,6 +3023,105 @@ public class GateWayServiceImpl extends
 		}
 		return 0L;
 	}
+
+
+	/**
+	 *
+	 * @param txnseqno
+	 * @return
+	 */
+	@Override
+	public ResultBean generateAsyncRespMessage(String txnseqno) {
+		ResultBean resultBean = null;
+        try {
+            TxnsOrderinfoModel orderinfo = txnsOrderinfoDAO.getOrderByTxnseqno(txnseqno);
+            if(StringUtil.isEmpty(orderinfo.getBackurl())){
+            	return new ResultBean("09", "no need async");
+            }else {
+				if(orderinfo.getBackurl().indexOf("http")<0){
+					return new ResultBean("09", "no need async");
+				}
+			}
+            
+            
+            TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(orderinfo.getRelatetradetxn());
+             String version="v1.0";// 网关版本
+             String encoding="1";// 编码方式
+             String certId="";// 证书 ID
+             String signature="";// 签名
+             String signMethod="01";// 签名方法
+             String merId=txnsLog.getAccfirmerno();// 商户代码
+             String orderId=txnsLog.getAccordno();// 商户订单号
+             String txnType=orderinfo.getTxntype();// 交易类型
+             String txnSubType=orderinfo.getTxnsubtype();// 交易子类
+             String bizType=orderinfo.getBiztype();// 产品类型
+             String accessType="2";// 接入类型
+             String txnTime=orderinfo.getOrdercommitime();// 订单发送时间
+             String txnAmt=orderinfo.getOrderamt()+"";// 交易金额
+             String currencyCode="156";// 交易币种
+             String reqReserved=orderinfo.getReqreserved();// 请求方保留域
+             String reserved="";// 保留域
+             String queryId=txnsLog.getTradeseltxn();// 交易查询流水号
+             String respCode=txnsLog.getRetcode();// 响应码
+             String respMsg=txnsLog.getRetinfo();// 应答信息
+             String settleAmt="";// 清算金额
+             String settleCurrencyCode="";// 清算币种
+             String settleDate=txnsLog.getAccsettledate();// 清算日期
+             String traceNo=txnsLog.getTradeseltxn();// 系统跟踪号
+             String traceTime=DateUtil.getCurrentDateTime();// 交易传输时间
+             String exchangeDate="";// 兑换日期
+             String exchangeRate="";// 汇率
+             String accNo="";// 账号
+             String payCardType="";// 支付卡类型
+             String payType="";// 支付方式
+             String payCardNo="";// 支付卡标识
+             String payCardIssueName="";// 支付卡名称
+             String bindId="";// 绑定标识号
+            
+             
+             OrderAsynRespBean orderRespBean = new OrderAsynRespBean(version, encoding, certId, signature, signMethod, merId, orderId, txnType, txnSubType, bizType, accessType, txnTime, txnAmt, currencyCode, reqReserved, reserved, queryId, respCode, respMsg, settleAmt, settleCurrencyCode, settleDate, traceNo, traceTime, exchangeDate, exchangeRate, accNo, payCardType, payType, payCardNo, payCardIssueName, bindId);
+             String privateKey= "";
+             if("000204".equals(orderinfo.getBiztype())){
+            	 privateKey = coopInstiService.getCoopInstiMK(orderinfo.getFirmemberno(), TerminalAccessType.WIRELESS).getZplatformPriKey();
+             }else if("000201".equals(orderinfo.getBiztype())||"000205".equals(orderinfo.getBiztype())){
+            	 if("0".equals(orderinfo.getAccesstype())){
+                 	privateKey = merchMKService.get(orderinfo.getSecmemberno()).getLocalPriKey().trim();
+                 }else if("2".equals(orderinfo.getAccesstype())){
+                 	privateKey = coopInstiService.getCoopInstiMK(orderinfo.getFirmemberno(), TerminalAccessType.MERPORTAL).getZplatformPriKey();
+                 }else if("1".equals(orderinfo.getAccesstype())){
+                	 privateKey = merchMKService.get(orderinfo.getSecmemberno()).getLocalPriKey().trim();
+                 }
+            	 //privateKey = merchMKService.get(orderinfo.getFirmemberno()).getLocalPriKey();
+             }
+             
+             if("000205".equals(orderinfo.getBiztype())){
+            	 AnonOrderAsynRespBean asynRespBean = new AnonOrderAsynRespBean(version, encoding, txnType, txnSubType, bizType, "00", orderinfo.getSecmembername(), orderId, txnTime, orderinfo.getPaytimeout(), txnAmt, settleCurrencyCode, orderinfo.getOrderdesc(), reserved, orderinfo.getStatus(), orderinfo.getTn(), respCode, respMsg);
+            	 return new ResultBean(generateAsyncOrderResult(asynRespBean, privateKey.trim()));
+             }
+            
+            resultBean = new ResultBean(generateAsyncOrderResult(orderRespBean, privateKey.trim()));
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            resultBean = new ResultBean("RC99", "系统异常");
+        }
+        return resultBean;
+	}
+	public AnonOrderAsynRespBean generateAsyncOrderResult(AnonOrderAsynRespBean orderAsyncRespBean,String privateKey) throws Exception{   
+        String[] unParamstring = {"signature"};
+        String dataMsg = ObjectDynamic.generateParamer(orderAsyncRespBean, false, unParamstring).trim();
+        byte[] data =  URLEncoder.encode(dataMsg,"utf-8").getBytes();
+        //orderAsyncRespBean.setSignature(URLEncoder.encode(RSAUtils.sign(data, privateKey),"utf-8"));
+        return orderAsyncRespBean;
+    }
+	
+	public OrderAsynRespBean generateAsyncOrderResult(OrderAsynRespBean orderAsyncRespBean,String privateKey) throws Exception{   
+        String[] unParamstring = {"signature"};
+        String dataMsg = ObjectDynamic.generateParamer(orderAsyncRespBean, false, unParamstring).trim();
+        byte[] data =  URLEncoder.encode(dataMsg,"utf-8").getBytes();
+        orderAsyncRespBean.setSignature(URLEncoder.encode(RSAUtils.sign(data, privateKey),"utf-8"));
+        return orderAsyncRespBean;
+    }
 	
 	@Transactional(propagation = Propagation.REQUIRED,rollbackFor = Throwable.class)
     public Map<String, Object> withdraw(TradeBean tradeBean) throws AccBussinessException, IllegalEntryRequestException, AbstractBusiAcctException, NumberFormatException, TradeException{

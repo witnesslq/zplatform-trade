@@ -69,7 +69,7 @@ public class ChanPayAsyncServiceImpl implements ChanPayAsyncService {
 	 * @throws TradeException
 	 */
 	@Override
-	@Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Throwable.class)
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Throwable.class)
 	public ResultBean dealWithTradeAsync(
 			TradeAsyncResultBean tradeAsyncResultBean) throws TradeException {
 		ResultBean resultBean = null;
@@ -113,6 +113,7 @@ public class ChanPayAsyncServiceImpl implements ChanPayAsyncService {
 				gatewaypayService.update(gatewayOrder);
 				// 更新数据 交易流水
 
+
 				PayPartyBean payPartyBean = new PayPartyBean();
 				payPartyBean.setPayordfintime(tradeAsyncResultBean.getGmt_payment());
 				payPartyBean
@@ -134,7 +135,7 @@ public class ChanPayAsyncServiceImpl implements ChanPayAsyncService {
 			}else if(tradeStatusEnum == TradeStatusEnum.TRADE_FINISHED){
 				resultBean = new ResultBean("success");
 			}
-			
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

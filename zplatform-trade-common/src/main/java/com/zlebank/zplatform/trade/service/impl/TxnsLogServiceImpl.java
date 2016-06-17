@@ -835,7 +835,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 				TxnsLogModel txnsLog = getTxnsLogByTxnseqno(value.get("TXNSEQNO")+"");
 				log.info("txnsLog:"+txnsLog.getTxnseqno());
 				//通道手续费
-				Long channelFee = Long.valueOf(value.get("CFEE")+"")+Long.valueOf(StringUtil.isEmpty(value.get("DFEE")+"")?"0":value.get("DFEE")+"");
+				Long channelFee = Long.valueOf(StringUtil.isEmpty(value.get("CFEE")+"")?"0":value.get("CFEE")+"")+Long.valueOf(StringUtil.isEmpty(value.get("DFEE")+"")?"0":value.get("DFEE")+"");
 				String payMemberId = "";
         		String payToMemberId = "";
 				 //记录提现账务
@@ -933,7 +933,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
     			
 				log.info("txnsLog:"+txnsLog.getTxnseqno());
 				//通道手续费
-				Long channelFee = Long.valueOf(value.get("CFEE")+"")+Long.valueOf(StringUtil.isEmpty(value.get("DFEE")+"")?"0":value.get("DFEE")+"");
+				Long channelFee = Long.valueOf(StringUtil.isEmpty(value.get("CFEE")+"")?"0":value.get("CFEE")+"")+Long.valueOf(StringUtil.isEmpty(value.get("DFEE")+"")?"0":value.get("DFEE")+"");
 				String payMemberId = "";
         		String payToMemberId = "";
         		String busiType = txnsLog.getBusitype();

@@ -156,7 +156,7 @@ public class RealNameAuthServiceImpl  implements RealNameAuthService{
         } catch (IllegalEntryRequestException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			 log.error(e.getMessage(),e);
+			log.error(e.getMessage(),e);
 		} 
         return true;
     }
