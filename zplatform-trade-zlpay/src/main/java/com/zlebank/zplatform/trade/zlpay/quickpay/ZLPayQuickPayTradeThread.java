@@ -5,6 +5,8 @@ import org.apache.commons.logging.LogFactory;
 
 import com.zlebank.zplatform.commons.dao.ProvinceDAO;
 import com.zlebank.zplatform.commons.dao.pojo.BusiTypeEnum;
+import com.zlebank.zplatform.commons.utils.StringUtil;
+import com.zlebank.zplatform.member.service.MemberBankCardService;
 import com.zlebank.zplatform.trade.adapter.accounting.IAccounting;
 import com.zlebank.zplatform.trade.adapter.quickpay.IQuickPayTrade;
 import com.zlebank.zplatform.trade.bean.PayPartyBean;
@@ -48,6 +50,8 @@ public class ZLPayQuickPayTradeThread implements IQuickPayTrade{
     private ITxnsOrderinfoDAO txnsOrderinfoDAO;
     private IQuickpayCustService quickpayCustService;
     private IZlTradeService zlTradeService;
+    
+    private MemberBankCardService memberBankCardService;
     
     public ZLPayQuickPayTradeThread() {
          txnsQuickpayService = (ITxnsQuickpayService) SpringContext.getContext().getBean("txnsQuickpayService");
@@ -131,6 +135,13 @@ public class ZLPayQuickPayTradeThread implements IQuickPayTrade{
         txnsQuickpayService.updateMarginRegister(resultBean);
         //更新交易流水表和交易订单表
 */        
+    	
+    	if(StringUtil.isNotEmpty(trade.getCardId()+"")){//用户未绑卡
+    		
+    		sendSms(trade);
+    	}else{
+    		
+    	}
         
         return sendSms(trade);
     }
