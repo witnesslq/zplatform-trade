@@ -160,6 +160,10 @@ public class WeChatServiceImpl implements WeChatService{
 		txnsLogService.update(txnsLog);
 		//更新交易订单信息
 		txnsOrderinfoDAO.updateOrderinfo(order);
+		
+		if(resultCodeEnum==ResultCodeEnum.FAIL){
+			return;
+		}
 		//处理账务
 		/**账务处理开始 **/
         // 应用方信息

@@ -26,7 +26,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zlebank.zplatform.commons.utils.StringUtil;
-import com.zlebank.zplatform.member.pojo.PojoMember;
 import com.zlebank.zplatform.member.pojo.PojoMerchDeta;
 import com.zlebank.zplatform.member.service.CoopInstiService;
 import com.zlebank.zplatform.member.service.MemberService;
@@ -34,9 +33,7 @@ import com.zlebank.zplatform.member.service.MerchService;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.dao.IRouteConfigDAO;
 import com.zlebank.zplatform.trade.exception.TradeException;
-import com.zlebank.zplatform.trade.model.MemberBaseModel;
 import com.zlebank.zplatform.trade.model.RouteConfigModel;
-import com.zlebank.zplatform.trade.service.IMemberService;
 import com.zlebank.zplatform.trade.service.IRouteConfigService;
 import com.zlebank.zplatform.trade.service.base.BaseServiceImpl;
 
@@ -190,6 +187,21 @@ public class RouteConfigServiceImpl extends BaseServiceImpl<RouteConfigModel, Lo
         }
         return null;
     }
+    
+    public Map<String, Object> getCardPBCCode(String cardNo){
+    	
+    	Map<String, Object> cardMap = getCardInfo(cardNo);
+    	if(cardMap==null){
+    		return null;
+    	}
+    	String sql = "select t.pbc_bankcode,t.bankname from t_bank_insti t where t.bankcode= ? and status = ?";
+    	List<Map<String, Object>> valueList = (List<Map<String, Object>>) super.queryBySQL(sql, new Object[]{cardMap.get("BANKCODE"),"1"});
+    	if(valueList.size()>0){
+    		return valueList.get(0);
+    	}
+    	return null;
+    }
+    
     @Transactional(propagation=Propagation.REQUIRES_NEW)
     public String getDefaultVerInfo(String instiCode,String busicode,int verType) throws TradeException{
     	List<Map<String, Object>> resultList = (List<Map<String, Object>>) super.queryBySQL("select COOP_INSTI_CODE,BUSI_CODE,VER_TYPE,VER_VALUE from T_NONMER_DEFAULT_CONFIG where COOP_INSTI_CODE=? and BUSI_CODE=? and VER_TYPE=?", new Object[]{instiCode,busicode,verType+""});

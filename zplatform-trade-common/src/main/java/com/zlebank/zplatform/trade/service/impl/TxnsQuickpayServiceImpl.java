@@ -98,18 +98,29 @@ public class TxnsQuickpayServiceImpl extends BaseServiceImpl<TxnsQuickpayModel, 
     @Transactional
     public void updateMobileCode(ResultBean bean) {
         // TODO Auto-generated method stub
-        ZLPayResultBean zlPayResultBean = (ZLPayResultBean)bean.getResultObj();
-        TxnsQuickpayModel txnsQuickpay = super.findByProperty("payorderno", zlPayResultBean.getMerchantSeqId()).get(0);
-        if(bean.isResultBool()){
-            txnsQuickpay.setStatus("00");
-        }else{
+    	if(bean.isResultBool()){
+    		ZLPayResultBean zlPayResultBean = (ZLPayResultBean)bean.getResultObj();
+            TxnsQuickpayModel txnsQuickpay = super.findByProperty("payorderno", zlPayResultBean.getMerchantSeqId()).get(0);
+            if(bean.isResultBool()){
+                txnsQuickpay.setStatus("00");
+            }else{
+                txnsQuickpay.setStatus("02");
+            } 
+            txnsQuickpay.setRetorderno(zlPayResultBean.getPnrSeqId());
+            txnsQuickpay.setPayfinishtime(DateUtil.getCurrentDateTime());
+            txnsQuickpay.setPayretcode(zlPayResultBean.getRespCode());
+            txnsQuickpay.setPayretinfo(zlPayResultBean.getRespDesc());
+            super.update(txnsQuickpay);
+    	}else{
+    		String merchantseqid = bean.getResultObj()+"";
+    		TxnsQuickpayModel txnsQuickpay = super.findByProperty("payorderno",merchantseqid).get(0);
             txnsQuickpay.setStatus("02");
-        } 
-        txnsQuickpay.setRetorderno(zlPayResultBean.getPnrSeqId());
-        txnsQuickpay.setPayfinishtime(DateUtil.getCurrentDateTime());
-        txnsQuickpay.setPayretcode(zlPayResultBean.getRespCode());
-        txnsQuickpay.setPayretinfo(zlPayResultBean.getRespDesc());
-        super.update(txnsQuickpay);
+            txnsQuickpay.setPayfinishtime(DateUtil.getCurrentDateTime());
+            txnsQuickpay.setPayretcode(bean.getErrCode());
+            txnsQuickpay.setPayretinfo(bean.getErrMsg());
+            super.update(txnsQuickpay);
+    	}
+        
         
     }
     /**
@@ -117,7 +128,7 @@ public class TxnsQuickpayServiceImpl extends BaseServiceImpl<TxnsQuickpayModel, 
      * @param marginRegisterBean
      */
     @Override
-    @Transactional
+    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor = Throwable.class)
     public void saveMarginRegister(TradeBean trade,MarginRegisterBean marginRegisterBean) {
         // TODO Auto-generated method stub
         TxnsQuickpayModel txnsQuickpay = new TxnsQuickpayModel(trade,marginRegisterBean);
@@ -223,7 +234,7 @@ public class TxnsQuickpayServiceImpl extends BaseServiceImpl<TxnsQuickpayModel, 
      * @param onlineDepositShortBean
      */
     @Override
-    @Transactional
+    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
     public void saveOnlineDepositShort(TradeBean trade,OnlineDepositShortBean onlineDepositShortBean) {
         // TODO Auto-generated method stub
         TxnsQuickpayModel txnsQuickpay = new TxnsQuickpayModel(trade,onlineDepositShortBean);

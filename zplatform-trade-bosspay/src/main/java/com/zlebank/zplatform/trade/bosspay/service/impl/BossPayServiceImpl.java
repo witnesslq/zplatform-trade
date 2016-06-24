@@ -18,6 +18,7 @@ import javax.xml.rpc.ServiceException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
@@ -40,6 +41,7 @@ import com.zlebank.zplatform.trade.bosspay.client.ColltnAndPmtService;
 import com.zlebank.zplatform.trade.bosspay.client.ColltnAndPmtServiceLocator;
 import com.zlebank.zplatform.trade.bosspay.enums.StatusEnum;
 import com.zlebank.zplatform.trade.bosspay.service.BossPayService;
+import com.zlebank.zplatform.trade.service.IRouteConfigService;
 import com.zlebank.zplatform.trade.utils.ConsUtil;
 import com.zlebank.zplatform.trade.utils.DateUtil;
 
@@ -54,20 +56,31 @@ import com.zlebank.zplatform.trade.utils.DateUtil;
 @Service("bossPayService")
 public class BossPayServiceImpl implements BossPayService{
 	private static final Log log = LogFactory.getLog(BossPayServiceImpl.class);
+	
+	@Autowired
+	private IRouteConfigService routeConfigService;
+	
 	public ResultBean realCollecting(TradeBean trade){
 		ResultBean resultBean = null;
 		try {
+			//查询银行卡的人行联行号（总行）
+			String bankNumber = routeConfigService.getCardPBCCode(trade.getCardNo()).get("PBC_BANKCODE")+"";
+			String bankName = routeConfigService.getCardPBCCode(trade.getCardNo()).get("BANKNAME")+"";
+			if(bankNumber==null){
+				resultBean = new ResultBean("T000", "无法获取有效的人行联行号");
+				return resultBean;
+			}
 			RealtmcolltnRequestBean requestBean = new RealtmcolltnRequestBean(DateUtil.getCurrentDateTime(),ConsUtil.getInstance().cons.getBosspay_bank_account(),
 					ConsUtil.getInstance().cons.getBosspay_agreement_id(), 
 					trade.getCardNo(), 
 					trade.getAcctName(), 
-					"313551080046",//bankNumber,
-					"中国邮政储蓄银行股份有限公司江西省分行",//bankName, 
-					"江西恒邦",//bankProvince, 
-					"江西恒邦",//bankCity, 
+					bankNumber,//bankNumber,
+					bankName,//bankName, 
+					"",//bankProvince, 
+					"",//bankCity, 
 					trade.getAmount(),
 					"09001", 
-					"123", 
+					"代收业务", 
 					ConsUtil.getInstance().cons.getBosspay_userId(),
 					ConsUtil.getInstance().cons.getBosspay_user_key());
 			if(ConsUtil.getInstance().cons.getBosspay_test_flag()==1){

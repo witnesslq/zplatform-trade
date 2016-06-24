@@ -653,10 +653,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
             
             PojoMember mbmberByMemberId = memberService2.getMbmberByMemberId(data.getTranData().getMemberId(), null);
             PojoCoopInsti coopInsti = coopInstiDAO.get(mbmberByMemberId.getInstiId());
-            //MemberBaseModel member = memberService.get(data.getTranData().getMemberId());
-
             PojoMerchDeta member = merchService.getMerchBymemberId(data.getTranData().getMemberId());
-           // MemberBaseModel member = memberService.get(data.getTranData().getMemberId());
             PojoMember memberPojoMember = memberService2.getMbmberByMemberId(data.getTranData().getMemberId(), null);
             PojoCoopInsti pojoCoopInsti = coopInstiDAO.get(memberPojoMember.getInstiId());
 
