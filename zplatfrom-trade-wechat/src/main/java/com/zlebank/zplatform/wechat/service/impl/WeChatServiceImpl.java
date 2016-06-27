@@ -34,6 +34,7 @@ import com.zlebank.zplatform.trade.bean.PayPartyBean;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.enums.ChannelEnmu;
 import com.zlebank.zplatform.trade.bean.enums.OrderStatusEnum;
+import com.zlebank.zplatform.trade.bean.gateway.AnonOrderAsynRespBean;
 import com.zlebank.zplatform.trade.bean.gateway.OrderAsynRespBean;
 import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
 import com.zlebank.zplatform.trade.factory.AccountingAdapterFactory;
@@ -147,7 +148,10 @@ public class WeChatServiceImpl implements WeChatService{
 			txnsLog.setTradestatflag("00000001");//交易完成结束位
 		    txnsLog.setTradetxnflag("10000000");
 		    txnsLog.setRelate("10000000");
+		    txnsLog.setRetdatetime(DateUtil.getCurrentDateTime());
 		    txnsLog.setTradeseltxn(UUIDUtil.uuid());
+		    txnsLog.setRetcode("0000");
+		    txnsLog.setRetinfo("交易成功");
 			order.setStatus(OrderStatusEnum.SUCCESS.getStatus());
 		}else if(resultCodeEnum==ResultCodeEnum.FAIL){//交易失败
 			txnsLog.setPayretcode(result.getErr_code());
@@ -157,7 +161,7 @@ public class WeChatServiceImpl implements WeChatService{
 		txnsLog.setPayordfintime(DateUtil.getCurrentDateTime());
         txnsLog.setRetdatetime(DateUtil.getCurrentDateTime());
 		//更新支付方信息
-		txnsLogService.update(txnsLog);
+		txnsLogService.updateTxnsLog(txnsLog);
 		//更新交易订单信息
 		txnsOrderinfoDAO.updateOrderinfo(order);
 		
@@ -186,13 +190,24 @@ public class WeChatServiceImpl implements WeChatService{
         ResultBean orderResp = 
                 generateAsyncRespMessage(txnsLog.getTxnseqno());
         if (orderResp.isResultBool()) {
-            OrderAsynRespBean respBean = (OrderAsynRespBean) orderResp
-                    .getResultObj();
-            new SynHttpRequestThread(
-            		order.getFirmemberno(),
-            		order.getRelatetradetxn(),
-            		order.getBackurl(),
-                    respBean.getNotifyParam()).start();
+        	if("000205".equals(order.getBiztype())){
+        		AnonOrderAsynRespBean respBean = (AnonOrderAsynRespBean) orderResp
+                        .getResultObj();
+                new SynHttpRequestThread(
+                		order.getFirmemberno(),
+                		order.getRelatetradetxn(),
+                		order.getBackurl(),
+                        respBean.getNotifyParam()).start();
+        	}else{
+        		OrderAsynRespBean respBean = (OrderAsynRespBean) orderResp
+                        .getResultObj();
+                new SynHttpRequestThread(
+                		order.getFirmemberno(),
+                		order.getRelatetradetxn(),
+                		order.getBackurl(),
+                        respBean.getNotifyParam()).start();
+        	}
+            
         }
         /**异步通知处理结束 **/
 	}
@@ -244,17 +259,25 @@ public class WeChatServiceImpl implements WeChatService{
              String payCardIssueName="";// 支付卡名称
              String bindId="";// 绑定标识号
             
+             
              OrderAsynRespBean orderRespBean = new OrderAsynRespBean(version, encoding, certId, signature, signMethod, merId, orderId, txnType, txnSubType, bizType, accessType, txnTime, txnAmt, currencyCode, reqReserved, reserved, queryId, respCode, respMsg, settleAmt, settleCurrencyCode, settleDate, traceNo, traceTime, exchangeDate, exchangeRate, accNo, payCardType, payType, payCardNo, payCardIssueName, bindId);
              String privateKey= "";
              if("000204".equals(orderinfo.getBiztype())){
             	 privateKey = coopInstiService.getCoopInstiMK(orderinfo.getFirmemberno(), TerminalAccessType.WIRELESS).getZplatformPriKey();
-             }else if("000201".equals(orderinfo.getBiztype())){
+             }else if("000201".equals(orderinfo.getBiztype())||"000205".equals(orderinfo.getBiztype())){
             	 if("0".equals(orderinfo.getAccesstype())){
                  	privateKey = merchMKService.get(orderinfo.getSecmemberno()).getLocalPriKey().trim();
                  }else if("2".equals(orderinfo.getAccesstype())){
                  	privateKey = coopInstiService.getCoopInstiMK(orderinfo.getFirmemberno(), TerminalAccessType.MERPORTAL).getZplatformPriKey();
+                 }else if("1".equals(orderinfo.getAccesstype())){
+                	 privateKey = merchMKService.get(orderinfo.getSecmemberno()).getLocalPriKey().trim();
                  }
             	 //privateKey = merchMKService.get(orderinfo.getFirmemberno()).getLocalPriKey();
+             }
+             
+             if("000205".equals(orderinfo.getBiztype())){
+            	 AnonOrderAsynRespBean asynRespBean = new AnonOrderAsynRespBean(version, encoding, txnType, txnSubType, bizType, "00", orderinfo.getSecmembername(), orderId, txnTime, orderinfo.getPaytimeout(), txnAmt, settleCurrencyCode, orderinfo.getOrderdesc(), reserved, orderinfo.getStatus(), orderinfo.getTn(), respCode, respMsg);
+            	 return new ResultBean(generateAsyncOrderResult(asynRespBean, privateKey.trim()));
              }
             
             resultBean = new ResultBean(generateAsyncOrderResult(orderRespBean, privateKey.trim()));
@@ -273,7 +296,13 @@ public class WeChatServiceImpl implements WeChatService{
         return orderAsyncRespBean;
     }
 
-
+	public AnonOrderAsynRespBean generateAsyncOrderResult(AnonOrderAsynRespBean orderAsyncRespBean,String privateKey) throws Exception{   
+        String[] unParamstring = {"signature"};
+        String dataMsg = ObjectDynamic.generateParamer(orderAsyncRespBean, false, unParamstring).trim();
+        byte[] data =  URLEncoder.encode(dataMsg,"utf-8").getBytes();
+        //orderAsyncRespBean.setSignature(URLEncoder.encode(RSAUtils.sign(data, privateKey),"utf-8"));
+        return orderAsyncRespBean;
+    }
 	/**
 	 *
 	 * @param queryBillBean

@@ -68,7 +68,7 @@ public class WeChatRefundTrade implements IRefundTrade {
 			
 			//更新支付方信息
 			PayPartyBean payPartyBean = new PayPartyBean(txnsLog.getTxnseqno(), 
-					"05", 
+					"06", 
 					OrderNumber.getInstance().generateWeChatOrderNO(),//payordno, 
 					ChannelEnmu.WEBCHAT.getChnlcode(), 
 					WXConfigure.getMchid(), 
