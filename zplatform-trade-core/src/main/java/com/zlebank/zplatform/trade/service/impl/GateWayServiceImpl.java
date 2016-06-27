@@ -3004,7 +3004,7 @@ public class GateWayServiceImpl extends
 				.queryBySQL(
 						"select FNC_GETFEES_notxns(?,?,?,?,?,?) as fee from dual",
 						new Object[] { merch.getFeeVer(), busicode, txnAmt,
-								merchNo, txnseqno, txnsLog.getCardtype() });
+								merchNo, txnseqno, txnsLog==null?null:txnsLog.getCardtype() });
 		if (feeList.size() > 0) {
 			if (StringUtil.isNull(feeList.get(0).get("FEE"))) {
 				return 0L;
