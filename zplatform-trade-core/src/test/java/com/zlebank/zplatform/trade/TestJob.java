@@ -58,9 +58,9 @@ public class TestJob {
         weChatService = (WeChatService) context.getBean("weChatService");
     }
     @Test
-    public void test(){
+    public void testBatch(){
     	try {
-    		refundJob.doRefundQuery();
+    		refundJob.execute();
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
@@ -72,7 +72,10 @@ public class TestJob {
     		TradeBean tradeBean= new TradeBean();
         	//tradeBean.setTxnseqno("1606249900053699");
     		//tradeBean.setTxnseqno("1606279900053739");
-    		tradeBean.setTxnseqno("1606279900053799");
+    		//tradeBean.setTxnseqno("1606279900053799");
+    		//tradeBean.setTxnseqno("1606289900053889");
+    		//tradeBean.setTxnseqno("1606289900053940");
+    		tradeBean.setTxnseqno("1606289900053941");
         	ResultBean resultBean=weChatRefundTrade.refund(tradeBean);
         	if(resultBean.isResultBool()){
         		System.out.println("成功");
@@ -88,23 +91,13 @@ public class TestJob {
     
     @Test
     public void testAnsy(){
-    	 StringBuffer sq= new StringBuffer();
-	    	sq.append("<xml><appid><![CDATA[wx16a0b09dbf94f380]]></appid>");
-	    	sq.append("<attach><![CDATA[证联]]></attach>");
-	    	sq.append("<bank_type><![CDATA[CFT]]></bank_type>");
-	    	sq.append("<cash_fee><![CDATA[1]]></cash_fee>");
-	    	sq.append("<device_info><![CDATA[WEB]]></device_info>");
-	     	sq.append("<fee_type><![CDATA[CNY]]></fee_type>");
-	     	sq.append("<is_subscribe><![CDATA[N]]></is_subscribe>");
-	     	sq.append("<mch_id><![CDATA[1345867901]]></mch_id>");
-	     	sq.append("<nonce_str><![CDATA[815D0DECE9746E75A1FDA8D411D3AD2D]]></nonce_str>");
-	     	sq.append("<openid><![CDATA[omBzYwICDExiIz1-ejI3v86oUsGU]]></openid>");
-	     	sq.append("<out_trade_no><![CDATA[1606279000000363]]></out_trade_no>");
-	     	sq.append("<result_code><![CDATA[SUCCESS]]></result_code><return_code><![CDATA[SUCCESS]]></return_code>");
-	     	sq.append("<sign><![CDATA[60F0803BDBC0ED717C464425BB9154C9]]></sign>");
-	     	sq.append("<time_end><![CDATA[20160627110422]]></time_end><total_fee>1</total_fee>");
-	     	sq.append("<trade_type><![CDATA[APP]]></trade_type>");
-	     	sq.append("<transaction_id><![CDATA[4003202001201606277955896260]]></transaction_id></xml>");
+    		StringBuffer sq= new StringBuffer();
+	    	/*sq.append("<xml><appid><![CDATA[wx16a0b09dbf94f380]]></appid><attach><![CDATA[证联]]></attach><bank_type><![CDATA[CFT]]></bank_type><cash_fee><![CDATA[1]]></cash_fee><device_info><![CDATA[WEB]]>");
+	    	sq.append("</device_info><fee_type><![CDATA[CNY]]></fee_type><is_subscribe><![CDATA[N]]></is_subscribe><mch_id><![CDATA[1345867901]]></mch_id><nonce_str><![CDATA[272CD241E851A1C65271F3BD36AA08DE]]>");
+	    	sq.append("</nonce_str><openid><![CDATA[omBzYwICDExiIz1-ejI3v86oUsGU]]></openid><out_trade_no><![CDATA[1606289000000543]]></out_trade_no><result_code><![CDATA[SUCCESS]]></result_code>");
+	    	sq.append("<return_code><![CDATA[SUCCESS]]></return_code><sign><![CDATA[7C1D8F56F3395551321144635B10F303]]></sign><time_end><![CDATA[20160628155106]]></time_end><total_fee>1</total_fee>");
+	    	sq.append("<trade_type><![CDATA[APP]]></trade_type><transaction_id><![CDATA[4003202001201606288023842166]]></transaction_id></xml>");*/
+    		
 	     	try {
 	     		WXApplication bean = new WXApplication();
 	     		PayResultBean result =bean.parseResultXml(sq.toString());

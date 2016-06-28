@@ -12,6 +12,7 @@ package com.zlebank.zplatform.wechat.refund;
 
 import net.sf.json.JSONObject;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import com.zlebank.zplatform.trade.bean.PayPartyBean;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.TradeBean;
 import com.zlebank.zplatform.trade.bean.enums.ChannelEnmu;
+import com.zlebank.zplatform.trade.bean.enums.OrderStatusEnum;
 import com.zlebank.zplatform.trade.bean.enums.RefundTypeEnum;
 import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
@@ -73,11 +75,12 @@ public class WeChatRefundTrade implements IRefundTrade {
 			TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(tradeBean.getTxnseqno());
 			//原始交易流水
 			TxnsLogModel txnsLog_old = txnsLogService.getTxnsLogByTxnseqno(txnsLog.getTxnseqnoOg());
+			
 			//获取订单
 			TxnsOrderinfoModel order = txnsOrderinfoDAO.getOrderByTxnseqno(tradeBean.getTxnseqno());
-			if(order.getStatus().equals(TxnsOrderinfoModel.STATUS_ERROR)
-					||order.getStatus().equals(TxnsOrderinfoModel.STATUS_SUCCESS)
-					||order.getStatus().equals(TxnsOrderinfoModel.STATUS_TIME_OUT)){
+			if(order.getStatus().equals(OrderStatusEnum.FAILED.getStatus())
+					||order.getStatus().equals(OrderStatusEnum.SUCCESS.getStatus())
+					||order.getStatus().equals(OrderStatusEnum.INVALID.getStatus())){
 				 resultBean = new ResultBean("", "此订单已处理或订单状态不对！");
 			}else{
 				//更新支付方信息
@@ -129,8 +132,8 @@ public class WeChatRefundTrade implements IRefundTrade {
 				}
 			}
 		} catch (WXVerifySignFailedException e) {
-			 resultBean = new ResultBean("T099", e.getMessage());
-	         e.printStackTrace();
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return resultBean;
 	}

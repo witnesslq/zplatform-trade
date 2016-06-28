@@ -110,7 +110,7 @@
 			<dependency>
 				<groupId>com.zlebank.zplatform</groupId>
 				<artifactId>zplatform-member</artifactId>
-				<version>1.5.5</version>
+				<version>1.5.6</version>
 			</dependency>
 			<dependency>
 				<groupId>junit</groupId>
@@ -318,6 +318,6 @@
 		<module>../zplatform-trade-bosspay</module>
 		<module>../zplatfrom-trade-chanpay</module>
 		<module>../zplatfrom-trade-wechat</module>
-		<!-- <module>../zplatform-trade-zlpay</module> -->
+		<module>../zplatform-trade-zlpay</module>
 	</modules>
 </project>

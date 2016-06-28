@@ -49,6 +49,7 @@ import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.enums.BusinessEnum;
 import com.zlebank.zplatform.trade.bean.enums.ChannelEnmu;
 import com.zlebank.zplatform.trade.bean.enums.ChnlTypeEnum;
+import com.zlebank.zplatform.trade.bean.enums.OrderStatusEnum;
 import com.zlebank.zplatform.trade.bean.enums.RiskLevelEnum;
 import com.zlebank.zplatform.trade.bean.gateway.QueryBean;
 import com.zlebank.zplatform.trade.dao.ITxnsLogDAO;
@@ -142,9 +143,8 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         	cardMap = getCardInfo(payPartyBean.getCardNo());
         }
         String hql = "update TxnsLogModel set paytype=?,payordno=?,payinst=?,payfirmerno=?,payordcomtime=?,pan=?,cardtype=?,cardinstino=?,txnfee=?,pan_name=? where txnseqno=?";
-        super.updateByHQL(hql, new Object[]{"01",payPartyBean.getPayordno(),payPartyBean.getPayinst(),payPartyBean.getPayfirmerno(),payPartyBean.getPayordcomtime(),
+        super.updateByHQL(hql, new Object[]{StringUtil.isNotEmpty(payPartyBean.getPaytype())?payPartyBean.getPaytype():"01",payPartyBean.getPayordno(),payPartyBean.getPayinst(),payPartyBean.getPayfirmerno(),payPartyBean.getPayordcomtime(),
         payPartyBean.getCardNo(),cardMap==null?"":cardMap.get("TYPE")+"",cardMap==null?"":cardMap.get("BANKCODE")+"",getTxnFee(txnsLog),payPartyBean.getPanName(),payPartyBean.getTxnseqno()});
-
         return null;
     }
     
@@ -625,7 +625,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         	TxnsLogModel txnsLog = getTxnsLogByTxnseqno(data.getTranData().getTxnseqno());
             if(txnsLog!=null){
             	if("4000".equals(txnsLog.getBusitype())){
-                    txnsLog.setPaytype("04"); //支付类型（01：快捷，02：网银，03：账户）
+                    txnsLog.setPaytype("06"); //支付类型（01：快捷，02：网银，03：账户 06退款）
                     txnsLog.setPayordno(data.getBankTranDataSeqNo());//支付定单号
                     txnsLog.setPayinst(ChannelEnmu.CMBCINSTEADPAY.getChnlcode());//支付所属机构
                     txnsLog.setPayfirmerno(ConsUtil.getInstance().cons.getCmbc_insteadpay_merid());//支付一级商户号
@@ -636,7 +636,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
                     txnsLog.setTxnfee(data.getTranData().getTranFee().longValue());
                     update(txnsLog);
             	}else if("3000".equals(txnsLog.getBusitype())){
-            		txnsLog.setPaytype("04"); //支付类型（01：快捷，02：网银，03：账户）
+            		txnsLog.setPaytype("04"); //支付类型（01：快捷，02：网银，03：账户 04代付）
                     txnsLog.setPayordno(data.getBankTranDataSeqNo());//支付定单号
                     txnsLog.setPayinst(ChannelEnmu.CMBCINSTEADPAY.getChnlcode());//支付所属机构
                     txnsLog.setPayfirmerno(ConsUtil.getInstance().cons.getCmbc_insteadpay_merid());//支付一级商户号
@@ -655,10 +655,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
             
             PojoMember mbmberByMemberId = memberService2.getMbmberByMemberId(data.getTranData().getMemberId(), null);
             PojoCoopInsti coopInsti = coopInstiDAO.get(mbmberByMemberId.getInstiId());
-            //MemberBaseModel member = memberService.get(data.getTranData().getMemberId());
-
             PojoMerchDeta member = merchService.getMerchBymemberId(data.getTranData().getMemberId());
-           // MemberBaseModel member = memberService.get(data.getTranData().getMemberId());
             PojoMember memberPojoMember = memberService2.getMbmberByMemberId(data.getTranData().getMemberId(), null);
             PojoCoopInsti pojoCoopInsti = coopInstiDAO.get(memberPojoMember.getInstiId());
 
@@ -1063,7 +1060,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 		//退款申请成功的
 		sb.append(" and ttl.payretcode=? ");
 		sb.append(" and ceil(to_date(?, 'yyyy-mm-dd hh24:mi:ss')-to_date(ttl.payordcomtime,'yyyy-mm-dd hh24:mi:ss'))*24*60>=? ");
-		List<?> result = (List<?>) super.queryBySQL(sb.toString(), new Object[]{"91000001","01","02","SUCCESS",DateUtil.getTimeStamp(),mins });
+		List<?> result = (List<?>) super.queryBySQL(sb.toString(), new Object[]{ChannelEnmu.WEBCHAT.getChnlcode(),OrderStatusEnum.INITIAL.getStatus(),OrderStatusEnum.PAYING.getStatus(),"SUCCESS",DateUtil.getTimeStamp(),mins });
 	     return result;
 	}
 	

@@ -21,5 +21,12 @@ import com.zlebank.zplatform.trade.model.TxncodeDefModel;
  * @since 
  */
 public interface ITxncodeDefService extends IBaseService<TxncodeDefModel, Long>{
+	/**
+	 * 获取内部业务代码实体类
+	 * @param txntype
+	 * @param txnsubtype
+	 * @param biztype
+	 * @return
+	 */
     public TxncodeDefModel getBusiCode(String txntype,String txnsubtype,String biztype);
 }

@@ -778,8 +778,13 @@ public class GateWayController {
                 model.put("trade", trade);
                 switch (channel) {
                     case ZLPAY :
-                        zlpayChannel(trade, routId, model);
-                        break;
+                    	TxnsOrderinfoModel gatewayOrderBean2 = gateWayService.getOrderByTxnseqno(trade.getTxnseqno());
+                        ResultBean orderResp2 = gateWayService.generateAsyncRespMessage(trade.getTxnseqno());
+                        OrderAsynRespBean respBean2 = (OrderAsynRespBean) orderResp2.getResultObj();
+                        model.put("suburl",gatewayOrderBean2.getFronturl()+ "?"+ ObjectDynamic.generateReturnParamer(respBean2, false, null));
+                        model.put("errMsg", "交易成功");
+                        model.put("respCode", "0000");
+                        return new ModelAndView("/fastpay/success", model);
                     case REAPAY :
                         return new ModelAndView("redirect:/gateway/waiting.htm?txnseqno="+ trade.getTxnseqno()+"&reapayOrderNo="+trade.getReaPayOrderNo()+"&orderNo="+trade.getOrderId());
                     case TEST:
@@ -994,10 +999,9 @@ public class GateWayController {
     @RequestMapping("/toNetBank.htm")
     public ModelAndView toBank(TradeBean trade) {
         Map<String, Object> model = new HashMap<String, Object>();
-        ChannelEnmu channelEnmu = ChannelEnmu.fromValue("91000001");
-        
+        ChannelEnmu channelEnmu = ChannelEnmu.fromValue("90000001");
         switch (channelEnmu) {
-			case CHANPAYGATEWAY:
+			case CHANPAY:
 				model.put("txnseqno", trade.getTxnseqno());
 				model.put("bankcode", trade.getBankCode());
 				return new ModelAndView("redirect:/chanpay/createOrder", model);
@@ -1291,7 +1295,7 @@ public class GateWayController {
         Map<String, Object> model = new HashMap<String, Object>();
         // TxnsOrderinfoModel gatewayOrderBean =
         // gateWayService.getOrderinfoByOrderNo(orderNo);
-        gateWayService.updateOrderToFail(orderNo);
+        gateWayService.updateOrderToFail(txnseqno);
         TxnsLogModel txnsLog = txnsLogService.get(txnseqno);
         model.put("errMsg", txnsLog.getRetinfo());
         model.put("respCode", txnsLog.getRetcode());
@@ -1420,7 +1424,7 @@ public class GateWayController {
     @RequestMapping("/error.htm")
     public ModelAndView toExceptionPage(String orderNo, String txnseqno) {
         Map<String, Object> model = new HashMap<String, Object>();
-        gateWayService.updateOrderToFail(orderNo);
+        gateWayService.updateOrderToFail(txnseqno);
         model.put("errMsg", "系统异常,请联系证联金融客服");
         model.put("respCode", "ZL34");
         model.put("txnseqno", txnseqno);
@@ -1597,7 +1601,8 @@ public class GateWayController {
 		queryTradeBean.setProduct_code("20201");
 		List<BankItemBean> queryBank = (List<BankItemBean>) chanPayService.queryBank(queryTradeBean);
 		
-		List<BankItemBean> b2c_bank = new ArrayList<BankItemBean>();
+		List<BankItemBean> b2c_bank_cc = new ArrayList<BankItemBean>();
+		List<BankItemBean> b2c_bank_dc = new ArrayList<BankItemBean>();
 		List<BankItemBean> b2b_bank = new ArrayList<BankItemBean>();
 		for(BankItemBean bankItemBean : queryBank){
 			/*if("QPAY".equals(bankItemBean.getPay_mode())){
@@ -1605,16 +1610,21 @@ public class GateWayController {
 			}*/
 			if("ONLINE_BANK".equals(bankItemBean.getPay_mode())){
 				if("C".equals(bankItemBean.getCard_attribute())){
-					b2c_bank.add(bankItemBean);
+					
+					if("DC".equals(bankItemBean.getCard_type())){
+						b2c_bank_dc.add(bankItemBean);
+					}else{
+						b2c_bank_cc.add(bankItemBean);
+					}
+					
 				}else if("B".equals(bankItemBean.getCard_attribute())){
 					b2b_bank.add(bankItemBean);
 				}
 			}
-			
 		}
 		
 		
-	    return queryBank;
+	    return b2c_bank_dc;
     }
     
     private void responseData(AnonOrderAsynRespBean respBean, String coopInstCode,String merchNo,InsteadPayNotifyTask task) {

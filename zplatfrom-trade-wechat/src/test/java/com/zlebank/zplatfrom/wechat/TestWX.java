@@ -211,13 +211,7 @@ public class TestWX {
 			}
 	}
 	
-	@Test
-	public void testDealQueryRefund(){
-		context = new ClassPathXmlApplicationContext("ContextTest.xml");
-		WeChatService weChatService =(WeChatService) context.getBean("weChatService");
-		//weChatService.dealRefundBatchByBank();
-		weChatService.dealRefundBatchByCharge();
-	}
+	
 	
 	
 }

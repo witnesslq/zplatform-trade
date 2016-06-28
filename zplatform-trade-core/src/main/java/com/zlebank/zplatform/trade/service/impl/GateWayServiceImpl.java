@@ -1470,13 +1470,13 @@ public class GateWayServiceImpl extends
 	}
 
 	@Transactional
-	public void updateOrderToFail(String orderNo) {
-		TxnsOrderinfoModel orderinfo = getOrderinfoByOrderNo(orderNo);
+	public void updateOrderToFail(String txnseqno) {
+		TxnsOrderinfoModel orderinfo = getOrderByTxnseqno(txnseqno);
 		if ("02".equals(orderinfo.getStatus())) {
 			int rows = super
 					.updateByHQL(
-							"update TxnsOrderinfoModel set status = ? where orderno=? ",
-							new Object[] { "03", orderNo });
+							"update TxnsOrderinfoModel set status = ? where relatetradetxn=? ",
+							new Object[] { "03", txnseqno });
 		}
 	}
 
@@ -1506,14 +1506,6 @@ public class GateWayServiceImpl extends
 
 	}
 
-	/**
-     *
-     */
-
-	public void saveErrorTrade() {
-		// TODO Auto-generated method stub
-
-	}
 
 	/**
 	 *
@@ -2613,7 +2605,7 @@ public class GateWayServiceImpl extends
 			String amount, String merchId, String memberId)
 			throws TradeException {
 		// TODO Auto-generated method stub
-		TxnsOrderinfoModel orderInfo = getOrderinfoByOrderNoAndMemberId(
+		TxnsOrderinfoModel orderInfo = getOrderinfoByOrderNoAndMerch(
 				orderNo, merchId);
 		if (orderInfo != null) {
 			TxnsLogModel txnsLog = txnsLogService
@@ -3012,7 +3004,7 @@ public class GateWayServiceImpl extends
 				.queryBySQL(
 						"select FNC_GETFEES_notxns(?,?,?,?,?,?) as fee from dual",
 						new Object[] { merch.getFeeVer(), busicode, txnAmt,
-								merchNo, txnseqno, txnsLog.getCardtype() });
+								merchNo, txnseqno, txnsLog==null?null:txnsLog.getCardtype() });
 		if (feeList.size() > 0) {
 			if (StringUtil.isNull(feeList.get(0).get("FEE"))) {
 				return 0L;
@@ -3099,7 +3091,7 @@ public class GateWayServiceImpl extends
             	 return new ResultBean(generateAsyncOrderResult(asynRespBean, privateKey.trim()));
              }
             
-            resultBean = new ResultBean(generateAsyncOrderResult(orderRespBean, privateKey.trim()));
+            resultBean = new ResultBean(GateWayTradeAnalyzer.generateAsyncOrderResult(orderRespBean, privateKey.trim()));
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

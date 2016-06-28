@@ -598,7 +598,7 @@ public class MerchCashController {
         Map<String, Object> model = new HashMap<String, Object>();
         // TxnsOrderinfoModel gatewayOrderBean =
         // gateWayService.getOrderinfoByOrderNo(orderNo);
-        gateWayService.updateOrderToFail(orderNo);
+        gateWayService.updateOrderToFail(txnseqno);
         TxnsLogModel txnsLog = txnsLogService.get(txnseqno);
         model.put("errMsg", txnsLog.getRetinfo());
         model.put("respCode", txnsLog.getRetcode());
@@ -727,7 +727,7 @@ public class MerchCashController {
     @RequestMapping("/error.htm")
     public ModelAndView toExceptionPage(String orderNo, String txnseqno) {
         Map<String, Object> model = new HashMap<String, Object>();
-        gateWayService.updateOrderToFail(orderNo);
+        gateWayService.updateOrderToFail(txnseqno);
         model.put("errMsg", "系统异常,请联系证联金融客服");
         model.put("respCode", "ZL34");
         model.put("txnseqno", txnseqno);

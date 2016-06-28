@@ -19,16 +19,10 @@ public class RefundJob {
 	 * 跑批-查询支付的退款
 	 * @throws IOException
 	 */
-	@Transactional(propagation = Propagation.REQUIRED)
-	public void doRefundQuery() throws IOException {
-		try {
-			log.info("start RefundJob");
-			weChatService.dealRefundBatch();
-			log.info("end RefundJob");
-		} catch (Exception e) {
-			log.error(e.getMessage());
-			e.printStackTrace();
-		}
+	public void execute(){
+		log.info("start RefundJob");
+		weChatService.dealRefundBatch();
+		log.info("end RefundJob");
 		
 	}
 	
