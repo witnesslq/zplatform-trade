@@ -42,7 +42,7 @@ public class RefundAccounting implements IAccounting{
     private ITxnsLogService txnsLogService;
     private ITxnsOrderinfoDAO txnsOrderinfoDAO;
     public RefundAccounting(){
-        accEntryService = (AccEntryService) SpringContext.getContext().getBean("accEntryService");
+        accEntryService = (AccEntryService) SpringContext.getContext().getBean("accEntryServiceImpl");
         txnsRefundService = (ITxnsRefundService) SpringContext.getContext().getBean("txnsRefundService");
         txnsLogService = (ITxnsLogService) SpringContext.getContext().getBean("txnsLogService");
         txnsOrderinfoDAO = (ITxnsOrderinfoDAO) SpringContext.getContext().getBean("txnsOrderinfoDAO");;
@@ -93,11 +93,7 @@ public class RefundAccounting implements IAccounting{
         	txnsLog.setAppinst("000000000000");
         	
             accEntryService.accEntryProcess(tradeInfo, entryEvent);
-            if ("0000".equals(txnsLog.getRetcode())) {
-            	tradeInfo.setChannelFee(new BigDecimal(0));
-            	accEntryService.accEntryProcess(tradeInfo, EntryEvent.RECON_SUCCESS);
-            }
-            txnsRefundService.update(refund);
+            txnsRefundService.updateRefund(refund);
             txnsOrderinfoDAO.updateOrderinfo(order);
             txnsLog.setApporderstatus(AccStatusEnum.Finish.getCode());
             txnsLog.setAppordfintime(DateUtil.getCurrentDateTime());
@@ -128,7 +124,7 @@ public class RefundAccounting implements IAccounting{
         txnsLogService.updateAppStatus(txnseqno, txnsLog.getApporderstatus(), txnsLog.getApporderinfo());
         txnsLog.setAccbusicode(BusinessEnum.REFUND_BANK.getBusiCode());
         txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
-        txnsLogService.update(txnsLog);
+        txnsLogService.updateTxnsLog(txnsLog);
         log.info("退款账务结束，交易序列号:"+txnseqno);
         return null;
     }

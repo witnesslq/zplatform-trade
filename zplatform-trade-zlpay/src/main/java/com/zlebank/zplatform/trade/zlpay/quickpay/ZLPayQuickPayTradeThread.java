@@ -11,15 +11,18 @@ import com.zlebank.zplatform.member.service.MemberBankCardService;
 import com.zlebank.zplatform.sms.service.ISMSService;
 import com.zlebank.zplatform.trade.adapter.accounting.IAccounting;
 import com.zlebank.zplatform.trade.adapter.quickpay.IQuickPayTrade;
+import com.zlebank.zplatform.trade.bean.AppPartyBean;
 import com.zlebank.zplatform.trade.bean.PayPartyBean;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.TradeBean;
 import com.zlebank.zplatform.trade.bean.ZLPayResultBean;
+import com.zlebank.zplatform.trade.bean.enums.ChnlTypeEnum;
 import com.zlebank.zplatform.trade.bean.enums.TradeTypeEnum;
 import com.zlebank.zplatform.trade.bean.zlpay.MarginRegisterBean;
 import com.zlebank.zplatform.trade.bean.zlpay.MarginSmsBean;
 import com.zlebank.zplatform.trade.bean.zlpay.OnlineDepositShortBean;
 import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
+import com.zlebank.zplatform.trade.dao.RspmsgDAO;
 import com.zlebank.zplatform.trade.factory.AccountingAdapterFactory;
 import com.zlebank.zplatform.trade.model.PojoCardBind;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
@@ -34,6 +37,7 @@ import com.zlebank.zplatform.trade.utils.OrderNumber;
 import com.zlebank.zplatform.trade.utils.SMSThreadPool;
 import com.zlebank.zplatform.trade.utils.SMSUtil;
 import com.zlebank.zplatform.trade.utils.SpringContext;
+import com.zlebank.zplatform.trade.utils.UUIDUtil;
 import com.zlebank.zplatform.trade.zlpay.analyzer.ZlPayTradeAnalyzer;
 import com.zlebank.zplatform.trade.zlpay.service.IZlTradeService;
 /**
@@ -56,6 +60,7 @@ public class ZLPayQuickPayTradeThread implements IQuickPayTrade{
     private IZlTradeService zlTradeService;
     private CardBindService cardBindService;
     private ISMSService smsService;
+    private RspmsgDAO rspmsgDAO;
     
     public ZLPayQuickPayTradeThread() {
          txnsQuickpayService = (ITxnsQuickpayService) SpringContext.getContext().getBean("txnsQuickpayService");
@@ -65,6 +70,7 @@ public class ZLPayQuickPayTradeThread implements IQuickPayTrade{
          cardBindService = (CardBindService) SpringContext.getContext().getBean("cardBindService");
          smsService = (ISMSService) SpringContext.getContext().getBean(
  				"smsService");
+         rspmsgDAO = (RspmsgDAO) SpringContext.getContext().getBean("rspmsgDAO");
     }
     
     @Override
@@ -132,8 +138,15 @@ public class ZLPayQuickPayTradeThread implements IQuickPayTrade{
                 }
                 log.info("end zlpay MarginRegister");
                 log.info("start zlpay submitpay,txnseqno:"+trade.getTxnseqno());
+                PayPartyBean payPartyBean1 = new PayPartyBean(trade.getTxnseqno(),
+    					"01", OrderNumber.getInstance().generateZLOrderId(), PAYINSTID,
+    					ConsUtil.getInstance().cons.getInstuId(), "",
+    					DateUtil.getCurrentDateTime(), "", trade.getCardNo());
+    			payPartyBean1.setPanName(trade.getAcctName());
+    			txnsLogService.updatePayInfo_Fast(payPartyBean1);
+                
     	    	//TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(trade.getTxnseqno());
-    	    	trade.setOrderId(OrderNumber.getInstance().generateZLOrderId());
+    	    	trade.setOrderId(payPartyBean1.getPayordno());
     	        OnlineDepositShortBean onlineDepositShortBean = ZlPayTradeAnalyzer
     	                .generateOnlineDepositShort(trade);
     	        //记录快捷交易入金流水
@@ -141,6 +154,7 @@ public class ZLPayQuickPayTradeThread implements IQuickPayTrade{
     	        resultBean = zlTradeService.onlineDepositShort(onlineDepositShortBean);
     	        //更新快捷交易入金流水
     	        txnsQuickpayService.updateOnlineDepositShort(resultBean);
+    	        updateTradeResult(resultBean,trade.getTxnseqno());
     	        log.info("ZLPAY submit Pay end!");
                 
     		}else{
@@ -160,8 +174,8 @@ public class ZLPayQuickPayTradeThread implements IQuickPayTrade{
     				resultBean = new ResultBean("30HK", "交易失败，动态口令或短信验证码校验失败");
     			}
     			PayPartyBean payPartyBean = new PayPartyBean(trade.getTxnseqno(),
-    					"01", "", "93000002",
-    					ConsUtil.getInstance().cons.getCmbc_merid(), "",
+    					"01", OrderNumber.getInstance().generateZLOrderId(), PAYINSTID,
+    					ConsUtil.getInstance().cons.getInstuId(), "",
     					DateUtil.getCurrentDateTime(), "", trade.getCardNo());
     			payPartyBean.setPanName(trade.getAcctName());
     			txnsLogService.updatePayInfo_Fast(payPartyBean);
@@ -178,7 +192,7 @@ public class ZLPayQuickPayTradeThread implements IQuickPayTrade{
     			trade.setUserId(cardBind.getBindId());
     			log.info("start zlpay submitpay,txnseqno:"+trade.getTxnseqno());
     	    	//TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(trade.getTxnseqno());
-    	    	trade.setOrderId(OrderNumber.getInstance().generateZLOrderId());
+    	    	trade.setOrderId(payPartyBean.getPayordno());
     	        OnlineDepositShortBean onlineDepositShortBean = ZlPayTradeAnalyzer
     	                .generateOnlineDepositShort(trade);
     	        //记录快捷交易入金流水
@@ -186,6 +200,8 @@ public class ZLPayQuickPayTradeThread implements IQuickPayTrade{
     	        resultBean = zlTradeService.onlineDepositShort(onlineDepositShortBean);
     	        //更新快捷交易入金流水
     	        txnsQuickpayService.updateOnlineDepositShort(resultBean);
+    	        
+    	        updateTradeResult(resultBean,trade.getTxnseqno());
     	        log.info("ZLPAY submit Pay end!");
     		}
     	}
@@ -245,13 +261,30 @@ public class ZLPayQuickPayTradeThread implements IQuickPayTrade{
         if(resultBean.isResultBool()){//交易成功
         	payrettsnseqno =zlPayResultBean.getPnrSeqId();//支付方流水号
         	txnsOrderinfoDAO.updateOrderToSuccess(txnseqno);
+        	txnsLog.setRetcode("0000");
+        	txnsLog.setRetinfo("交易成功");
         }else{//交易失败
         	txnsOrderinfoDAO.updateOrderToFail(txnseqno);
-        } 
-        //更新交易支付方信息
+        	txnsLog.setRetcode("3099");
+        	txnsLog.setRetinfo("交易失败");
+        }
+        
+        //
+        txnsLog.setTradeseltxn(UUIDUtil.uuid());
+        txnsLog.setRelate("10000000");
+        txnsLog.setTradestatflag("00000001");
+        txnsLog.setRetdatetime(DateUtil.getCurrentDateTime());
+        txnsLog.setTradetxnflag("10000000");
+        txnsLogService.updateTxnsLog(txnsLog);
+      //更新交易支付方信息
         txnsLogService.updatePayInfo_Fast_result(txnseqno, payrettsnseqno, retcode, retinfo);
+        String commiteTime = DateUtil.getCurrentDateTime();
         //账务处理
         AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue(txnsLog.getBusitype())).accountedFor(txnseqno);
+        AppPartyBean appParty = new AppPartyBean("","000000000000", commiteTime,DateUtil.getCurrentDateTime(), txnseqno, "");
+        txnsLogService.updateAppInfo(appParty);
+        txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
+        
     }
     
     

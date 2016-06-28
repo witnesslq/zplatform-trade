@@ -47,12 +47,14 @@ import com.zlebank.zplatform.trade.cmbc.service.IFTPCMBCService;
 import com.zlebank.zplatform.trade.cmbc.service.IInsteadPayService;
 import com.zlebank.zplatform.trade.dao.BankTransferBatchDAO;
 import com.zlebank.zplatform.trade.dao.BankTransferDataDAO;
+import com.zlebank.zplatform.trade.dao.CMBCResfileLogDAO;
 import com.zlebank.zplatform.trade.dao.ITxnsInsteadPayDAO;
 import com.zlebank.zplatform.trade.dao.TransferBatchDAO;
 import com.zlebank.zplatform.trade.dao.TransferDataDAO;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.model.PojoBankTransferBatch;
 import com.zlebank.zplatform.trade.model.PojoBankTransferData;
+import com.zlebank.zplatform.trade.model.PojoCMBCResfileLog;
 import com.zlebank.zplatform.trade.model.PojoTranData;
 import com.zlebank.zplatform.trade.model.PojoTxnsInsteadPay;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
@@ -72,6 +74,9 @@ import com.zlebank.zplatform.trade.utils.OrderNumber;
 @Service("insteadPayService")
 public class InsteadPayServiceImpl implements IInsteadPayService {
     private static final Log log = LogFactory.getLog(InsteadPayServiceImpl.class);
+    private static final String Key = ConsUtil.getInstance().cons.getCmbc_insteadpay_batch_md5(); //"1234567887654321";
+    private static String SecretFilePath = ConsUtil.getInstance().cons.getCmbc_secretfilepath();//"D:\\cmbc\\secret.txt";
+    private static final String ENCODE = "GBK";
     @Autowired
     private IFTPCMBCService ftpcmbcService;
     @Autowired
@@ -80,15 +85,15 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
     private TransferBatchDAO transferBatchDAO;
     @Autowired
     private ITxnsLogService txnsLogService;
-    private static final String Key = ConsUtil.getInstance().cons.getCmbc_insteadpay_batch_md5(); //"1234567887654321";
-    private static String SecretFilePath = ConsUtil.getInstance().cons.getCmbc_secretfilepath();//"D:\\cmbc\\secret.txt";
-    private static final String ENCODE = "GBK";
+    
     @Autowired
     private BankTransferBatchDAO bankTransferBatchDAO;
     @Autowired
     private BankTransferDataDAO bankTransferDataDAO;
     @Autowired
     private ITxnsInsteadPayDAO txnsInsteadPayDAO;
+    @Autowired
+    private CMBCResfileLogDAO cmbcResfileLogDAO;
     
     /**
      * 批量代付(跨行)
@@ -373,6 +378,7 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
             long sumAmt = 0;//总金额
             long succAmt = 0;//成功金额
             List<PojoBankTransferData> resultList = new ArrayList<PojoBankTransferData>();
+            List<PojoCMBCResfileLog> cmbcResfileList = new ArrayList<PojoCMBCResfileLog>();
             while ((lineTxt = bufferedReader.readLine()) != null) {
                 if(i==0){
                     //0    1        2       3           4
@@ -395,7 +401,9 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
                 //第三方流水号|银行流水号|帐号|户名|金额|付款结果|失败返回码|失败原因|付款日期|付款时间
                 String[] body = lineTxt.split("\\|");
                 PojoBankTransferData resultBean = new PojoBankTransferData(body);
+                PojoCMBCResfileLog cmbcResfileLog = new PojoCMBCResfileLog(body);
                 resultList.add(resultBean);
+                cmbcResfileList.add(cmbcResfileLog);
                 i++;
             }
             log.info("cmbc Back to disk file context:/n/r"+JSON.toJSONString(resultList));
@@ -458,7 +466,7 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
             txnsInsteadPayDAO.update(txnsInsteadPay);
             //更新划拨明细数据
             
-            
+            cmbcResfileLogDAO.saveCMBCResfileLog(cmbcResfileList, transferBatch.getBankTranBatchNo());
         }else{
             
         }
