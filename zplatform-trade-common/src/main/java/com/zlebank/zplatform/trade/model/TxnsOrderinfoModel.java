@@ -11,6 +11,17 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "T_TXNS_ORDERINFO")
 public class TxnsOrderinfoModel implements java.io.Serializable {
+	/**订单状态【待审核】**/
+	public static final String STATUS_APPLY="01";
+	/**订单状态【处理中】**/
+	public static final String STATUS_DEAL="02";
+	/**订单状态【【失败】**/
+	public static final String STATUS_ERROR="03";
+	/**订单状态【【成功】**/
+	public static final String STATUS_SUCCESS="00";
+	/**订单状态【【超时|异常】**/
+	public static final String STATUS_TIME_OUT="04";
+	
 
  // Fields
 

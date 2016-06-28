@@ -46,4 +46,11 @@ public interface WeChatService {
 	 * @return
 	 */
 	public List<String[]> dowanWeChatBill(QueryBillBean queryBillBean );
+	
+	/***
+	 * 退款查询定时任务跑批
+	 */
+	public void dealRefundBatch();
+	
+	
 }

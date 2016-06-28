@@ -89,8 +89,8 @@ public class SSLSender {
             e.printStackTrace();
         }  finally {
             try {
-                httpclient.close();
-                instream.close();
+            	if (httpclient != null)  httpclient.close();
+                if( instream!= null ) instream.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }

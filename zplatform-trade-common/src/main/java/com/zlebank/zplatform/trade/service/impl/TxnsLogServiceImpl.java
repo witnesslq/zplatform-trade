@@ -11,6 +11,8 @@
 package com.zlebank.zplatform.trade.service.impl;
 
 import java.math.BigDecimal;
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -829,6 +831,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
     @Transactional(propagation=Propagation.REQUIRES_NEW)
     public void excuteRecon(){
     	log.info("start ReconJob");
+    	
 		List<Map<String, Object>> selfTxnList = (List<Map<String, Object>>) queryBySQL("SELECT * FROM T_SELF_TXN T WHERE STATUS = ? AND RESULT = ?", new Object[]{"9","02"});
 		if(selfTxnList.size()>0){
 			for(Map<String, Object> value:selfTxnList){
@@ -1041,4 +1044,28 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         }
         super.update(txnsLog);
 	}
+
+
+	@Override
+	public List<?> getRefundOrderInfo(String refundtype,int mins ) {
+		StringBuffer sb= new StringBuffer();
+		sb.append(" select ttl.txnseqno ");
+		sb.append(" from t_txns_log ttl ");
+		sb.append(" join  t_txns_refund ttr  on ttr.reltxnseqno= ttl.txnseqno  ");
+		sb.append(" join t_txns_orderinfo  tto on tto.relatetradetxn= ttl.txnseqno  ");
+		sb.append(" where 1=1 ");
+		//退款类型
+		//sb.append(" and ttr.refundtype=? ");
+		//微信渠道
+		sb.append(" and ttl.payinst=? ");
+		//订单状态为待支付
+		sb.append(" and tto.status in (?,?) ");
+		//退款申请成功的
+		sb.append(" and ttl.payretcode=? ");
+		sb.append(" and ceil(to_date(?, 'yyyy-mm-dd hh24:mi:ss')-to_date(ttl.payordcomtime,'yyyy-mm-dd hh24:mi:ss'))*24*60>=? ");
+		List<?> result = (List<?>) super.queryBySQL(sb.toString(), new Object[]{"91000001","01","02","SUCCESS",DateUtil.getTimeStamp(),mins });
+	     return result;
+	}
+	
+	
 }
