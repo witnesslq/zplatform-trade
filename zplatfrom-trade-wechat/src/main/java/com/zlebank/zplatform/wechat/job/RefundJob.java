@@ -19,6 +19,7 @@ public class RefundJob {
 	 * 跑批-查询支付的退款
 	 * @throws IOException
 	 */
+	@Transactional
 	public void execute(){
 		log.info("start RefundJob");
 		weChatService.dealRefundBatch();

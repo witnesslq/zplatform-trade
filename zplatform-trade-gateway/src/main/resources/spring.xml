@@ -21,6 +21,8 @@
 			<list>
 				<ref bean="reconJobTrigger"/> 
 				<ref bean="cmbcTrigger1"/> 
+				<!-- 微信 -->
+				<ref bean="refundJobTrigger"/> 
 				<!-- <ref bean="simpleTrigger" /> -->
 				<!-- <ref bean="simpleTrigger2" />  转移到DB-->
 				<!-- <ref bean="simpleTrigger3" /> 
@@ -175,16 +177,17 @@
 	<!-- 微信退款查询 -->
 	<bean id="refundJob" class="com.zlebank.zplatform.wechat.job.RefundJob" />
 	
-	<bean id="refundByChargeJobTrigger"
+	<bean id="refundJobTrigger"
 	 class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
-		<property name="jobDetail" ref="refundByChargeJobDetail" />
+		<property name="jobDetail" ref="refundJobDetail" />
 		<!-- 启动延迟10秒 -->
 		<property name="startDelay" value="10000" />  
 		<!-- 20分钟执行一次任务 -->
 		<property name="repeatInterval" value="1200000" />
+		
     </bean>
     
-	<bean id="refundByChargeJobDetail"
+	<bean id="refundJobDetail"
 		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
 		<property name="targetObject" ref="refundJob" />
 		<property name="targetMethod" value="execute" />
