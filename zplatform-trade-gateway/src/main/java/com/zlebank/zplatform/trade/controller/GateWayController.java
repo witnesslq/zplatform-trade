@@ -74,6 +74,7 @@ import com.zlebank.zplatform.trade.bean.RoutBean;
 import com.zlebank.zplatform.trade.bean.TradeBean;
 import com.zlebank.zplatform.trade.bean.ZLPayResultBean;
 import com.zlebank.zplatform.trade.bean.enums.ChannelEnmu;
+import com.zlebank.zplatform.trade.bean.enums.OrderStatusEnum;
 import com.zlebank.zplatform.trade.bean.gateway.AnonOrderAsynRespBean;
 import com.zlebank.zplatform.trade.bean.gateway.OrderAsynRespBean;
 import com.zlebank.zplatform.trade.bean.gateway.OrderBean;
@@ -184,16 +185,23 @@ public class GateWayController {
     private ChanPayService chanPayService;
     @Autowired
     private MerchMKService merchMKService;
-
-    
     @Autowired
     private CoopInstiDAO coopInstiDAO;
     
+    
+    /***
+     * 收银台生成订单
+     * @param order
+     * @param httpSession
+     * @param request
+     * @return
+     */
     @RequestMapping("/coporder.htm")
     public ModelAndView pay(OrderBean order,HttpSession httpSession,HttpServletRequest request) {
         log.info("receive web message(json):" + JSON.toJSONString(order));
         Map<String, Object> model = new HashMap<String, Object>();
         try {
+        	//校验订单信息
             if (!validateOrder(order, model)) {
                 return new ModelAndView("/erro_gw", model);
             }
@@ -214,7 +222,12 @@ public class GateWayController {
         }
         return new ModelAndView("/erro_gw", model);
     }
-
+    /***
+     * 校验订单信息
+     * @param order
+     * @param model
+     * @return
+     */
     private boolean validateOrder(OrderBean order, Map<String, Object> model) {
         // 验证订单数据有效性，用hibernate validator处理
         ResultBean resultBean = GateWayTradeAnalyzer.validateOrder(order);
@@ -232,6 +245,7 @@ public class GateWayController {
             model.put("errCode", riskResultBean.getErrCode());
             return false;
         }
+        //校验签名信息
         ResultBean signResultBean = gateWayService.verifyOrder(order);
         if (!signResultBean.isResultBool()) {
             // 订单信息验签未通过
@@ -272,7 +286,7 @@ public class GateWayController {
                 model.put("errCode", msg.getWebrspcode());
                 return false;
             }
-            
+            //校验商户会员信息 1-普通会员 2-商户会员 3-合作机构
             if (order.getMerId().startsWith("2")) {// 对于商户会员需要进行检查
             	PojoMember pojoMember = memberService2.getMbmberByMemberId(order.getMerId(), null);
             	PojoCoopInsti pojoCoopInsti = coopInstiDAO.get(pojoMember.getInstiId());
@@ -285,8 +299,6 @@ public class GateWayController {
             }
 
         }
-        
-
         // 业务验证
         // 充值业务，如果memberId为空，或者为999999999999999时为非法订单
         ResultBean memberBusiResultBean = gateWayService
@@ -298,7 +310,7 @@ public class GateWayController {
             model.put("errCode", msg.getWebrspcode());
             return false;
         }
-        
+        //校验非匿名会员和商户的资金账户是否正常 
         try {
 			gateWayService.checkBusiAcct(order.getMerId(), ((RiskRateInfoBean)riskResultBean.getResultObj()).getMerUserId());
 		} catch (TradeException e) {
@@ -311,26 +323,37 @@ public class GateWayController {
 		}
         return true;
     }
-
+    /***
+     * 
+     * @param txnseqno
+     * @param request
+     * @return
+     * @throws Exception
+     */
     @RequestMapping(value = "/cash.htm", method = RequestMethod.GET)
     public ModelAndView cashIndex(@RequestParam("txnseqno") String txnseqno,HttpServletRequest request) throws Exception {
         Map<String, Object> model = new HashMap<String, Object>();
         try {
+        	//1.获取交易信息
             if (StringUtil.isEmpty(txnseqno)) {
                 model.put("errMsg", "交易失败，查无此交易");
                 return new ModelAndView("/erro_gw", model);
             }
             TxnsLogModel txnsLog = txnsLogService
                     .getTxnsLogByTxnseqno(txnseqno);
+            //2.获取一级商户信息
             CoopInsti coopInsti = coopInstiService.getInstiByInstiCode(txnsLog.getAccfirmerno());
+            //3.获取二级商户信息
             PojoMerchDeta merch = null;
             if (StringUtil.isNotEmpty(txnsLog.getAccsecmerno())) {
             	merch = merchService.getMerchBymemberId(txnsLog.getAccsecmerno());
             }
+            //根据受理订单和一级商户获取订单信息
             TxnsOrderinfoModel orderInfo = gateWayService
                     .getOrderinfoByOrderNoAndMemberId(txnsLog.getAccordno(),
                             txnsLog.getAccfirmerno());
-            if ("00".equals(orderInfo.getStatus())) {// 支付成功的订单不可重复支付
+            // 支付成功的订单不可重复支付
+            if (OrderStatusEnum.SUCCESS.equals(orderInfo.getStatus())) {
                 model.put("errMsg", "交易成功，请不要重复支付");
                 model.put("errCode", "RC10");
                 return new ModelAndView("/erro_gw", model);
