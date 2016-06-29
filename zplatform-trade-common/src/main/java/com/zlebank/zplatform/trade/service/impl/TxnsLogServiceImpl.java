@@ -1059,7 +1059,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 		sb.append(" and tto.status in (?,?) ");
 		//退款申请成功的
 		sb.append(" and ttl.payretcode=? ");
-		sb.append(" and ceil(to_date(?, 'yyyy-mm-dd hh24:mi:ss')-to_date(ttl.payordcomtime,'yyyy-mm-dd hh24:mi:ss'))*24*60>=? ");
+		sb.append(" and ceil((to_date(?, 'yyyy-mm-dd hh24:mi:ss')-to_date(ttl.payordcomtime,'yyyy-mm-dd hh24:mi:ss'))*24*60)>=? ");
 		List<?> result = (List<?>) super.queryBySQL(sb.toString(), new Object[]{ChannelEnmu.WEBCHAT.getChnlcode(),OrderStatusEnum.INITIAL.getStatus(),OrderStatusEnum.PAYING.getStatus(),"SUCCESS",DateUtil.getTimeStamp(),mins });
 	     return result;
 	}
