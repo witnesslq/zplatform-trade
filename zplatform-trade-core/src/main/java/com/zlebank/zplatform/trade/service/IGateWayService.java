@@ -136,6 +136,15 @@ public interface IGateWayService extends IBaseService<TxnsOrderinfoModel, Long>{
     public String createWapOrder(String json)throws TradeException, UnsupportedEncodingException;
     public void verifyWapOrder(JSONObject order) throws TradeException;
     public void verifyRepeatWapOrder(String orderNo,String txntime,String amount,String merchId,String memberId) throws TradeException;
+    /***
+     * 校验web订单是否重复
+     * @param orderNo
+     * @param txntime
+     * @param amount
+     * @param merchId
+     * @param memberId
+     * @throws TradeException
+     */
     public void verifyRepeatWebOrder(String orderNo,String txntime,String amount,String merchId,String memberId) throws TradeException;
     public void verifyMerch(String merchId,String subMerchId) throws TradeException;
     public void signWapMessage(WapOrderRespBean orderRespBean);

@@ -208,3 +208,4 @@ public class TransferDataDAOImpl  extends HibernateBaseDAOImpl<PojoTranData> imp
 		return query.list();
 	}
 }
+

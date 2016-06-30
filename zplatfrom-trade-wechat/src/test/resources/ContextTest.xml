@@ -10,7 +10,7 @@
     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd">
 
 	<!-- 使用annotation 自动注册com.zlebank.zplatform.acc包下面的bean, 并保证@Required、@Autowired的属性被注入 -->
-	<context:component-scan base-package="com.zlebank.zplatform.trade.webchat">
+	<context:component-scan base-package="com.zlebank.zplatform">
 	</context:component-scan>
 	<bean id="springContext" class="com.zlebank.zplatform.trade.utils.SpringContext"></bean>
 	<bean id="sessionFactory"
@@ -48,18 +48,23 @@
 		<property name="maxIdleTime" value="20" />
 
 	</bean>
-<bean id="propertyFileConfig"
-		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="locations">
-			<list>
-				<value>acc.config.properties</value>
-			</list>
-		</property>
-	</bean>
+
 
 	<bean id="transactionManager"
 		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
+	<bean id="propertyFileConfig"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>job-setting.properties</value>
+				<value>acc.config.properties</value>
+				<value>zlrt.properties</value>
+			</list>
+		</property>
+	</bean>
+	
+	
 	<tx:annotation-driven />
 </beans>

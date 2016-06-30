@@ -45,7 +45,7 @@ public class RefundAccounting implements IAccounting{
         accEntryService = (AccEntryService) SpringContext.getContext().getBean("accEntryServiceImpl");
         txnsRefundService = (ITxnsRefundService) SpringContext.getContext().getBean("txnsRefundService");
         txnsLogService = (ITxnsLogService) SpringContext.getContext().getBean("txnsLogService");
-        txnsOrderinfoDAO = (ITxnsOrderinfoDAO) SpringContext.getContext().getBean("txnsOrderinfoDAO");;
+        txnsOrderinfoDAO = (ITxnsOrderinfoDAO) SpringContext.getContext().getBean("txnsOrderinfo");;
     }
     
     
@@ -91,9 +91,8 @@ public class RefundAccounting implements IAccounting{
         	log.info("账务处理数据:"+ JSON.toJSONString(tradeInfo));
         	txnsLog.setAppordcommitime(DateUtil.getCurrentDateTime());
         	txnsLog.setAppinst("000000000000");
-        	
             accEntryService.accEntryProcess(tradeInfo, entryEvent);
-            txnsRefundService.updateRefund(refund);
+            txnsRefundService.update(refund);
             txnsOrderinfoDAO.updateOrderinfo(order);
             txnsLog.setApporderstatus(AccStatusEnum.Finish.getCode());
             txnsLog.setAppordfintime(DateUtil.getCurrentDateTime());

@@ -1,3 +1,4 @@
+
 package com.zlebank.zplatform.trade.utils;
 
 public class ConsModel {
@@ -1373,8 +1374,4 @@ public class ConsModel {
 	public void setRefund_day(int refund_day) {
 		this.refund_day = refund_day;
 	}
-
-	
-	
-	
 }

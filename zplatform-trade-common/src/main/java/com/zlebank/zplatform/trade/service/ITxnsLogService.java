@@ -285,5 +285,13 @@ public interface ITxnsLogService extends IBaseService<TxnsLogModel, String>{
      * @param retinfo
      */
     public void updateWeChatRefundResult(String txnseqno,String payrettsnseqno,String retcode,String retinfo);
+    
+   /***
+    * 查询微信退款申请成功的订单
+    * @param refundtype
+    * @param mins
+    * @return
+    */
+	public List<?> getRefundOrderInfo(String refundtype,int mins);
 
 }

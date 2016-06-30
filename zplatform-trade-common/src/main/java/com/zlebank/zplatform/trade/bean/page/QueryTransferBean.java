@@ -90,4 +90,3 @@ public class QueryTransferBean implements Serializable{
 	
     
 }
-

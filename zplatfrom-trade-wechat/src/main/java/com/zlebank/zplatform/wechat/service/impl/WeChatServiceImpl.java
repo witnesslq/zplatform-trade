@@ -10,17 +10,31 @@
  */
 package com.zlebank.zplatform.wechat.service.impl;
 
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSON;
+import com.zlebank.zplatform.acc.bean.TradeInfo;
+import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
+import com.zlebank.zplatform.acc.exception.AccBussinessException;
+import com.zlebank.zplatform.acc.exception.IllegalEntryRequestException;
+import com.zlebank.zplatform.acc.service.AccEntryService;
+import com.zlebank.zplatform.acc.service.entry.EntryEvent;
+import com.zlebank.zplatform.commons.dao.pojo.AccStatusEnum;
 import com.zlebank.zplatform.commons.dao.pojo.BusiTypeEnum;
 import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.commons.utils.RSAUtils;
@@ -32,15 +46,20 @@ import com.zlebank.zplatform.trade.adapter.accounting.IAccounting;
 import com.zlebank.zplatform.trade.bean.AppPartyBean;
 import com.zlebank.zplatform.trade.bean.PayPartyBean;
 import com.zlebank.zplatform.trade.bean.ResultBean;
+import com.zlebank.zplatform.trade.bean.enums.BusinessEnum;
 import com.zlebank.zplatform.trade.bean.enums.ChannelEnmu;
 import com.zlebank.zplatform.trade.bean.enums.OrderStatusEnum;
+import com.zlebank.zplatform.trade.bean.enums.RefundTypeEnum;
 import com.zlebank.zplatform.trade.bean.gateway.AnonOrderAsynRespBean;
 import com.zlebank.zplatform.trade.bean.gateway.OrderAsynRespBean;
 import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
 import com.zlebank.zplatform.trade.factory.AccountingAdapterFactory;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.model.TxnsOrderinfoModel;
+import com.zlebank.zplatform.trade.model.TxnsRefundModel;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
+import com.zlebank.zplatform.trade.service.ITxnsRefundService;
+import com.zlebank.zplatform.trade.service.impl.TxnsRefundServiceImpl;
 import com.zlebank.zplatform.trade.utils.ConsUtil;
 import com.zlebank.zplatform.trade.utils.ObjectDynamic;
 import com.zlebank.zplatform.trade.utils.OrderNumber;
@@ -48,11 +67,16 @@ import com.zlebank.zplatform.trade.utils.SynHttpRequestThread;
 import com.zlebank.zplatform.trade.utils.UUIDUtil;
 import com.zlebank.zplatform.wechat.enums.ResultCodeEnum;
 import com.zlebank.zplatform.wechat.exception.WXVerifySignFailedException;
+import com.zlebank.zplatform.wechat.refund.WeChatRefundTrade;
 import com.zlebank.zplatform.wechat.service.WeChatService;
 import com.zlebank.zplatform.wechat.wx.PrintBean;
 import com.zlebank.zplatform.wechat.wx.WXApplication;
 import com.zlebank.zplatform.wechat.wx.bean.PayResultBean;
 import com.zlebank.zplatform.wechat.wx.bean.QueryBillBean;
+import com.zlebank.zplatform.wechat.wx.bean.QueryRefundBean;
+import com.zlebank.zplatform.wechat.wx.bean.QueryRefundResultBean;
+import com.zlebank.zplatform.wechat.wx.bean.RefundBean;
+import com.zlebank.zplatform.wechat.wx.bean.RefundResultBean;
 import com.zlebank.zplatform.wechat.wx.bean.WXOrderBean;
 import com.zlebank.zplatform.wechat.wx.common.WXConfigure;
 
@@ -66,6 +90,7 @@ import com.zlebank.zplatform.wechat.wx.common.WXConfigure;
  */
 @Service("weChatService")
 public class WeChatServiceImpl implements WeChatService{
+	private static final Log log = LogFactory.getLog(WeChatServiceImpl.class);
 
 	@Autowired
 	private ITxnsOrderinfoDAO txnsOrderinfoDAO; 
@@ -75,6 +100,10 @@ public class WeChatServiceImpl implements WeChatService{
 	private CoopInstiService coopInstiService;
 	@Autowired
 	private MerchMKService merchMKService;
+	@Autowired
+	private AccEntryService accEntryService;
+	@Autowired
+	private ITxnsRefundService txnsRefundService;
 	/**
 	 *
 	 * @param tn
@@ -87,8 +116,6 @@ public class WeChatServiceImpl implements WeChatService{
 		TxnsOrderinfoModel order = txnsOrderinfoDAO.getOrderByTN(tn);
 		//获取交易流水数据
 		TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(order.getRelatetradetxn());
-		
-		
 		//更新支付方信息
 		PayPartyBean payPartyBean = new PayPartyBean(txnsLog.getTxnseqno(), 
 				"05", 
@@ -99,8 +126,7 @@ public class WeChatServiceImpl implements WeChatService{
 				DateUtil.getCurrentDateTime(), 
 				"", 
 				"");
-		txnsLogService.updatePayInfo_Fast(payPartyBean);
-		//创建微信订单并提交
+		txnsLogService.updatePayInfo_Fast(payPartyBean);		//创建微信订单并提交
 		WXApplication instance = new WXApplication();
 		WXOrderBean order_wechat = new WXOrderBean();
 		order_wechat.setBody(StringUtil.isEmpty(order.getGoodsname())?"默认商品":order.getGoodsname());
@@ -186,7 +212,7 @@ public class WeChatServiceImpl implements WeChatService{
         }
         /**账务处理结束 **/
        
-        /**异步通知处理开始 **/
+        /**异步通知处理开始 
         ResultBean orderResp = 
                 generateAsyncRespMessage(txnsLog.getTxnseqno());
         if (orderResp.isResultBool()) {
@@ -209,6 +235,7 @@ public class WeChatServiceImpl implements WeChatService{
         	}
             
         }
+        **/
         /**异步通知处理结束 **/
 	}
 
@@ -314,4 +341,98 @@ public class WeChatServiceImpl implements WeChatService{
         PrintBean printBean = ap.downLoadBill(queryBillBean);
 		return printBean.getContent();
 	}
+
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Throwable.class)
+	public void dealRefundBatch() {
+	    log.info("查询退款定时任务开始【dealRefundBatch】");
+		//1.查询待处理的退款的订单
+		List<?> txnlogs= this.txnsLogService.getRefundOrderInfo(null,20);
+		JSONArray jsonArray = JSONArray.fromObject(txnlogs);
+		if(txnlogs.size()>0){
+			 for (int i = 0; i < jsonArray.size(); i++) {
+				 JSONObject entity = jsonArray.getJSONObject(i);
+				 String txnseqno = entity.get("TXNSEQNO")+"";
+				TxnsLogModel  txnsLog=this.txnsLogService.getTxnsLogByTxnseqno(txnseqno);
+				TxnsOrderinfoModel order = txnsOrderinfoDAO.getOrderByTxnseqno(txnseqno);
+				//原始交易流水
+				TxnsLogModel txnsLog_old = txnsLogService.getTxnsLogByTxnseqno(txnsLog.getTxnseqnoOg());
+				//2.调微信服务端
+				WXApplication instance = new WXApplication();
+				QueryRefundBean rb = new QueryRefundBean();
+				//商户订单号
+				rb.setOut_trade_no(txnsLog_old.getPayordno());
+				rb.setTransaction_id(txnsLog_old.getPayrettsnseqno());
+				log.info("调微信【查询退款】入参："+rb.toString());
+				QueryRefundResultBean refund = instance.refundQuery(rb);
+				log.info("调微信【查询退款】出参："+(null==refund?"无返回值":refund.getReturn_code().toString()));
+				//3.根据返回结果处理
+				if(ResultCodeEnum.SUCCESS.getCode().equals(refund.getReturn_code())){
+					//成功
+					txnsLog.setPayretcode(ResultCodeEnum.SUCCESS.getCode());
+					txnsLog.setPayretinfo("交易成功");
+					txnsLog.setTradestatflag("00000001");//交易完成结束位
+				    txnsLog.setTradetxnflag("10000000");
+				    txnsLog.setRelate("10000000");
+				    txnsLog.setRetdatetime(DateUtil.getCurrentDateTime());
+				    txnsLog.setTradeseltxn(UUIDUtil.uuid());
+				    txnsLog.setRetcode("0000");
+				    txnsLog.setRetinfo("交易成功");
+				    //订单状态为成功
+					order.setStatus(OrderStatusEnum.SUCCESS.getStatus());
+		            //退款成功
+		            TxnsRefundModel refundEn = txnsRefundService.getRefundByTxnseqno(txnseqno);
+		            refundEn.setStatus("00");
+		            txnsRefundService.update(refundEn);
+				//3.2如果失败
+				}else if(ResultCodeEnum.FAIL.getCode().equals(refund.getReturn_code())){
+					txnsLog.setPayretcode(refund.getErr_code());
+					txnsLog.setPayretinfo(refund.getErr_code_des());
+					 //订单状态为失败
+					  order.setStatus(OrderStatusEnum.FAILED.getStatus());
+					  log.info("退款跑批:"+txnseqno+"退款失败");
+				//3.3需重新发起
+				}else if(ResultCodeEnum.NOTSURE.getCode().equals(refund.getReturn_code())){
+					txnsLog.setPayretcode(refund.getErr_code());
+					txnsLog.setPayretinfo(refund.getErr_code_des());
+					 //订单状态为失败
+					  order.setStatus(OrderStatusEnum.FAILED.getStatus());
+					  log.info("退款跑批:"+txnseqno+"需商户重新发起");
+			    //3.4 //订单处理中不处理
+				}
+				txnsLog.setPayordfintime(DateUtil.getCurrentDateTime());
+		        txnsLog.setRetdatetime(DateUtil.getCurrentDateTime());
+				//更新支付方信息
+				txnsLogService.updateTxnsLog(txnsLog);
+				//更新交易订单信息
+				txnsOrderinfoDAO.updateOrderinfo(order);
+		        //更新订单状态
+				txnsOrderinfoDAO.update(order);
+				 /**账务处理开始 **/
+		        // 应用方信息
+		        try {
+		        	 AppPartyBean appParty = new AppPartyBean("",
+		                     "000000000000", DateUtil.getCurrentDateTime(),
+		                     DateUtil.getCurrentDateTime(), txnsLog.getTxnseqno(), "AC000000");
+		        	 txnsLogService.updateAppInfo(appParty);
+		            IAccounting accounting = AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue(txnsLog.getBusitype()));
+		            ResultBean accountResultBean = accounting.accountedFor(txnseqno);
+		            txnsLogService.updateAppStatus(txnsLog.getTxnseqno(), accountResultBean.getErrCode(), accountResultBean.getErrMsg());
+		        } catch (Exception e) {
+		            e.printStackTrace();
+		        }
+		        /**账务处理结束 **/
+				log.info("查询退款定时任务结束【dealRefundBatch】 ");
+				
+		      }
+	
+		}
+		
+	}
+
+
+	
+	
+	
 }

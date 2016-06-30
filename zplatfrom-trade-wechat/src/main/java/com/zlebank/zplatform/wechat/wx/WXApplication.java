@@ -160,6 +160,7 @@ public class WXApplication {
     private String sendXMLData(String xml, String url) {
         try {
             log.debug("【发送给微信的报文为】"+xml);
+            log.debug("【发送给微信的url为】"+url);
 //            String url = "https://api.mch.weixin.qq.com/pay/unifiedorder";
             PostMethod post = null;
             post = new PostMethod(url);
@@ -170,6 +171,7 @@ public class WXApplication {
             HttpClient client = new HttpClient();
             client.getHttpConnectionManager().getParams().setSoTimeout(10000);// 10秒过期
             int status = client.executeMethod(post);
+            log.debug("【发送给微信返回 的状态status:】"+status);
             // 成功接收
             if (status == 200) {
                 BufferedReader br = null;
@@ -512,6 +514,7 @@ public class WXApplication {
         addElement(root, "refund_fee_type", WXConfigure.getFeeType());// 货币类型，符合ISO 4217标准的三位字母代码，默认人民币：CNY，其他值列表详见货币类型
         addElement(root, "total_fee",bean.getTotal_fee());// 订单总金额，单位为分，只能为整数，详见支付金额
         addElement(root, "transaction_id",bean.getTransaction_id());// 微信生成的订单号，在支付通知中有返回
+        
         // 加签
         String sign = sign(getStringXML(invokeAPI));
         addElement(root, "sign", sign);// 签名
