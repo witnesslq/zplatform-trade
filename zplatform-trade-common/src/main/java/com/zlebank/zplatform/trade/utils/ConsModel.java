@@ -116,7 +116,7 @@ public class ConsModel {
 	private String wechat_notify_url="";
 	
 	private int is_junit=0;
-	
+	private int refund_day=180;
 	
 	
 	
@@ -1358,6 +1358,20 @@ public class ConsModel {
 	 */
 	public void setIs_junit(int is_junit) {
 		this.is_junit = is_junit;
+	}
+
+	/**
+	 * @return the refund_day
+	 */
+	public int getRefund_day() {
+		return refund_day;
+	}
+
+	/**
+	 * @param refund_day the refund_day to set
+	 */
+	public void setRefund_day(int refund_day) {
+		this.refund_day = refund_day;
 	}
 
 	

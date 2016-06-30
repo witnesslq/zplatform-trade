@@ -130,6 +130,7 @@ import com.zlebank.zplatform.trade.service.ITxnsWithdrawService;
 import com.zlebank.zplatform.trade.service.ITxnsWithholdingService;
 import com.zlebank.zplatform.trade.service.RefundRouteConfigService;
 import com.zlebank.zplatform.trade.service.base.BaseServiceImpl;
+import com.zlebank.zplatform.trade.utils.ConsUtil;
 import com.zlebank.zplatform.trade.utils.DateUtil;
 import com.zlebank.zplatform.trade.utils.ObjectDynamic;
 import com.zlebank.zplatform.trade.utils.OrderNumber;
@@ -1031,7 +1032,7 @@ public class GateWayServiceImpl extends
 		///判断交易时间是否超过期限
 		String txnDateTime = old_txnsLog.getAccordfintime();//交易完成时间作为判断依据
 		Date txnDate = DateUtil.parse(DateUtil.DEFAULT_DATE_FROMAT, txnDateTime);
-		Date failureDateTime = DateUtil.skipDateTime(txnDate, 1);//失效的日期
+		Date failureDateTime = DateUtil.skipDateTime(txnDate, ConsUtil.getInstance().cons.getRefund_day());//失效的日期
 		Calendar first_date = Calendar.getInstance();
 		first_date.setTime(new Date());
 		Calendar d_end = Calendar.getInstance();
@@ -1040,10 +1041,7 @@ public class GateWayServiceImpl extends
 		log.info("first_date date:"+DateUtil.formatDateTime(DateUtil.SIMPLE_DATE_FROMAT, first_date.getTime()));
 		log.info("d_end(trade failure) date:"+DateUtil.formatDateTime(DateUtil.SIMPLE_DATE_FROMAT, failureDateTime));
 		
-		
-		
 		if(!DateUtil.calendarCompare(first_date, d_end)){
-			
 			throw new TradeException("GW29");
 		}
 

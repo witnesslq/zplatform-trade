@@ -142,6 +142,8 @@ public class ConsUtil {
 			cons.setWechat_notify_url(prop.getProperty("wechat_notify_url"));
 			
 			cons.setIs_junit(Integer.valueOf(prop.getProperty("is_junit", "0")));
+			
+			cons.setRefund_day(Integer.valueOf(prop.getProperty("refund_day", "180")));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
