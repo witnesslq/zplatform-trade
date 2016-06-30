@@ -15,6 +15,8 @@ import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -1025,6 +1027,24 @@ public class GateWayServiceImpl extends
 				.getTxnsLogByTxnseqno(old_orderInfo.getRelatetradetxn());
 		if (old_txnsLog == null) {
 			throw new TradeException("GW14");
+		}
+		///判断交易时间是否超过期限
+		String txnDateTime = old_txnsLog.getAccordfintime();//交易完成时间作为判断依据
+		Date txnDate = DateUtil.parse(DateUtil.DEFAULT_DATE_FROMAT, txnDateTime);
+		Date failureDateTime = DateUtil.skipDateTime(txnDate, 1);//失效的日期
+		Calendar first_date = Calendar.getInstance();
+		first_date.setTime(new Date());
+		Calendar d_end = Calendar.getInstance();
+		d_end.setTime(failureDateTime);
+		log.info("trade date:"+DateUtil.formatDateTime(DateUtil.SIMPLE_DATE_FROMAT, txnDate));
+		log.info("first_date date:"+DateUtil.formatDateTime(DateUtil.SIMPLE_DATE_FROMAT, first_date.getTime()));
+		log.info("d_end(trade failure) date:"+DateUtil.formatDateTime(DateUtil.SIMPLE_DATE_FROMAT, failureDateTime));
+		
+		
+		
+		if(!DateUtil.calendarCompare(first_date, d_end)){
+			
+			throw new TradeException("GW29");
 		}
 
 		try {

@@ -27,7 +27,6 @@ import com.wisvalley.key.EncryptRSA;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.TradeBean;
 import com.zlebank.zplatform.trade.bosspay.bean.BtchcolltnRequestBean;
-import com.zlebank.zplatform.trade.bosspay.bean.BtchpmtQueryRequestBean;
 import com.zlebank.zplatform.trade.bosspay.bean.BtchpmtQueryResponseBean;
 import com.zlebank.zplatform.trade.bosspay.bean.BtchpmtRequestBean;
 import com.zlebank.zplatform.trade.bosspay.bean.BtchpmtResponseBean;
@@ -39,7 +38,6 @@ import com.zlebank.zplatform.trade.bosspay.bean.RealtmpmtRequestBean;
 import com.zlebank.zplatform.trade.bosspay.bean.SendMsgBean;
 import com.zlebank.zplatform.trade.bosspay.client.ColltnAndPmtService;
 import com.zlebank.zplatform.trade.bosspay.client.ColltnAndPmtServiceLocator;
-import com.zlebank.zplatform.trade.bosspay.enums.StatusEnum;
 import com.zlebank.zplatform.trade.bosspay.service.BossPayService;
 import com.zlebank.zplatform.trade.service.IRouteConfigService;
 import com.zlebank.zplatform.trade.utils.ConsUtil;
@@ -60,6 +58,7 @@ public class BossPayServiceImpl implements BossPayService{
 	@Autowired
 	private IRouteConfigService routeConfigService;
 	
+	@SuppressWarnings("unused")
 	public ResultBean realCollecting(TradeBean trade){
 		ResultBean resultBean = null;
 		try {
@@ -245,6 +244,7 @@ public class BossPayServiceImpl implements BossPayService{
 	 * @param serialNum
 	 * @return
 	 */
+	@SuppressWarnings("unused")
 	@Override
 	public ResultBean queryRealInsteadPay(String serialNum) {
 		try {
@@ -370,7 +370,7 @@ public class BossPayServiceImpl implements BossPayService{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return null;
+		return resultBean;
 	}
 
 

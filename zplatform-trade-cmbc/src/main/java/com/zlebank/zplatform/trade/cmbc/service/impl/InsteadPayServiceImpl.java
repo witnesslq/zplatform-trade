@@ -365,11 +365,11 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
         }
     }
     
-    private void analyzeResFile(File file,String fileName) throws NumberFormatException, IOException{
+    @SuppressWarnings("resource")
+	private void analyzeResFile(File file,String fileName) throws NumberFormatException, IOException{
         if(file.isFile() && file.exists()) { 
             //判断文件是否存在
             InputStreamReader read = new InputStreamReader(new FileInputStream(file), ENCODE);// 考虑到编码格式
-            @SuppressWarnings("resource")
 			BufferedReader bufferedReader = new BufferedReader(read);
             String lineTxt = null;
             int i = 0;

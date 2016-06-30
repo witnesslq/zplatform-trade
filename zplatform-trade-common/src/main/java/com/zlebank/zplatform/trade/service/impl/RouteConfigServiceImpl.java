@@ -202,6 +202,16 @@ public class RouteConfigServiceImpl extends BaseServiceImpl<RouteConfigModel, Lo
     	return null;
     }
     
+    
+    public String getBankName(String bankCode){
+    	String sql = "select bank_name from t_bank_info  where bank_node = ?";
+    	List<Map<String, Object>> valueList = (List<Map<String, Object>>) super.queryBySQL(sql, new Object[]{bankCode});
+    	if(valueList.size()>0){
+    		return valueList.get(0).get("BANK_NAME").toString();
+    	}
+		return null;
+    }
+    
     @Transactional(propagation=Propagation.REQUIRES_NEW)
     public String getDefaultVerInfo(String instiCode,String busicode,int verType) throws TradeException{
     	List<Map<String, Object>> resultList = (List<Map<String, Object>>) super.queryBySQL("select COOP_INSTI_CODE,BUSI_CODE,VER_TYPE,VER_VALUE from T_NONMER_DEFAULT_CONFIG where COOP_INSTI_CODE=? and BUSI_CODE=? and VER_TYPE=?", new Object[]{instiCode,busicode,verType+""});

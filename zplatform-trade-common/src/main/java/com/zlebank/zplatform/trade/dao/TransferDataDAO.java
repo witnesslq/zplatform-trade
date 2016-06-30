@@ -75,4 +75,6 @@ public interface TransferDataDAO extends BaseDAO<PojoTranData>{
      */
     public List<PojoTranData> queryWaritTransferData(Long tranBatchId);
     
+    public List<Long> getBatchIDByMerchOrderNo(String merchOrderNo);
+    
 }

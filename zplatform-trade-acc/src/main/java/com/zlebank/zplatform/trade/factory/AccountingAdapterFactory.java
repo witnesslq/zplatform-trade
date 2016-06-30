@@ -40,7 +40,7 @@ public class AccountingAdapterFactory {
 		return accountingAdapterFactory;
 	}
 
-	public IAccounting getAccounting(String busitype) {
+	/*public IAccounting getAccounting(String busitype) {
 		IAccounting accounting = null;
 		if (busitype.equals("1000")) {// 消费
 			accounting = new ConsumeAccounting();
@@ -50,7 +50,7 @@ public class AccountingAdapterFactory {
 			accounting = new SafeGuardMoneyAccounting();
 		}
 		return accounting;
-	}
+	}*/
 
 	public IAccounting getAccounting(BusiTypeEnum busitype) {
 		IAccounting accounting = null;
