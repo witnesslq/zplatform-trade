@@ -118,7 +118,11 @@ public class ConsModel {
 	
 	private int is_junit=0;
 	private int refund_day=180;
-	
+	private String chanpay_cj_merchant_id="";
+	private String chanpay_cj_merchant_name="";
+	private String chanpay_cj_business_code="";
+	private String chanpay_cj_account_no="";
+	private String chanpay_cj_product_no="";
 	
 	
 	public String getZlrt_url() {
@@ -1374,4 +1378,76 @@ public class ConsModel {
 	public void setRefund_day(int refund_day) {
 		this.refund_day = refund_day;
 	}
+
+	/**
+	 * @return the chanpay_cj_merchant_id
+	 */
+	public String getChanpay_cj_merchant_id() {
+		return chanpay_cj_merchant_id;
+	}
+
+	/**
+	 * @param chanpay_cj_merchant_id the chanpay_cj_merchant_id to set
+	 */
+	public void setChanpay_cj_merchant_id(String chanpay_cj_merchant_id) {
+		this.chanpay_cj_merchant_id = chanpay_cj_merchant_id;
+	}
+
+	/**
+	 * @return the chanpay_cj_merchant_name
+	 */
+	public String getChanpay_cj_merchant_name() {
+		return chanpay_cj_merchant_name;
+	}
+
+	/**
+	 * @param chanpay_cj_merchant_name the chanpay_cj_merchant_name to set
+	 */
+	public void setChanpay_cj_merchant_name(String chanpay_cj_merchant_name) {
+		this.chanpay_cj_merchant_name = chanpay_cj_merchant_name;
+	}
+
+	/**
+	 * @return the chanpay_cj_business_code
+	 */
+	public String getChanpay_cj_business_code() {
+		return chanpay_cj_business_code;
+	}
+
+	/**
+	 * @param chanpay_cj_business_code the chanpay_cj_business_code to set
+	 */
+	public void setChanpay_cj_business_code(String chanpay_cj_business_code) {
+		this.chanpay_cj_business_code = chanpay_cj_business_code;
+	}
+
+	/**
+	 * @return the chanpay_cj_account_no
+	 */
+	public String getChanpay_cj_account_no() {
+		return chanpay_cj_account_no;
+	}
+
+	/**
+	 * @param chanpay_cj_account_no the chanpay_cj_account_no to set
+	 */
+	public void setChanpay_cj_account_no(String chanpay_cj_account_no) {
+		this.chanpay_cj_account_no = chanpay_cj_account_no;
+	}
+
+	/**
+	 * @return the chanpay_cj_product_no
+	 */
+	public String getChanpay_cj_product_no() {
+		return chanpay_cj_product_no;
+	}
+
+	/**
+	 * @param chanpay_cj_product_no the chanpay_cj_product_no to set
+	 */
+	public void setChanpay_cj_product_no(String chanpay_cj_product_no) {
+		this.chanpay_cj_product_no = chanpay_cj_product_no;
+	}
+	
+	
 }

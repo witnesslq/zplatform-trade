@@ -20,7 +20,8 @@ public class ConsUtil {
     public static final String WHITELISTQUERY = "3007";
     public static final String WITHHOLDINGSELF = "1009";
     public static final String WITHHOLDINGSELFQUERY = "3009";
-    
+    public static final String REALNAMEAUTH_CHANPAY = "G60001";
+    public static final String WITHHOLDING_CHANPAY = "G10001";
 	private ConsUtil(){
 		try {
 			cons = new ConsModel();
@@ -145,6 +146,13 @@ public class ConsUtil {
 			cons.setIs_junit(Integer.valueOf(prop.getProperty("is_junit", "0")));
 			
 			cons.setRefund_day(Integer.valueOf(prop.getProperty("refund_day", "180")));
+			cons.setChanpay_cj_account_no(prop.getProperty("chanpay_cj_account_no", ""));
+			cons.setChanpay_cj_business_code(prop.getProperty("chanpay_cj_business_code", ""));
+			cons.setChanpay_cj_merchant_id(prop.getProperty("chanpay_cj_merchant_id", ""));
+			cons.setChanpay_cj_merchant_name(prop.getProperty("chanpay_cj_merchant_name", ""));
+			cons.setChanpay_cj_product_no(prop.getProperty("chanpay_cj_product_no", ""));
+			
+			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

@@ -29,7 +29,7 @@ public interface ChanPayCollectMoneyService {
 	 * @param tradeBean
 	 * @return
 	 */
-	public ResultBean realNameAuth(TradeBean tradeBean) throws InterruptedException;
+	public ResultBean realNameAuth(TradeBean tradeBean);
 	
 	/**
 	 * 查询实名认证结果

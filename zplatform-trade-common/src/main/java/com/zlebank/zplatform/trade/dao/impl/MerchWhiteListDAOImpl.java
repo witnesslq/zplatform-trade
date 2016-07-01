@@ -47,6 +47,7 @@ public class MerchWhiteListDAOImpl extends HibernateBaseDAOImpl<PojoMerchWhiteLi
             crite.add(Restrictions.eq("cardNo", accNo));
         if (StringUtil.isNotEmpty(accName))
             crite.add(Restrictions.eq("accName", accName));
+        crite.add(Restrictions.in("status", new String[]{"0", "1"}));
         return (PojoMerchWhiteList) crite.uniqueResult();
     }
 

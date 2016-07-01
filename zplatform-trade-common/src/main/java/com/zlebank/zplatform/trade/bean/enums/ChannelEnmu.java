@@ -10,6 +10,7 @@ public enum ChannelEnmu {
     BOSSPAYCOLLECTION("92000001"),//博士金电实时代收
     WEBCHAT("91000001"),//微信支付渠道
     CHANPAY("90000001"),//畅捷网关支付
+    CHANPAYCOLLECTMONEY("90000002"),//畅捷代收
     UNKNOW("");//未知
     private String chnlcode;
     
