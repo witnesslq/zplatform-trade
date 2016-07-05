@@ -114,6 +114,7 @@ public class RealnameAuthDAOImpl extends HibernateBaseDAOImpl<PojoRealnameAuth> 
      * @return
      */
     @Override
+    @Transactional(readOnly=true)
     public PojoRealnameAuth getByCardInfo(PojoRealnameAuth realnameAuth) {
         Criteria crite= this.getSession().createCriteria(PojoRealnameAuth.class);
         crite.add(Restrictions.eq("cardNo", realnameAuth.getCardNo()));

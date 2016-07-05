@@ -81,7 +81,7 @@ public class ChanPayCollectMoneyServiceImpl implements ChanPayCollectMoneyServic
 		try {
 			data = new G60001Bean();
 			data.setReqSn(tradeBean.getPayOrderNo());
-			data.setMertid("cp2016011227674");
+			data.setMertid("cp2016051996321");
 			data.setBankGeneralName(bankName);
 			data.setSn(U.createUUID());
 			data.setBankName(subBankName);
@@ -112,6 +112,12 @@ public class ChanPayCollectMoneyServiceImpl implements ChanPayCollectMoneyServic
 		}
 		
 		if("0000".equals(data.getRetCode())){
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			for(int i = 0;i<5;i++){
 				ResultBean queryResultBean = queryRealNameAuth(data.getReqSn());
 				if(queryResultBean.isResultBool()){
@@ -134,10 +140,14 @@ public class ChanPayCollectMoneyServiceImpl implements ChanPayCollectMoneyServic
 					}else if(bodyRetEnmu==BodyRetEnmu.FAILED){//交易失败
 						data.setRetCode(bean.getDtlRetCode());
 						data.setErrMsg(bean.getDtlErrMsg());
+						resultBean = new ResultBean(data);
+						resultBean.setResultBool(false);
 						break;
 					}else{//未知原因导致的失败
 						data.setRetCode(bean.getDtlRetCode());
 						data.setErrMsg(bean.getDtlErrMsg());
+						resultBean = new ResultBean(data);
+						resultBean.setResultBool(false);
 						break;
 					}
 					
@@ -225,7 +235,7 @@ public class ChanPayCollectMoneyServiceImpl implements ChanPayCollectMoneyServic
 		try {
 			G60002Bean data = new G60002Bean();
 			data.setReqSn(U.createUUID());
-			data.setMertid("cp2016011227674");
+			data.setMertid("cp2016051996321");
 			data.setQryReqSn(qry_req_sn);
 			buildCjmsgAndSend(data);
 			resultBean = new ResultBean(data);
@@ -346,7 +356,7 @@ public class ChanPayCollectMoneyServiceImpl implements ChanPayCollectMoneyServic
 		try {
 			data = new G60003Bean();
 			data.setReqSn(U.createUUID());
-			data.setMertid("cp2016011227674");
+			data.setMertid("cp2016051996321");
 			data.setCorpAccountNo("110061882018010000000");
 			data.setBusinessCode("01400");
 			data.setAlterType("0");
@@ -383,10 +393,16 @@ public class ChanPayCollectMoneyServiceImpl implements ChanPayCollectMoneyServic
 			resultBean = new ResultBean("T000", e.getMessage());
 		}
 		if("0000".equals(data.getRetCode())){
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			for(int i = 0;i<5;i++){
 				ResultBean queryResultBean = queryProtocolSign(data.getReqSn());
 				if(queryResultBean.isResultBool()){
-					G60002Bean bean = (G60002Bean) queryResultBean.getResultObj();
+					G60004Bean bean = (G60004Bean) queryResultBean.getResultObj();
 					
 					BodyRetEnmu bodyRetEnmu = BodyRetEnmu.fromValue(bean.getDtlRetCode());
 					if(bodyRetEnmu==BodyRetEnmu.ACCEPTED||bodyRetEnmu==BodyRetEnmu.PROCESSING){
@@ -405,10 +421,12 @@ public class ChanPayCollectMoneyServiceImpl implements ChanPayCollectMoneyServic
 					}else if(bodyRetEnmu==BodyRetEnmu.FAILED){//交易失败
 						data.setRetCode(bean.getDtlRetCode());
 						data.setErrMsg(bean.getDtlErrMsg());
+						resultBean = new ResultBean(data);
 						break;
 					}else{//未知原因导致的失败
 						data.setRetCode(bean.getDtlRetCode());
 						data.setErrMsg(bean.getDtlErrMsg());
+						resultBean = new ResultBean(data);
 						break;
 					}
 					
@@ -507,7 +525,7 @@ public class ChanPayCollectMoneyServiceImpl implements ChanPayCollectMoneyServic
 		G60004Bean data = new G60004Bean();
 		try {
 			data.setReqSn(U.createUUID());
-			data.setMertid("cp2016011227674");
+			data.setMertid("cp2016051996321");
 			data.setQryReqSn(qry_req_sn);
 			buildCjmsgAndSend(data);
 			resultBean = new ResultBean(data);
@@ -627,10 +645,9 @@ public class ChanPayCollectMoneyServiceImpl implements ChanPayCollectMoneyServic
 		String bankNumber = routeConfigService.getCardPBCCode(tradeBean.getCardNo()).get("PBC_BANKCODE")+"";
 		String subBankName = routeConfigService.getCardPBCCode(tradeBean.getCardNo()).get("BANKNAME")+"";
 		String bankName = routeConfigService.getBankName(bankNumber);
-		
 		G10001Bean data = new G10001Bean();
 		try {
-			data.setMertid("cp2016011227674");
+			data.setMertid("cp2016051996321");
 			data.setBusinessCode("01400");
 			data.setCorpAccNo("110061882018010000000");
 			data.setProductCode("00606666");
@@ -654,7 +671,7 @@ public class ChanPayCollectMoneyServiceImpl implements ChanPayCollectMoneyServic
 			data.setPostscript("代收业务");
 			data.setAccountProp("0");
 			data.setAccountType("00");
-			data.setReqSn(U.createUUID());
+			data.setReqSn(tradeBean.getPayOrderNo());
 			buildCjmsgAndSend(data);
 		} catch (TradeException e) {
 			// TODO Auto-generated catch block
@@ -675,12 +692,17 @@ public class ChanPayCollectMoneyServiceImpl implements ChanPayCollectMoneyServic
 		}
 		
 		if("0000".equals(data.getRetCode())){
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			for(int i = 0;i<5;i++){
 				ResultBean queryResultBean = queryCollectMoney(data.getReqSn());
 				if(queryResultBean.isResultBool()){
-					G60002Bean bean = (G60002Bean) queryResultBean.getResultObj();
-					
-					BodyRetEnmu bodyRetEnmu = BodyRetEnmu.fromValue(bean.getDtlRetCode());
+					G20001Bean bean = (G20001Bean) queryResultBean.getResultObj();
+					BodyRetEnmu bodyRetEnmu = BodyRetEnmu.fromValue(bean.getRetCode());
 					if(bodyRetEnmu==BodyRetEnmu.ACCEPTED||bodyRetEnmu==BodyRetEnmu.PROCESSING){
 						try {
 							Thread.sleep(1000);
@@ -690,17 +712,21 @@ public class ChanPayCollectMoneyServiceImpl implements ChanPayCollectMoneyServic
 						}
 						continue;
 					}else if(bodyRetEnmu==BodyRetEnmu.SUCCESS){//交易成功
-						data.setRetCode(bean.getDtlRetCode());
-						data.setErrMsg(bean.getDtlErrMsg());
+						data.setRetCode(bean.getRetCode());
+						data.setErrMsg(bean.getErrMsg());
 						resultBean = new ResultBean(data);
 						break;
 					}else if(bodyRetEnmu==BodyRetEnmu.FAILED){//交易失败
-						data.setRetCode(bean.getDtlRetCode());
-						data.setErrMsg(bean.getDtlErrMsg());
+						data.setRetCode(bean.getRetCode());
+						data.setErrMsg(bean.getErrMsg());
+						resultBean = new ResultBean(data);
+						resultBean.setResultBool(false);
 						break;
 					}else{//未知原因导致的失败
-						data.setRetCode(bean.getDtlRetCode());
-						data.setErrMsg(bean.getDtlErrMsg());
+						data.setRetCode(bean.getRetCode());
+						data.setErrMsg(bean.getErrMsg());
+						resultBean = new ResultBean(data);
+						resultBean.setResultBool(false);
 						break;
 					}
 					
@@ -791,14 +817,16 @@ public class ChanPayCollectMoneyServiceImpl implements ChanPayCollectMoneyServic
 	 */
 	@Override
 	public ResultBean queryCollectMoney(String qry_req_sn) {
+		ResultBean resultBean = null;
 		G20001Bean data = new G20001Bean();
 		try {
-			data.setMertid("cp2016011227674");
+			data.setMertid("cp2016051996321");
 			data.setQryReqSn(qry_req_sn);
 			data.setSummary("");
 			data.setPostscript("");
 			data.setReqSn(U.createUUID());
 			buildCjmsgAndSend(data);
+			resultBean = new ResultBean(data);
 		} catch (TradeException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -812,7 +840,7 @@ public class ChanPayCollectMoneyServiceImpl implements ChanPayCollectMoneyServic
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return null;
+		return resultBean;
 	}
 	/** 组织Cj报文，并发送 
 	 * @throws IOException 
@@ -840,14 +868,15 @@ public class ChanPayCollectMoneyServiceImpl implements ChanPayCollectMoneyServic
 		Element msgEl = reqDoc.getRootElement();
 		Element infoEl = msgEl.element("INFO");
 
-		data.setRetCode(infoEl.elementText("RET_CODE"));
-		data.setErrMsg(infoEl.elementText("ERR_MSG"));
+		
 		data.setTimestamp(infoEl.elementText("TIMESTAMP"));
 		
 		Element bodyEl = msgEl.element("BODY");
 		if (bodyEl == null) {
 			return;
 		}
+		data.setRetCode(bodyEl.elementText("RET_CODE"));
+		data.setErrMsg(bodyEl.elementText("ERR_MSG"));
 		data.setCharge(StringUtils.isBlank(bodyEl.elementText("CHARGE"))?0:Long.parseLong(bodyEl.elementText("CHARGE")));
 		data.setCorpAcctNo(bodyEl.elementText("CORP_ACCT_NO"));
 		data.setCorpAcctName(bodyEl.elementText("CORP_ACCT_NAME"));

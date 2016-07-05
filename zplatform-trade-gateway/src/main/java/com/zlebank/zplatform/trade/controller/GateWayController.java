@@ -582,7 +582,6 @@ public class GateWayController {
         if (StringUtil.isEmpty(trade.getTxnseqno())) {
             return new ModelAndView("redirect:/gateway/cash.htm?txnseqno=" + txnseqno_);
         }
-        
         Map<String, Object> model = new HashMap<String, Object>();
         TradeBean tradeBean2 = trade.clone();
         try {
@@ -693,6 +692,8 @@ public class GateWayController {
                         return new ModelAndView("redirect:/gateway/payment.htm?txnseqno="+ trade.getTxnseqno()+"&reapayOrderNo="+trade.getReaPayOrderNo()+"&orderNo="+trade.getOrderId());
                     case CMBCSELFWITHHOLDING:
                         return new ModelAndView("redirect:/gateway/payment.htm?txnseqno="+ trade.getTxnseqno()+"&reapayOrderNo="+trade.getReaPayOrderNo()+"&orderNo="+trade.getOrderId());
+                    case CHANPAYCOLLECTMONEY:
+                    	return new ModelAndView("redirect:/gateway/payment.htm?txnseqno="+ trade.getTxnseqno()+"&reapayOrderNo="+trade.getReaPayOrderNo()+"&orderNo="+trade.getOrderId());
 				default:
 					break;
                     
@@ -871,6 +872,29 @@ public class GateWayController {
                                 }
                             }
                             break;
+                        case CHANPAYCOLLECTMONEY:
+                        	serialno = txnsLog.getPayordno();
+                            if(!txnsLog.getPayretcode().equals("0000")){
+                                model.put("errMsg", txnsLog.getRetinfo());
+                                model.put("respCode", txnsLog.getRetcode());
+                                TradeBean tradeBean = new TradeBean();
+                                tradeBean.setTxnseqno(txnseqno);
+                                model.put("trade", tradeBean);
+                                model.put("txnseqno", txnseqno);
+                                return "failed";
+                            }
+                            withholding = txnsWithholdingService.getWithholdingBySerialNo(serialno);
+                            model.put("errMsg", txnsLog.getRetinfo());
+                            model.put("respCode", txnsLog.getRetcode());
+                            TradeBean tradeBean = new TradeBean();
+                            tradeBean.setTxnseqno(txnseqno);
+                            model.put("trade", tradeBean);
+                            model.put("txnseqno", txnseqno);
+                            if("S".equalsIgnoreCase(withholding.getExectype())){
+                                return "completed";
+                            }else{
+                                return "failed";
+                            }
 					default:
 						break;
                     }

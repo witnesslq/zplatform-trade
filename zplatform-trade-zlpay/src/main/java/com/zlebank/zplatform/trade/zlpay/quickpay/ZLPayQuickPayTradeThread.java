@@ -275,6 +275,7 @@ public class ZLPayQuickPayTradeThread implements IQuickPayTrade{
         txnsLog.setTradestatflag("00000001");
         txnsLog.setRetdatetime(DateUtil.getCurrentDateTime());
         txnsLog.setTradetxnflag("10000000");
+        txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
         txnsLogService.updateTxnsLog(txnsLog);
       //更新交易支付方信息
         txnsLogService.updatePayInfo_Fast_result(txnseqno, payrettsnseqno, retcode, retinfo);
@@ -283,7 +284,7 @@ public class ZLPayQuickPayTradeThread implements IQuickPayTrade{
         AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue(txnsLog.getBusitype())).accountedFor(txnseqno);
         AppPartyBean appParty = new AppPartyBean("","000000000000", commiteTime,DateUtil.getCurrentDateTime(), txnseqno, "");
         txnsLogService.updateAppInfo(appParty);
-        txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
+        
         
     }
     

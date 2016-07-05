@@ -50,7 +50,7 @@ public class CJG60004Test {
 			data.setReqSn(U.createUUID());
 			
 			data.setMertid("cp2016011227674");
-			data.setQryReqSn("8f706e9db2bd46edb5b42d3d14427b08");
+			data.setQryReqSn("ec425530a1674e3aa81ef59459795934");
 			
 			buildCjmsgAndSend(data);
 			

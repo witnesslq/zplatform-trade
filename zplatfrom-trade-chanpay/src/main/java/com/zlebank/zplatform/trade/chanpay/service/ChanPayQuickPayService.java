@@ -30,4 +30,28 @@ public interface ChanPayQuickPayService {
 	 * @throws TradeException
 	 */
 	public ResultBean realNameAuth(TradeBean tradeBean) throws TradeException;
+	
+	/**
+	 * 协议签约
+	 * @param tradeBean
+	 * @return
+	 * @throws TradeException
+	 */
+	public ResultBean protocolSign(TradeBean tradeBean) throws TradeException;
+	
+	/**
+	 * 代收
+	 * @param tradeBean
+	 * @return
+	 * @throws TradeException
+	 */
+	public ResultBean collectMoney(TradeBean tradeBean) throws TradeException;
+	
+	/**
+	 * 账务处理
+	 * @param resultBean
+	 * @param txnseqno
+	 * @return
+	 */
+	public ResultBean dealWithAccounting(ResultBean resultBean,String txnseqno);
 }

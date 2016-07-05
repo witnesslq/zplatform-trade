@@ -22,6 +22,7 @@ public class ConsUtil {
     public static final String WITHHOLDINGSELFQUERY = "3009";
     public static final String REALNAMEAUTH_CHANPAY = "G60001";
     public static final String WITHHOLDING_CHANPAY = "G10001";
+    public static final String PROTOCOLSIGN_CHANPAY = "G10003";
 	private ConsUtil(){
 		try {
 			cons = new ConsModel();

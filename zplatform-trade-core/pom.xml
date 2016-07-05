@@ -42,11 +42,11 @@
 			<artifactId>zplatform-trade-common</artifactId>
 			<version>1.4.0-SNAPSHOT</version>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.zlebank.zplatform</groupId>
 			<artifactId>zplatform-trade-bosspay</artifactId>
 			<version>1.4.0-SNAPSHOT</version>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>com.zlebank.zplatform</groupId>
 			<artifactId>zplatform-trade-chanpay</artifactId>

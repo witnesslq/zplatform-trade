@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.zlebank.zplatform</groupId>
@@ -6,7 +7,7 @@
 		<version>1.4.0-SNAPSHOT</version>
 		<relativePath>../zplatform-trade-deploy/pom.xml</relativePath>
 	</parent>
-	<artifactId>zplatform-trade-reapay</artifactId> 
+	<artifactId>zplatform-trade-reapay</artifactId>
 	<packaging>jar</packaging>
 
 	<name>zplatform-trade-reapay</name>
@@ -21,11 +22,24 @@
 			<groupId>com.zlebank.zplatform</groupId>
 			<artifactId>zplatform-trade-common</artifactId>
 			<version>1.4.0-SNAPSHOT</version>
-		</dependency> 
-		<dependency>
-			<groupId>com.zlebank.zplatform</groupId>
-			<artifactId>jce-jdk13</artifactId>
-			<version>136</version>
 		</dependency>
+		<!-- <dependency> <groupId>com.zlebank.zplatform</groupId> <artifactId>jce-jdk13</artifactId> 
+			<version>136</version> </dependency> -->
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk15on</artifactId>
+			<version>1.52</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.3.3</version>
+		</dependency>
+		<dependency>
+    <groupId>org.apache.httpcomponents</groupId>
+    <artifactId>httpcore</artifactId>
+    <version>4.3.3</version>
+</dependency>
+		
 	</dependencies>
 </project>

@@ -66,7 +66,7 @@ public class CJG60003Test {
 			data.setId("150223199310160050");
 			data.setTel("15101125144");
 			data.setBeginDate("06/21/2016");
-			data.setEndDate("06/21/2017");
+			data.setEndDate("07/21/2017");
 			
 			
 			buildCjmsgAndSend(data);

@@ -189,6 +189,29 @@ public class TxnsWithholdingModel implements java.io.Serializable {
         this.chnlcode = ChannelEnmu.CMBCWITHHOLDING.getChnlcode();
     }
     
+    public TxnsWithholdingModel(String bankinscode,String bankname,String bankaccno,String bankaccname,String bankacctype,String certtype,String certno,String mobile,ChannelEnmu channelEnmu) {
+    	if(channelEnmu==ChannelEnmu.CHANPAYCOLLECTMONEY){
+    		this.serialno = OrderNumber.getInstance().generateRealNameOrderNo();
+	        this.merid = ConsUtil.getInstance().cons.getChanpay_cj_merchant_id();
+	        this.mername = ConsUtil.getInstance().cons.getChanpay_cj_merchant_name();
+	        this.transdate = DateUtil.getCurrentDate();
+	        this.transtime = DateUtil.getCurrentTime();
+	        this.servicecode = ConsUtil.PROTOCOLSIGN_CHANPAY;
+	        this.cardtype = bankacctype;
+	        this.accno = bankaccno;
+	        this.accname = bankaccname;
+	        this.certtype = certtype;
+	        this.certno = certno;
+	        this.phone = mobile;
+	        this.memberid = "";
+	        this.orderno = "";
+	        this.payerbankinscode=bankinscode;
+	        this.payerbankname = bankname;
+	        this.chnlcode = channelEnmu.getChnlcode();
+    	}
+       
+    }
+    
     
     
     public TxnsWithholdingModel(String oritransdate,String orireqserialno,String txnseqno,ChannelEnmu channel) {

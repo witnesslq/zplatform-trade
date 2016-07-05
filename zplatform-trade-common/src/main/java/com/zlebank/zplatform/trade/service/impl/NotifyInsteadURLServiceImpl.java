@@ -52,6 +52,7 @@ import com.zlebank.zplatform.trade.model.ConfigInfoModel;
 import com.zlebank.zplatform.trade.model.PojoInsteadPayBatch;
 import com.zlebank.zplatform.trade.service.InsteadPayService;
 import com.zlebank.zplatform.trade.service.NotifyInsteadURLService;
+import com.zlebank.zplatform.trade.utils.SpringContext;
 
 /**
  * 代付URL通知类
@@ -78,7 +79,7 @@ public class NotifyInsteadURLServiceImpl implements NotifyInsteadURLService,  Ap
     @Autowired
     private CoopInstiService coopInstiService;
 
-    @Autowired
+    //@Autowired
     private InsteadPayService insteadPayService;
     
     @Autowired

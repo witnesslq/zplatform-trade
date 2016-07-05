@@ -101,7 +101,7 @@ import com.zlebank.zplatform.trade.utils.OrderNumber;
  * @date 2015年11月25日 上午10:48:24
  * @since
  */
-@Service("insteadPayServiceImpl")
+@Service("insteadPayServiceImpl2")
 public class InsteadPayServiceImpl
         extends
             AbstractBasePageService<InsteadPayDetailQuery, InsteadPayDetailBean>

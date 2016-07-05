@@ -321,14 +321,9 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
             ResultBean resultBean = quickPayTrade.bankSign(trade);
             
             if (resultBean.isResultBool()) {
-                if(routId.equals("93000002")||routId.equals("93000003")){
-                    
-                }else if(routId.equals("92000001")){
-                	
-                }else if(routId.equals("98000001")){
-                	
-                }else{
-                    ReaPayResultBean payResultBean = (ReaPayResultBean) resultBean
+                
+                if(routId.equals("96000001")){
+                	ReaPayResultBean payResultBean = (ReaPayResultBean) resultBean
                             .getResultObj();
                     if (!"0000".equals(payResultBean.getResult_code())) {
                         throw new TradeException("T000",payResultBean.getResult_msg());
