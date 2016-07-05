@@ -35,6 +35,7 @@ import com.zlebank.zplatform.trade.model.TxnsRefundModel;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
 import com.zlebank.zplatform.trade.service.ITxnsRefundService;
 import com.zlebank.zplatform.trade.utils.OrderNumber;
+import com.zlebank.zplatform.trade.utils.SpringContext;
 import com.zlebank.zplatform.wechat.enums.ResultCodeEnum;
 import com.zlebank.zplatform.wechat.exception.WXVerifySignFailedException;
 import com.zlebank.zplatform.wechat.wx.WXApplication;
@@ -50,16 +51,20 @@ import com.zlebank.zplatform.wechat.wx.common.WXConfigure;
  * @date 2016年6月8日 上午10:01:16
  * @since
  */
-@Service("weChatRefundTrade")
 public class WeChatRefundTrade implements IRefundTrade {
 
 	private static final Log log = LogFactory.getLog(WeChatRefundTrade.class);
-	@Autowired
 	private ITxnsLogService txnsLogService;
-	@Autowired
 	private ITxnsRefundService txnsRefundService;
-	@Autowired
 	private ITxnsOrderinfoDAO txnsOrderinfoDAO; 
+	
+	
+	public WeChatRefundTrade(){
+    	txnsLogService = (ITxnsLogService) SpringContext.getContext().getBean("txnsLogService");
+    	txnsRefundService = (ITxnsRefundService) SpringContext.getContext().getBean("txnsRefundService");
+    	txnsOrderinfoDAO = (ITxnsOrderinfoDAO) SpringContext.getContext().getBean("txnsOrderinfo");
+    }
+
 	/**
 	 *
 	 * @param tradeBean
