@@ -813,7 +813,7 @@ public class GateWayController {
     public Object queryCMBCTrade(String orderNo,String txnseqno) {
         Map<String, Object> model = new HashMap<String, Object>();
         TxnsLogModel txnsLog = null;
-        int[] timeArray = new int[]{1000, 2000, 8000, 16000, 32000,64000};
+        int[] timeArray = new int[]{1000, 2000, 2000, 2000,2000,2000};
         try {
             for (int i = 0; i < 6; i++) {
                 txnsLog=txnsLogService.getTxnsLogByTxnseqno(txnseqno);
