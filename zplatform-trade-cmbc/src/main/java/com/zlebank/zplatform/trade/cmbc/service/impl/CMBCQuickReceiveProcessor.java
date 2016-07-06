@@ -198,6 +198,7 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
         txnsLog.setRelate("10000000");
         txnsLog.setTradeseltxn(UUIDUtil.uuid());
         txnsLog.setPayrettsnseqno(withholding.getPayserialno());
+        txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
         txnsLogService.updateTxnsLog(txnsLog);
         TxnsOrderinfoModel orderinfo = txnsOrderinfoDAO.getOrderByTxnseqno(txnseqno);
         orderinfo.setStatus("00");
