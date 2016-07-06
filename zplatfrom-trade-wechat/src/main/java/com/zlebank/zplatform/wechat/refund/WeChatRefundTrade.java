@@ -12,7 +12,6 @@ package com.zlebank.zplatform.wechat.refund;
 
 import net.sf.json.JSONObject;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +28,7 @@ import com.zlebank.zplatform.trade.bean.enums.ChannelEnmu;
 import com.zlebank.zplatform.trade.bean.enums.OrderStatusEnum;
 import com.zlebank.zplatform.trade.bean.enums.RefundTypeEnum;
 import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
+import com.zlebank.zplatform.trade.dao.TranDataDAO;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.model.TxnsOrderinfoModel;
 import com.zlebank.zplatform.trade.model.TxnsRefundModel;
@@ -64,6 +64,7 @@ public class WeChatRefundTrade implements IRefundTrade {
     	txnsRefundService = (ITxnsRefundService) SpringContext.getContext().getBean("txnsRefundService");
     	txnsOrderinfoDAO = (ITxnsOrderinfoDAO) SpringContext.getContext().getBean("txnsOrderinfo");
     }
+
 
 	/**
 	 *
