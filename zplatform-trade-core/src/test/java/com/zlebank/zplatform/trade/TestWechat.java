@@ -96,6 +96,17 @@ public class TestWechat {
     }
     
     @Test
+    public void createOrder(){
+    	try {
+    		weChatService.creatOrder("160705002700053299");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    	
+    	
+    }
+    
+    @Test
     public void testAnsy(){
     		StringBuffer sq= new StringBuffer();
 	    	/*sq.append("<xml><appid><![CDATA[wx16a0b09dbf94f380]]></appid><attach><![CDATA[证联]]></attach><bank_type><![CDATA[CFT]]></bank_type><cash_fee><![CDATA[1]]></cash_fee><device_info><![CDATA[WEB]]>");

@@ -57,7 +57,7 @@
 			</props>
 		</property>
 	</bean>
-    <!-- 
+   
 	<bean id="accDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
 		destroy-method="close">
 		<property name="driverClass" value="oracle.jdbc.OracleDriver" />
@@ -69,7 +69,7 @@
 		<property name="initialPoolSize" value="1" />
 		<property name="maxIdleTime" value="20" />
 	</bean>
-	 -->
+	 <!-- 
 	 <bean id="accDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
 		destroy-method="close">
 		<property name="driverClass" value="oracle.jdbc.OracleDriver" />
@@ -81,7 +81,7 @@
 		<property name="initialPoolSize" value="1" />
 		<property name="maxIdleTime" value="20" />
 	</bean>
-
+ -->
 
 	<bean id="transactionManager"
 		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
