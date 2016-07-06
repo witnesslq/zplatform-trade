@@ -58,11 +58,14 @@ public class WeChatRefundTrade implements IRefundTrade {
 	private ITxnsRefundService txnsRefundService;
 	private ITxnsOrderinfoDAO txnsOrderinfoDAO; 
 	
+	
 	public WeChatRefundTrade(){
     	txnsLogService = (ITxnsLogService) SpringContext.getContext().getBean("txnsLogService");
     	txnsRefundService = (ITxnsRefundService) SpringContext.getContext().getBean("txnsRefundService");
-    	txnsOrderinfoDAO = (ITxnsOrderinfoDAO) SpringContext.getContext().getBean("txnsOrderinfoDAO");
+    	txnsOrderinfoDAO = (ITxnsOrderinfoDAO) SpringContext.getContext().getBean("txnsOrderinfo");
     }
+
+
 	/**
 	 *
 	 * @param tradeBean
