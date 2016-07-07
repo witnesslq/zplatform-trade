@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -52,6 +53,9 @@ import com.zlebank.zplatform.commons.enums.BusinessCodeEnum;
 import com.zlebank.zplatform.commons.utils.Base64Utils;
 import com.zlebank.zplatform.commons.utils.RSAUtils;
 import com.zlebank.zplatform.commons.utils.StringUtil;
+import com.zlebank.zplatform.commons.utils.security.AESHelper;
+import com.zlebank.zplatform.commons.utils.security.AESUtil;
+import com.zlebank.zplatform.commons.utils.security.RSAHelper;
 import com.zlebank.zplatform.member.bean.CoopInstiMK;
 import com.zlebank.zplatform.member.bean.MemberBean;
 import com.zlebank.zplatform.member.bean.MerchMK;
@@ -2412,7 +2416,7 @@ public class GateWayServiceImpl extends
 		}
 		saveAcctTrade(txnsLog.getTxnseqno(), orderinfo.getOrderno(), resultBean);
 		if (resultBean.isResultBool()) {
-			ResultBean orderResp = generateRespMessage(orderinfo.getOrderno(),
+			/*ResultBean orderResp = generateRespMessage(orderinfo.getOrderno(),
 					txnsLog.getAccfirmerno());
 			if (orderResp.isResultBool()) {
 				TxnsOrderinfoModel gatewayOrderBean = getOrderinfoByOrderNo(orderinfo
@@ -2425,12 +2429,94 @@ public class GateWayServiceImpl extends
 						respBean.getNotifyParam()).start();
 			} else {
 				throw new TradeException("AP07");
+			}*/
+			
+			ResultBean orderResp = 
+			        generateAsyncRespMessage(txnsLog.getTxnseqno());
+			if (orderResp.isResultBool()) {
+				if("000205".equals(orderinfo.getBiztype())){
+	        		AnonOrderAsynRespBean respBean = (AnonOrderAsynRespBean) orderResp.getResultObj();
+	        		
+	        		InsteadPayNotifyTask task = new InsteadPayNotifyTask();
+	        		//对匿名支付订单数据进行加密加签
+	        		responseData(respBean, txnsLog.getAccfirmerno(), txnsLog.getAccsecmerno(), task);
+	        		new SynHttpRequestThread(
+	                        StringUtil.isNotEmpty(orderinfo.getSecmemberno())?orderinfo.getSecmemberno():orderinfo.getFirmemberno(),
+	                        		orderinfo.getRelatetradetxn(),
+	                        		orderinfo.getBackurl(),
+	                        task).start();
+	        	}else{
+	        		OrderAsynRespBean respBean = (OrderAsynRespBean) orderResp
+	                        .getResultObj();
+	                new SynHttpRequestThread(
+	                		StringUtil.isNotEmpty(orderinfo.getSecmemberno())?orderinfo.getSecmemberno():orderinfo.getFirmemberno(),
+	                				orderinfo.getRelatetradetxn(),
+	                				orderinfo.getBackurl(),
+	                        respBean.getNotifyParam()).start();
+	        	}
+			   
+			}else {
+				throw new TradeException("AP07");
 			}
 		} else {
 			throw new TradeException("AP05");
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	private void responseData(AnonOrderAsynRespBean respBean, String coopInstCode,String merchNo,InsteadPayNotifyTask task) {
+        if (log.isDebugEnabled()) {
+            log.debug("【入参responseData】"+net.sf.json.JSONObject.fromObject(respBean));
+        }
+        net.sf.json.JSONObject jsonData = net.sf.json.JSONObject.fromObject(respBean);
+        // 排序
+        Map<String, Object> map = new TreeMap<String, Object>();
+        map =(Map<String, Object>) net.sf.json.JSONObject.toBean(jsonData, TreeMap.class);
+        jsonData = net.sf.json.JSONObject.fromObject(map);
+        
+        net.sf.json.JSONObject addit = new net.sf.json.JSONObject();
+        addit.put("accessType", "1");
+        addit.put("coopInstiId", coopInstCode);
+        addit.put("merId", merchNo);
+        MerchMK merchMk = merchMKService.get(addit.getString("merId"));
+        RSAHelper rsa = new RSAHelper(merchMk.getMemberPubKey(), merchMk.getLocalPriKey());
+        String aesKey = null;
+        try {
+            aesKey = AESUtil.getAESKey();
+            if (log.isDebugEnabled()) {
+                log.debug("【AES KEY】" + aesKey);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        addit.put("encryKey", rsa.encrypt(aesKey));
+        addit.put("encryMethod", "01");
+
+        // 加签名
+        StringBuffer originData = new StringBuffer(addit.toString());//业务数据
+        originData.append(jsonData.toString());// 附加数据
+        if (log.isDebugEnabled()) {
+            log.debug("【应答报文】加签用字符串：" + originData.toString());
+        }
+        // 加签
+        String sign = rsa.sign(originData.toString());
+        AESHelper packer = new AESHelper(aesKey);
+        JSONObject rtnSign = new JSONObject();
+        rtnSign.put("signature", sign);
+        rtnSign.put("signMethod", "01");
+        
+        // 业务数据
+        task.setData(packer.pack(jsonData.toString()));
+        // 附加数据
+        task.setAddit(addit.toString());
+        // 签名数据
+        task.setSign(rtnSign.toString());
+        if (log.isDebugEnabled()) {
+            log.debug("【发送报文数据】【业务数据】："+task.getData());
+            log.debug("【发送报文数据】【附加数据】："+task.getAddit());
+            log.debug("【发送报文数据】【签名数据】："+ task.getSign());
+        }
+    }
 	/**
 	 * 查询会员已绑卡信息
 	 * 

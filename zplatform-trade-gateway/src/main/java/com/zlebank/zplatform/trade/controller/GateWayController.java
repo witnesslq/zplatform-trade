@@ -1214,7 +1214,12 @@ public class GateWayController {
         // gateWayService.getOrderinfoByOrderNo(orderNo);
         gateWayService.updateOrderToFail(txnseqno);
         TxnsLogModel txnsLog = txnsLogService.get(txnseqno);
-        model.put("errMsg", txnsLog.getRetinfo());
+        if(StringUtil.isNotEmpty(txnsLog.getRetinfo())){
+        	model.put("errMsg", txnsLog.getRetinfo());
+        }else{
+        	model.put("errMsg", txnsLog.getPayretinfo());
+        }
+        
         model.put("respCode", txnsLog.getRetcode());
         model.put("txnseqno", txnseqno);;
         return new ModelAndView("/erro", model);

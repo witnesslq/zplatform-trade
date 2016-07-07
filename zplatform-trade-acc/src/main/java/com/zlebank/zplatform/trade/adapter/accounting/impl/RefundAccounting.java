@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.acc.bean.TradeInfo;
@@ -51,6 +53,7 @@ public class RefundAccounting implements IAccounting{
     
 
     @Override
+    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
     public ResultBean accountedFor(String txnseqno) {
     	TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(txnseqno);
 		TxnsRefundModel refund = txnsRefundService.getRefundByTxnseqno(txnseqno);
@@ -92,7 +95,7 @@ public class RefundAccounting implements IAccounting{
         	txnsLog.setAppordcommitime(DateUtil.getCurrentDateTime());
         	txnsLog.setAppinst("000000000000");
             accEntryService.accEntryProcess(tradeInfo, entryEvent);
-            txnsRefundService.update(refund);
+            txnsRefundService.updateRefund(refund);//update(refund);
             txnsOrderinfoDAO.updateOrderinfo(order);
             txnsLog.setApporderstatus(AccStatusEnum.Finish.getCode());
             txnsLog.setAppordfintime(DateUtil.getCurrentDateTime());
