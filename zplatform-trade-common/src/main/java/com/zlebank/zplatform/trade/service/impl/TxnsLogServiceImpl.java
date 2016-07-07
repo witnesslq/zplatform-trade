@@ -546,6 +546,22 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         // TODO Auto-generated method stub
         super.update(txnsLog);
     }
+    
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+    public void updateAnonOrderToMemberOrder(String txnseqno,String memberId){
+    	 try {
+             String hql = "update TxnsLogModel set accmemberid = ?  where txnseqno = ? ";
+             super.updateByHQL(hql, new Object[]{memberId,txnseqno});
+             
+             hql = "update TxnsOrderinfoModel set memberid = ?  where relatetradetxn = ? ";
+             super.updateByHQL(hql, new Object[]{memberId,txnseqno});
+             
+         } catch (Exception e) {
+             // TODO Auto-generated catch block
+             e.printStackTrace();
+             
+         }
+    }
 
 
     @Override

@@ -53,12 +53,15 @@ import com.zlebank.zplatform.trade.bean.PayPartyBean;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.enums.BusinessEnum;
 import com.zlebank.zplatform.trade.bean.enums.ChannelEnmu;
+import com.zlebank.zplatform.trade.bean.enums.ChnlTypeEnum;
 import com.zlebank.zplatform.trade.bean.enums.OrderStatusEnum;
 import com.zlebank.zplatform.trade.bean.enums.RefundTypeEnum;
 import com.zlebank.zplatform.trade.bean.gateway.AnonOrderAsynRespBean;
 import com.zlebank.zplatform.trade.bean.gateway.OrderAsynRespBean;
 import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
+import com.zlebank.zplatform.trade.dao.RspmsgDAO;
 import com.zlebank.zplatform.trade.factory.AccountingAdapterFactory;
+import com.zlebank.zplatform.trade.model.PojoRspmsg;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.model.TxnsOrderinfoModel;
 import com.zlebank.zplatform.trade.model.TxnsRefundModel;
@@ -110,6 +113,9 @@ public class WeChatServiceImpl implements WeChatService{
 	private AccEntryService accEntryService;
 	@Autowired
 	private ITxnsRefundService txnsRefundService;
+	@Autowired
+	private RspmsgDAO rspmsgDAO;
+	
 	/**
 	 *
 	 * @param tn
@@ -470,18 +476,40 @@ public class WeChatServiceImpl implements WeChatService{
 		            //退款成功
 		            TxnsRefundModel refundEn = txnsRefundService.getRefundByTxnseqno(txnseqno);
 		            refundEn.setStatus("00");
-		            txnsRefundService.update(refundEn);
+		            txnsRefundService.updateRefund(refundEn);
 				//3.2如果失败
 				}else if(ResultCodeEnum.FAIL.getCode().equals(refund.getReturn_code())){
 					txnsLog.setPayretcode(refund.getErr_code());
 					txnsLog.setPayretinfo(refund.getErr_code_des());
+					//
+					try {
+						PojoRspmsg rspmsg = rspmsgDAO.getRspmsgByChnlCode(ChnlTypeEnum.WECHAT, refund.getErr_code());
+						txnsLog.setRetcode(rspmsg.getWebrspcode());
+					    txnsLog.setRetinfo(rspmsg.getRspinfo());
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						txnsLog.setRetcode("3499");
+					    txnsLog.setRetinfo("交易失败");
+					}
+					
 					 //订单状态为失败
-					  order.setStatus(OrderStatusEnum.FAILED.getStatus());
-					  log.info("退款跑批:"+txnseqno+"退款失败");
+					 order.setStatus(OrderStatusEnum.FAILED.getStatus());
+					 log.info("退款跑批:"+txnseqno+"退款失败");
 				//3.3需重新发起
 				}else if(ResultCodeEnum.NOTSURE.getCode().equals(refund.getReturn_code())){
 					txnsLog.setPayretcode(refund.getErr_code());
 					txnsLog.setPayretinfo(refund.getErr_code_des());
+					try {
+						PojoRspmsg rspmsg = rspmsgDAO.getRspmsgByChnlCode(ChnlTypeEnum.WECHAT, refund.getErr_code());
+						txnsLog.setRetcode(rspmsg.getWebrspcode());
+					    txnsLog.setRetinfo(rspmsg.getRspinfo());
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						txnsLog.setRetcode("3499");
+					    txnsLog.setRetinfo("交易失败");
+					}
 					 //订单状态为失败
 					  order.setStatus(OrderStatusEnum.FAILED.getStatus());
 					  log.info("退款跑批:"+txnseqno+"需商户重新发起");
@@ -494,17 +522,15 @@ public class WeChatServiceImpl implements WeChatService{
 				//更新交易订单信息
 				txnsOrderinfoDAO.updateOrderinfo(order);
 		        //更新订单状态
-				txnsOrderinfoDAO.update(order);
+				//txnsOrderinfoDAO.update(order);
 				 /**账务处理开始 **/
 		        // 应用方信息
 		        try {
 		        	 AppPartyBean appParty = new AppPartyBean("",
 		                     "000000000000", DateUtil.getCurrentDateTime(),
-		                     DateUtil.getCurrentDateTime(), txnsLog.getTxnseqno(), "AC000000");
-		        	 txnsLogService.updateAppInfo(appParty);
-		            IAccounting accounting = AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue(txnsLog.getBusitype()));
-		            ResultBean accountResultBean = accounting.accountedFor(txnseqno);
-		            txnsLogService.updateAppStatus(txnsLog.getTxnseqno(), accountResultBean.getErrCode(), accountResultBean.getErrMsg());
+		                     DateUtil.getCurrentDateTime(), txnsLog.getTxnseqno(), "");
+		        	txnsLogService.updateAppInfo(appParty);
+		            AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue(txnsLog.getBusitype())).accountedFor(txnseqno);
 		        } catch (Exception e) {
 		            e.printStackTrace();
 		        }

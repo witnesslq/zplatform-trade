@@ -55,6 +55,7 @@ public class RefundAccounting implements IAccounting{
     @Override
     @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
     public ResultBean accountedFor(String txnseqno) {
+    	
     	TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(txnseqno);
 		TxnsRefundModel refund = txnsRefundService.getRefundByTxnseqno(txnseqno);
 		TxnsOrderinfoModel order = txnsOrderinfoDAO.getOrderByTxnseqno(txnseqno);
@@ -95,7 +96,7 @@ public class RefundAccounting implements IAccounting{
         	txnsLog.setAppordcommitime(DateUtil.getCurrentDateTime());
         	txnsLog.setAppinst("000000000000");
             accEntryService.accEntryProcess(tradeInfo, entryEvent);
-            txnsRefundService.updateRefund(refund);//update(refund);
+            txnsRefundService.updateRefund(refund);
             txnsOrderinfoDAO.updateOrderinfo(order);
             txnsLog.setApporderstatus(AccStatusEnum.Finish.getCode());
             txnsLog.setAppordfintime(DateUtil.getCurrentDateTime());

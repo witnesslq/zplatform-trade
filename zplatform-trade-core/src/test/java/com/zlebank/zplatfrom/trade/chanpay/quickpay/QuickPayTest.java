@@ -14,6 +14,7 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -25,6 +26,7 @@ import com.zlebank.zplatform.trade.bean.TradeBean;
 import com.zlebank.zplatform.trade.bean.enums.TradeTypeEnum;
 import com.zlebank.zplatform.trade.chanpay.quickpay.ChanpayQuickPayTradeThread;
 import com.zlebank.zplatform.trade.factory.AccountingAdapterFactory;
+import com.zlebank.zplatform.trade.service.ITxnsLogService;
 
 /**
  * Class Description
@@ -38,6 +40,8 @@ import com.zlebank.zplatform.trade.factory.AccountingAdapterFactory;
 @ContextConfiguration("/*.xml")
 public class QuickPayTest {
 
+	@Autowired
+	private ITxnsLogService txnsLogService;
 	@Test
 	public void test_banksign() {
 		/*IQuickPayTrade quickPayTrade = new ChanpayQuickPayTradeThread();
@@ -54,8 +58,10 @@ public class QuickPayTest {
 		
 		//1606289900053941
 		
-		IAccounting accounting = AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue("4000"));
-        ResultBean accountResultBean = accounting.accountedFor("1606289900053941");
+		//IAccounting accounting = AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue("4000"));
+        //ResultBean accountResultBean = accounting.accountedFor("1606289900053941");
+		
+		txnsLogService.updateAnonOrderToMemberOrder("1607079900054460", "100000000000576");
 	}
 
 	//@Test

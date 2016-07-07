@@ -198,7 +198,6 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
         txnsLog.setRelate("10000000");
         txnsLog.setTradeseltxn(UUIDUtil.uuid());
         txnsLog.setPayrettsnseqno(withholding.getPayserialno());
-        txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
         txnsLogService.updateTxnsLog(txnsLog);
         TxnsOrderinfoModel orderinfo = txnsOrderinfoDAO.getOrderByTxnseqno(txnseqno);
         orderinfo.setStatus("00");
@@ -329,9 +328,9 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
         // 应用方信息
         try {
             AppPartyBean appParty = new AppPartyBean("","000000000000", commiteTime,DateUtil.getCurrentDateTime(), txnseqno, "");
-            txnsLogService.updateAppInfo(appParty);
             IAccounting accounting = AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue(txnsLog.getBusitype()));
             accounting.accountedFor(txnseqno);
+            txnsLogService.updateAppInfo(appParty);
         } catch (Exception e) {
             e.printStackTrace();
         }
