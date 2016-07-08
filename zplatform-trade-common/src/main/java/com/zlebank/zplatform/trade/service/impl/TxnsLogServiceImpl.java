@@ -20,6 +20,7 @@ import java.util.Map;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -65,6 +66,7 @@ import com.zlebank.zplatform.trade.model.PojoTranData;
 import com.zlebank.zplatform.trade.model.RiskTradeLogModel;
 import com.zlebank.zplatform.trade.model.TxncodeDefModel;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
+import com.zlebank.zplatform.trade.model.TxnsOrderinfoModel;
 import com.zlebank.zplatform.trade.model.TxnsWithholdingModel;
 import com.zlebank.zplatform.trade.service.IMemberService;
 import com.zlebank.zplatform.trade.service.IRiskTradeLogService;
@@ -1078,6 +1080,65 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 		sb.append(" and ceil((to_date(?, 'yyyy-mm-dd hh24:mi:ss')-to_date(ttl.payordcomtime,'yyyy-mm-dd hh24:mi:ss'))*24*60)>=? ");
 		List<?> result = (List<?>) super.queryBySQL(sb.toString(), new Object[]{ChannelEnmu.WEBCHAT.getChnlcode(),OrderStatusEnum.INITIAL.getStatus(),OrderStatusEnum.PAYING.getStatus(),"SUCCESS",DateUtil.getTimeStamp(),mins });
 	     return result;
+	}
+
+
+	@Override
+	public List<Object> queryTxnsLog(Map<String, Object> map) {
+		StringBuffer hql= new StringBuffer();
+		hql.append(" select t.txnseqno from TxnsLogModel t ,TxnsOrderinfoModel t1 where t.txnseqno=t1.relatetradetxn ");
+		//hql.append(" where 1=1 ");
+		if(map!=null){
+			//订单状态
+			List<String> statList =new ArrayList<String>();
+			if(map.get("statList")!=null){
+				statList= (List<String>) map.get("statList");
+			}
+			if(statList.size()>0){
+				hql.append(" and t1.status in(");
+				for(int i=0;i<statList.size();i++){
+					if(i==0){
+						hql.append(":statId"+i);
+					}else{
+						hql.append(",:statId"+i);
+					}
+				}
+				hql.append(") ");
+			}
+			//支付类型
+			String paytype = map.get("paytype")==null?"" :map.get("paytype").toString();
+			if(StringUtil.isNotEmpty(paytype)){
+				hql.append(" and paytype=:paytype ");
+			}
+			//支付机构
+			String payinst = map.get("payinst")==null?"":map.get("payinst").toString();
+			if(StringUtil.isNotEmpty(payinst)){
+				hql.append(" and payinst=:payinst ");
+			}
+			//交易类型
+			String busitype = map.get("busitype")==null?"":map.get("busitype").toString();
+			if(StringUtil.isNotEmpty(busitype)){
+				hql.append(" and busitype=:busitype ");
+			}
+			hql.append(" order by t.txnseqno ");
+			Session session = getSession();
+	        Query query = session.createQuery(hql.toString());
+			for(int i=0;i<statList.size();i++){
+				query.setParameter("statId"+i, statList.get(i));
+			}
+			if(StringUtil.isNotEmpty(paytype)){
+				 query.setParameter("paytype", paytype);
+			}
+			if(StringUtil.isNotEmpty(busitype)){
+				 query.setParameter("busitype", busitype);
+			}
+			if(StringUtil.isNotEmpty(payinst)){
+				query.setParameter("payinst", payinst);
+			}
+	        return query.list();
+		}
+	       
+		return null;
 	}
 	
 	

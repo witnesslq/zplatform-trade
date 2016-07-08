@@ -10,8 +10,8 @@
  */
 package com.zlebank.zplatform.wechat.service.impl;
 
-import java.math.BigDecimal;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -28,14 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.alibaba.fastjson.JSON;
-import com.zlebank.zplatform.acc.bean.TradeInfo;
-import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
-import com.zlebank.zplatform.acc.exception.AccBussinessException;
-import com.zlebank.zplatform.acc.exception.IllegalEntryRequestException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
-import com.zlebank.zplatform.acc.service.entry.EntryEvent;
-import com.zlebank.zplatform.commons.dao.pojo.AccStatusEnum;
 import com.zlebank.zplatform.commons.dao.pojo.BusiTypeEnum;
 import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.commons.utils.RSAUtils;
@@ -51,11 +44,10 @@ import com.zlebank.zplatform.trade.adapter.accounting.IAccounting;
 import com.zlebank.zplatform.trade.bean.AppPartyBean;
 import com.zlebank.zplatform.trade.bean.PayPartyBean;
 import com.zlebank.zplatform.trade.bean.ResultBean;
-import com.zlebank.zplatform.trade.bean.enums.BusinessEnum;
+import com.zlebank.zplatform.trade.bean.TradeBean;
 import com.zlebank.zplatform.trade.bean.enums.ChannelEnmu;
 import com.zlebank.zplatform.trade.bean.enums.ChnlTypeEnum;
 import com.zlebank.zplatform.trade.bean.enums.OrderStatusEnum;
-import com.zlebank.zplatform.trade.bean.enums.RefundTypeEnum;
 import com.zlebank.zplatform.trade.bean.gateway.AnonOrderAsynRespBean;
 import com.zlebank.zplatform.trade.bean.gateway.OrderAsynRespBean;
 import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
@@ -75,17 +67,17 @@ import com.zlebank.zplatform.trade.utils.OrderNumber;
 import com.zlebank.zplatform.trade.utils.SynHttpRequestThread;
 import com.zlebank.zplatform.trade.utils.UUIDUtil;
 import com.zlebank.zplatform.wechat.enums.ResultCodeEnum;
+import com.zlebank.zplatform.wechat.enums.TradeStateCodeEnum;
 import com.zlebank.zplatform.wechat.exception.WXVerifySignFailedException;
-import com.zlebank.zplatform.wechat.refund.WeChatRefundTrade;
 import com.zlebank.zplatform.wechat.service.WeChatService;
 import com.zlebank.zplatform.wechat.wx.PrintBean;
 import com.zlebank.zplatform.wechat.wx.WXApplication;
 import com.zlebank.zplatform.wechat.wx.bean.PayResultBean;
 import com.zlebank.zplatform.wechat.wx.bean.QueryBillBean;
+import com.zlebank.zplatform.wechat.wx.bean.QueryOrderBean;
+import com.zlebank.zplatform.wechat.wx.bean.QueryOrderResultBean;
 import com.zlebank.zplatform.wechat.wx.bean.QueryRefundBean;
 import com.zlebank.zplatform.wechat.wx.bean.QueryRefundResultBean;
-import com.zlebank.zplatform.wechat.wx.bean.RefundBean;
-import com.zlebank.zplatform.wechat.wx.bean.RefundResultBean;
 import com.zlebank.zplatform.wechat.wx.bean.WXOrderBean;
 import com.zlebank.zplatform.wechat.wx.common.WXConfigure;
 
@@ -100,7 +92,7 @@ import com.zlebank.zplatform.wechat.wx.common.WXConfigure;
 @Service("weChatService")
 public class WeChatServiceImpl implements WeChatService{
 	private static final Log log = LogFactory.getLog(WeChatServiceImpl.class);
-
+    
 	@Autowired
 	private ITxnsOrderinfoDAO txnsOrderinfoDAO; 
 	@Autowired
@@ -219,35 +211,10 @@ public class WeChatServiceImpl implements WeChatService{
             txnsLogService.updateAppStatus(txnsLog.getTxnseqno(), accountResultBean.getErrCode(), accountResultBean.getErrMsg());
             
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+           log.error(e.getMessage());
+           e.printStackTrace();
         }
         /**账务处理结束 **/
-       
-        /**异步通知处理开始   **/
-       /* ResultBean orderResp = 
-                generateAsyncRespMessage(txnsLog.getTxnseqno());
-        if (orderResp.isResultBool()) {
-        	if("000205".equals(order.getBiztype())){
-        		AnonOrderAsynRespBean respBean = (AnonOrderAsynRespBean) orderResp
-                        .getResultObj();
-                new SynHttpRequestThread(
-                		order.getFirmemberno(),
-                		order.getRelatetradetxn(),
-                		order.getBackurl(),
-                        respBean.getNotifyParam()).start();
-        	}else{
-        		OrderAsynRespBean respBean = (OrderAsynRespBean) orderResp
-                        .getResultObj();
-                new SynHttpRequestThread(
-                		order.getFirmemberno(),
-                		order.getRelatetradetxn(),
-                		order.getBackurl(),
-                        respBean.getNotifyParam()).start();
-        	}
-            
-        }*/
-        
         ResultBean orderResp = 
 		        generateAsyncRespMessage(txnsLog.getTxnseqno());
 		if (orderResp.isResultBool()) {
@@ -542,6 +509,271 @@ public class WeChatServiceImpl implements WeChatService{
 		}
 		
 	}
+
+
+	
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Throwable.class)
+	public ResultBean queryWechatOrder(TradeBean trade) {
+		ResultBean resultBean = null;
+		//1.查询订单的状态，如果是待支付，消费订单，并且已生成微信预订单号
+		//当交易流水为空
+		if(StringUtil.isEmpty(trade.getTn())){
+			resultBean=new ResultBean("", "交易流水号【tn】不能为空！");
+			return resultBean;
+		}
+		//获取交易订单信息
+		TxnsOrderinfoModel order = txnsOrderinfoDAO.getOrderByTN(trade.getTn());
+		if(order==null){
+			resultBean=new ResultBean("", "请检查交易流水号【tn】！");
+			return resultBean;
+		}
+		//获取交易流水数据
+		TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(order.getRelatetradetxn());
+		if(txnsLog ==null){
+			resultBean=new ResultBean("", "请检查交易流水号【tn】！");
+			return resultBean;
+		}
+		
+		//订单状态为成功或失败
+		Boolean isStatus = order.getStatus().equals(OrderStatusEnum.SUCCESS.getStatus())
+				||order.getStatus().equals(OrderStatusEnum.FAILED.getStatus())
+				||order.getStatus().equals(OrderStatusEnum.INVALID.getStatus());
+		//成功或失败，支付返回
+		if(isStatus){
+			resultBean = new ResultBean(order);
+			return resultBean;
+		}
+		//是否微信渠道
+		Boolean isChnl = txnsLog.getPayinst().equals(ChannelEnmu.WEBCHAT.getChnlcode());
+		//是否微信类型
+		Boolean isChnlType = txnsLog.getPaytype().equals("05");
+		//是否为消费类型
+		Boolean isBusiType = txnsLog.getBusitype().equals(BusiTypeEnum.consumption.getCode());
+		if(isChnl&&isChnlType &&isBusiType){
+			//2.需要调微信查询订单 调微信服务端
+			WXApplication instance = new WXApplication();
+			QueryOrderBean rb = new QueryOrderBean();
+			//商户订单号
+			rb.setOut_trade_no(txnsLog.getPayordno());
+			rb.setTransaction_id(txnsLog.getPayrettsnseqno());
+			log.info("调微信【查询订单状态】入参："+rb.toString());
+			QueryOrderResultBean result = instance.queryOrder(rb);
+			log.info("调微信【查询订单状态】出参："+(null==result?"无返回值":result.getReturn_code().toString()));	
+			//3.通信成功
+			if(ResultCodeEnum.SUCCESS.getCode().equals(result.getReturn_code())){
+			     //返回状态为：支付成功，或 退款中
+				if(result.getTrade_state().equals(TradeStateCodeEnum.SUCCESS.getCode())
+				  ||result.getTrade_state().equals(TradeStateCodeEnum.REFUND.getCode())){
+					txnsLog.setPayrettsnseqno(result.getTransaction_id()+"");
+					txnsLog.setPayretcode(TradeStateCodeEnum.SUCCESS.getCode());
+					txnsLog.setPayretinfo("交易成功");
+					txnsLog.setTradestatflag("00000001");//交易完成结束位
+				    txnsLog.setTradetxnflag("10000000");
+				    txnsLog.setRelate("10000000");
+				    txnsLog.setRetdatetime(DateUtil.getCurrentDateTime());
+				    txnsLog.setTradeseltxn(UUIDUtil.uuid());
+				    txnsLog.setRetcode("0000");
+				    txnsLog.setRetinfo("交易成功");
+					order.setStatus(OrderStatusEnum.SUCCESS.getStatus());
+				//返回状态为：支付失败，或 已撤消	
+			     }else if(result.getTrade_state().equals(TradeStateCodeEnum.PAYERROR.getCode())
+			    		 ||result.getTrade_state().equals(TradeStateCodeEnum.REVOKED.getCode())){
+			    	txnsLog.setPayretcode(result.getTrade_state());
+					txnsLog.setPayretinfo(result.getTrade_state_desc());
+					order.setStatus(OrderStatusEnum.FAILED.getStatus());
+			     //返回状态为：支付中 
+			     }else if(result.getTrade_state().equals(TradeStateCodeEnum.USERPAYING.getCode())){
+			    	 order.setStatus(OrderStatusEnum.PAYING.getStatus());
+			     }
+			//3.2无业务报文
+			}else if(ResultCodeEnum.FAIL.getCode().equals(result.getReturn_code())){
+				resultBean = new ResultBean(result.getErr_code(), result.getErr_code_des());
+				return resultBean;
+			}
+			txnsLog.setPayordfintime(DateUtil.getCurrentDateTime());
+	        txnsLog.setRetdatetime(DateUtil.getCurrentDateTime());
+			//更新支付方信息
+			txnsLogService.updateTxnsLog(txnsLog);
+			//更新交易订单信息
+			txnsOrderinfoDAO.updateOrderinfo(order);
+			if((result.getTrade_state().equals(TradeStateCodeEnum.SUCCESS.getCode())
+		    		 ||result.getTrade_state().equals(TradeStateCodeEnum.REFUND.getCode()))){
+				//处理账务
+				/**账务处理开始 **/
+		        // 应用方信息
+		        try {
+		            AppPartyBean appParty = new AppPartyBean("",
+		                    "000000000000", DateUtil.getCurrentDateTime(),
+		                    DateUtil.getCurrentDateTime(), txnsLog.getTxnseqno(), "AC000000");
+		            txnsLogService.updateAppInfo(appParty);
+		            IAccounting accounting = AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue(txnsLog.getBusitype()));
+		            ResultBean accountResultBean = accounting.accountedFor(txnsLog.getTxnseqno());
+		            txnsLogService.updateAppStatus(txnsLog.getTxnseqno(), accountResultBean.getErrCode(), accountResultBean.getErrMsg());
+		            
+		        } catch (Exception e) {
+		            log.error(e.getMessage());
+		            e.printStackTrace();
+		            resultBean = new ResultBean("", result.getErr_code_des());
+					return resultBean;
+		        }
+		        /**账务处理结束 **/
+				/**异步通知处理开始  **/
+		        ResultBean orderResp = 
+		                generateAsyncRespMessage(txnsLog.getTxnseqno());
+		        if (orderResp.isResultBool()) {
+		        	if("000205".equals(order.getBiztype())){
+		        		AnonOrderAsynRespBean respBean = (AnonOrderAsynRespBean) orderResp
+		                        .getResultObj();
+		                new SynHttpRequestThread(
+		                		order.getFirmemberno(),
+		                		order.getRelatetradetxn(),
+		                		order.getBackurl(),
+		                        respBean.getNotifyParam()).start();
+		        	}else{
+		        		OrderAsynRespBean respBean = (OrderAsynRespBean) orderResp
+		                        .getResultObj();
+		                new SynHttpRequestThread(
+		                		order.getFirmemberno(),
+		                		order.getRelatetradetxn(),
+		                		order.getBackurl(),
+		                        respBean.getNotifyParam()).start();
+		        	}
+		            
+		        }
+		        /**异步通知处理结束 **/
+			}
+		}
+		resultBean = new ResultBean(order);
+		return resultBean;
+	}
+
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Throwable.class)
+	public void dealAnsyOrder() {
+		log.info("定时任务微信订单查询开始：dealAnsyOrder start");
+		Map<String,Object> map= new HashMap<String,Object>();
+		//订单状态
+		List<String> statList=new ArrayList<String>();
+		statList.add(OrderStatusEnum.INITIAL.getStatus());
+		statList.add(OrderStatusEnum.PAYING.getStatus());
+		map.put("statList",statList);
+		//微信类型
+		map.put("paytype", "05");
+		//微信渠道
+		map.put("painst", ChannelEnmu.WEBCHAT.getChnlcode());
+		//消费类型
+		map.put("busitype", BusiTypeEnum.consumption.getCode());
+		List<Object> txnlogs = this.txnsLogService.queryTxnsLog(map);
+		for(Object item : txnlogs){
+			String txnseqno = item.toString();
+			TxnsLogModel txnsLog= this.txnsLogService.getTxnsLogByTxnseqno(txnseqno); 
+           TxnsOrderinfoModel order= this.txnsOrderinfoDAO.getOrderByTxnseqno(txnsLog.getTxnseqno());
+			//2.需要调微信查询订单 调微信服务端
+			WXApplication instance = new WXApplication();
+			QueryOrderBean rb = new QueryOrderBean();
+			//商户订单号
+			rb.setOut_trade_no(txnsLog.getPayordno());
+			rb.setTransaction_id(txnsLog.getPayrettsnseqno());
+			log.info("调微信【查询订单状态】入参：out_trade_no="+rb.getOut_trade_no()+",transaction_id"+rb.getTransaction_id());
+			QueryOrderResultBean result = instance.queryOrder(rb);
+			log.info("调微信【查询订单状态】出参："+(null==result?"无返回值":result.getReturn_code().toString()));	
+			//3.通信成功
+			if(ResultCodeEnum.SUCCESS.getCode().equals(result.getReturn_code())){
+				log.info("微信返回订单状态"+result.getTrade_state()+":"+result.getTrade_state_desc());
+			     //返回状态为：支付成功，或 退款中
+				if(result.getTrade_state().equals(TradeStateCodeEnum.SUCCESS.getCode())
+				  ||result.getTrade_state().equals(TradeStateCodeEnum.REFUND.getCode())){
+					txnsLog.setPayrettsnseqno(result.getTransaction_id()+"");
+					txnsLog.setPayretcode(TradeStateCodeEnum.SUCCESS.getCode());
+					txnsLog.setPayretinfo("交易成功");
+					txnsLog.setTradestatflag("00000001");//交易完成结束位
+				    txnsLog.setTradetxnflag("10000000");
+				    txnsLog.setRelate("10000000");
+				    txnsLog.setRetdatetime(DateUtil.getCurrentDateTime());
+				    txnsLog.setTradeseltxn(UUIDUtil.uuid());
+				    txnsLog.setRetcode("0000");
+				    txnsLog.setRetinfo("交易成功");
+					order.setStatus(OrderStatusEnum.SUCCESS.getStatus());
+				//返回状态为：支付失败，或 已撤消	
+			     }else if(result.getTrade_state().equals(TradeStateCodeEnum.PAYERROR.getCode())
+			    		 ||result.getTrade_state().equals(TradeStateCodeEnum.REVOKED.getCode())){
+			    	txnsLog.setPayretcode(result.getTrade_state());
+					txnsLog.setPayretinfo(result.getTrade_state_desc());
+					order.setStatus(OrderStatusEnum.FAILED.getStatus());
+			     //返回状态为：支付中 
+			     }else if(result.getTrade_state().equals(TradeStateCodeEnum.USERPAYING.getCode())){
+			    	 order.setStatus(OrderStatusEnum.PAYING.getStatus());
+			     }
+			//3.2无业务报文
+			}else if(ResultCodeEnum.FAIL.getCode().equals(result.getReturn_code())){
+				log.error("微信订单查询报错:"+result.getReturn_code()+result.getReturn_msg());
+				continue;
+			}
+			txnsLog.setPayordfintime(DateUtil.getCurrentDateTime());
+	        txnsLog.setRetdatetime(DateUtil.getCurrentDateTime());
+			//更新支付方信息
+			txnsLogService.updateTxnsLog(txnsLog);
+			//更新交易订单信息
+			txnsOrderinfoDAO.updateOrderinfo(order);
+			if((result.getTrade_state().equals(TradeStateCodeEnum.SUCCESS.getCode())
+		    		 ||result.getTrade_state().equals(TradeStateCodeEnum.REFUND.getCode()))){
+				//处理账务
+				/**账务处理开始 **/
+		        // 应用方信息
+		        try {
+		            AppPartyBean appParty = new AppPartyBean("",
+		                    "000000000000", DateUtil.getCurrentDateTime(),
+		                    DateUtil.getCurrentDateTime(), txnsLog.getTxnseqno(), "AC000000");
+		            txnsLogService.updateAppInfo(appParty);
+		            IAccounting accounting = AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue(txnsLog.getBusitype()));
+		            ResultBean accountResultBean = accounting.accountedFor(txnsLog.getTxnseqno());
+		            txnsLogService.updateAppStatus(txnsLog.getTxnseqno(), accountResultBean.getErrCode(), accountResultBean.getErrMsg());
+		            
+		        } catch (Exception e) {
+		            log.error(e.getMessage());
+		            break;
+		        }
+		        /**账务处理结束 **/
+				//**异步通知处理开始  **/
+		        ResultBean orderResp = 
+		                generateAsyncRespMessage(txnsLog.getTxnseqno());
+		        if (orderResp.isResultBool()) {
+		        	if("000205".equals(order.getBiztype())){
+		        		AnonOrderAsynRespBean respBean = (AnonOrderAsynRespBean) orderResp
+		                        .getResultObj();
+		                new SynHttpRequestThread(
+		                		order.getFirmemberno(),
+		                		order.getRelatetradetxn(),
+		                		order.getBackurl(),
+		                        respBean.getNotifyParam()).start();
+		        	}else{
+		        		OrderAsynRespBean respBean = (OrderAsynRespBean) orderResp
+		                        .getResultObj();
+		                new SynHttpRequestThread(
+		                		order.getFirmemberno(),
+		                		order.getRelatetradetxn(),
+		                		order.getBackurl(),
+		                        respBean.getNotifyParam()).start();
+		        	}
+		            
+		        }
+		        /**异步通知处理结束 **/
+			}
+				
+			}
+		
+		log.info("定时任务微信订单查询结束：dealAnsyOrder end");
+		
+	}
+	
+	
+	
+
+
+	
 
 
 	

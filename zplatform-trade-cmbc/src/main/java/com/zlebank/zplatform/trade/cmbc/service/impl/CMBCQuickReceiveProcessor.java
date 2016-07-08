@@ -328,9 +328,9 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
         // 应用方信息
         try {
             AppPartyBean appParty = new AppPartyBean("","000000000000", commiteTime,DateUtil.getCurrentDateTime(), txnseqno, "");
+            txnsLogService.updateAppInfo(appParty);
             IAccounting accounting = AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue(txnsLog.getBusitype()));
             accounting.accountedFor(txnseqno);
-            txnsLogService.updateAppInfo(appParty);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -92,7 +92,6 @@ public class TxnsRefundServiceImpl extends BaseServiceImpl<TxnsRefundModel,Long>
 	 * @return
 	 */
 	@Override
-	@Transactional(readOnly=true)
 	public TxnsRefundModel getRefundByTxnseqno(String txnseqno) {
 		String hql = " from TxnsRefundModel c where c.reltxnseqno = ? ";
         return super.getUniqueByHQL(hql, new Object[]{txnseqno});

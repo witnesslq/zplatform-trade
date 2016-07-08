@@ -293,6 +293,14 @@ public interface ITxnsLogService extends IBaseService<TxnsLogModel, String>{
     * @return
     */
 	public List<?> getRefundOrderInfo(String refundtype,int mins);
+	
+	/***
+	 * 查询交易日志
+	 * @param map
+	 * @return
+	 */
+	public List<Object> queryTxnsLog(Map<String,Object> map);
+	
 
 	/**
 	 * 更新匿名下单，登陆支付

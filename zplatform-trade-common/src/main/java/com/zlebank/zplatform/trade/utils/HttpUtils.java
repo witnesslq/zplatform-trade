@@ -232,7 +232,9 @@ private HttpClient httpClient = null;
             HttpPost httpPost = new HttpPost(url);
             UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params,encoding);
             httpPost.setEntity(entity);
+            
             HttpResponse response = this.httpClient.execute(httpPost);
+            
             if(HttpStatus.SC_OK==response.getStatusLine().getStatusCode()){
                 resultBean = new ResultBean(response.getStatusLine().getStatusCode()+"", EntityUtils.toString(response.getEntity(), encoding));
                 return resultBean;

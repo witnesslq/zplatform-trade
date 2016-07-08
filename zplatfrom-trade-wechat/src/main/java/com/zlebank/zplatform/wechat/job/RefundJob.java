@@ -26,5 +26,14 @@ public class RefundJob {
 		log.info("end RefundJob");
 		
 	}
+	/***
+	 * 跑批-查询已支付未收到异步通知的订单
+	 */
+	@Transactional(propagation = Propagation.REQUIRED,rollbackFor=Throwable.class)
+	public void queryOrder(){
+		log.info("start queryOrder");
+		weChatService.dealAnsyOrder();
+		log.info("end queryOrder");
+	}
 	
 }

@@ -26,6 +26,7 @@ import com.zlebank.zplatform.trade.bean.TradeBean;
 import com.zlebank.zplatform.trade.bean.wap.WapRefundBean;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
+import com.zlebank.zplatform.trade.model.TxnsOrderinfoModel;
 import com.zlebank.zplatform.trade.service.IGateWayService;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
 import com.zlebank.zplatform.trade.service.impl.GateWayServiceImpl;
@@ -57,7 +58,7 @@ public class TestWechat {
     public void init(){
     	  ApplicationContext context = ApplicationContextUtil.get();
         refundJob = (RefundJob) context.getBean("refundJob");
-        weChatRefundTrade = (IRefundTrade) context.getBean("weChatRefundTrade");
+     //   weChatRefundTrade = (IRefundTrade) context.getBean("weChatRefundTrade");
         weChatService = (WeChatService) context.getBean("weChatService");
         logService = (ITxnsLogService) context.getBean("txnsLogService");
         gateWayService = (IGateWayService) context.getBean("gateWayService");
@@ -81,7 +82,7 @@ public class TestWechat {
     		//tradeBean.setTxnseqno("1606289900053889");
     		//tradeBean.setTxnseqno("1606289900053940");
     		//tradeBean.setTxnseqno("1606289900053941");
-    		tradeBean.setTxnseqno("1606299900063340");
+    		tradeBean.setTxnseqno("1607079900054460");
         	ResultBean resultBean=weChatRefundTrade.refund(tradeBean);
         	if(resultBean.isResultBool()){
         		System.out.println("成功");
@@ -161,7 +162,7 @@ public class TestWechat {
     
     @Test
     public void testFundApply(){
-    	TxnsLogModel txnsLog=logService.getTxnsLogByTxnseqno("1606299900063326");
+    	TxnsLogModel txnsLog=logService.getTxnsLogByTxnseqno("1607079900054440");
     	WapRefundBean refundBean = new WapRefundBean();
     	refundBean.setOrderId(DateUtil.getCurrentDateTime());
     	refundBean.setOrigOrderId(txnsLog.getAccordno());
@@ -178,6 +179,28 @@ public class TestWechat {
     	} catch (TradeException e) {
     		e.printStackTrace();
     	}
+    }
+    
+    @Test
+    public void testQueryWechatOrder(){
+    	TradeBean tradeBean= new TradeBean();
+		tradeBean.setTxnseqno("1607079900054460");
+    	ResultBean resultBean=weChatService.queryWechatOrder(tradeBean);
+    	if(resultBean.isResultBool()){
+    		TxnsOrderinfoModel order=(TxnsOrderinfoModel) resultBean.getResultObj();
+    		System.out.println("成功"+order.getStatus());
+    	}else{
+    		System.out.println(resultBean.getErrCode()+""+resultBean.getErrMsg());
+    	}
+    }
+    @Test
+    public void testQueryOrder(){
+    	try {
+    		refundJob.queryOrder();
+		} catch (Exception e) {
+			e.printStackTrace();
+			// TODO: handle exception
+		}
     }
     
   
