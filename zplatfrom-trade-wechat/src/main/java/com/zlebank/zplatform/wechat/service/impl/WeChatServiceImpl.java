@@ -212,7 +212,7 @@ public class WeChatServiceImpl implements WeChatService{
         try {
             AppPartyBean appParty = new AppPartyBean("",
                     "000000000000", DateUtil.getCurrentDateTime(),
-                    DateUtil.getCurrentDateTime(), txnsLog.getTxnseqno(), "AC000000");
+                    DateUtil.getCurrentDateTime(), txnsLog.getTxnseqno(), "");
             txnsLogService.updateAppInfo(appParty);
             IAccounting accounting = AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue(txnsLog.getBusitype()));
             ResultBean accountResultBean = accounting.accountedFor(txnsLog.getTxnseqno());

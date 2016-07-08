@@ -2433,7 +2433,7 @@ public class GateWayServiceImpl extends
 			
 			ResultBean orderResp = 
 			        generateAsyncRespMessage(txnsLog.getTxnseqno());
-			if (orderResp.isResultBool()) {
+			if(orderResp.isResultBool()) {
 				if("000205".equals(orderinfo.getBiztype())){
 	        		AnonOrderAsynRespBean respBean = (AnonOrderAsynRespBean) orderResp.getResultObj();
 	        		
@@ -2445,7 +2445,7 @@ public class GateWayServiceImpl extends
 	                        		orderinfo.getRelatetradetxn(),
 	                        		orderinfo.getBackurl(),
 	                        task).start();
-	        	}else{
+	        	}else if("000201".equals(orderinfo.getBiztype())){
 	        		OrderAsynRespBean respBean = (OrderAsynRespBean) orderResp
 	                        .getResultObj();
 	                new SynHttpRequestThread(
@@ -2456,7 +2456,7 @@ public class GateWayServiceImpl extends
 	        	}
 			   
 			}else {
-				throw new TradeException("AP07");
+				//throw new TradeException("AP07");
 			}
 		} else {
 			throw new TradeException("AP05");

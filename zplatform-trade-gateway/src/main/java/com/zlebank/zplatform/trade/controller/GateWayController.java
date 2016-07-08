@@ -667,6 +667,7 @@ public class GateWayController {
                 ChannelEnmu channel = ChannelEnmu.fromValue(routId);
                 trade.setPayinstiId(channel.getChnlcode());
                 webGateWayService.submitPay(trade);
+                txnsLogService.updateAnonOrderToMemberOrder(orderinfo.getRelatetradetxn(), "100000000000576");
                 model.put("trade", trade);
                 switch (channel) {
                     case ZLPAY :
