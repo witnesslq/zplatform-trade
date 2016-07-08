@@ -702,6 +702,16 @@ public class WeChatServiceImpl implements WeChatService{
 			    		 ||result.getTrade_state().equals(TradeStateCodeEnum.REVOKED.getCode())){
 			    	txnsLog.setPayretcode(result.getTrade_state());
 					txnsLog.setPayretinfo(result.getTrade_state_desc());
+					try {
+						PojoRspmsg rspmsg = rspmsgDAO.getRspmsgByChnlCode(ChnlTypeEnum.WECHAT, result.getErr_code());
+						txnsLog.setRetcode(rspmsg.getWebrspcode());
+					    txnsLog.setRetinfo(rspmsg.getRspinfo());
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						txnsLog.setRetcode("3499");
+					    txnsLog.setRetinfo("交易失败");
+					}
 					order.setStatus(OrderStatusEnum.FAILED.getStatus());
 			     //返回状态为：支付中 
 			     }else if(result.getTrade_state().equals(TradeStateCodeEnum.USERPAYING.getCode())){
@@ -768,15 +778,4 @@ public class WeChatServiceImpl implements WeChatService{
 		log.info("定时任务微信订单查询结束：dealAnsyOrder end");
 		
 	}
-	
-	
-	
-
-
-	
-
-
-	
-	
-	
 }
