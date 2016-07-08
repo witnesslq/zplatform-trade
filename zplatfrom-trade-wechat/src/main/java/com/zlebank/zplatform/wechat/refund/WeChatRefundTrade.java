@@ -54,6 +54,7 @@ import com.zlebank.zplatform.wechat.wx.common.WXConfigure;
 public class WeChatRefundTrade implements IRefundTrade {
 
 	private static final Log log = LogFactory.getLog(WeChatRefundTrade.class);
+		
 	private ITxnsLogService txnsLogService;
 	private ITxnsRefundService txnsRefundService;
 	private ITxnsOrderinfoDAO txnsOrderinfoDAO; 
