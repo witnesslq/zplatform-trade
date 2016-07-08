@@ -302,4 +302,10 @@ public interface ITxnsLogService extends IBaseService<TxnsLogModel, String>{
 	public List<TxnsLogModel> queryTxnsLog(Map<String,Object> map);
 	
 
+	/**
+	 * 更新匿名下单，登陆支付
+	 * @param txnseqno
+	 * @param memberId
+	 */
+	public void updateAnonOrderToMemberOrder(String txnseqno,String memberId);
 }

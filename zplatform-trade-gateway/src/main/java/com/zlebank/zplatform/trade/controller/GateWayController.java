@@ -813,9 +813,9 @@ public class GateWayController {
     public Object queryCMBCTrade(String orderNo,String txnseqno) {
         Map<String, Object> model = new HashMap<String, Object>();
         TxnsLogModel txnsLog = null;
-        int[] timeArray = new int[]{1000, 2000, 8000, 16000, 32000,64000};
+        int[] timeArray = new int[]{1000, 2000, 2000, 2000,2000,2000,2000,2000,2000,2000};
         try {
-            for (int i = 0; i < 6; i++) {
+            for (int i = 0; i < 10; i++) {
                 txnsLog=txnsLogService.getTxnsLogByTxnseqno(txnseqno);
                 if(StringUtil.isNotEmpty(txnsLog.getPayretcode())){
                     ChannelEnmu channel = ChannelEnmu.fromValue(txnsLog.getPayinst());
@@ -890,7 +890,7 @@ public class GateWayController {
                             tradeBean.setTxnseqno(txnseqno);
                             model.put("trade", tradeBean);
                             model.put("txnseqno", txnseqno);
-                            if("S".equalsIgnoreCase(withholding.getExectype())){
+                            if(txnsLog.getPayretcode().equals("0000")){
                                 return "completed";
                             }else{
                                 return "failed";
@@ -1193,7 +1193,7 @@ public class GateWayController {
         TxnsOrderinfoModel gatewayOrderBean = gateWayService
                 .getOrderinfoByOrderNoAndMemberId(txnsLog.getAccordno(),txnsLog.getAccfirmerno());
         ResultBean orderResp = gateWayService.generateAsyncRespMessage(txnsLog.getTxnseqno());
-        OrderRespBean respBean = (OrderRespBean) orderResp.getResultObj();
+        OrderAsynRespBean respBean = (OrderAsynRespBean) orderResp.getResultObj();
         model.put("suburl", gatewayOrderBean.getFronturl() + "?"+ ObjectDynamic.generateReturnParamer(respBean, false, null));
         model.put("errMsg", "交易成功");
         model.put("respCode", "0000");
@@ -1214,7 +1214,12 @@ public class GateWayController {
         // gateWayService.getOrderinfoByOrderNo(orderNo);
         gateWayService.updateOrderToFail(txnseqno);
         TxnsLogModel txnsLog = txnsLogService.get(txnseqno);
-        model.put("errMsg", txnsLog.getRetinfo());
+        if(StringUtil.isNotEmpty(txnsLog.getRetinfo())){
+        	model.put("errMsg", txnsLog.getRetinfo());
+        }else{
+        	model.put("errMsg", txnsLog.getPayretinfo());
+        }
+        
         model.put("respCode", txnsLog.getRetcode());
         model.put("txnseqno", txnseqno);;
         return new ModelAndView("/erro", model);
@@ -1598,3 +1603,4 @@ public class GateWayController {
         }
     }
 }
+
