@@ -54,6 +54,12 @@ public interface WeChatService {
 	 * 退款查询定时任务跑批
 	 */
 	public void dealRefundBatch();
+	/**
+	 *订单查询跑批
+	 *将已支付，
+	 *但没收到异步通知的订单进行主动请求 
+	 */
+	public void dealAnsyOrder();
 	
 	/***
 	 * 查询微信订单

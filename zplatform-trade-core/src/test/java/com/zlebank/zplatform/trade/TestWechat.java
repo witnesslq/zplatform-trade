@@ -58,7 +58,7 @@ public class TestWechat {
     public void init(){
     	  ApplicationContext context = ApplicationContextUtil.get();
         refundJob = (RefundJob) context.getBean("refundJob");
-        weChatRefundTrade = (IRefundTrade) context.getBean("weChatRefundTrade");
+     //   weChatRefundTrade = (IRefundTrade) context.getBean("weChatRefundTrade");
         weChatService = (WeChatService) context.getBean("weChatService");
         logService = (ITxnsLogService) context.getBean("txnsLogService");
         gateWayService = (IGateWayService) context.getBean("gateWayService");
@@ -192,6 +192,15 @@ public class TestWechat {
     	}else{
     		System.out.println(resultBean.getErrCode()+""+resultBean.getErrMsg());
     	}
+    }
+    @Test
+    public void testQueryOrder(){
+    	try {
+    		refundJob.queryOrder();
+		} catch (Exception e) {
+			e.printStackTrace();
+			// TODO: handle exception
+		}
     }
     
   

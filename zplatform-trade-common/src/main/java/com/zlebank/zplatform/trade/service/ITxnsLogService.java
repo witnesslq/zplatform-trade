@@ -299,7 +299,7 @@ public interface ITxnsLogService extends IBaseService<TxnsLogModel, String>{
 	 * @param map
 	 * @return
 	 */
-	public List<TxnsLogModel> queryTxnsLog(Map<String,Object> map);
+	public List<Object> queryTxnsLog(Map<String,Object> map);
 	
 
 	/**

@@ -1084,15 +1084,26 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 
 
 	@Override
-	public List<TxnsLogModel> queryTxnsLog(Map<String, Object> map) {
+	public List<Object> queryTxnsLog(Map<String, Object> map) {
 		StringBuffer hql= new StringBuffer();
-		hql.append("select t.* from TxnsLogModel t , TxnsOrderinfoModel t1 ");
-		hql.append(" where t.txnseqno=t1.relatetradetxn ");
+		hql.append(" select t.txnseqno from TxnsLogModel t ,TxnsOrderinfoModel t1 where t.txnseqno=t1.relatetradetxn ");
+		//hql.append(" where 1=1 ");
 		if(map!=null){
 			//订单状态
-			String status = map.get("status")==null?"":map.get("status").toString();
-			if(StringUtil.isNotEmpty(status)){
-				hql.append(" and t1.status=:status ");
+			List<String> statList =new ArrayList<String>();
+			if(map.get("statList")!=null){
+				statList= (List<String>) map.get("statList");
+			}
+			if(statList.size()>0){
+				hql.append(" and t1.status in(");
+				for(int i=0;i<statList.size();i++){
+					if(i==0){
+						hql.append(":statId"+i);
+					}else{
+						hql.append(",:statId"+i);
+					}
+				}
+				hql.append(") ");
 			}
 			//支付类型
 			String paytype = map.get("paytype")==null?"" :map.get("paytype").toString();
@@ -1104,14 +1115,22 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 			if(StringUtil.isNotEmpty(payinst)){
 				hql.append(" and payinst=:payinst ");
 			}
+			//交易类型
+			String busitype = map.get("busitype")==null?"":map.get("busitype").toString();
+			if(StringUtil.isNotEmpty(busitype)){
+				hql.append(" and busitype=:busitype ");
+			}
 			hql.append(" order by t.txnseqno ");
 			Session session = getSession();
 	        Query query = session.createQuery(hql.toString());
-	        if(StringUtil.isNotEmpty(status)){
-			     query.setParameter("status", status);
+			for(int i=0;i<statList.size();i++){
+				query.setParameter("statId"+i, statList.get(i));
 			}
 			if(StringUtil.isNotEmpty(paytype)){
 				 query.setParameter("paytype", paytype);
+			}
+			if(StringUtil.isNotEmpty(busitype)){
+				 query.setParameter("busitype", busitype);
 			}
 			if(StringUtil.isNotEmpty(payinst)){
 				query.setParameter("payinst", payinst);
