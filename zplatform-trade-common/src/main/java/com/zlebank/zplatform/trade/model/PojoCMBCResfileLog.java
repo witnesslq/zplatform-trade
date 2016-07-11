@@ -52,6 +52,13 @@ public class PojoCMBCResfileLog implements Serializable {
 	
 
 	/**
+	 * 
+	 */
+	public PojoCMBCResfileLog() {
+		super();
+	}
+
+	/**
 	 * @param body
 	 
 	 */
@@ -97,7 +104,7 @@ public class PojoCMBCResfileLog implements Serializable {
 	/**
 	 * @return the bankTranDataSeqNo
 	 */
-	@Column(name = "BANK_TRAN_DATA_SEQ_NO")
+	@Column(name = "BANKTRANDATASEQNO")
 	public String getBankTranDataSeqNo() {
 		return bankTranDataSeqNo;
 	}
@@ -113,7 +120,7 @@ public class PojoCMBCResfileLog implements Serializable {
 	/**
 	 * @return the bankTranResNo
 	 */
-	@Column(name = "BANK_TRAN_RES_NO")
+	@Column(name = "BANKTRANRESNO")
 	public String getBankTranResNo() {
 		return bankTranResNo;
 	}
@@ -129,7 +136,7 @@ public class PojoCMBCResfileLog implements Serializable {
 	/**
 	 * @return the accNo
 	 */
-	@Column(name = "ACC_NO")
+	@Column(name = "ACCNO")
 	public String getAccNo() {
 		return accNo;
 	}
@@ -145,7 +152,7 @@ public class PojoCMBCResfileLog implements Serializable {
 	/**
 	 * @return the accName
 	 */
-	@Column(name = "ACC_NAME")
+	@Column(name = "ACCNAME")
 	public String getAccName() {
 		return accName;
 	}
@@ -161,7 +168,7 @@ public class PojoCMBCResfileLog implements Serializable {
 	/**
 	 * @return the tranAmt
 	 */
-	@Column(name = "TRAN_AMT")
+	@Column(name = "TRANAMT")
 	public Long getTranAmt() {
 		return tranAmt;
 	}
@@ -177,7 +184,7 @@ public class PojoCMBCResfileLog implements Serializable {
 	/**
 	 * @return the resType
 	 */
-	@Column(name = "RES_TYPE")	
+	@Column(name = "RESTYPE")	
 	public String getResType() {
 		return resType;
 	}
@@ -193,7 +200,7 @@ public class PojoCMBCResfileLog implements Serializable {
 	/**
 	 * @return the resCode
 	 */
-	@Column(name = "RES_CODE")	
+	@Column(name = "RESCODE")	
 	public String getResCode() {
 		return resCode;
 	}
@@ -209,7 +216,7 @@ public class PojoCMBCResfileLog implements Serializable {
 	/**
 	 * @return the resInfo
 	 */
-	@Column(name = "RES_INFO")	
+	@Column(name = "RESINFO")	
 	public String getResInfo() {
 		return resInfo;
 	}
@@ -225,7 +232,7 @@ public class PojoCMBCResfileLog implements Serializable {
 	/**
 	 * @return the payDate
 	 */
-	@Column(name = "PAY_DATE")
+	@Column(name = "PAYDATE")
 	public String getPayDate() {
 		return payDate;
 	}
@@ -241,7 +248,7 @@ public class PojoCMBCResfileLog implements Serializable {
 	/**
 	 * @return the payDatetime
 	 */
-	@Column(name = "PAY_DATETIME")
+	@Column(name = "PAYDATETIME")
 	public String getPayDatetime() {
 		return payDatetime;
 	}
@@ -257,7 +264,7 @@ public class PojoCMBCResfileLog implements Serializable {
 	/**
 	 * @return the bankTranBatchNo
 	 */
-	@Column(name = "BANK_TRAN_BATCH_NO")
+	@Column(name = "BANKTRANBATCHNO")
 	public String getBankTranBatchNo() {
 		return bankTranBatchNo;
 	}

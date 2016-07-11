@@ -24,6 +24,7 @@ import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.TradeBean;
@@ -41,7 +42,7 @@ import com.zlebank.zplatform.trade.chanpay.utils.CjSignHelper.VerifyResult;
 import com.zlebank.zplatform.trade.chanpay.utils.U;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.service.IRouteConfigService;
-import com.zlebank.zplatform.trade.utils.DateUtil;
+import com.zlebank.zplatform.trade.utils.ConsUtil;
 import com.zlebank.zplatform.trade.utils.OrderNumber;
 
 /**
@@ -81,7 +82,7 @@ public class ChanPayCollectMoneyServiceImpl implements ChanPayCollectMoneyServic
 		try {
 			data = new G60001Bean();
 			data.setReqSn(tradeBean.getPayOrderNo());
-			data.setMertid("cp2016051996321");
+			data.setMertid(ConsUtil.getInstance().cons.getChanpay_cj_merchant_id());
 			data.setBankGeneralName(bankName);
 			data.setSn(U.createUUID());
 			data.setBankName(subBankName);
@@ -235,7 +236,7 @@ public class ChanPayCollectMoneyServiceImpl implements ChanPayCollectMoneyServic
 		try {
 			G60002Bean data = new G60002Bean();
 			data.setReqSn(U.createUUID());
-			data.setMertid("cp2016051996321");
+			data.setMertid(ConsUtil.getInstance().cons.getChanpay_cj_merchant_id());
 			data.setQryReqSn(qry_req_sn);
 			buildCjmsgAndSend(data);
 			resultBean = new ResultBean(data);
@@ -356,9 +357,9 @@ public class ChanPayCollectMoneyServiceImpl implements ChanPayCollectMoneyServic
 		try {
 			data = new G60003Bean();
 			data.setReqSn(U.createUUID());
-			data.setMertid("cp2016051996321");
-			data.setCorpAccountNo("110061882018010000000");
-			data.setBusinessCode("01400");
+			data.setMertid(ConsUtil.getInstance().cons.getChanpay_cj_merchant_id());
+			data.setCorpAccountNo(ConsUtil.getInstance().cons.getChanpay_cj_account_no());
+			data.setBusinessCode(ConsUtil.getInstance().cons.getChanpay_cj_business_code());
 			data.setAlterType("0");
 			data.setProtocolType("0");
 			data.setSn(U.createUUID());
@@ -525,7 +526,7 @@ public class ChanPayCollectMoneyServiceImpl implements ChanPayCollectMoneyServic
 		G60004Bean data = new G60004Bean();
 		try {
 			data.setReqSn(U.createUUID());
-			data.setMertid("cp2016051996321");
+			data.setMertid(ConsUtil.getInstance().cons.getChanpay_cj_merchant_id());
 			data.setQryReqSn(qry_req_sn);
 			buildCjmsgAndSend(data);
 			resultBean = new ResultBean(data);
@@ -647,10 +648,10 @@ public class ChanPayCollectMoneyServiceImpl implements ChanPayCollectMoneyServic
 		String bankName = routeConfigService.getBankName(bankNumber);
 		G10001Bean data = new G10001Bean();
 		try {
-			data.setMertid("cp2016051996321");
-			data.setBusinessCode("01400");
-			data.setCorpAccNo("110061882018010000000");
-			data.setProductCode("00606666");
+			data.setMertid(ConsUtil.getInstance().cons.getChanpay_cj_merchant_id());
+			data.setBusinessCode(ConsUtil.getInstance().cons.getChanpay_cj_business_code());
+			data.setCorpAccNo(ConsUtil.getInstance().cons.getChanpay_cj_account_no());
+			data.setProductCode(ConsUtil.getInstance().cons.getChanpay_cj_product_no());
 			data.setSubMertid("");
 			data.setBankGeneralName(bankName);
 			data.setAccountNo(tradeBean.getCardNo());

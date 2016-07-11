@@ -741,7 +741,6 @@ public class WeChatServiceImpl implements WeChatService{
 		            IAccounting accounting = AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue(txnsLog.getBusitype()));
 		            ResultBean accountResultBean = accounting.accountedFor(txnsLog.getTxnseqno());
 		            txnsLogService.updateAppStatus(txnsLog.getTxnseqno(), accountResultBean.getErrCode(), accountResultBean.getErrMsg());
-		            
 		        } catch (Exception e) {
 		            log.error(e.getMessage());
 		            break;
@@ -752,8 +751,7 @@ public class WeChatServiceImpl implements WeChatService{
 		                generateAsyncRespMessage(txnsLog.getTxnseqno());
 		        if (orderResp.isResultBool()) {
 		        	if("000205".equals(order.getBiztype())){
-		        		AnonOrderAsynRespBean respBean = (AnonOrderAsynRespBean) orderResp
-		                        .getResultObj();
+		        		AnonOrderAsynRespBean respBean = (AnonOrderAsynRespBean) orderResp.getResultObj();
 		                new SynHttpRequestThread(
 		                		order.getFirmemberno(),
 		                		order.getRelatetradetxn(),

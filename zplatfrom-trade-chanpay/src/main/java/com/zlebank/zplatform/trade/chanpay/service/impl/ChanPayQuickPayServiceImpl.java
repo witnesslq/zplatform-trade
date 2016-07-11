@@ -1,4 +1,4 @@
-/* 
+/** 
  * ChanPayQuickPayServiceImpl.java  
  * 
  * version TODO
