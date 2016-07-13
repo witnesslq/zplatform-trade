@@ -103,7 +103,7 @@ public class WeChatRefundTrade implements IRefundTrade {
 				txnsLogService.updatePayInfo_Fast(payPartyBean);
 				WXApplication instance = new WXApplication();
 				RefundBean rb = new RefundBean();
-				rb.setOut_refund_no(String.valueOf(System.currentTimeMillis()));// 退款流水号（唯一，可当场生成）
+				rb.setOut_refund_no(payPartyBean.getPayordno());// 退款流水号（唯一，可当场生成）
 				rb.setOut_trade_no(txnsLog_old.getPayordno());// 原商户号（证联生成的）
 				rb.setRefund_fee(txnsLog.getAmount()+"");// 退款金额
 				rb.setTotal_fee(txnsLog_old.getAmount()+"");// 总金额
@@ -116,7 +116,7 @@ public class WeChatRefundTrade implements IRefundTrade {
 					if(ResultCodeEnum.SUCCESS.getCode().equals(refund.getResult_code())){
 						String retcode = "";
 						String retinfo = "";
-						String transaction_id = refund.getTransaction_id();//微信订单号
+						String transaction_id = refund.getRefund_id();//微信退款订单号
 						RefundTypeEnum refundTypeEnum = RefundTypeEnum.fromWeChatValue(refund.getRefund_channel());//退款渠道
 						if(ResultCodeEnum.fromValue(refund.getResult_code())==ResultCodeEnum.SUCCESS){
 							retcode=refund.getResult_code();

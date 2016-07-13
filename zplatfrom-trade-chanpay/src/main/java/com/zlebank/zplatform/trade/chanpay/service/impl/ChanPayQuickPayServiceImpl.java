@@ -200,14 +200,17 @@ public class ChanPayQuickPayServiceImpl implements ChanPayQuickPayService {
 		txnsLogService.updatePayInfo_Fast_result(tradeBean.getTxnseqno(),
 				data.getRetCode(), data.getErrMsg());
 
-		if (!"0000".equals(data.getRetCode())) {// 交易失败
-			txnsOrderinfoDAO.updateOrderToFail(tradeBean.getTxnseqno());
+		if ("0000".equals(data.getRetCode())) {// 交易失败
+			//txnsOrderinfoDAO.updateOrderToFail(tradeBean.getTxnseqno());
 			txnsLogService.updateCoreRetResult(tradeBean.getTxnseqno(), "3699",
 					data.getErrMsg());
 			resultBean = new ResultBean(data.getRetCode(), data.getErrMsg());
-			// resultBean.setSuccessResultDto(data);
-			// resultBean.setResultBool(true);
+			 /*data.setRetCode("0000");
+			 resultBean.setSuccessResultDto(data);
+			 resultBean.setResultBool(true);*/
 		} else {
+			//txnsOrderinfoDAO.updateOrderToSuccess(tradeBean.getTxnseqno());
+			data.setRetCode("0000");
 			resultBean = new ResultBean(data);
 		}
 		log.info("畅捷代收结束,txnseqno:" + tradeBean.getTxnseqno());

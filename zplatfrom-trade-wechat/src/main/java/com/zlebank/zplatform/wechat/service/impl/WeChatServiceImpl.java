@@ -206,10 +206,7 @@ public class WeChatServiceImpl implements WeChatService{
                     "000000000000", DateUtil.getCurrentDateTime(),
                     DateUtil.getCurrentDateTime(), txnsLog.getTxnseqno(), "");
             txnsLogService.updateAppInfo(appParty);
-            IAccounting accounting = AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue(txnsLog.getBusitype()));
-            ResultBean accountResultBean = accounting.accountedFor(txnsLog.getTxnseqno());
-            txnsLogService.updateAppStatus(txnsLog.getTxnseqno(), accountResultBean.getErrCode(), accountResultBean.getErrMsg());
-            
+            AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue(txnsLog.getBusitype())).accountedFor(txnsLog.getTxnseqno());
         } catch (Exception e) {
            log.error(e.getMessage());
            e.printStackTrace();
@@ -398,6 +395,9 @@ public class WeChatServiceImpl implements WeChatService{
 	public List<String[]> dowanWeChatBill(QueryBillBean queryBillBean) {
 		WXApplication ap = new WXApplication();
         PrintBean printBean = ap.downLoadBill(queryBillBean);
+        if(printBean==null){
+        	return null;
+        }
 		return printBean.getContent();
 	}
 

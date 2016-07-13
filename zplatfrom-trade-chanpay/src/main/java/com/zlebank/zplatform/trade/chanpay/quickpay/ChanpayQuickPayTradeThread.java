@@ -164,7 +164,7 @@ public class ChanpayQuickPayTradeThread implements IQuickPayTrade{
 	@Override
 	public void setTradeType(TradeTypeEnum tradeType) {
 		// TODO Auto-generated method stub
-		
+		this.tradeType = tradeType;
 	}
 	/**
 	 *
@@ -173,6 +173,6 @@ public class ChanpayQuickPayTradeThread implements IQuickPayTrade{
 	@Override
 	public void setTradeBean(TradeBean tradeBean) {
 		// TODO Auto-generated method stub
-		
+		this.tradeBean = tradeBean;
 	}
 }

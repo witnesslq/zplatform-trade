@@ -161,6 +161,7 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         }
     }
     
+    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
     public void updateOrderToStartPay(String txnseqno) throws TradeException{
         TxnsOrderinfoModel orderinfo = super.getUniqueByHQL("from TxnsOrderinfoModel where relatetradetxn = ? and (status=? or status = ?)", new Object[]{txnseqno,"01","03"});
         if(orderinfo==null){

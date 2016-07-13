@@ -1041,6 +1041,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 	public void updateWeChatRefundResult(String txnseqno,
 			String payrettsnseqno, String retcode, String retinfo) {
 		TxnsLogModel txnsLog = super.get(txnseqno);
+		txnsLog.setPayrettsnseqno(payrettsnseqno);
         txnsLog.setPayretcode(retcode);
         txnsLog.setPayretinfo(retinfo);
         txnsLog.setPayordfintime(DateUtil.getCurrentDateTime());

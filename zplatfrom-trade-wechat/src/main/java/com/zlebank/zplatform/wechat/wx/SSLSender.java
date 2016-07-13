@@ -52,6 +52,7 @@ public class SSLSender {
             // 初始化httpclient
             httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
             // 初始化POST提交 
+            log.info("【发送给微信退款的url为】"+WXConfigure.REFUND_URL);
             HttpPost httppost = new HttpPost(WXConfigure.REFUND_URL);
             HttpEntity requestEntity = new StringEntity(xml,ContentType.APPLICATION_XML);
             httppost.setEntity(requestEntity);

@@ -2174,9 +2174,7 @@ public class GateWayServiceImpl extends
 			trade.setCardId(bindId);
 			ResultBean resultBean = quickPayTrade.bankSign(trade);
 			if (resultBean.isResultBool()) {
-				if (routId.equals("93000002") || routId.equals("93000003")) {
-
-				} else {
+				if (routId.equals("96000001") ) {
 					ReaPayResultBean payResultBean = (ReaPayResultBean) resultBean
 							.getResultObj();
 					if (!"0000".equals(payResultBean.getResult_code())) {
@@ -2262,8 +2260,7 @@ public class GateWayServiceImpl extends
 			quickPayTrade.setTradeType(TradeTypeEnum.SENDSMS);
 			ResultBean resultBean = quickPayTrade.bankSign(trade);
 			if (resultBean.isResultBool()) {
-				if (routId.equals("93000002") || routId.equals("93000003")) {
-				} else {
+				if (routId.equals("96000001")) {
 					ReaPayResultBean bean = (ReaPayResultBean) resultBean
 							.getResultObj();
 					if (!"0000".equals(bean.getResult_code())) {
@@ -2320,7 +2317,7 @@ public class GateWayServiceImpl extends
 				txnsLog.getCheckstandver(), txnsLog.getBusicode(),
 				txnsLog.getBusitype(), card.getCardtype(), "goods", "gooddesc",
 				card.getCvv2(), card.getValidtime(), txnsLog.getAccmemberid(),
-				card.getBindcardid(), "", reapayOrderNo, "", "", 0L, "", "",
+				card.getBindcardid(), "", reapayOrderNo, "", "", card.getId(), "", "",
 				orderinfo.getTn(), "", "");
 		ResultBean routResultBean = routeConfigService.getWapTransRout(DateUtil
 				.getCurrentDateTime(), trade.getAmount() + "",
