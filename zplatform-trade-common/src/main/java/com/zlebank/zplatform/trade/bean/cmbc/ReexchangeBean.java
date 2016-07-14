@@ -8,7 +8,7 @@
  * Copyright (c) 2015,zlebank.All rights reserved.
  * 
  */
-package com.zlebank.zplatform.trade.cmbc.bean;
+package com.zlebank.zplatform.trade.bean.cmbc;
 
 import java.io.Serializable;
 

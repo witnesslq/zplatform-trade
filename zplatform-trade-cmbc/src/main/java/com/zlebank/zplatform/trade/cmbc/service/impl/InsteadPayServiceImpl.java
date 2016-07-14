@@ -32,11 +32,11 @@ import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.bean.UpdateData;
+import com.zlebank.zplatform.trade.bean.cmbc.ReexchangeBean;
 import com.zlebank.zplatform.trade.bean.enums.InsteadPayTypeEnum;
 import com.zlebank.zplatform.trade.cmbc.bean.InsteadPayBean;
 import com.zlebank.zplatform.trade.cmbc.bean.RealTimePayBean;
 import com.zlebank.zplatform.trade.cmbc.bean.RealTimeQueryBean;
-import com.zlebank.zplatform.trade.cmbc.bean.ReexchangeBean;
 import com.zlebank.zplatform.trade.cmbc.bean.enmus.FileTypeEnmu;
 import com.zlebank.zplatform.trade.cmbc.bean.gateway.InsteadPayMessageBean;
 import com.zlebank.zplatform.trade.cmbc.exception.CMBCTradeException;
@@ -554,6 +554,8 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
                 
             }
             //数据没有问题
+            //更新转账明细数据
+            
             
             
         } else {

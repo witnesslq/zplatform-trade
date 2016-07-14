@@ -23,6 +23,7 @@ import com.zlebank.zplatform.commons.bean.TransferDataQuery;
 import com.zlebank.zplatform.commons.dao.impl.HibernateBaseDAOImpl;
 import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.commons.utils.StringUtil;
+import com.zlebank.zplatform.trade.bean.cmbc.ReexchangeBean;
 import com.zlebank.zplatform.trade.bean.enums.InsteadPayTypeEnum;
 import com.zlebank.zplatform.trade.bean.page.QueryTransferBean;
 import com.zlebank.zplatform.trade.dao.BankTransferDataDAO;
@@ -162,6 +163,60 @@ HibernateBaseDAOImpl<PojoBankTransferData>
         }
 
     }
+    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
+    public void updateReexchangeTransData(List<ReexchangeBean> reexchangeList){
+    	StringBuffer hqlBuffer = new StringBuffer();
+        hqlBuffer.append("update PojoBankTransferData set bankTranResNo = ?, ");
+        hqlBuffer.append("resType = ?,");
+        hqlBuffer.append("resCode = ?,");
+        hqlBuffer.append("resInfo = ?,");
+        hqlBuffer.append("status = ? ");
+        hqlBuffer.append("where bankTranDataSeqNo = ? ");
+        Session session = getSession();
+    	for(ReexchangeBean bean : reexchangeList){
+    		Query query = session.createQuery(hqlBuffer.toString());
+            PojoBankTransferData data_old = getTransferDataByTranId(bean.getTranId());
+            if(data_old==null){
+            	continue;
+            }
+            query.setParameter(0, bean.getBankTranId());
+            query.setParameter(1, bean.getRespType());
+            query.setParameter(2, bean.getRespCode());
+            query.setParameter(3, bean.getRespMsg());
+            query.setParameter(4, "S".equalsIgnoreCase(bean.getRespType())? "00": "03");
+            query.setParameter(5, bean.getTranId());
+            query.executeUpdate();
+            query = session.createQuery("update TxnsLogModel set payretcode=?,payretinfo=?,payordfintime=?,payrettsnseqno=?,retcode=?,retinfo=?, tradeseltxn=?,accordcommitime=?,retdatetime=?,relate=?,tradetxnflag=? where txnseqno=?");
+            if("S".equalsIgnoreCase(bean.getRespType())){
+                query.setParameter(0, "000000");
+                query.setParameter(1, "交易成功");
+                query.setParameter(4, "0000");
+                query.setParameter(5, "交易成功");
+            }else{
+                query.setParameter(0, bean.getRespCode());
+                query.setParameter(1, bean.getRespMsg());
+                query.setParameter(4, bean.getRespCode());
+                query.setParameter(5, bean.getRespMsg());
+            }
+            query.setParameter(2, DateUtil.getCurrentDateTime());
+            query.setParameter(3, bean.getBankTranId());
+            query.setParameter(6, UUID.randomUUID().toString().replaceAll("-", "").toUpperCase());
+            query.setParameter(7, DateUtil.getCurrentDateTime());
+            query.setParameter(8, DateUtil.getCurrentDateTime());
+            query.setParameter(9, "10000000");
+            query.setParameter(10, "10000000");
+            query.setParameter(11, data_old.getTranData().getTxnseqno());
+            query.executeUpdate();
+            
+            //更新划拨数据
+            PojoTranData tranData = data_old.getTranData();
+            tranData.setStatus("S".equalsIgnoreCase(bean.getRespType())? "02": "03");
+            tranDataDAO.update(tranData);
+    	}
+    }
+    
+    
+    
     
     @SuppressWarnings("unchecked")
     @Transactional(propagation=Propagation.REQUIRES_NEW)
