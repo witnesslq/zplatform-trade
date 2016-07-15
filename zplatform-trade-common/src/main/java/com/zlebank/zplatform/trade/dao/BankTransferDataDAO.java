@@ -103,5 +103,5 @@ public interface BankTransferDataDAO  extends BaseDAO<PojoBankTransferData>{
      * 更新退汇交易数据
      * @param reexchangeList
      */
-    public void updateReexchangeTransData(List<ReexchangeBean> reexchangeList);
+    public void batchUpdateReexchangeTransData(List<ReexchangeBean> reexchangeList);
 }

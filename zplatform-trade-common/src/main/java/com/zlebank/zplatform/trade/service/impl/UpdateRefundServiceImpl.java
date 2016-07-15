@@ -137,7 +137,13 @@ public class UpdateRefundServiceImpl implements UpdateRefundService, UpdateSubje
             entryEvent = EntryEvent.TRADE_SUCCESS;
             log.info("退款交易成功，交易序列号:"+data.getTxnSeqNo());
             txnsLog.setApporderinfo("退款账务成功(交易成功)");
-        } else {
+        } else if("04".equals(data.getResultCode())){
+        	tradeInfo.setChannelId(txnsLog.getPayinst());
+        	tradeInfo.setChannelFee(data.getChannelFee());
+            entryEvent = EntryEvent.REFUND_EXCHANGE;
+            log.info("退款交易成功，交易序列号:"+data.getTxnSeqNo());
+            txnsLog.setApporderinfo("退款账务成功(代付退汇)");
+        }else {
             entryEvent = EntryEvent.TRADE_FAIL;
             log.info("退款交易失败，交易序列号:"+data.getTxnSeqNo());
             txnsLog.setApporderinfo("退款账务成功(交易失败)");
@@ -174,6 +180,13 @@ public class UpdateRefundServiceImpl implements UpdateRefundService, UpdateSubje
             txnsLog.setApporderinfo(e1.getMessage());
 		} catch (IllegalEntryRequestException e) {
 			// TODO Auto-generated catch block
+			e.printStackTrace();
+			if(txnsLog!=null){
+				txnsLog.setApporderstatus(AccStatusEnum.AccountingFail.getCode());
+				txnsLog.setApporderinfo(e.getMessage());
+			}
+		}catch (Exception e) {
+			// TODO: handle exception
 			e.printStackTrace();
 			if(txnsLog!=null){
 				txnsLog.setApporderstatus(AccStatusEnum.AccountingFail.getCode());
