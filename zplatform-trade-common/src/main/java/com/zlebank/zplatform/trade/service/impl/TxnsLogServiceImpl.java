@@ -52,6 +52,7 @@ import com.zlebank.zplatform.trade.bean.enums.ChannelEnmu;
 import com.zlebank.zplatform.trade.bean.enums.ChnlTypeEnum;
 import com.zlebank.zplatform.trade.bean.enums.OrderStatusEnum;
 import com.zlebank.zplatform.trade.bean.enums.RiskLevelEnum;
+import com.zlebank.zplatform.trade.bean.enums.TradeStatFlagEnum;
 import com.zlebank.zplatform.trade.bean.gateway.QueryBean;
 import com.zlebank.zplatform.trade.dao.ITxnsLogDAO;
 import com.zlebank.zplatform.trade.dao.InsteadPayDetailDAO;
@@ -1140,6 +1141,12 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 		}
 	       
 		return null;
+	}
+	
+	@Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
+	public void udpateTradeStatFlag(String txnseqno,TradeStatFlagEnum tradeStatFlagEnum){
+		String hql = "update TxnsLogModel set tradestatflag = ? where txnseqno = ?";
+		super.updateByHQL(hql, new Object[]{tradeStatFlagEnum.getStatus(),txnseqno});
 	}
 	
 	

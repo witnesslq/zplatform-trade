@@ -52,7 +52,6 @@ public class RealnameAuthDAOImpl extends HibernateBaseDAOImpl<PojoRealnameAuth> 
         	if(cardInfo==null){
         		getSession().save(realnameAuth);
         	}
-            
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

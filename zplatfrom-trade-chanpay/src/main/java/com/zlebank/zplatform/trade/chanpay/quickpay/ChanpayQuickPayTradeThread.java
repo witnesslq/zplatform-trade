@@ -95,24 +95,18 @@ public class ChanpayQuickPayTradeThread implements IQuickPayTrade{
 	public ResultBean bankSign(TradeBean trade) {
 		ResultBean resultBean = null;
 		try {
+			//实名认证，因为不确定畅捷哪家银行不需要实名认证，所以全部都进行实名认证
+			resultBean = chanPayQuickPayService.realNameAuth(trade);
+			if(!resultBean.isResultBool()){
+				return resultBean;
+			}
 			if(trade.getCardId()==0){//未绑定银行卡
-				//检查系统实名认证表中是否有相关记录
-				PojoRealnameAuth realnameAuth = new PojoRealnameAuth(trade);
-				realnameAuth = realnameAuthDAO.getByCardInfo(realnameAuth);
-				if(realnameAuth!=null){//已经完成实名认证，不需要再次调用畅捷的实名认证接口，需要调用畅捷的协议签约接口
-					resultBean = chanPayQuickPayService.protocolSign(trade);
-			    }else{
-			    	resultBean = chanPayQuickPayService.realNameAuth(trade);
-			    	if(resultBean.isResultBool()){
-			    		resultBean = chanPayQuickPayService.protocolSign(trade);
-			    	}
-			    }
+		    	resultBean = chanPayQuickPayService.protocolSign(trade);
 			}else{//绑定银行卡
 				PojoCardBind cardBind = cardBindService.getCardBind(trade.getCardId(), ChannelEnmu.CHANPAYCOLLECTMONEY.getChnlcode());
 				if(cardBind==null){//未签署协议
 					resultBean = chanPayQuickPayService.protocolSign(trade);
 				}else{//已签署协议
-					
 					return sendSms(trade);
 				}
 			}
