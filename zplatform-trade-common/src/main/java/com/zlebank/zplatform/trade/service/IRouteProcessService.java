@@ -22,8 +22,11 @@ import com.zlebank.zplatform.trade.model.RouteProcessModel;
  * @since 
  */
 public interface IRouteProcessService extends IBaseService<RouteProcessModel, Long>{
+	@Deprecated
     public RoutBean getNextRoutStep(String routId,String currentStep,String busicode);
+	@Deprecated
     public RoutBean getFirstRoutStep(String routId,String busicode);
+	@Deprecated
     public RoutBean getCurrentStep(String routId,String beforeStep,String busicode);
     
 }

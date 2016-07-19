@@ -550,7 +550,7 @@ public class TxnsLogModel implements java.io.Serializable {
 
     @Column(name = "TRADESELTXN", length = 32)
     public String getTradeseltxn() {
-        return this.tradeseltxn;
+        return this.tradeseltxn;         
     }
 
     public void setTradeseltxn(String tradeseltxn) {

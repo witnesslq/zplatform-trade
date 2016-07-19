@@ -241,7 +241,7 @@ public class QuickpayCustServiceImpl extends BaseServiceImpl<QuickpayCustModel, 
     @Transactional
     public void updateBindCardId(Long id,String bindCardId){
         if(StringUtil.isEmpty(bindCardId)){
-            super.delete(super.get(id));
+            //super.delete(super.get(id));
         }else{
             super.updateByHQL("update QuickpayCustModel set bindcardid = ? where id = ?", new Object[]{bindCardId,id});
         }
@@ -256,7 +256,7 @@ public class QuickpayCustServiceImpl extends BaseServiceImpl<QuickpayCustModel, 
     public void deleteCard(Long id) {
         QuickpayCustModel card = super.get(id);
         if(StringUtil.isEmpty(card.getBindcardid())){
-            super.delete(card);
+            //super.delete(card);
         }
         
     }

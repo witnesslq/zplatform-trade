@@ -47,7 +47,7 @@ public class OrderNumber {
         List<Map<String,Object>> resultList = (List<Map<String, Object>>) txnsLogService.queryBySQL("select "+sequences+".NEXTVAL seq from dual", new Object[]{});
         DecimalFormat df = new DecimalFormat("00000000");
         SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd");
-        String seqNo = df.format( resultList.get(0).get("SEQ"));
+        String seqNo = df.format(resultList.get(0).get("SEQ"));
         return sdf.format(new Date())+seqNo;
     }
     @SuppressWarnings("unchecked")
@@ -130,6 +130,12 @@ public class OrderNumber {
         String seqNo=generateSerialNumber("SEQ_CMBC_QUICK_NO");
         return seqNo.substring(0,6)+"92"+seqNo.substring(6);
     }
+    
+    public String generateChanPayOrderNo(){
+        String seqNo=generateSerialNumber("SEQ_CHANPAY_ORDER_NO");
+        return seqNo.substring(0,6)+"90"+seqNo.substring(6);
+    }
+    
     
     @Transactional
     public String generateRealNameOrderNo(){

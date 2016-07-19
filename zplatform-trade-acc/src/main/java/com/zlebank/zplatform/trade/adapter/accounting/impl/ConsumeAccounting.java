@@ -21,6 +21,7 @@ import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
 import com.zlebank.zplatform.acc.exception.AccBussinessException;
+import com.zlebank.zplatform.acc.exception.IllegalEntryRequestException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.commons.dao.pojo.AccStatusEnum;
@@ -134,7 +135,14 @@ public class ConsumeAccounting implements IAccounting{
             } catch (NumberFormatException e) {
                 resultBean = new ResultBean("T099", e.getMessage());
                 e.printStackTrace();
-            }
+            }catch (RuntimeException e) {
+				// TODO: handle exception
+            	e.printStackTrace();
+            	resultBean = new ResultBean("T000", e.getMessage());
+			} catch (IllegalEntryRequestException e) {
+				// TODO Auto-generated catch block
+				resultBean = new ResultBean(e.getCode(), e.getMessage());
+            } 
         
         if(txnsLog==null){
             return resultBean;

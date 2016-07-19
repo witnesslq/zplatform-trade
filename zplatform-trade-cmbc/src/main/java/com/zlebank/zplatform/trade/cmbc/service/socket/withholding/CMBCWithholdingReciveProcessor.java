@@ -325,14 +325,14 @@ public class CMBCWithholdingReciveProcessor implements ReceiveProcessor{
     public void saveFailedCMBCTrade(TxnsWithholdingModel withholding){
         TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(withholding.getTxnseqno());
         txnsLog.setPayordfintime(DateUtil.getCurrentDateTime());
-        PojoRspmsg msg = rspmsgDAO.getRspmsgByChnlCode(ChnlTypeEnum.CMBCWITHHOLDING, withholding.getExeccode());
+       /* PojoRspmsg msg = rspmsgDAO.getRspmsgByChnlCode(ChnlTypeEnum.CMBCWITHHOLDING, withholding.getExeccode());
         if(msg!=null){
             txnsLog.setRetcode(msg.getWebrspcode());
             txnsLog.setRetinfo(msg.getRspinfo());
         }else{
             txnsLog.setRetcode("0052");
             txnsLog.setRetinfo("交易失败，系统忙，请稍后再试！");
-        }
+        }*/
         txnsLog.setRetdatetime(DateUtil.getCurrentDateTime());
         txnsLog.setTradestatflag("00000001");
         txnsLog.setTradetxnflag("10000000");

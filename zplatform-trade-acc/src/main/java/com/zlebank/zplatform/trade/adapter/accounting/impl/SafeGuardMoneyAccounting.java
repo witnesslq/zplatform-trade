@@ -18,6 +18,7 @@ import org.apache.commons.logging.LogFactory;
 import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
 import com.zlebank.zplatform.acc.exception.AccBussinessException;
+import com.zlebank.zplatform.acc.exception.IllegalEntryRequestException;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.entry.EntryEvent;
 import com.zlebank.zplatform.trade.adapter.accounting.IAccounting;
@@ -104,7 +105,10 @@ public class SafeGuardMoneyAccounting implements IAccounting{
                 // TODO Auto-generated catch block
                 e.printStackTrace();
                 resultBean = new ResultBean("T099", e.getMessage());
-            }
+            } catch (IllegalEntryRequestException e) {
+				// TODO Auto-generated catch block
+            	resultBean = new ResultBean(e.getCode(), e.getMessage());
+			}
             if(txnsLog==null){
                 return resultBean;
             }

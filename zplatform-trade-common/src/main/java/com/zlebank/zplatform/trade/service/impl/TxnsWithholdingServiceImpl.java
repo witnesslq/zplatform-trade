@@ -22,7 +22,7 @@ public class TxnsWithholdingServiceImpl extends BaseServiceImpl<TxnsWithholdingM
         return txnsWithholdingDAO.getSession();
     }
     @Override
-    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
     public void saveWithholdingLog(TxnsWithholdingModel withholding)
             throws TradeException {
         try {
@@ -35,8 +35,7 @@ public class TxnsWithholdingServiceImpl extends BaseServiceImpl<TxnsWithholdingM
     }
     @Override
     @Transactional(propagation=Propagation.REQUIRES_NEW)
-    public void updateRealNameResult(TxnsWithholdingModel withholding)
-            throws TradeException {
+    public void updateRealNameResult(TxnsWithholdingModel withholding) throws TradeException {
         StringBuffer updateHQL = new StringBuffer("update TxnsWithholdingModel set ");
         updateHQL.append("exectype = ?,");
         updateHQL.append("execcode = ?,");

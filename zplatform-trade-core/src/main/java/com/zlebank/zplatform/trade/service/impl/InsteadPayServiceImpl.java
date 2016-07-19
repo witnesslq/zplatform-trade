@@ -29,6 +29,7 @@ import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.bean.enums.Usage;
 import com.zlebank.zplatform.acc.exception.AbstractBusiAcctException;
 import com.zlebank.zplatform.acc.exception.AccBussinessException;
+import com.zlebank.zplatform.acc.exception.IllegalEntryRequestException;
 import com.zlebank.zplatform.acc.pojo.Money;
 import com.zlebank.zplatform.acc.service.AccEntryService;
 import com.zlebank.zplatform.acc.service.BusiAcctService;
@@ -100,7 +101,7 @@ import com.zlebank.zplatform.trade.utils.OrderNumber;
  * @date 2015年11月25日 上午10:48:24
  * @since
  */
-@Service("insteadPayServiceImpl")
+@Service("insteadPayServiceImpl2")
 public class InsteadPayServiceImpl
         extends
             AbstractBasePageService<InsteadPayDetailQuery, InsteadPayDetailBean>
@@ -340,7 +341,12 @@ public class InsteadPayServiceImpl
             } catch (NumberFormatException e) {
                 log.error(e.getMessage(),e);
                 throw new  FailToInsertAccEntryException();
-            }
+            } catch (IllegalEntryRequestException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				log.error(e.getMessage(),e);
+                throw new  FailToInsertAccEntryException();
+			}
         }
         // 商户余额是否能够支付手续费
         if (merBalance.compareTo(payBalance.add(feeAmt))<0) {
@@ -533,7 +539,7 @@ public class InsteadPayServiceImpl
             if ("00".equals(detail.getRespCode())) {
                 successQty++;
                 successAmt = successAmt+ detail.getAmt();
-            } else if ("09".equals(detail.getRespCode())) {
+            } else if ("01".equals(detail.getRespCode()) || "02".equals(detail.getRespCode()) || "03".equals(detail.getRespCode()) || "04".equals(detail.getRespCode())) {
                 failQty++;
                 failAmt = failAmt+ detail.getAmt();
             } else {
