@@ -119,7 +119,17 @@ public class TradeBean implements Serializable,Cloneable{
     
     private String payOrderNo;
     
-    /**
+    private String devId;
+    
+    
+    
+    public String getDevId() {
+		return devId;
+	}
+	public void setDevId(String devId) {
+		this.devId = devId;
+	}
+	/**
      * @return the memberIP
      */
     public String getMemberIP() {
