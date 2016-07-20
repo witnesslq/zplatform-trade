@@ -90,6 +90,7 @@ public class UpdateWithdrawServiceImpl implements UpdateWithdrawService,UpdateSu
         BusinessEnum businessEnum = null;
         
         EntryEvent entryEvent = null;
+        TradeInfo tradeInfo=new TradeInfo();
         if("00".equals(data.getResultCode())){
         	businessEnum = BusinessEnum.WITHDRAWALS;
         	orderinfo.setStatus("00");
@@ -113,6 +114,12 @@ public class UpdateWithdrawServiceImpl implements UpdateWithdrawService,UpdateSu
         	orderinfo.setStatus("03");
         	entryEvent = EntryEvent.TRADE_FAIL;
         	withdrawModel.setStatus(WithdrawEnum.BATCHFAILURE.getCode());
+        }else if("04".equals(data.getResultCode())){
+        	businessEnum = BusinessEnum.WITHDRAWALS;
+        	orderinfo.setStatus("03");
+        	entryEvent = EntryEvent.REFUND_EXCHANGE;
+        	withdrawModel.setStatus(WithdrawEnum.BATCHFAILURE.getCode());
+        	tradeInfo.setChannelFee(data.getChannelFee());
         }
         
         withdrawModel.setTxntime(DateUtil.getCurrentDateTime());
@@ -125,7 +132,6 @@ public class UpdateWithdrawServiceImpl implements UpdateWithdrawService,UpdateSu
         TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(data.getTxnSeqNo());
         //更新订单信息
         txnsOrderinfoDAO.update(orderinfo);
-        TradeInfo tradeInfo=new TradeInfo();
         tradeInfo.setPayMemberId(withdrawModel.getMemberid());
         tradeInfo.setAmount(new BigDecimal(withdrawModel.getAmount()));
         tradeInfo.setCharge(new BigDecimal(withdrawModel.getFee()));
@@ -143,7 +149,12 @@ public class UpdateWithdrawServiceImpl implements UpdateWithdrawService,UpdateSu
             	accEntryService.accEntryProcess(tradeInfo, EntryEvent.RECON_SUCCESS);
             }
             txnsLog.setApporderstatus("00");
-            txnsLog.setApporderinfo("提现账务处理成功");
+            if("04".equals(data.getResultCode())){
+            	txnsLog.setApporderinfo("提现账务处理成功（退汇）");
+            }else{
+            	txnsLog.setApporderinfo("提现账务处理成功");
+            }
+            
         } catch (AccBussinessException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -161,6 +172,13 @@ public class UpdateWithdrawServiceImpl implements UpdateWithdrawService,UpdateSu
             txnsLog.setApporderinfo(e1.getMessage());
 		} catch (IllegalEntryRequestException e) {
 			// TODO Auto-generated catch block
+			e.printStackTrace();
+			if(txnsLog!=null){
+				txnsLog.setApporderstatus(AccStatusEnum.AccountingFail.getCode());
+				txnsLog.setApporderinfo(e.getMessage());
+			}
+		}catch (Exception e) {
+			// TODO: handle exception
 			e.printStackTrace();
 			if(txnsLog!=null){
 				txnsLog.setApporderstatus(AccStatusEnum.AccountingFail.getCode());

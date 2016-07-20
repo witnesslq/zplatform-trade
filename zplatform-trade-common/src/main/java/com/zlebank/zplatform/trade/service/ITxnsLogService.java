@@ -21,6 +21,7 @@ import com.zlebank.zplatform.trade.bean.AppPartyBean;
 import com.zlebank.zplatform.trade.bean.PayPartyBean;
 import com.zlebank.zplatform.trade.bean.ReaPayResultBean;
 import com.zlebank.zplatform.trade.bean.ResultBean;
+import com.zlebank.zplatform.trade.bean.enums.TradeStatFlagEnum;
 import com.zlebank.zplatform.trade.bean.gateway.QueryBean;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.model.PojoBankTransferData;
@@ -308,4 +309,11 @@ public interface ITxnsLogService extends IBaseService<TxnsLogModel, String>{
 	 * @param memberId
 	 */
 	public void updateAnonOrderToMemberOrder(String txnseqno,String memberId);
+	
+	/**
+	 * 更新交易状态标记位
+	 * @param txnseqno
+	 * @param tradeStatFlagEnum
+	 */
+	public void udpateTradeStatFlag(String txnseqno,TradeStatFlagEnum tradeStatFlagEnum);
 }

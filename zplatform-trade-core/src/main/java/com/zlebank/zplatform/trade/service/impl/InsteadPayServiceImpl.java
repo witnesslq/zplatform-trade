@@ -539,7 +539,7 @@ public class InsteadPayServiceImpl
             if ("00".equals(detail.getRespCode())) {
                 successQty++;
                 successAmt = successAmt+ detail.getAmt();
-            } else if ("09".equals(detail.getRespCode())) {
+            } else if ("01".equals(detail.getRespCode()) || "02".equals(detail.getRespCode()) || "03".equals(detail.getRespCode()) || "04".equals(detail.getRespCode())) {
                 failQty++;
                 failAmt = failAmt+ detail.getAmt();
             } else {

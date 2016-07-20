@@ -2182,11 +2182,12 @@ public class GateWayServiceImpl extends
 					}
 				}
 				return bindId + "";
+			}else{
+				throw new TradeException("GW27");
 			}
 		} else {
 			throw new TradeException("T001");
 		}
-		return "";
 
 	}
 

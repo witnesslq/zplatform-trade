@@ -17,6 +17,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -32,11 +33,11 @@ import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.bean.UpdateData;
+import com.zlebank.zplatform.trade.bean.cmbc.ReexchangeBean;
 import com.zlebank.zplatform.trade.bean.enums.InsteadPayTypeEnum;
 import com.zlebank.zplatform.trade.cmbc.bean.InsteadPayBean;
 import com.zlebank.zplatform.trade.cmbc.bean.RealTimePayBean;
 import com.zlebank.zplatform.trade.cmbc.bean.RealTimeQueryBean;
-import com.zlebank.zplatform.trade.cmbc.bean.ReexchangeBean;
 import com.zlebank.zplatform.trade.cmbc.bean.enmus.FileTypeEnmu;
 import com.zlebank.zplatform.trade.cmbc.bean.gateway.InsteadPayMessageBean;
 import com.zlebank.zplatform.trade.cmbc.exception.CMBCTradeException;
@@ -504,20 +505,22 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
             while ((lineTxt = bufferedReader.readLine()) != null) {
                 if(i==0){
                     //0    1        2       3           4
-                    //PO|总笔数|总金额|成功笔数|成功金额
+                    //PO|总笔数|总金额|
                     String[] head = lineTxt.split("\\|");
                     sumItems   =  Long.valueOf(head[1]);
                     sumAmt     =  Long.valueOf(head[2]);
-                    succItems  =  Long.valueOf(head[3]);
-                    succAmt    =  Long.valueOf(head[4]);
+                    i++;
+                    continue;
                 }
                 if("########".equals(lineTxt.trim())){
                     break;
                 }
+                log.info("原始退汇文件内容("+i+"行):"+lineTxt);
                 //0     1        2         3              4      5       6         7            8           9     10
                 //报盘日期|报盘批次|第三方流水号|银行流水号|帐号|户名|金额|付款结果|失败返回码|失败原因|退汇日期
                 String[] body = lineTxt.split("\\|");
                 ReexchangeBean resultBean = new ReexchangeBean(body);
+                log.info("接收到退汇文件内容("+i+"行):"+JSON.toJSONString(resultBean));
                 resultList.add(resultBean);
                 i++;
             }
@@ -553,13 +556,53 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
             if(succAmt_self!=succAmt){//成功总金额和实际成功总金额不一致
                 
             }
-            //数据没有问题
-            
-            
+            //更新转账明细数据
+            bankTransferDataDAO.batchUpdateReexchangeTransData(resultList);
+            //更新对应业务的数据，调用业务处理接口
+            dealWithReexchangeBusiData(resultList);
         } else {
             
         }
     }
+    
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+    public void dealWithReexchangeBusiData(List<ReexchangeBean> transferDataList){
+    	for (ReexchangeBean data : transferDataList) {
+            PojoBankTransferData transferData = bankTransferDataDAO.getTransferDataByTranId(data.getTranId());
+            if(transferData==null){
+            	continue;
+            }
+            UpdateData updateData = new UpdateData();
+            updateData.setTxnSeqNo(transferData.getTranData().getTxnseqno());
+            updateData.setResultCode("S".equalsIgnoreCase(data.getRespType())? "00": "04");
+            updateData.setResultMessage("S".equalsIgnoreCase(data.getRespType())? "交易成功": transferData.getResInfo());
+            updateData.setChannelCode(transferData.getBankTranBatch().getChannel().getBankChannelCode());
+            updateData.setChannelFee(new BigDecimal(Math.abs(data.getTransAmt()-transferData.getTranAmt())));
+            ObserverListService service  = ObserverListService.getInstance();
+            service.notify(updateData, transferData.getTranData().getBusiType());
+            
+            PojoBankTransferBatch transferBatch = transferData.getBankTranBatch();
+            if(transferBatch!=null){
+            	Long succItems = transferBatch.getSuccessCount();
+            	Long succAmt  = transferBatch.getSuccessAmt();
+            	Long failItems = transferBatch.getFailCount();
+            	Long failAmt = transferBatch.getFailAmt();
+                transferBatch.setSuccessCount(succItems-1);
+                transferBatch.setSuccessAmt(succAmt-data.getTransAmt());
+                transferBatch.setFailCount(failItems+1);
+                transferBatch.setFailAmt(failAmt+data.getTransAmt());
+                if(failItems>0){
+                	transferBatch.setTranStatus("02");
+                }else if(succItems==0){
+                	transferBatch.setTranStatus("04");
+                }else{
+                	transferBatch.setTranStatus("03");
+                }
+                bankTransferBatchDAO.update(transferBatch);
+            }
+    	}
+    }
+
 
     public static void main(String[] args) {
         InsteadPayServiceImpl impl =new InsteadPayServiceImpl();
