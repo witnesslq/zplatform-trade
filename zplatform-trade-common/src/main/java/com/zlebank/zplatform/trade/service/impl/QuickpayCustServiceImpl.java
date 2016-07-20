@@ -260,5 +260,12 @@ public class QuickpayCustServiceImpl extends BaseServiceImpl<QuickpayCustModel, 
         }
         
     }
+	@Override
+	@Transactional
+	public List<QuickpayCustModel> getCardList(String cardNo, String accName,
+			String phone, String cerId, String memberId) {
+		 List<QuickpayCustModel> cardList = (List<QuickpayCustModel>) super.queryByHQL("from QuickpayCustModel where cardno=? and accname = ? and phone = ? and idnum = ? and relatememberno = ? and status = ?", new Object[]{cardNo,accName,phone,cerId,memberId,"00"});
+		return cardList;
+	}
 
 }

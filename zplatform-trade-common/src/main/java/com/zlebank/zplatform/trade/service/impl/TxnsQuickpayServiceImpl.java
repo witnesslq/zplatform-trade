@@ -404,6 +404,7 @@ public class TxnsQuickpayServiceImpl extends BaseServiceImpl<TxnsQuickpayModel, 
      * @return
      */
     @Override
+    @Transactional
     public List<TxnsQuickpayModel> queryTxnsByOrderNo(String orderNo) {
         return (List<TxnsQuickpayModel>) super.queryByHQL(" from TxnsQuickpayModel where relateorderno = ? and paycode = ? ", new Object[]{orderNo,"1001"});
     }
@@ -413,6 +414,7 @@ public class TxnsQuickpayServiceImpl extends BaseServiceImpl<TxnsQuickpayModel, 
      * @return
      */
     @Override
+    @Transactional
     public String getReapayOrderNo(String txnseqno) {
         List<TxnsQuickpayModel> quickpayList =  (List<TxnsQuickpayModel>) super.queryByHQL(" from TxnsQuickpayModel where relatetradetxnseqno = ? order by id desc", new Object[]{txnseqno});
         if(quickpayList.size()>0){

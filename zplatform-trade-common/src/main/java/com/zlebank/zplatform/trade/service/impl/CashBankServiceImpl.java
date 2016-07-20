@@ -14,12 +14,14 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.zlebank.zplatform.trade.common.page.PageVo;
 import com.zlebank.zplatform.trade.dao.ICashBankDAO;
 import com.zlebank.zplatform.trade.model.CashBankModel;
 import com.zlebank.zplatform.trade.service.ICashBankService;
@@ -74,5 +76,69 @@ public class CashBankServiceImpl extends BaseServiceImpl<CashBankModel, Long> im
     	Map<String, BigDecimal> valueMap = (Map<String, BigDecimal>) query.uniqueResult();
     	return valueMap.get("TOTAL").longValue();
     }
+    
+	@Override
+	public PageVo<CashBankModel> getCardList(Map<String, Object> map,
+			Integer pageNo, Integer pageSize) {
+		PageVo<CashBankModel> pageVo = new PageVo<CashBankModel>();
+		StringBuffer hq = new StringBuffer();
+		if(map!=null){
+			//卡类型 1-借记卡 2=贷记卡
+			String cardType = map.get("cardtype")==null ?"":map.get("cardtype").toString();
+			//类型 01：快捷 02：网关
+			String payType = map.get("paytype")==null ?"" :map.get("paytype").toString();
+			//状态 00-在用
+			String status = map.get("status")==null ?"":map.get("status").toString();
+			//支持业务类型
+			String busiCode = map.get("busiCode")==null ?"" : map.get("busiCode").toString();
+			if(StringUtils.isNotEmpty(cardType)){
+				hq.append("and cardtype=:cardtype ");
+			}
+			if(StringUtils.isNotEmpty(payType)){
+				hq.append(" and paytype=:paytype ");
+			}
+			if(StringUtils.isNotEmpty(status)){
+				hq.append(" and status =:status");
+			}
+			if(StringUtils.isNotEmpty(busiCode)){
+				hq.append(" and buicode =:busicode ");
+			}
+			//查询列表
+			StringBuffer listHql= new StringBuffer(" from  CashBankModel where 1=1 ").append(hq);
+			//查询总条数
+			StringBuffer totalHql = new StringBuffer(" select count(*) from  CashBankModel where 1=1 ").append(hq);
+	        
+			Query query = cashBankDAO.getSession().createQuery(listHql.toString());
+	        
+			Query tquery = cashBankDAO.getSession().createQuery(totalHql.toString());
+			
+			if(StringUtils.isNotEmpty(cardType)){
+				query.setParameter("cardtype", cardType);
+				tquery.setParameter("cardtype", cardType);
+			}
+			if(StringUtils.isNotEmpty(payType)){
+				query.setParameter("paytype", payType);
+				tquery.setParameter("paytype", payType);
+			}
+			if(StringUtils.isNotEmpty(status)){
+				query.setParameter("status", status);
+				tquery.setParameter("status", status);
+			}
+			if(StringUtils.isNotEmpty(busiCode)){
+				query.setParameter("busiCode", busiCode);
+				tquery.setParameter("busiCode", busiCode);
+			}
+			if(pageSize!= null && pageNo !=null){
+				
+				query.setFirstResult(((pageNo==0?1:pageNo)-1)*pageSize);
+		    	query.setMaxResults(pageSize);
+			}
+			List<CashBankModel> list= query.list();
+			pageVo.setList(list);
+			int total =((Number) tquery.iterate().next()).intValue();
+			pageVo.setTotal(total);
+		}
+		return pageVo;
+	}
 
 }

@@ -1561,7 +1561,7 @@ public class GateWayServiceImpl extends
 						"from TxnsOrderinfoModel where orderno = ? and  secmemberno = ?",
 						new Object[] { orderNo, merchNo });
 	}
-
+	@Transactional
 	public TxnsOrderinfoModel getOrderinfoByTN(String tn) {
 		return super.getUniqueByHQL("from TxnsOrderinfoModel where tn = ? ",
 				new Object[] { tn });
