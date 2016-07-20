@@ -68,12 +68,9 @@ import com.zlebank.zplatform.trade.adapter.quickpay.IQuickPayTrade;
 import com.zlebank.zplatform.trade.analyzer.GateWayTradeAnalyzer;
 import com.zlebank.zplatform.trade.analyzer.ReaPayTradeAnalyzer;
 import com.zlebank.zplatform.trade.bean.AppPartyBean;
-import com.zlebank.zplatform.trade.bean.PayPartyBean;
 import com.zlebank.zplatform.trade.bean.ReaPayResultBean;
 import com.zlebank.zplatform.trade.bean.ResultBean;
-import com.zlebank.zplatform.trade.bean.RoutBean;
 import com.zlebank.zplatform.trade.bean.TradeBean;
-import com.zlebank.zplatform.trade.bean.ZLPayResultBean;
 import com.zlebank.zplatform.trade.bean.enums.ChannelEnmu;
 import com.zlebank.zplatform.trade.bean.enums.OrderStatusEnum;
 import com.zlebank.zplatform.trade.bean.gateway.AnonOrderAsynRespBean;
@@ -107,7 +104,6 @@ import com.zlebank.zplatform.trade.service.IAccountPayService;
 import com.zlebank.zplatform.trade.service.IGateWayService;
 import com.zlebank.zplatform.trade.service.IProdCaseService;
 import com.zlebank.zplatform.trade.service.IRouteConfigService;
-import com.zlebank.zplatform.trade.service.IRouteProcessService;
 import com.zlebank.zplatform.trade.service.ITxncodeDefService;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
 import com.zlebank.zplatform.trade.service.ITxnsNotifyTaskService;
@@ -149,8 +145,6 @@ public class GateWayController {
     private ITxnsLogService txnsLogService;
     @Autowired
     private IRouteConfigService routeConfigService;
-    @Autowired
-    private IRouteProcessService routeProcessService;
     @Autowired
     private ITxncodeDefService txncodeDefService;
     @Autowired
