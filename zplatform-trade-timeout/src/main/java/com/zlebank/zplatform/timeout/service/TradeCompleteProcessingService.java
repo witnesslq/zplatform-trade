@@ -1,0 +1,31 @@
+/* 
+ * TradeCompleteProcessingService.java  
+ * 
+ * version TODO
+ *
+ * 2016年7月20日 
+ * 
+ * Copyright (c) 2016,zlebank.All rights reserved.
+ * 
+ */
+package com.zlebank.zplatform.timeout.service;
+
+import com.zlebank.zplatform.trade.bean.ResultBean;
+
+/**
+ * Class Description
+ *
+ * @author guojia
+ * @version
+ * @date 2016年7月20日 上午11:43:36
+ * @since 
+ */
+public interface TradeCompleteProcessingService {
+
+	/**
+	 * 畅捷代收交易查询补账方法
+	 * @param txnseqno
+	 * @param resultBean
+	 */
+	public void chanPayCollectMoneyCompleteTrade(String txnseqno,ResultBean resultBean);
+}
