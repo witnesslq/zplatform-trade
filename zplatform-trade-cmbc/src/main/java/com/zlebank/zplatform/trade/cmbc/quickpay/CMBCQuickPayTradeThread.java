@@ -15,6 +15,7 @@ import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.TradeBean;
 import com.zlebank.zplatform.trade.bean.enums.TradeTypeEnum;
 import com.zlebank.zplatform.trade.cmbc.exception.CMBCTradeException;
+import com.zlebank.zplatform.trade.cmbc.service.CMBCCrossLineQuickPayService;
 import com.zlebank.zplatform.trade.cmbc.service.ICMBCQuickPayService;
 import com.zlebank.zplatform.trade.cmbc.service.ICMBCTransferService;
 import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
@@ -53,6 +54,9 @@ public class CMBCQuickPayTradeThread implements IQuickPayTrade {
 	private ITxnsOrderinfoDAO txnsOrderinfoDAO;
 	private IQuickpayCustService quickpayCustService;
 	private ISMSService smsService;
+	
+	private CMBCCrossLineQuickPayService cmbcCrossLineQuickPayService = (CMBCCrossLineQuickPayService) SpringContext.getContext().getBean("cmbcCrossLineQuickPayService"); 
+	
 
 	public CMBCQuickPayTradeThread() {
 		txnsQuickpayService = (ITxnsQuickpayService) SpringContext.getContext()
@@ -110,8 +114,13 @@ public class CMBCQuickPayTradeThread implements IQuickPayTrade {
 
 	@Override
 	public ResultBean submitPay(TradeBean trade) {
-		ResultBean resultBean = null;
-		try {
+		//支付
+		ResultBean resultBean = cmbcCrossLineQuickPayService.submitPay(trade);
+		//账务
+		if(resultBean.isResultBool()){
+			resultBean = cmbcCrossLineQuickPayService.dealWithAccounting(trade.getTxnseqno(), resultBean);
+		}
+		/*try {
 			log.info("CMBC submit Pay start!");
 			if (log.isDebugEnabled()) {
 				try {
@@ -168,7 +177,7 @@ public class CMBCQuickPayTradeThread implements IQuickPayTrade {
 			resultBean = new ResultBean("T000", "交易失败");
 		}
 
-		log.info("CMBC submit Pay end!");
+		log.info("CMBC submit Pay end!");*/
 
 		return resultBean;
 	}
@@ -182,8 +191,7 @@ public class CMBCQuickPayTradeThread implements IQuickPayTrade {
 	@Override
 	public ResultBean bankSign(TradeBean trade) {
 		// TODO Auto-generated method stub
-		ResultBean resultBean = null;
-		try {
+		/*try {
 			// 卡信息进行实名认证
 			PojoRealnameAuth realnameAuth = new PojoRealnameAuth(trade);
 			// 保存卡信息认证流水
@@ -216,8 +224,8 @@ public class CMBCQuickPayTradeThread implements IQuickPayTrade {
 			resultBean = new ResultBean(e.getCode(), e.getMessage());
 			e.printStackTrace();
 			return resultBean;
-		}
-
+		}*/
+		ResultBean resultBean = cmbcCrossLineQuickPayService.bankSign(trade);
 		// 民生银行的实名认证和白名单采集已经做完，这里只发送短信验证码发送短信验证码
 		log.info("CMBC withholding bank sign start!");
 		if (log.isDebugEnabled()) {

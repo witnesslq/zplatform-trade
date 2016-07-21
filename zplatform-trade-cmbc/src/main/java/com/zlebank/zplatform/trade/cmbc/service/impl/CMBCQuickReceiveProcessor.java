@@ -41,6 +41,7 @@ import com.zlebank.zplatform.trade.bean.TradeBean;
 import com.zlebank.zplatform.trade.bean.enums.TradeTypeEnum;
 import com.zlebank.zplatform.trade.bean.gateway.AnonOrderAsynRespBean;
 import com.zlebank.zplatform.trade.bean.gateway.OrderAsynRespBean;
+import com.zlebank.zplatform.trade.cmbc.service.CMBCCrossLineQuickPayService;
 import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
 import com.zlebank.zplatform.trade.dao.RspmsgDAO;
 import com.zlebank.zplatform.trade.factory.AccountingAdapterFactory;
@@ -87,6 +88,9 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
     private RspmsgDAO rspmsgDAO;
     @Autowired
     private CoopInstiService coopInstiService;
+    @Autowired
+    private CMBCCrossLineQuickPayService cmbcCrossLineQuickPayService;
+    
     /**
      *
      * @param resultBean
@@ -102,7 +106,8 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
         }else if(tradeType==TradeTypeEnum.UNKNOW){//银行卡签约
            
         }else if(tradeType==TradeTypeEnum.ACCOUNTING){
-            dealWithSuccessTrade(tradeBean.getTxnseqno(),(TxnsWithholdingModel)resultBean.getResultObj());
+            //dealWithSuccessTrade(tradeBean.getTxnseqno(),(TxnsWithholdingModel)resultBean.getResultObj());
+        	cmbcCrossLineQuickPayService.dealWithAccounting(tradeBean.getTxnseqno(), resultBean);
         }
     }
     
@@ -118,11 +123,7 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
                 txnsLogService.updatePayInfo_Fast(payPartyBean);
                 //更新交易流水中心应答信息
                 txnsLogService.updateCMBCWithholdingRetInfo(tradeBean.getTxnseqno(), withholding);
-                
-                
-                
                 String commiteTime = DateUtil.getCurrentDateTime();
-               
                 String merchOrderNo =  tradeBean.getOrderId();
                 // 处理同步通知和异步通知
                 // 根据原始订单拼接应答报文，异步通知商户

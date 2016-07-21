@@ -46,7 +46,11 @@ public class TradeQueueBean implements Serializable{
 	@JSONField(name="txnDateTime")
 	private String txnDateTime;
 	
-	
+	/**
+	 * 交易实现类
+	 */
+	@JSONField(serialize = false)
+	private String impl;
 	
 	/**
 	 * @return the txnseqno
@@ -86,6 +90,24 @@ public class TradeQueueBean implements Serializable{
 	}
 	
 	
+	/**
+	 * @return the impl
+	 */
+	public String getImpl() {
+		return impl;
+	}
+	/**
+	 * @param impl the impl to set
+	 */
+	public void setImpl(String impl) {
+		this.impl = impl;
+	}
+	/**
+	 * @return the serialversionuid
+	 */
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
 	public static void main(String[] args) {
 		TradeQueueBean tradeQueueBean = new TradeQueueBean();
 		tradeQueueBean.setPayInsti("123455");

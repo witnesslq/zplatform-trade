@@ -54,4 +54,11 @@ public interface ChanPayQuickPayService {
 	 * @return
 	 */
 	public ResultBean dealWithAccounting(ResultBean resultBean,String txnseqno);
+	
+	/**
+	 * 查询畅捷代收交易结果
+	 * @param txnseqno
+	 * @return
+	 */
+	public ResultBean queryTrade(String txnseqno);
 }

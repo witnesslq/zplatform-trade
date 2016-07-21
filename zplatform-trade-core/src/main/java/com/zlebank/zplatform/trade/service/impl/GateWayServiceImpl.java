@@ -86,6 +86,7 @@ import com.zlebank.zplatform.trade.bean.ZLPayResultBean;
 import com.zlebank.zplatform.trade.bean.enums.BusinessEnum;
 import com.zlebank.zplatform.trade.bean.enums.ChannelEnmu;
 import com.zlebank.zplatform.trade.bean.enums.ChnlTypeEnum;
+import com.zlebank.zplatform.trade.bean.enums.TradeStatFlagEnum;
 import com.zlebank.zplatform.trade.bean.enums.TradeTypeEnum;
 import com.zlebank.zplatform.trade.bean.gateway.AnonOrderAsynRespBean;
 import com.zlebank.zplatform.trade.bean.gateway.OrderAsynRespBean;
@@ -475,7 +476,7 @@ public class GateWayServiceImpl extends
 		}
 
 		txnsLog.setAccordcommitime(DateUtil.getCurrentDateTime());
-		txnsLog.setTradestatflag("00000000");// 交易初始状态
+		txnsLog.setTradestatflag(TradeStatFlagEnum.INITIAL.getStatus());// 交易初始状态
 		// txnsLog.setTradcomm(GateWayTradeAnalyzer.generateCommAmt(order.getReserved()));
 		if (StringUtil.isNotEmpty(riskRateInfoBean.getMerUserId())) {
 			if ("999999999999999".equals(riskRateInfoBean.getMerUserId())) {

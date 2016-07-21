@@ -230,7 +230,7 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         updateOrderToStartPay(orderinfo.getRelatetradetxn());
         quickPayTrade.setTradeType(TradeTypeEnum.SUBMITPAY);
         quickPayTrade.setTradeBean(tradeBean);
-        if(ConsUtil.getInstance().cons.getIs_junit()==0){
+        if(ConsUtil.getInstance().cons.getIs_junit()==1){
         	quickPayTrade.submitPay(tradeBean);
         }else{
         	TradeAdapterFactory.getInstance().getThreadPool(routId).executeMission(quickPayTrade);

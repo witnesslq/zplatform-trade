@@ -19,13 +19,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.commons.dao.pojo.BusiTypeEnum;
+import com.zlebank.zplatform.member.service.MerchMKService;
 import com.zlebank.zplatform.sms.service.ISMSService;
 import com.zlebank.zplatform.trade.bean.AppPartyBean;
 import com.zlebank.zplatform.trade.bean.PayPartyBean;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.TradeBean;
-import com.zlebank.zplatform.trade.bean.ZLPayResultBean;
 import com.zlebank.zplatform.trade.bean.enums.ChannelEnmu;
+import com.zlebank.zplatform.trade.bean.enums.TradeStatFlagEnum;
 import com.zlebank.zplatform.trade.chanpay.bean.cj.G10001Bean;
 import com.zlebank.zplatform.trade.chanpay.bean.cj.G60001Bean;
 import com.zlebank.zplatform.trade.chanpay.bean.cj.G60003Bean;
@@ -43,6 +44,7 @@ import com.zlebank.zplatform.trade.service.CardBindService;
 import com.zlebank.zplatform.trade.service.IRouteConfigService;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
 import com.zlebank.zplatform.trade.service.ITxnsWithholdingService;
+import com.zlebank.zplatform.trade.service.TradeNotifyService;
 import com.zlebank.zplatform.trade.utils.ConsUtil;
 import com.zlebank.zplatform.trade.utils.DateUtil;
 import com.zlebank.zplatform.trade.utils.OrderNumber;
@@ -77,6 +79,10 @@ public class ChanPayQuickPayServiceImpl implements ChanPayQuickPayService {
 	private ISMSService smsService;
 	@Autowired
 	private IRouteConfigService routeConfigService;
+	@Autowired
+	private MerchMKService merchMKService;
+	@Autowired
+	private TradeNotifyService tradeNotifyService;
 
 	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Throwable.class)
 	public ResultBean realNameAuth(TradeBean tradeBean) throws TradeException {
@@ -235,14 +241,13 @@ public class ChanPayQuickPayServiceImpl implements ChanPayQuickPayService {
 		}
 		txnsLog.setTradeseltxn(UUIDUtil.uuid());
 		txnsLog.setRelate("10000000");
-		txnsLog.setTradestatflag("00000001");
+		txnsLog.setTradestatflag(TradeStatFlagEnum.FINISH_SUCCESS.getStatus());
 		txnsLog.setRetdatetime(DateUtil.getCurrentDateTime());
 		txnsLog.setTradetxnflag("10000000");
 		txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
 		txnsLogService.updateTxnsLog(txnsLog);
 		// 更新交易支付方信息
-		txnsLogService.updatePayInfo_Fast_result(txnseqno, payrettsnseqno,
-				retcode, retinfo);
+		txnsLogService.updatePayInfo_Fast_result(txnseqno, payrettsnseqno,retcode, retinfo);
 		String commiteTime = DateUtil.getCurrentDateTime();
 		// 账务处理
 		AccountingAdapterFactory.getInstance()
@@ -252,6 +257,19 @@ public class ChanPayQuickPayServiceImpl implements ChanPayQuickPayService {
 				commiteTime, DateUtil.getCurrentDateTime(), txnseqno, "");
 		txnsLogService.updateAppInfo(appParty);
 
+		tradeNotifyService.notify(txnseqno);
 		return null;
+	}
+	
+	
+	public ResultBean queryTrade(String txnseqno){
+		TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(txnseqno);
+		TradeStatFlagEnum tradeStatFlagEnum = TradeStatFlagEnum.fromValue(txnsLog.getTradestatflag());
+		if(tradeStatFlagEnum==TradeStatFlagEnum.PAYING||tradeStatFlagEnum==TradeStatFlagEnum.OVERTIME){
+			return chanPayCollectMoneyService.queryCollectMoney(txnsLog.getPayordno());
+		}else {
+			return null;
+		}
+		
 	}
 }

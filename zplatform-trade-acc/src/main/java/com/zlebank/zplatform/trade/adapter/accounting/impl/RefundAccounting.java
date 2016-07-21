@@ -19,6 +19,7 @@ import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.enums.BusinessEnum;
 import com.zlebank.zplatform.trade.bean.enums.InsteadPayDetailStatusEnum;
 import com.zlebank.zplatform.trade.bean.enums.RefundStatusEnum;
+import com.zlebank.zplatform.trade.bean.enums.TradeStatFlagEnum;
 import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.model.TxnsOrderinfoModel;
@@ -124,6 +125,7 @@ public class RefundAccounting implements IAccounting{
         txnsLog.setAccbusicode(BusinessEnum.REFUND_BANK.getBusiCode());
         txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
         txnsLogService.updateTxnsLog(txnsLog);
+        txnsLogService.updateTradeStatFlag(txnseqno, TradeStatFlagEnum.FINISH_ACCOUNTING);
         log.info("退款账务结束，交易序列号:"+txnseqno);
         return null;
     }

@@ -315,5 +315,19 @@ public interface ITxnsLogService extends IBaseService<TxnsLogModel, String>{
 	 * @param txnseqno
 	 * @param tradeStatFlagEnum
 	 */
-	public void udpateTradeStatFlag(String txnseqno,TradeStatFlagEnum tradeStatFlagEnum);
+	public void updateTradeStatFlag(String txnseqno,TradeStatFlagEnum tradeStatFlagEnum);
+	
+	/**
+	 * 更新民生核心交易数据
+	 * @param txnseqno
+	 */
+	public void updateCMBCTradeData(PayPartyBean payPartyBean);
+	
+	/**
+	 * 更新短信验证码错误交易数据
+	 * @param txnseqno
+	 * @param retcode
+	 * @param retinfo
+	 */
+	public void updateSMSErrorData(String txnseqno,String retcode,String retinfo);
 }

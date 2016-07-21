@@ -207,6 +207,23 @@ public class PayPartyBean implements Serializable{
         this.cardNo = cardNo;
         
     }
+    public PayPartyBean(String txnseqno, String paytype, String payordno,
+            String payinst, String payfirmerno, String paysecmerno,
+            String payordcomtime, String payordfintime, String cardNo,String payrettsnseqno
+            ) {
+        super();
+        this.txnseqno = txnseqno;
+        this.paytype = paytype;
+        this.payordno = payordno;
+        this.payinst = payinst;
+        this.payfirmerno = payfirmerno;
+        this.paysecmerno = paysecmerno;
+        this.payordcomtime = payordcomtime;
+        this.payordfintime = payordfintime;
+        this.cardNo = cardNo;
+        this.payrettsnseqno = payrettsnseqno;
+        
+    }
     /**
      * @return the payrettsnseqno
      */

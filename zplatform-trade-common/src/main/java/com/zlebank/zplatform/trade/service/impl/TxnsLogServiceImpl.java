@@ -24,6 +24,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -145,35 +146,59 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         if(StringUtil.isNotEmpty(payPartyBean.getCardNo())){
         	cardMap = getCardInfo(payPartyBean.getCardNo());
         }
-        String hql = "update TxnsLogModel set paytype=?,payordno=?,payinst=?,payfirmerno=?,payordcomtime=?,pan=?,cardtype=?,cardinstino=?,txnfee=?,pan_name=? where txnseqno=?";
-        super.updateByHQL(hql, new Object[]{StringUtil.isNotEmpty(payPartyBean.getPaytype())?payPartyBean.getPaytype():"01",payPartyBean.getPayordno(),payPartyBean.getPayinst(),payPartyBean.getPayfirmerno(),payPartyBean.getPayordcomtime(),
-        payPartyBean.getCardNo(),cardMap==null?"":cardMap.get("TYPE")+"",cardMap==null?"":cardMap.get("BANKCODE")+"",getTxnFee(txnsLog),payPartyBean.getPanName(),payPartyBean.getTxnseqno()});
+        String hql = "update TxnsLogModel set paytype=?,payordno=?,payinst=?,payfirmerno=?,payordcomtime=?,pan=?,cardtype=?,cardinstino=?,txnfee=?,pan_name=?,payrettsnseqno=? where txnseqno=?";
+        super.updateByHQL(hql, 
+        		new Object[]{
+        				StringUtil.isNotEmpty(payPartyBean.getPaytype())?payPartyBean.getPaytype():"01",
+        				payPartyBean.getPayordno(),
+        				payPartyBean.getPayinst(),
+        				payPartyBean.getPayfirmerno(),
+        				payPartyBean.getPayordcomtime(),
+        				payPartyBean.getCardNo(),cardMap==null?"":cardMap.get("TYPE")+"",
+        			    cardMap==null?"":cardMap.get("BANKCODE")+"",
+        			    getTxnFee(txnsLog),
+        			    payPartyBean.getPanName(),
+        			    payPartyBean.getPayrettsnseqno(),
+        			    payPartyBean.getTxnseqno()});
         return null;
     }
     
-    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
     public void updatePayInfo_Fast_result(String txnseqno,String retcode,String retinfo){
-        TxnsLogModel txnsLog = super.get(txnseqno);
+    	String hql = "update TxnsLogModel set payretcode=?,payretinfo=? where txnseqno=?";
+    	
+    	
+    	super.updateByHQL(hql, new Object[]{retcode,retinfo,txnseqno});
+        /*TxnsLogModel txnsLog = super.get(txnseqno);
         txnsLog.setPayretcode(retcode);
         txnsLog.setPayretinfo(retinfo);
         txnsLog.setPayordfintime(DateUtil.getCurrentDateTime());
-        super.update(txnsLog);
+        super.update(txnsLog);*/
     }
-    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
     public void updatePayInfo_Fast_result(String txnseqno,String payrettsnseqno,String retcode,String retinfo){
-        TxnsLogModel txnsLog = super.get(txnseqno);
+       /* TxnsLogModel txnsLog = super.get(txnseqno);
         txnsLog.setPayretcode(retcode);
         txnsLog.setPayretinfo(retinfo);
         txnsLog.setPayordfintime(DateUtil.getCurrentDateTime());
-        txnsLog.setPayrettsnseqno(payrettsnseqno);
-        super.update(txnsLog);
+        txnsLog.setPayrettsnseqno(payrettsnseqno);*/
+        String hql = "update TxnsLogModel set payretcode=?,payretinfo=?,payrettsnseqno=?,payordfintime=? where txnseqno=?";
+        super.updateByHQL(hql, new Object[]{retcode,retinfo,payrettsnseqno,DateUtil.getCurrentDateTime(),txnseqno});
+        /*super.update(txnsLog);*/
     }
-    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor = Throwable.class)
     public void updateCoreRetResult(String txnseqno,String retcode,String retinfo){
-        TxnsLogModel txnsLog = super.get(txnseqno);
+        /* TxnsLogModel txnsLog = super.get(txnseqno);
         txnsLog.setRetcode(retcode);
         txnsLog.setRetinfo(retinfo);
-        super.update(txnsLog);
+        if("0000".equals(retcode)){
+        	txnsLog.setTradestatflag(TradeStatFlagEnum.FINISH_SUCCESS.getStatus());
+        }else{
+        	txnsLog.setTradestatflag(TradeStatFlagEnum.FINISH_FAILED.getStatus());
+        }*/
+        String hql = "update TxnsLogModel set retcode=?,retinfo=?,tradestatflag=? where txnseqno=?";
+        super.updateByHQL(hql,new Object[]{retcode,retinfo,"0000".equals(retcode)?TradeStatFlagEnum.FINISH_SUCCESS.getStatus():TradeStatFlagEnum.FINISH_FAILED.getStatus(),txnseqno});
+        //super.update(txnsLog);
     }
     
     
@@ -235,6 +260,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
     
     
     @Transactional
+    @Deprecated
     public ResultBean updateRoutInfo(String txnseqno,String routId,String currentStep,String cashCode){
         ResultBean resultBean =null;
         try {
@@ -251,6 +277,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
     }
     
     @Transactional
+    @Deprecated
     public void updateWapRoutInfo(String txnseqno,String routId) throws TradeException{
         try {
           TxnsLogModel txnsLog = super.get(txnseqno);
@@ -281,12 +308,12 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         }
         return null;
     }
-    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
     public ResultBean updateAppInfo(AppPartyBean appParty){
         ResultBean resultBean =null;
         try {
-            String hql = "update TxnsLogModel set appinst=?,appordcommitime=?,appordno=?,appordfintime=?,accordfintime=? where txnseqno = ?";
-            int row = super.updateByHQL(hql, new Object[]{appParty.getAppinst(),appParty.getAppordcommitime(),appParty.getAppordno(),appParty.getAppordfintime(),DateUtil.getCurrentDateTime(),appParty.getTxnseqno()});
+            String hql = "update TxnsLogModel set appinst=?,appordcommitime=?,appordno=?,appordfintime=?,accordfintime=?,tradestatflag=? where txnseqno = ?";
+            int row = super.updateByHQL(hql, new Object[]{appParty.getAppinst(),appParty.getAppordcommitime(),appParty.getAppordno(),appParty.getAppordfintime(),DateUtil.getCurrentDateTime(),TradeStatFlagEnum.FINISH_ACCOUNTING.getStatus(),appParty.getTxnseqno()});
             log.info("effect rows:"+row);
             resultBean = new ResultBean("success");
         } catch (Exception e) {
@@ -302,7 +329,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
      * @return
      */
     @Override
-    @Transactional(propagation=Propagation.REQUIRED)
+    @Transactional(readOnly=true,isolation=Isolation.READ_COMMITTED)
     public TxnsLogModel getTxnsLogByTxnseqno(String txnseqno) {
         return super.get(txnseqno);
     }
@@ -354,20 +381,29 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
     }
     @Transactional(propagation=Propagation.REQUIRES_NEW)
     public void updateCMBCWithholdingRetInfo(String txnseqno, TxnsWithholdingModel withholdin) {
-        TxnsLogModel txnsLog = super.get(txnseqno);
-        txnsLog.setPayretinfo(withholdin.getExecmsg());
-        txnsLog.setPayretcode(withholdin.getExeccode());
+    	String hql = "update TxnsLogModel set payretcode=?,payretinfo=?,retcode=?,retinfo=?,tradestatflag=? where txnseqno = ?";
+    	Object[] paramaters = null;
+    	
+//        TxnsLogModel txnsLog = super.get(txnseqno);
+//        txnsLog.setPayretinfo(withholdin.getExecmsg());
+//        txnsLog.setPayretcode(withholdin.getExeccode());
         try {
-            PojoRspmsg msg =   rspmsgDAO.getRspmsgByChnlCode(ChnlTypeEnum.CMBCWITHHOLDING,withholdin.getExeccode().trim());
-            txnsLog.setRetinfo(msg.getRspinfo());
-            txnsLog.setRetcode(msg.getWebrspcode());
+            PojoRspmsg msg = rspmsgDAO.getRspmsgByChnlCode(ChnlTypeEnum.CMBCWITHHOLDING,withholdin.getExeccode().trim());
+//            txnsLog.setRetinfo(msg.getRspinfo());
+//            txnsLog.setRetcode(msg.getWebrspcode());
+            paramaters = new Object[]{withholdin.getExeccode(),withholdin.getExecmsg(),msg.getWebrspcode(),msg.getRspinfo(),
+            		"0000".equals(msg.getWebrspcode())?TradeStatFlagEnum.FINISH_SUCCESS.getStatus():TradeStatFlagEnum.FINISH_FAILED.getStatus()
+            		,txnseqno};
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-            txnsLog.setRetinfo(withholdin.getExecmsg());
-            txnsLog.setRetcode(withholdin.getExeccode());
+//            txnsLog.setRetinfo(withholdin.getExecmsg());
+//            txnsLog.setRetcode(withholdin.getExeccode());
+            paramaters = new Object[]{withholdin.getExeccode(),withholdin.getExecmsg(),withholdin.getExeccode(),withholdin.getExecmsg(),
+            		TradeStatFlagEnum.FINISH_FAILED.getStatus(),txnseqno};
         }
-        super.update(txnsLog);
+//        super.update(txnsLog);
+        super.updateByHQL(hql, paramaters);
     }
 
     /**
@@ -1144,10 +1180,80 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 	}
 	
 	@Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
-	public void udpateTradeStatFlag(String txnseqno,TradeStatFlagEnum tradeStatFlagEnum){
+	public void updateTradeStatFlag(String txnseqno,TradeStatFlagEnum tradeStatFlagEnum){
 		String hql = "update TxnsLogModel set tradestatflag = ? where txnseqno = ?";
 		super.updateByHQL(hql, new Object[]{tradeStatFlagEnum.getStatus(),txnseqno});
 	}
 	
 	
+	public void updateCMBCTradeData(PayPartyBean payPartyBean){
+		Object[] paramaters = null;
+        TxnsLogModel txnsLog = getTxnsLogByTxnseqno(payPartyBean.getTxnseqno());
+        Map<String, Object> cardMap = null;
+        if(StringUtil.isNotEmpty(payPartyBean.getCardNo())){
+        	cardMap = getCardInfo(payPartyBean.getCardNo());
+        }
+        String hql = "update TxnsLogModel set paytype=?,payordno=?,payinst=?,payfirmerno=?,payordcomtime=?,pan=?,cardtype=?,cardinstino=?,txnfee=?,pan_name=?,payrettsnseqno=?,payretcode=?,payretinfo=?,retcode=?,retinfo=?,tradestatflag=?,payordfintime=?, retdatetime=?,tradetxnflag=?,relate=?,tradeseltxn=? where txnseqno=?";
+        
+	    try {
+	        PojoRspmsg msg = rspmsgDAO.getRspmsgByChnlCode(ChnlTypeEnum.CMBCWITHHOLDING,payPartyBean.getPayretcode().trim());
+	        paramaters = new Object[]{
+	        		StringUtil.isNotEmpty(payPartyBean.getPaytype())?payPartyBean.getPaytype():"01",
+					payPartyBean.getPayordno(),
+					payPartyBean.getPayinst(),
+					payPartyBean.getPayfirmerno(),
+					payPartyBean.getPayordcomtime(),
+					payPartyBean.getCardNo(),cardMap==null?"":cardMap.get("TYPE")+"",
+				    cardMap==null?"":cardMap.get("BANKCODE")+"",
+				    getTxnFee(txnsLog),
+				    payPartyBean.getPanName(),
+				    payPartyBean.getPayrettsnseqno(),
+				    payPartyBean.getPayretcode().trim(),
+				    payPartyBean.getPayretinfo().trim(),
+				    msg.getWebrspcode(),msg.getRspinfo(),
+	        		"0000".equals(msg.getWebrspcode())?TradeStatFlagEnum.FINISH_SUCCESS.getStatus():TradeStatFlagEnum.FINISH_FAILED.getStatus(),
+	        		DateUtil.getCurrentDateTime(),
+	        		DateUtil.getCurrentDateTime(),
+	        		"10000000",
+	        		"10000000",
+	        		UUIDUtil.uuid(),
+	        		payPartyBean.getTxnseqno()};
+	    } catch (Exception e) {
+	        paramaters = new Object[]{
+	        		StringUtil.isNotEmpty(payPartyBean.getPaytype())?payPartyBean.getPaytype():"01",
+					payPartyBean.getPayordno(),
+					payPartyBean.getPayinst(),
+					payPartyBean.getPayfirmerno(),
+					payPartyBean.getPayordcomtime(),
+					payPartyBean.getCardNo(),cardMap==null?"":cardMap.get("TYPE")+"",
+				    cardMap==null?"":cardMap.get("BANKCODE")+"",
+				    getTxnFee(txnsLog),
+				    payPartyBean.getPanName(),
+				    payPartyBean.getPayrettsnseqno(),
+				    payPartyBean.getPayretcode().trim(),
+				    payPartyBean.getPayretinfo().trim(),
+				    payPartyBean.getPayretcode().trim(),
+				    payPartyBean.getPayretinfo().trim(),
+	        		TradeStatFlagEnum.FINISH_FAILED.getStatus(),
+	        		DateUtil.getCurrentDateTime(),
+	        		DateUtil.getCurrentDateTime(),
+	        		"10000000",
+	        		"10000000",
+	        		UUIDUtil.uuid(),
+	        		payPartyBean.getTxnseqno()};
+	    }
+	    super.updateByHQL(hql, paramaters);
+	}
+	
+	public void updateSMSErrorData(String txnseqno,String retcode,String retinfo){
+    	String hql = "update TxnsLogModel set payretcode=?,payretinfo=?,retcode=?,retinfo=?,tradestatflag=? where txnseqno=?";
+    	super.updateByHQL(hql, new Object[]{
+    			retcode,
+    			retinfo,
+    			retcode,
+    			retinfo,
+    			"0000".equals(retcode)?TradeStatFlagEnum.FINISH_SUCCESS.getStatus():TradeStatFlagEnum.FINISH_FAILED.getStatus(),
+    			txnseqno}
+    	);
+    }
 }

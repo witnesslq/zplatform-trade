@@ -148,8 +148,7 @@ public class ChanpayQuickPayTradeThread implements IQuickPayTrade{
 	 */
 	@Override
 	public ResultBean queryTrade(TradeBean trade) {
-		// TODO Auto-generated method stub
-		return null;
+		return chanPayQuickPayService.queryTrade(trade.getTxnseqno());
 	}
 	/**
 	 *

@@ -26,7 +26,8 @@ public enum TradeStatFlagEnum {
 	PAYING("0010000"),
 	OVERTIME("0000010"),
 	FINISH_FAILED("0001001"),
-	FINISH_SUCCESS("0000101"),
+	FINISH_SUCCESS("0000100"),
+	FINISH_ACCOUNTING("0000101"),
 	FINSH("0000001"),
 	UNKNOW("");
 	
@@ -38,7 +39,7 @@ public enum TradeStatFlagEnum {
     
     public static TradeStatFlagEnum fromValue(String value) {
         for(TradeStatFlagEnum enums:values()){
-            if(enums.status==value){
+            if(enums.status.equals(value)){
                 return enums;
             }
         }

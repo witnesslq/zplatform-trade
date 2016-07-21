@@ -821,13 +821,14 @@ public class ChanPayCollectMoneyServiceImpl implements ChanPayCollectMoneyServic
 		ResultBean resultBean = null;
 		G20001Bean data = new G20001Bean();
 		try {
-			data.setMertid("cp2016051996321");
+			data.setMertid(ConsUtil.getInstance().cons.getChanpay_cj_merchant_id());
 			data.setQryReqSn(qry_req_sn);
 			data.setSummary("");
 			data.setPostscript("");
 			data.setReqSn(U.createUUID());
 			buildCjmsgAndSend(data);
 			resultBean = new ResultBean(data);
+			resultBean.setErrCode(data.getRetCode());
 		} catch (TradeException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
