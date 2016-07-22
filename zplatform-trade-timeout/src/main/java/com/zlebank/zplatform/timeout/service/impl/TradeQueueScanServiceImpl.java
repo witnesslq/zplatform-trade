@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import com.zlebank.zplatform.timeout.pool.TradeQueueThreadPool;
 import com.zlebank.zplatform.timeout.service.TradeQueueQuery;
 import com.zlebank.zplatform.timeout.service.TradeQueueScanService;
+import com.zlebank.zplatform.timeout.trade.CMBCTradeThread;
 import com.zlebank.zplatform.timeout.trade.ChanPayTradeThread;
 import com.zlebank.zplatform.trade.bean.TradeQueueBean;
 import com.zlebank.zplatform.trade.bean.enums.ChannelEnmu;
@@ -69,6 +70,9 @@ public class TradeQueueScanServiceImpl implements TradeQueueScanService{
 					TradeQueueQuery tradeQueueQuery = null;
 					if(ChannelEnmu.CHANPAYCOLLECTMONEY.getChnlcode().equals(tradeQueueBean.getPayInsti())){
 						tradeQueueQuery = new ChanPayTradeThread();
+						tradeQueueQuery.setTradeQueueBean(tradeQueueBean);
+					}else if (ChannelEnmu.CMBCWITHHOLDING.getChnlcode().equals(tradeQueueBean.getPayInsti())) {
+						tradeQueueQuery = new CMBCTradeThread();
 						tradeQueueQuery.setTradeQueueBean(tradeQueueBean);
 					}
 					if(ConsUtil.getInstance().cons.getIs_junit()==1){

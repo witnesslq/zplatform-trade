@@ -24,7 +24,9 @@ import com.zlebank.zplatform.trade.bean.enums.TradeStatFlagEnum;
 import com.zlebank.zplatform.trade.chanpay.bean.cj.G10001Bean;
 import com.zlebank.zplatform.trade.chanpay.bean.cj.G20001Bean;
 import com.zlebank.zplatform.trade.chanpay.service.ChanPayQuickPayService;
+import com.zlebank.zplatform.trade.cmbc.service.CMBCCrossLineQuickPayService;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
+import com.zlebank.zplatform.trade.model.TxnsWithholdingModel;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
 
 /**
@@ -43,6 +45,9 @@ public class TradeCompleteProcessingServiceImpl implements TradeCompleteProcessi
 	private ITxnsLogService txnsLogService;
 	@Autowired
 	private ChanPayQuickPayService chanPayQuickPayService;
+	@Autowired
+	private CMBCCrossLineQuickPayService cmbcCrossLineQuickPayService;
+	
 	
 	/**
 	 *
@@ -66,6 +71,19 @@ public class TradeCompleteProcessingServiceImpl implements TradeCompleteProcessi
 				bean.setErrMsg(data.getErrMsg());
 				resultBean.setResultObj(bean);
 				chanPayQuickPayService.dealWithAccounting(resultBean, txnseqno);
+			}
+		}
+	}
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+	public void cmbcCrossLineCompleteTrade(String txnseqno,ResultBean resultBean) {
+		TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(txnseqno);
+		TradeStatFlagEnum tradeStatFlagEnum = TradeStatFlagEnum.fromValue(txnsLog.getTradestatflag());
+		if(tradeStatFlagEnum==TradeStatFlagEnum.PAYING||tradeStatFlagEnum==TradeStatFlagEnum.OVERTIME){//交易支付中或者交易超时
+			TxnsWithholdingModel withholding = (TxnsWithholdingModel) resultBean.getResultObj();
+			log.info("接收民生交易查询流水数据：" + JSON.toJSONString(withholding));
+			txnsLogService.updateCMBCWithholdingRetInfo(txnseqno,withholding);
+			if ("000000".equals(withholding.getOriexeccode())) {// 交易成功
+				cmbcCrossLineQuickPayService.dealWithAccounting(txnseqno, resultBean);
 			}
 		}
 	}

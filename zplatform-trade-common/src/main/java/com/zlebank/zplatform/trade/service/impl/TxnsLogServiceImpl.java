@@ -318,6 +318,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
             resultBean = new ResultBean("success");
         } catch (Exception e) {
             resultBean = new ResultBean("RC33","业务处理失败");
+            e.printStackTrace();
         }
         return resultBean;
     }
@@ -1185,7 +1186,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 		super.updateByHQL(hql, new Object[]{tradeStatFlagEnum.getStatus(),txnseqno});
 	}
 	
-	
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
 	public void updateCMBCTradeData(PayPartyBean payPartyBean){
 		Object[] paramaters = null;
         TxnsLogModel txnsLog = getTxnsLogByTxnseqno(payPartyBean.getTxnseqno());

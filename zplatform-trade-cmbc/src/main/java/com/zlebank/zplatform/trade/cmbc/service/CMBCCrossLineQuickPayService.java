@@ -44,4 +44,11 @@ public interface CMBCCrossLineQuickPayService {
 	 * @return
 	 */
 	public ResultBean dealWithAccounting(String txnseqno,ResultBean resultBean);
+	
+	/**
+	 * 民生跨行代扣--交易查询
+	 * @param txnseqno
+	 * @return
+	 */
+	public ResultBean queryTrade(String txnseqno);
 }

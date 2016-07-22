@@ -28,4 +28,11 @@ public interface TradeCompleteProcessingService {
 	 * @param resultBean
 	 */
 	public void chanPayCollectMoneyCompleteTrade(String txnseqno,ResultBean resultBean);
+	
+	/**
+	 * 民生跨行代收交易查询补账方法
+	 * @param txnseqno
+	 * @param resultBean
+	 */
+	public void cmbcCrossLineCompleteTrade(String txnseqno,ResultBean resultBean);
 }

@@ -23,7 +23,9 @@ import com.zlebank.zplatform.trade.cmbc.service.IWithholdingService;
 import com.zlebank.zplatform.trade.dao.RspmsgDAO;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.model.PojoRspmsg;
+import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.model.TxnsWithholdingModel;
+import com.zlebank.zplatform.trade.service.ITxnsLogService;
 import com.zlebank.zplatform.trade.service.ITxnsWithholdingService;
 
 /**
@@ -47,6 +49,9 @@ public class CMBCQuickPayServiceImpl implements ICMBCQuickPayService{
     private ITxnsWithholdingService txnsWithholdingService;
     @Autowired
     private RspmsgDAO rspmsgDAO;
+    @Autowired
+    private ITxnsLogService txnsLogService;
+    
     /**
      * 跨行代扣
      * @param withholdingMsg
@@ -58,7 +63,7 @@ public class CMBCQuickPayServiceImpl implements ICMBCQuickPayService{
             TxnsWithholdingModel withholding = new TxnsWithholdingModel(trade,ChannelEnmu.CMBCWITHHOLDING);
             //处理平安银行bankcode不匹配
             dealWithPingAn(withholding);
-            withholding.setSerialno(generateSerialDateNumber("SEQ_CMBC_REALNAME_QUERY_NO"));
+            withholding.setSerialno(trade.getPayOrderNo());
             txnsWithholdingService.saveWithholdingLog(withholding);
             WithholdingMessageBean withholdingMsg = new WithholdingMessageBean(withholding);
             withholdingMsg.setWithholding(withholding);
@@ -134,6 +139,65 @@ public class CMBCQuickPayServiceImpl implements ICMBCQuickPayService{
             e.printStackTrace();
         }
     }
+    
+    public ResultBean queryCrossLineTrade(String txnseqno){
+    	ResultBean resultBean = null;
+    	try {
+			TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(txnseqno);
+			TxnsWithholdingModel withholding_old = txnsWithholdingService.getWithholdingBySerialNo(txnsLog.getPayordno());
+			TxnsWithholdingModel withholding = new TxnsWithholdingModel(withholding_old.getTransdate(),withholding_old.getSerialno(),txnseqno,ChannelEnmu.CMBCWITHHOLDING);
+			txnsWithholdingService.saveWithholdingLog(withholding);
+			withholdingService.realTimeWitholdinghQuery(withholding);
+			resultBean = queryCrossLineTradeResult(withholding.getSerialno());
+			
+		} catch (TradeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			resultBean = new ResultBean("T000", e.getMessage());
+		} catch (CMBCTradeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			resultBean = new ResultBean(e.getCode(), e.getMessage());
+		}
+    	return resultBean;
+    }
+    
+    public ResultBean queryCrossLineTradeResult(String serialno) {
+        TxnsWithholdingModel withholding = null;
+        ResultBean resultBean = null;
+        int[] timeArray = new int[]{1000, 2000, 4000, 4000, 4000};
+        try {
+            for (int i = 0; i < 5; i++) {
+                withholding = txnsWithholdingService.getWithholdingBySerialNo(serialno);
+                if(!StringUtil.isEmpty(withholding.getExectype())){
+                    if("S".equalsIgnoreCase(withholding.getOriexectype())){
+                        resultBean = new ResultBean(withholding);
+                        break;
+                    }else if("E".equalsIgnoreCase(withholding.getOriexectype())){
+                    	PojoRspmsg msg = rspmsgDAO.getRspmsgByChnlCode(ChnlTypeEnum.CMBCWITHHOLDING, withholding.getOriexeccode());
+                        resultBean = new ResultBean(msg.getWebrspcode(),msg.getRspinfo());
+                        break;
+                    }else if("R".equalsIgnoreCase(withholding.getOriexectype())){
+                        resultBean = new ResultBean("R","正在支付中");
+                        break;
+                    }
+                }
+                Thread.sleep(timeArray[i]);
+            }
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            resultBean = new ResultBean("09", e.getMessage());
+        }
+        
+        return resultBean;
+    }
+    
+    
+    
+    
+    
+    
     
     /**
      * 民生银行本行代扣（确认支付）

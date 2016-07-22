@@ -137,7 +137,7 @@ public class OrderNumber {
     }
     
     
-    @Transactional
+    
     public String generateRealNameOrderNo(){
         return generateSerialDateNumber("SEQ_CMBC_REALNAME_NO");
     }

@@ -44,6 +44,7 @@ import com.zlebank.zplatform.trade.service.ITxnsQuickpayService;
 import com.zlebank.zplatform.trade.service.ITxnsWithholdingService;
 import com.zlebank.zplatform.trade.service.TradeNotifyService;
 import com.zlebank.zplatform.trade.utils.ConsUtil;
+import com.zlebank.zplatform.trade.utils.OrderNumber;
 import com.zlebank.zplatform.trade.utils.UUIDUtil;
 
 /**
@@ -143,13 +144,6 @@ public class CMBCCrossLineQuickPayServiceImpl implements CMBCCrossLineQuickPaySe
 			} else if (retCode == 3) {
 				resultBean = new ResultBean("30HK", "交易失败，动态口令或短信验证码校验失败");
 			}
-			// 更新支付方信息
-			PayPartyBean payPartyBean = new PayPartyBean(tradeBean.getTxnseqno(),
-					"01", "", "93000002",
-					ConsUtil.getInstance().cons.getCmbc_merid(), "",
-					DateUtil.getCurrentDateTime(), "", tradeBean.getCardNo());
-			payPartyBean.setPanName(tradeBean.getAcctName());
-			txnsLogService.updatePayInfo_Fast(payPartyBean);
 			if (resultBean != null) {
 				//txnsLogService.updatePayInfo_Fast_result(tradeBean.getTxnseqno(), resultBean.getErrCode(),resultBean.getErrMsg());
 				//txnsLogService.updateCoreRetResult(tradeBean.getTxnseqno(),resultBean.getErrCode(), resultBean.getErrMsg());
@@ -157,6 +151,14 @@ public class CMBCCrossLineQuickPayServiceImpl implements CMBCCrossLineQuickPaySe
                 txnsOrderinfoDAO.updateOrderToFail(tradeBean.getTxnseqno());
 				return resultBean;
 			}
+			// 更新支付方信息
+			PayPartyBean payPartyBean = new PayPartyBean(tradeBean.getTxnseqno(),
+					"01", OrderNumber.getInstance().generateWithholdingOrderNo(), "93000002",
+					ConsUtil.getInstance().cons.getCmbc_merid(), "",
+					DateUtil.getCurrentDateTime(), "", tradeBean.getCardNo());
+			payPartyBean.setPanName(tradeBean.getAcctName());
+			txnsLogService.updatePayInfo_Fast(payPartyBean);
+			tradeBean.setPayOrderNo(payPartyBean.getPayordno());
 			tradeBean.setPayinstiId(ChannelEnmu.CMBCWITHHOLDING.getChnlcode());
 			// 获取持卡人所属省份代码
 			tradeBean.setProvno(provinceDAO.getProvinceByXZCode(tradeBean.getCertId().substring(0, 2)).getProvinceId()+ "");
@@ -219,9 +221,12 @@ public class CMBCCrossLineQuickPayServiceImpl implements CMBCCrossLineQuickPaySe
             e.printStackTrace();
             resultBean = new ResultBean("T000", e.getMessage());
         }
-        
-        
 		return resultBean;
+	}
+	
+	public ResultBean queryTrade(String txnseqno){
+		
+		return cmbcQuickPayService.queryCrossLineTrade(txnseqno);
 	}
 	
 }

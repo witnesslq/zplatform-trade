@@ -423,11 +423,13 @@ public class ChanPayCollectMoneyServiceImpl implements ChanPayCollectMoneyServic
 						data.setRetCode(bean.getDtlRetCode());
 						data.setErrMsg(bean.getDtlErrMsg());
 						resultBean = new ResultBean(data);
+						resultBean.setResultBool(false);
 						break;
 					}else{//未知原因导致的失败
 						data.setRetCode(bean.getDtlRetCode());
 						data.setErrMsg(bean.getDtlErrMsg());
 						resultBean = new ResultBean(data);
+						resultBean.setResultBool(false);
 						break;
 					}
 					

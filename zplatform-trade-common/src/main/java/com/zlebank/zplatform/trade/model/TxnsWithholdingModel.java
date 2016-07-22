@@ -217,7 +217,7 @@ public class TxnsWithholdingModel implements java.io.Serializable {
     public TxnsWithholdingModel(String oritransdate,String orireqserialno,String txnseqno,ChannelEnmu channel) {
         switch (channel) {
             case CMBCWITHHOLDING :
-                this.serialno = OrderNumber.getInstance().generateRealNameOrderNo();
+                this.serialno = OrderNumber.getInstance().generateWithholdingQueryOrderNo();
                 this.merid = ConsUtil.getInstance().cons.getCmbc_merid();
                 this.mername = ConsUtil.getInstance().cons.getCmbc_mername();
                 this.transdate = DateUtil.getCurrentDate();

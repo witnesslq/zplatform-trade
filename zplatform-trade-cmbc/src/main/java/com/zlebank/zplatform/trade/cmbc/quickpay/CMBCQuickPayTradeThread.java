@@ -184,8 +184,7 @@ public class CMBCQuickPayTradeThread implements IQuickPayTrade {
 
 	@Override
 	public ResultBean queryTrade(TradeBean trade) {
-		// TODO Auto-generated method stub
-		return null;
+		return cmbcCrossLineQuickPayService.queryTrade(trade.getTxnseqno());
 	}
 
 	@Override
