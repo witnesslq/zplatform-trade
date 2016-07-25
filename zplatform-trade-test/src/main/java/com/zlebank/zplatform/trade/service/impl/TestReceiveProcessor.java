@@ -106,7 +106,7 @@ public class TestReceiveProcessor implements ITradeReceiveProcessor{
             // 应用方信息
             AppPartyBean appParty = new AppPartyBean("",
                     "000000000000", commiteTime,
-                    DateUtil.getCurrentDateTime(), tradeBean.getTxnseqno(), "AC000000");
+                    DateUtil.getCurrentDateTime(), tradeBean.getTxnseqno(), "");
             txnsLogService.updateAppInfo(appParty);
             try {
                 IAccounting accounting = AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue(txnsLogService.getTxnsLogByTxnseqno(tradeBean.getTxnseqno()).getBusitype()));

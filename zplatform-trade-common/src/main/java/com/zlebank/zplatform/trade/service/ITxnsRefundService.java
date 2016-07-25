@@ -66,4 +66,16 @@ public interface ITxnsRefundService extends IBaseService<TxnsRefundModel, Long>{
      * @return
      */
     public Long getSumAmtByOldTxnseqno(String txnseqno_old);
+    
+    /**
+     * 更新退款订单状态为成功
+     * @param txnseqno
+     */
+    public void updateToSuccess(String txnseqno);
+    
+    /**
+     * 更新退款订单状态为失败
+     * @param txnseqno
+     */
+    public void updateToFailed(String txnseqno);
 }

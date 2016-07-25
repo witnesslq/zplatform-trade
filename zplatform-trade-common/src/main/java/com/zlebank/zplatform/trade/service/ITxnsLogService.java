@@ -330,4 +330,16 @@ public interface ITxnsLogService extends IBaseService<TxnsLogModel, String>{
 	 * @param retinfo
 	 */
 	public void updateSMSErrorData(String txnseqno,String retcode,String retinfo);
+	
+	/**
+	 * 更新微信核心交易数据
+	 * @param payPartyBean
+	 */
+	public void updateWeChatTradeData(PayPartyBean payPartyBean);
+	
+	/**
+	 * 更新交易失败时的数据
+	 * @param payPartyBean payinst必须有否则无法更新成功
+	 */
+	public void updateTradeFailed(PayPartyBean payPartyBean);
 }

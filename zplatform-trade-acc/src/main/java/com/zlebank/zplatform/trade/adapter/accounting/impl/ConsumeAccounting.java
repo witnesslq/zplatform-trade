@@ -143,7 +143,10 @@ public class ConsumeAccounting implements IAccounting{
 			} catch (IllegalEntryRequestException e) {
 				// TODO Auto-generated catch block
 				resultBean = new ResultBean(e.getCode(), e.getMessage());
-            } 
+            } catch (Exception e) {
+				// TODO: handle exception
+            	e.printStackTrace();
+			}
         
         if(txnsLog==null){
             return resultBean;

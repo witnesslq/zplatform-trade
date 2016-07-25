@@ -83,6 +83,7 @@ public class RefundAccounting implements IAccounting{
             log.info("退款交易成功，交易序列号:"+txnseqno);
             txnsLog.setApporderinfo("退款账务成功(交易成功)");
         } else {
+        	tradeInfo.setChannelId(txnsLog.getPayinst());
             entryEvent = EntryEvent.TRADE_FAIL;
             log.info("退款交易失败，交易序列号:"+txnseqno);
             txnsLog.setApporderinfo("退款账务成功(交易失败)");
@@ -93,7 +94,7 @@ public class RefundAccounting implements IAccounting{
         	txnsLog.setAppordcommitime(DateUtil.getCurrentDateTime());
         	txnsLog.setAppinst("000000000000");
             accEntryService.accEntryProcess(tradeInfo, entryEvent);
-            txnsRefundService.update(refund);
+            txnsRefundService.updateRefund(refund);
             txnsOrderinfoDAO.updateOrderinfo(order);
             txnsLog.setApporderstatus(AccStatusEnum.Finish.getCode());
             txnsLog.setAppordfintime(DateUtil.getCurrentDateTime());

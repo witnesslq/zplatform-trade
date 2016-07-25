@@ -12,6 +12,8 @@ package com.zlebank.zplatform.trade.bean;
 
 import java.io.Serializable;
 
+import com.zlebank.zplatform.trade.bean.enums.ChnlTypeEnum;
+
 /**
  * Class Description
  *
@@ -42,7 +44,7 @@ public class PayPartyBean implements Serializable{
     
     private String panName;
     
-    
+    private ChnlTypeEnum chnlTypeEnum;
     /**
      * @return the paytype
      */
@@ -290,6 +292,18 @@ public class PayPartyBean implements Serializable{
 	public void setPanName(String panName) {
 		this.panName = panName;
 
+	}
+	/**
+	 * @return the chnlTypeEnum
+	 */
+	public ChnlTypeEnum getChnlTypeEnum() {
+		return chnlTypeEnum;
+	}
+	/**
+	 * @param chnlTypeEnum the chnlTypeEnum to set
+	 */
+	public void setChnlTypeEnum(ChnlTypeEnum chnlTypeEnum) {
+		this.chnlTypeEnum = chnlTypeEnum;
 	}
     
     

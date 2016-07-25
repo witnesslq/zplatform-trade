@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
+import com.zlebank.zplatform.commons.dao.pojo.BusiTypeEnum;
 import com.zlebank.zplatform.timeout.service.TradeCompleteProcessingService;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.enums.TradeStatFlagEnum;
@@ -28,6 +29,8 @@ import com.zlebank.zplatform.trade.cmbc.service.CMBCCrossLineQuickPayService;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.model.TxnsWithholdingModel;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
+import com.zlebank.zplatform.wechat.service.WeChatService;
+import com.zlebank.zplatform.wechat.wx.bean.QueryOrderResultBean;
 
 /**
  * Class Description
@@ -47,6 +50,8 @@ public class TradeCompleteProcessingServiceImpl implements TradeCompleteProcessi
 	private ChanPayQuickPayService chanPayQuickPayService;
 	@Autowired
 	private CMBCCrossLineQuickPayService cmbcCrossLineQuickPayService;
+	@Autowired
+	private WeChatService weChatService;
 	
 	
 	/**
@@ -85,6 +90,23 @@ public class TradeCompleteProcessingServiceImpl implements TradeCompleteProcessi
 			if ("000000".equals(withholding.getOriexeccode())) {// 交易成功
 				cmbcCrossLineQuickPayService.dealWithAccounting(txnseqno, resultBean);
 			}
+		}
+	}
+	/**
+	 *
+	 * @param txnseqno
+	 * @param resultBean
+	 */
+	@Override
+	public void weChatCompleteTrade(String txnseqno, ResultBean resultBean) {
+		// TODO Auto-generated method stub
+		TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(txnseqno);
+		TradeStatFlagEnum tradeStatFlagEnum = TradeStatFlagEnum.fromValue(txnsLog.getTradestatflag());
+		if(tradeStatFlagEnum==TradeStatFlagEnum.PAYING||tradeStatFlagEnum==TradeStatFlagEnum.OVERTIME){//交易支付中或者交易超时
+			QueryOrderResultBean result = (QueryOrderResultBean) resultBean.getResultObj();
+			log.info("接收微信交易查询应答数据：" + JSON.toJSONString(result));
+			weChatService.dealWithAccounting(txnseqno, resultBean);
+			
 		}
 	}
 

@@ -116,10 +116,6 @@ public class CMBCQuickPayTradeThread implements IQuickPayTrade {
 	public ResultBean submitPay(TradeBean trade) {
 		//支付
 		ResultBean resultBean = cmbcCrossLineQuickPayService.submitPay(trade);
-		//账务
-		if(resultBean.isResultBool()){
-			resultBean = cmbcCrossLineQuickPayService.dealWithAccounting(trade.getTxnseqno(), resultBean);
-		}
 		/*try {
 			log.info("CMBC submit Pay start!");
 			if (log.isDebugEnabled()) {

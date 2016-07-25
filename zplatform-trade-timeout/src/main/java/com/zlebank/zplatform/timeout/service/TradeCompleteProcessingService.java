@@ -35,4 +35,11 @@ public interface TradeCompleteProcessingService {
 	 * @param resultBean
 	 */
 	public void cmbcCrossLineCompleteTrade(String txnseqno,ResultBean resultBean);
+	
+	/**
+	 * 微信交易查询补账方法
+	 * @param txnseqno
+	 * @param resultBean
+	 */
+	public void weChatCompleteTrade(String txnseqno,ResultBean resultBean);
 }

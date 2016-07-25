@@ -67,4 +67,19 @@ public interface WeChatService {
 	 * @return
 	 */
 	public ResultBean queryWechatOrder(TradeBean trade);
+	
+	/**
+	 * 查询微信交易订单和退款订单结果
+	 * @param txnseqno
+	 * @return
+	 */
+	public ResultBean queryOrder(String txnseqno);
+	
+	/**
+	 * 处理交易查询后账务数据
+	 * @param txnseqno
+	 * @param resultBean
+	 * @return
+	 */
+	public ResultBean dealWithAccounting(String txnseqno,ResultBean resultBean);
 }

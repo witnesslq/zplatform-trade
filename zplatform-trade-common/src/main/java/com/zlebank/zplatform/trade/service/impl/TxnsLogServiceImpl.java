@@ -1186,7 +1186,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 		super.updateByHQL(hql, new Object[]{tradeStatFlagEnum.getStatus(),txnseqno});
 	}
 	
-	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+	@Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
 	public void updateCMBCTradeData(PayPartyBean payPartyBean){
 		Object[] paramaters = null;
         TxnsLogModel txnsLog = getTxnsLogByTxnseqno(payPartyBean.getTxnseqno());
@@ -1257,4 +1257,72 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
     			txnseqno}
     	);
     }
+	
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+	public void updateWeChatTradeData(PayPartyBean payPartyBean){
+		Object[] paramaters = null;
+       
+        String hql = "update TxnsLogModel set payrettsnseqno=?,payretcode=?,payretinfo=?,retcode=?,retinfo=?,tradestatflag=?,payordfintime=?, retdatetime=?,tradetxnflag=?,relate=?,tradeseltxn=? where txnseqno=?";
+        
+	    try {
+	        PojoRspmsg msg = rspmsgDAO.getRspmsgByChnlCode(ChnlTypeEnum.WECHAT,payPartyBean.getPayretcode().trim());
+	        paramaters = new Object[]{
+				    payPartyBean.getPayrettsnseqno(),
+				    payPartyBean.getPayretcode().trim(),
+				    payPartyBean.getPayretinfo().trim(),
+				    msg.getWebrspcode(),
+				    msg.getRspinfo(),
+	        		"0000".equals(msg.getWebrspcode())?TradeStatFlagEnum.FINISH_SUCCESS.getStatus():TradeStatFlagEnum.FINISH_FAILED.getStatus(),
+	        		DateUtil.getCurrentDateTime(),
+	        		DateUtil.getCurrentDateTime(),
+	        		"10000000",
+	        		"10000000",
+	        		UUIDUtil.uuid(),
+	        		payPartyBean.getTxnseqno()};
+	    } catch (Exception e) {
+	        paramaters = new Object[]{
+				    payPartyBean.getPayrettsnseqno(),
+				    payPartyBean.getPayretcode().trim(),
+				    payPartyBean.getPayretinfo().trim(),
+				    "3499",
+				    payPartyBean.getPayretinfo().trim(),
+	        		TradeStatFlagEnum.FINISH_FAILED.getStatus(),
+	        		DateUtil.getCurrentDateTime(),
+	        		DateUtil.getCurrentDateTime(),
+	        		"10000000",
+	        		"10000000",
+	        		UUIDUtil.uuid(),
+	        		payPartyBean.getTxnseqno()};
+	    }
+	    super.updateByHQL(hql, paramaters);
+	}
+	
+	
+	public void updateTradeFailed(PayPartyBean payPartyBean){
+		String hql = "update TxnsLogModel set payretcode=?,payretinfo=?,retcode=?,retinfo=?,tradestatflag=?,payordfintime=? where txnseqno=?";
+		Object[] paramaters = null;
+		
+		try {
+	        PojoRspmsg msg = rspmsgDAO.getRspmsgByChnlCode(ChnlTypeEnum.fromValue(payPartyBean.getPayinst()),payPartyBean.getPayretcode().trim());
+	        paramaters = new Object[]{
+				    payPartyBean.getPayretcode().trim(),
+				    payPartyBean.getPayretinfo().trim(),
+				    msg.getWebrspcode(),
+				    msg.getRspinfo(),
+	        		TradeStatFlagEnum.FINISH_FAILED.getStatus(),
+	        		DateUtil.getCurrentDateTime(),
+	        		payPartyBean.getTxnseqno()};
+	    } catch (Exception e) {
+	        paramaters = new Object[]{
+				    payPartyBean.getPayrettsnseqno(),
+				    payPartyBean.getPayretcode().trim(),
+				    payPartyBean.getPayretinfo().trim(),
+				    "3499",
+				    payPartyBean.getPayretinfo().trim(),
+	        		TradeStatFlagEnum.FINISH_FAILED.getStatus(),
+	        		DateUtil.getCurrentDateTime(),
+	        		payPartyBean.getTxnseqno()};
+	    }
+		 super.updateByHQL(hql, paramaters);
+	}
 }

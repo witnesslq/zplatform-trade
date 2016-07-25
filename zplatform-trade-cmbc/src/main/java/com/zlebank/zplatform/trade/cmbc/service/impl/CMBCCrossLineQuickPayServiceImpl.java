@@ -192,7 +192,7 @@ public class CMBCCrossLineQuickPayServiceImpl implements CMBCCrossLineQuickPaySe
         if(StringUtil.isNotEmpty(withholding.getOrireqserialno())){
             TxnsWithholdingModel old_withholding = txnsWithholdingService.getWithholdingBySerialNo(withholding.getOrireqserialno());
             //更新支付方信息
-            payPartyBean = new PayPartyBean(txnseqno,"01", withholding.getSerialno(), old_withholding.getChnlcode(), ConsUtil.getInstance().cons.getCmbc_merid(), "", DateUtil.getCurrentDateTime(), "",old_withholding.getAccno(),withholding.getPayserialno());
+            payPartyBean = new PayPartyBean(txnseqno,"01", withholding.getOrireqserialno(), old_withholding.getChnlcode(), ConsUtil.getInstance().cons.getCmbc_merid(), "", DateUtil.getCurrentDateTime(), "",old_withholding.getAccno(),withholding.getPayserialno());
         }else{
             payPartyBean = new PayPartyBean(txnseqno,"01", withholding.getSerialno(), withholding.getChnlcode(), ConsUtil.getInstance().cons.getCmbc_merid(), "", DateUtil.getCurrentDateTime(), "",withholding.getAccno(),withholding.getPayserialno());
         }
