@@ -342,4 +342,10 @@ public interface ITxnsLogService extends IBaseService<TxnsLogModel, String>{
 	 * @param payPartyBean payinst必须有否则无法更新成功
 	 */
 	public void updateTradeFailed(PayPartyBean payPartyBean);
+	
+	/**
+	 * 更新交易核心数据和支付方数据
+	 * @param payPartyBean
+	 */
+	public void updateTradeData(PayPartyBean payPartyBean);
 }

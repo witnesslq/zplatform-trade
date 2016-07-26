@@ -20,6 +20,9 @@ import com.zlebank.zplatform.timeout.service.TradeQueueQuery;
 import com.zlebank.zplatform.timeout.service.TradeQueueScanService;
 import com.zlebank.zplatform.timeout.trade.CMBCTradeThread;
 import com.zlebank.zplatform.timeout.trade.ChanPayTradeThread;
+import com.zlebank.zplatform.timeout.trade.ReaPayTradeThread;
+import com.zlebank.zplatform.timeout.trade.WeChatTradeThread;
+import com.zlebank.zplatform.trade.bean.ReaPayResultBean;
 import com.zlebank.zplatform.trade.bean.TradeQueueBean;
 import com.zlebank.zplatform.trade.bean.enums.ChannelEnmu;
 import com.zlebank.zplatform.trade.bean.enums.TradeQueueEnum;
@@ -29,7 +32,6 @@ import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.service.IChnlDetaService;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
 import com.zlebank.zplatform.trade.service.TradeQueueService;
-import com.zlebank.zplatform.trade.service.impl.ChnlDetaServiceImpl;
 import com.zlebank.zplatform.trade.utils.ConsUtil;
 
 /**
@@ -68,11 +70,18 @@ public class TradeQueueScanServiceImpl implements TradeQueueScanService{
 					//交易具体的java实现
 					tradeQueueBean.setImpl(chnlDetaModel.getImpl());
 					TradeQueueQuery tradeQueueQuery = null;
-					if(ChannelEnmu.CHANPAYCOLLECTMONEY.getChnlcode().equals(tradeQueueBean.getPayInsti())){
+					ChannelEnmu channelEnmu = ChannelEnmu.fromValue(tradeQueueBean.getPayInsti());
+					if(ChannelEnmu.CHANPAYCOLLECTMONEY==channelEnmu){
 						tradeQueueQuery = new ChanPayTradeThread();
 						tradeQueueQuery.setTradeQueueBean(tradeQueueBean);
-					}else if (ChannelEnmu.CMBCWITHHOLDING.getChnlcode().equals(tradeQueueBean.getPayInsti())) {
+					}else if (ChannelEnmu.CMBCWITHHOLDING==channelEnmu) {
 						tradeQueueQuery = new CMBCTradeThread();
+						tradeQueueQuery.setTradeQueueBean(tradeQueueBean);
+					}else if(ChannelEnmu.WEBCHAT==channelEnmu){
+						tradeQueueQuery = new WeChatTradeThread();
+						tradeQueueQuery.setTradeQueueBean(tradeQueueBean);
+					}else if(ChannelEnmu.REAPAY==channelEnmu){
+						tradeQueueQuery = new ReaPayTradeThread();
 						tradeQueueQuery.setTradeQueueBean(tradeQueueBean);
 					}
 					if(ConsUtil.getInstance().cons.getIs_junit()==1){

@@ -267,5 +267,13 @@ public class QuickpayCustServiceImpl extends BaseServiceImpl<QuickpayCustModel, 
 		 List<QuickpayCustModel> cardList = (List<QuickpayCustModel>) super.queryByHQL("from QuickpayCustModel where cardno=? and accname = ? and phone = ? and idnum = ? and relatememberno = ? and status = ?", new Object[]{cardNo,accName,phone,cerId,memberId,"00"});
 		return cardList;
 	}
+	
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+	public void deleteUnBindCard(Long id){
+		QuickpayCustModel card = super.get(id);
+        if(card!=null){
+            super.delete(card);
+        }
+	}
 
 }

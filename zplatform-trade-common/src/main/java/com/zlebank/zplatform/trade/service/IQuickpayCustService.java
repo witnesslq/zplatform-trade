@@ -103,4 +103,5 @@ public interface IQuickpayCustService extends IBaseService<QuickpayCustModel, Lo
      */
     public List<QuickpayCustModel> getCardList(String cardNo ,String accName, String phone, String cerId, String memberId);
     
+    public void deleteUnBindCard(Long id);
 }

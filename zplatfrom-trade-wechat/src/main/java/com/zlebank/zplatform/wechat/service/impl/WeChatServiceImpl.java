@@ -127,7 +127,7 @@ public class WeChatServiceImpl implements WeChatService{
 		//更新支付方信息
 		PayPartyBean payPartyBean = new PayPartyBean(txnsLog.getTxnseqno(), 
 				"05", 
-				OrderNumber.getInstance().generateWeChatOrderNO(),//payordno, 
+				OrderNumber.getInstance().generateWeChatOrderNO(),//payordno,
 				ChannelEnmu.WEBCHAT.getChnlcode(), 
 				WXConfigure.getMchid(), 
 				"", 
@@ -381,10 +381,10 @@ public class WeChatServiceImpl implements WeChatService{
 					log.info("退款跑批:"+txnseqno+"需商户重新发起");
 			    //3.4 //订单处理中不处理
 				}
-				txnsLog.setPayordfintime(DateUtil.getCurrentDateTime());
-		        txnsLog.setRetdatetime(DateUtil.getCurrentDateTime());
+				//txnsLog.setPayordfintime(DateUtil.getCurrentDateTime());
+		        //txnsLog.setRetdatetime(DateUtil.getCurrentDateTime());
 				//更新支付方信息
-				txnsLogService.updateTxnsLog(txnsLog);
+				//txnsLogService.updateTxnsLog(txnsLog);
 				//更新交易订单信息
 				//txnsOrderinfoDAO.updateOrderinfo(order);
 		        //更新订单状态
@@ -651,13 +651,14 @@ public class WeChatServiceImpl implements WeChatService{
 			log.info("调微信【查询订单状态】出参："+(null==result?"无返回值":result.getReturn_code().toString()));	
 			resultBean = new ResultBean(result);
 		}else if(busiTypeEnum==BusiTypeEnum.refund){
+			TxnsLogModel txnsLog_old = txnsLogService.getTxnsLogByTxnseqno(txnsLog.getTxnseqnoOg());
 			WXApplication instance = new WXApplication();
-			QueryOrderBean rb = new QueryOrderBean();
+			QueryRefundBean rb = new QueryRefundBean();
 			//商户订单号
-			rb.setOut_trade_no(txnsLog.getPayordno());
-			//rb.setTransaction_id(txnsLog.getPayrettsnseqno());
+			rb.setOut_trade_no(txnsLog_old.getPayordno());
+			rb.setTransaction_id(txnsLog_old.getPayrettsnseqno());
 			log.info("调微信【查询订单状态】入参："+rb.toString());
-			QueryOrderResultBean result = instance.queryOrder(rb);
+			QueryRefundResultBean result = instance.refundQuery(rb);
 			log.info("调微信【查询订单状态】出参："+(null==result?"无返回值":result.getReturn_code().toString()));	
 			resultBean = new ResultBean(result);
 		}
@@ -793,7 +794,7 @@ public class WeChatServiceImpl implements WeChatService{
 				log.info("退款跑批:"+txnseqno+"需商户重新发起");
 			}
 			//更新支付方信息
-			txnsLogService.updateTxnsLog(txnsLog);
+			//txnsLogService.updateTxnsLog(txnsLog);
 			 /**账务处理开始 **/
 	        // 应用方信息
 	        try {

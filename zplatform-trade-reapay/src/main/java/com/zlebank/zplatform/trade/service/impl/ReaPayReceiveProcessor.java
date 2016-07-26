@@ -83,6 +83,8 @@ public class ReaPayReceiveProcessor implements ITradeReceiveProcessor{
             payPartyBean.setPanName(tradeBean.getAcctName());
             txnsLogService.updatePayInfo_Fast(payPartyBean);
             txnsLogService.updateReaPayRetInfo(tradeBean.getTxnseqno(), payResult);
+            
+            
     }
 	/**
 	 *

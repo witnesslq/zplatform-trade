@@ -54,6 +54,7 @@ import com.zlebank.zplatform.trade.bean.enums.ChnlTypeEnum;
 import com.zlebank.zplatform.trade.bean.enums.OrderStatusEnum;
 import com.zlebank.zplatform.trade.bean.enums.RiskLevelEnum;
 import com.zlebank.zplatform.trade.bean.enums.TradeStatFlagEnum;
+import com.zlebank.zplatform.trade.bean.enums.UnknowRetCodeEnum;
 import com.zlebank.zplatform.trade.bean.gateway.QueryBean;
 import com.zlebank.zplatform.trade.dao.ITxnsLogDAO;
 import com.zlebank.zplatform.trade.dao.InsteadPayDetailDAO;
@@ -367,18 +368,27 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
     @Override
     @Transactional
     public void updateReaPayRetInfo(String txnseqno, ReaPayResultBean payResult) {
-        TxnsLogModel txnsLog = super.get(txnseqno);
+    	String hql = "update TxnsLogModel set payretcode=?,payretinfo=?,retcode=?,retinfo=?,tradestatflag=? where txnseqno = ?";
+    	Object[] paramaters = null;
+       /* TxnsLogModel txnsLog = super.get(txnseqno);
         txnsLog.setPayretinfo(payResult.getResult_msg());
-        txnsLog.setPayretcode(payResult.getResult_code());
+        txnsLog.setPayretcode(payResult.getResult_code());*/
         try {
             PojoRspmsg msg =   rspmsgDAO.getRspmsgByChnlCode(ChnlTypeEnum.REAPAY,payResult.getResult_code());
-            txnsLog.setRetinfo(msg.getRspinfo());
-            txnsLog.setRetcode(msg.getWebrspcode());
+            /*txnsLog.setRetinfo(msg.getRspinfo());
+            txnsLog.setRetcode(msg.getWebrspcode());*/
+            paramaters = new Object[]{payResult.getResult_code(),payResult.getResult_msg(),msg.getWebrspcode(),msg.getRspinfo(),
+            		"0000".equals(msg.getWebrspcode())?TradeStatFlagEnum.FINISH_SUCCESS.getStatus():TradeStatFlagEnum.FINISH_FAILED.getStatus()
+            		,txnseqno};
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+            paramaters = new Object[]{payResult.getResult_code(),payResult.getResult_msg(),UnknowRetCodeEnum.REAPAY.getCode(),payResult.getResult_msg(),
+            		TradeStatFlagEnum.FINISH_FAILED.getStatus(),txnseqno};
         }
-        super.update(txnsLog);
+        super.updateByHQL(hql, paramaters);
+        
+        //super.update(txnsLog);
     }
     @Transactional(propagation=Propagation.REQUIRES_NEW)
     public void updateCMBCWithholdingRetInfo(String txnseqno, TxnsWithholdingModel withholdin) {
@@ -1284,7 +1294,45 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 				    payPartyBean.getPayrettsnseqno(),
 				    payPartyBean.getPayretcode().trim(),
 				    payPartyBean.getPayretinfo().trim(),
-				    "3499",
+				    UnknowRetCodeEnum.WECHAT.getCode(),
+				    payPartyBean.getPayretinfo().trim(),
+	        		TradeStatFlagEnum.FINISH_FAILED.getStatus(),
+	        		DateUtil.getCurrentDateTime(),
+	        		DateUtil.getCurrentDateTime(),
+	        		"10000000",
+	        		"10000000",
+	        		UUIDUtil.uuid(),
+	        		payPartyBean.getTxnseqno()};
+	    }
+	    super.updateByHQL(hql, paramaters);
+	}
+	@Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
+	public void updateTradeData(PayPartyBean payPartyBean){
+		Object[] paramaters = null;
+	       
+        String hql = "update TxnsLogModel set payrettsnseqno=?,payretcode=?,payretinfo=?,retcode=?,retinfo=?,tradestatflag=?,payordfintime=?, retdatetime=?,tradetxnflag=?,relate=?,tradeseltxn=? where txnseqno=?";
+        
+	    try {
+	        PojoRspmsg msg = rspmsgDAO.getRspmsgByChnlCode(payPartyBean.getChnlTypeEnum(),payPartyBean.getPayretcode().trim());
+	        paramaters = new Object[]{
+				    payPartyBean.getPayrettsnseqno(),
+				    payPartyBean.getPayretcode().trim(),
+				    payPartyBean.getPayretinfo().trim(),
+				    msg.getWebrspcode(),
+				    msg.getRspinfo(),
+	        		"0000".equals(msg.getWebrspcode())?TradeStatFlagEnum.FINISH_SUCCESS.getStatus():TradeStatFlagEnum.FINISH_FAILED.getStatus(),
+	        		DateUtil.getCurrentDateTime(),
+	        		DateUtil.getCurrentDateTime(),
+	        		"10000000",
+	        		"10000000",
+	        		UUIDUtil.uuid(),
+	        		payPartyBean.getTxnseqno()};
+	    } catch (Exception e) {
+	        paramaters = new Object[]{
+				    payPartyBean.getPayrettsnseqno(),
+				    payPartyBean.getPayretcode().trim(),
+				    payPartyBean.getPayretinfo().trim(),
+				    UnknowRetCodeEnum.fromChannl(payPartyBean.getPayinst()).getCode(),
 				    payPartyBean.getPayretinfo().trim(),
 	        		TradeStatFlagEnum.FINISH_FAILED.getStatus(),
 	        		DateUtil.getCurrentDateTime(),
@@ -1303,7 +1351,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 		Object[] paramaters = null;
 		
 		try {
-	        PojoRspmsg msg = rspmsgDAO.getRspmsgByChnlCode(ChnlTypeEnum.fromValue(payPartyBean.getPayinst()),payPartyBean.getPayretcode().trim());
+	        PojoRspmsg msg = rspmsgDAO.getRspmsgByChnlCode(payPartyBean.getChnlTypeEnum(),payPartyBean.getPayretcode().trim());
 	        paramaters = new Object[]{
 				    payPartyBean.getPayretcode().trim(),
 				    payPartyBean.getPayretinfo().trim(),
@@ -1317,7 +1365,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 				    payPartyBean.getPayrettsnseqno(),
 				    payPartyBean.getPayretcode().trim(),
 				    payPartyBean.getPayretinfo().trim(),
-				    "3499",
+				    UnknowRetCodeEnum.fromChannl(payPartyBean.getPayinst()).getCode(),
 				    payPartyBean.getPayretinfo().trim(),
 	        		TradeStatFlagEnum.FINISH_FAILED.getStatus(),
 	        		DateUtil.getCurrentDateTime(),

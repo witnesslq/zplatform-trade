@@ -42,4 +42,11 @@ public interface TradeCompleteProcessingService {
 	 * @param resultBean
 	 */
 	public void weChatCompleteTrade(String txnseqno,ResultBean resultBean);
+	
+	/**
+	 * 融宝交易查询补账方法
+	 * @param txnseqno
+	 * @param resultBean
+	 */
+	public void reaPayCompleteTrade(String txnseqno,ResultBean resultBean);
 }

@@ -29,6 +29,7 @@ import com.zlebank.zplatform.trade.cmbc.service.CMBCCrossLineQuickPayService;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.model.TxnsWithholdingModel;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
+import com.zlebank.zplatform.trade.service.ReaPayQuickPayService;
 import com.zlebank.zplatform.wechat.service.WeChatService;
 import com.zlebank.zplatform.wechat.wx.bean.QueryOrderResultBean;
 
@@ -52,7 +53,8 @@ public class TradeCompleteProcessingServiceImpl implements TradeCompleteProcessi
 	private CMBCCrossLineQuickPayService cmbcCrossLineQuickPayService;
 	@Autowired
 	private WeChatService weChatService;
-	
+	@Autowired
+	private ReaPayQuickPayService reaPayQuickPayService;
 	
 	/**
 	 *
@@ -98,15 +100,30 @@ public class TradeCompleteProcessingServiceImpl implements TradeCompleteProcessi
 	 * @param resultBean
 	 */
 	@Override
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
 	public void weChatCompleteTrade(String txnseqno, ResultBean resultBean) {
 		// TODO Auto-generated method stub
 		TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(txnseqno);
 		TradeStatFlagEnum tradeStatFlagEnum = TradeStatFlagEnum.fromValue(txnsLog.getTradestatflag());
 		if(tradeStatFlagEnum==TradeStatFlagEnum.PAYING||tradeStatFlagEnum==TradeStatFlagEnum.OVERTIME){//交易支付中或者交易超时
-			QueryOrderResultBean result = (QueryOrderResultBean) resultBean.getResultObj();
-			log.info("接收微信交易查询应答数据：" + JSON.toJSONString(result));
+			log.info("接收微信交易查询应答数据：" + JSON.toJSONString(resultBean.getResultObj()));
 			weChatService.dealWithAccounting(txnseqno, resultBean);
 			
+		}
+	}
+	/**
+	 *
+	 * @param txnseqno
+	 * @param resultBean
+	 */
+	@Override
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+	public void reaPayCompleteTrade(String txnseqno,ResultBean resultBean) {
+		TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(txnseqno);
+		TradeStatFlagEnum tradeStatFlagEnum = TradeStatFlagEnum.fromValue(txnsLog.getTradestatflag());
+		if(tradeStatFlagEnum==TradeStatFlagEnum.PAYING||tradeStatFlagEnum==TradeStatFlagEnum.OVERTIME){//交易支付中或者交易超时
+			log.info("接收融宝交易查询流水数据：" + JSON.toJSONString(resultBean.getResultObj()));
+			reaPayQuickPayService.dealWithAccounting(txnseqno, resultBean);
 		}
 	}
 
