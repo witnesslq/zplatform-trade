@@ -39,7 +39,7 @@ public class TradeQueueServiceImpl implements TradeQueueService{
 	private final static Log log = LogFactory.getLog(TradeQueueServiceImpl.class);
 	
 	
-	@Autowired
+	
 	private RedisTemplate<String, String> redisTemplate; 
 	
 	public void addTradeQueue(TradeQueueBean tradeQueueBean){
