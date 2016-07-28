@@ -28,6 +28,7 @@ import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.TradeBean;
+import com.zlebank.zplatform.trade.bean.enums.TradeStatFlagEnum;
 import com.zlebank.zplatform.trade.chanpay.bean.cj.G10001Bean;
 import com.zlebank.zplatform.trade.chanpay.bean.cj.G20001Bean;
 import com.zlebank.zplatform.trade.chanpay.bean.cj.G60001Bean;
@@ -42,6 +43,7 @@ import com.zlebank.zplatform.trade.chanpay.utils.CjSignHelper.VerifyResult;
 import com.zlebank.zplatform.trade.chanpay.utils.U;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.service.IRouteConfigService;
+import com.zlebank.zplatform.trade.service.ITxnsLogService;
 import com.zlebank.zplatform.trade.utils.ConsUtil;
 import com.zlebank.zplatform.trade.utils.OrderNumber;
 
@@ -60,6 +62,8 @@ public class ChanPayCollectMoneyServiceImpl implements ChanPayCollectMoneyServic
 	private static final Log log = LogFactory.getLog(ChanPayCollectMoneyServiceImpl.class);
 	@Autowired
 	private IRouteConfigService routeConfigService;
+	@Autowired
+	private ITxnsLogService txnsLogService;
 	@Autowired
 	private CjMsgSendService cjMsgSendService;
 	/**
@@ -680,18 +684,26 @@ public class ChanPayCollectMoneyServiceImpl implements ChanPayCollectMoneyServic
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			resultBean = new ResultBean(e.getCode(), e.getMessage());
+			txnsLogService.updateTradeStatFlag(tradeBean.getTxnseqno(), TradeStatFlagEnum.OVERTIME);
 		} catch (HttpException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			resultBean = new ResultBean("T000", e.getMessage());
+			txnsLogService.updateTradeStatFlag(tradeBean.getTxnseqno(), TradeStatFlagEnum.OVERTIME);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			resultBean = new ResultBean("T000", e.getMessage());
+			txnsLogService.updateTradeStatFlag(tradeBean.getTxnseqno(), TradeStatFlagEnum.OVERTIME);
 		} catch (DocumentException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			resultBean = new ResultBean("T000", e.getMessage());
+			txnsLogService.updateTradeStatFlag(tradeBean.getTxnseqno(), TradeStatFlagEnum.OVERTIME);
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			txnsLogService.updateTradeStatFlag(tradeBean.getTxnseqno(), TradeStatFlagEnum.OVERTIME);
 		}
 		
 		if("0000".equals(data.getRetCode())){
@@ -736,6 +748,8 @@ public class ChanPayCollectMoneyServiceImpl implements ChanPayCollectMoneyServic
 				}
 				
 			}
+		}else{
+			resultBean = new ResultBean("T000","交易失败");
 		}
 		return resultBean;
 	}
@@ -810,7 +824,7 @@ public class ChanPayCollectMoneyServiceImpl implements ChanPayCollectMoneyServic
 		bodyEl.addElement("SUMMARY").setText(U.nvl(data.getSummary()));
 		bodyEl.addElement("POSTSCRIPT").setText(U.nvl(data.getPostscript()));
 		String xml = Cj.formatXml_UTF8(doc);
-		log.info("产生G10001单笔实时收款：" + U.substringByByte(xml, 512));
+		log.info("产生G10001单笔实时收款：" + xml);
 		return xml;
 	}
 	/**

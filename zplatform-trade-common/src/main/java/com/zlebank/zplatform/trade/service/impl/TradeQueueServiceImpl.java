@@ -73,8 +73,13 @@ public class TradeQueueServiceImpl implements TradeQueueService{
 	}
 	
 	public long getQueueSize(TradeQueueEnum queueEnum){
-		ListOperations<String, String> opsForList = redisTemplate.opsForList();
-		return opsForList.size(queueEnum.getName());
+		if(redisTemplate.hasKey(queueEnum.getName())){
+			ListOperations<String, String> opsForList = redisTemplate.opsForList();
+			return opsForList.size(queueEnum.getName());
+		}else{
+			return 0;
+		}
+		
 	}
 	
 }

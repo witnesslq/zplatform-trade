@@ -85,7 +85,12 @@
 		    <artifactId>httpclient</artifactId>
 		    <version>4.3.4</version>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>com.zlebank.zplatform</groupId>
+			<artifactId>zplatform-trade-timeout</artifactId>
+			<version>1.5.0-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 </project>
 

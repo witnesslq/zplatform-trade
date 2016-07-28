@@ -24,4 +24,7 @@ public interface TradeQueueScanService {
 	 * 扫描交易队列
 	 */
 	public void scanTradeQueue();
+	
+	
+	public void scanOverTimeQueue();
 }

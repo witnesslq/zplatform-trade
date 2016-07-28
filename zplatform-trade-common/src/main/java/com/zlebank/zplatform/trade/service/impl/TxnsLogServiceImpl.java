@@ -48,6 +48,7 @@ import com.zlebank.zplatform.trade.bean.AppPartyBean;
 import com.zlebank.zplatform.trade.bean.PayPartyBean;
 import com.zlebank.zplatform.trade.bean.ReaPayResultBean;
 import com.zlebank.zplatform.trade.bean.ResultBean;
+import com.zlebank.zplatform.trade.bean.TradeQueueBean;
 import com.zlebank.zplatform.trade.bean.enums.BusinessEnum;
 import com.zlebank.zplatform.trade.bean.enums.ChannelEnmu;
 import com.zlebank.zplatform.trade.bean.enums.ChnlTypeEnum;
@@ -75,6 +76,7 @@ import com.zlebank.zplatform.trade.service.IMemberService;
 import com.zlebank.zplatform.trade.service.IRiskTradeLogService;
 import com.zlebank.zplatform.trade.service.ITxncodeDefService;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
+import com.zlebank.zplatform.trade.service.TradeQueueService;
 import com.zlebank.zplatform.trade.service.base.BaseServiceImpl;
 import com.zlebank.zplatform.trade.utils.ConsUtil;
 import com.zlebank.zplatform.trade.utils.DateUtil;
@@ -113,6 +115,8 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
     private InsteadPayDetailDAO insteadPayDetailDAO;
     @Autowired
     private MerchService merchService;
+    @Autowired
+	private TradeQueueService tradeQueueService;
     
     @Autowired
     private CoopInstiDAO coopInstiDAO;
@@ -1194,6 +1198,22 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 	public void updateTradeStatFlag(String txnseqno,TradeStatFlagEnum tradeStatFlagEnum){
 		String hql = "update TxnsLogModel set tradestatflag = ? where txnseqno = ?";
 		super.updateByHQL(hql, new Object[]{tradeStatFlagEnum.getStatus(),txnseqno});
+		if(tradeStatFlagEnum == TradeStatFlagEnum.OVERTIME){//交易超时时加入超时队列中
+			TxnsLogModel txnsLog = getTxnsLogByTxnseqno(txnseqno);
+			TradeQueueBean tradeQueueBean = new TradeQueueBean();
+			tradeQueueBean.setTxnseqno(txnseqno);
+			tradeQueueBean.setPayInsti(txnsLog.getPayinst());
+			tradeQueueBean.setTxnDateTime(txnsLog.getTxndate()+txnsLog.getTxntime());
+			tradeQueueService.addTimeOutQueue(tradeQueueBean);
+		}else if(tradeStatFlagEnum == TradeStatFlagEnum.PAYING){
+			TxnsLogModel txnsLog = getTxnsLogByTxnseqno(txnseqno);
+			TradeQueueBean tradeQueueBean = new TradeQueueBean();
+			tradeQueueBean.setTxnseqno(txnseqno);
+			tradeQueueBean.setPayInsti(txnsLog.getPayinst());
+			tradeQueueBean.setTxnDateTime(txnsLog.getTxndate()+txnsLog.getTxntime());
+			tradeQueueService.addTradeQueue(tradeQueueBean);
+		}
+		
 	}
 	
 	@Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)

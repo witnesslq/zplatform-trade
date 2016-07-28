@@ -51,7 +51,7 @@ public class WeChatTradeThread implements TradeQueueQuery {
 
 		ResultBean resultBean = weChatService.queryOrder(tradeQueueBean.getTxnseqno());
 		if (resultBean.isResultBool()) {
-			if ("0002".equals(resultBean.getErrCode()) || "0001".equals(resultBean.getErrCode())) {// 待处理，重回队列，等待下次查询
+			if ("PROCESSING".equals(resultBean.getErrCode()) || "USERPAYING".equals(resultBean.getErrCode())) {// 处理中，或者用户支付中，重回队列，等待下次查询
 				tradeQueueService.addTradeQueue(tradeQueueBean);
 				return;
 			}

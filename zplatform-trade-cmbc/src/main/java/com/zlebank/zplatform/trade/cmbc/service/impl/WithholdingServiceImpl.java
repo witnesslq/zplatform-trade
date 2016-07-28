@@ -262,6 +262,7 @@ public class WithholdingServiceImpl implements IWithholdingService {
             client.setReceiveProcessor(new CMBCWithholdingReciveProcessor());
             client.sendMessage(sendBytes);
             resultBean = new ResultBean("success");
+            
         } catch (UnsupportedEncodingException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

@@ -535,6 +535,7 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
 			return model;
 			// return new ModelAndView("/erro_merch_withdraw", model);
 		}
+		
 		PojoMerchDeta merch = merchService.getMerchBymemberId(orderinfo
 				.getSecmemberno());
 		withdraw = new TxnsWithdrawModel(tradeBean);
@@ -545,6 +546,7 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
 				.getBankNode());
 		withdraw.setBankname(bankNodeinfo.getMainBankSname());
 		txnsWithdrawService.saveWithdraw(withdraw);
+		txnsLogService.tradeRiskControl(txnsLog.getTxnseqno(),txnsLog.getAccfirmerno(),txnsLog.getAccsecmerno(),txnsLog.getAccmemberid(),txnsLog.getBusicode(),txnsLog.getAmount()+"","1",merch.getAccNum());
 		// 记录提现账务
 		TradeInfo tradeInfo = new TradeInfo();
 		tradeInfo.setBusiCode("30000001");

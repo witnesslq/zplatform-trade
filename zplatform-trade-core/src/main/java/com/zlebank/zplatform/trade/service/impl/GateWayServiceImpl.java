@@ -406,7 +406,7 @@ public class GateWayServiceImpl extends
 		throw new TradeException("GW03");
 		// return null;
 	}
-
+	@Transactional(propagation = Propagation.REQUIRED)
 	public String dealWithOrder(OrderBean order,
 			RiskRateInfoBean riskRateInfoBean) throws TradeException {
 		List<TxnsOrderinfoModel> orderinfoList = getSecondPayOrder(
@@ -515,6 +515,8 @@ public class GateWayServiceImpl extends
 				txnsLog.setTradcomm(0L);
 			}
 		}
+		txnsLog.setTradestatflag(TradeStatFlagEnum.INITIAL.getStatus());
+		
 
 		// 记录订单流水
 		TxnsOrderinfoModel orderinfo = new TxnsOrderinfoModel();
@@ -568,8 +570,9 @@ public class GateWayServiceImpl extends
 				order.getCoopInstiId()));
 		orderinfo.setMemberid(riskRateInfoBean.getMerUserId());
 		orderinfo.setCurrencycode("156");
-		saveOrderInfo(orderinfo);
 		txnsLogService.saveTxnsLog(txnsLog);
+		saveOrderInfo(orderinfo);
+		
 
 		return txnsLog.getTxnseqno();
 	}
@@ -694,8 +697,9 @@ public class GateWayServiceImpl extends
 				order.getCoopInstiId()));
 		orderinfo.setMemberid(order.getMerId());
 		orderinfo.setCurrencycode("156");
-		saveOrderInfo(orderinfo);
 		txnsLogService.saveTxnsLog(txnsLog);
+		saveOrderInfo(orderinfo);
+		
 
 		return txnsLog.getTxnseqno();
 	}
@@ -947,6 +951,7 @@ public class GateWayServiceImpl extends
 					txnsLog.setTradcomm(0L);
 				}
 			}
+			txnsLog.setTradestatflag(TradeStatFlagEnum.INITIAL.getStatus());
 			txnsLogService.save(txnsLog);
 
 			orderinfo = new TxnsOrderinfoModel();
@@ -1346,18 +1351,7 @@ public class GateWayServiceImpl extends
 			txnsLog.setTxnfee(txnsLogService.getTxnFee(txnsLog));
 			txnsLogService.save(txnsLog);
 
-			// 提现账务处理
-			TradeInfo tradeInfo = new TradeInfo();
-			tradeInfo.setPayMemberId(txnsLog.getAccmemberid());
-			tradeInfo.setPayToMemberId(txnsLog.getAccmemberid());
-			tradeInfo.setAmount(new BigDecimal(txnsLog.getAmount()));
-			tradeInfo.setCharge(new BigDecimal(txnsLog.getTxnfee() == null ? 0L
-					: txnsLog.getTxnfee()));
-			tradeInfo.setTxnseqno(txnsLog.getTxnseqno());
-			tradeInfo.setBusiCode(BusinessCodeEnum.WITHDRAWALS.getBusiCode());
-			tradeInfo.setCoopInstCode(txnsLog.getAcccoopinstino());
-			// 记录分录流水
-			accEntryService.accEntryProcess(tradeInfo, EntryEvent.AUDIT_APPLY);
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -1397,6 +1391,21 @@ public class GateWayServiceImpl extends
 			withdraw.setTexnseqno(txnsLog.getTxnseqno());
 			withdraw.setFee(txnsLog.getTxnfee());
 			txnsWithdrawService.saveEntity(withdraw);
+			
+			//风控
+			txnsLogService.tradeRiskControl(txnsLog.getTxnseqno(),txnsLog.getAccfirmerno(),txnsLog.getAccsecmerno(),txnsLog.getAccmemberid(),txnsLog.getBusicode(),txnsLog.getAmount()+"","1",withdraw.getAcctno());
+			// 提现账务处理
+			TradeInfo tradeInfo = new TradeInfo();
+			tradeInfo.setPayMemberId(txnsLog.getAccmemberid());
+			tradeInfo.setPayToMemberId(txnsLog.getAccmemberid());
+			tradeInfo.setAmount(new BigDecimal(txnsLog.getAmount()));
+			tradeInfo.setCharge(new BigDecimal(txnsLog.getTxnfee() == null ? 0L
+					: txnsLog.getTxnfee()));
+			tradeInfo.setTxnseqno(txnsLog.getTxnseqno());
+			tradeInfo.setBusiCode(BusinessCodeEnum.WITHDRAWALS.getBusiCode());
+			tradeInfo.setCoopInstCode(txnsLog.getAcccoopinstino());
+			// 记录分录流水
+			accEntryService.accEntryProcess(tradeInfo, EntryEvent.AUDIT_APPLY);
 			return orderinfo.getTn();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -2358,7 +2367,7 @@ public class GateWayServiceImpl extends
 		txnsLogService.initretMsg(txnsLog.getTxnseqno());
 		quickPayTrade.setTradeBean(trade);
 		quickPayTrade.setTradeType(TradeTypeEnum.SUBMITPAY);
-		// TradeAdapterFactory.getInstance().getThreadPool(routId).executeMission(quickPayTrade);
+		//TradeAdapterFactory.getInstance().getThreadPool(routId).executeMission(quickPayTrade);
 		
 		ResultBean resultBean = quickPayTrade.submitPay(trade);
 		if (!resultBean.isResultBool()) {
@@ -3264,6 +3273,9 @@ public class GateWayServiceImpl extends
 		tradeInfo.setCharge(new BigDecimal(withdraw.getFee()));
 		tradeInfo.setTxnseqno(orderinfo.getRelatetradetxn());
 		tradeInfo.setCoopInstCode(orderinfo.getFirmemberno());
+		//风控
+		txnsLogService.tradeRiskControl(txnsLog.getTxnseqno(),txnsLog.getAccfirmerno(),txnsLog.getAccsecmerno(),txnsLog.getAccmemberid(),txnsLog.getBusicode(),txnsLog.getAmount()+"","1",withdraw.getAcctno());
+		
 		// 记录分录流水
 		accEntryService.accEntryProcess(tradeInfo, EntryEvent.AUDIT_APPLY);
 		updateOrderToStartPay(tradeBean.getTxnseqno());

@@ -15,6 +15,7 @@ import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.TradeBean;
 import com.zlebank.zplatform.trade.bean.enums.ChannelEnmu;
 import com.zlebank.zplatform.trade.bean.enums.ChnlTypeEnum;
+import com.zlebank.zplatform.trade.bean.enums.TradeStatFlagEnum;
 import com.zlebank.zplatform.trade.cmbc.bean.gateway.WithholdingMessageBean;
 import com.zlebank.zplatform.trade.cmbc.exception.CMBCTradeException;
 import com.zlebank.zplatform.trade.cmbc.service.ICMBCQuickPayService;
@@ -77,10 +78,12 @@ public class CMBCQuickPayServiceImpl implements ICMBCQuickPayService{
         } catch (TradeException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+            txnsLogService.updateTradeStatFlag(trade.getTxnseqno(), TradeStatFlagEnum.OVERTIME);
             resultBean = new ResultBean(e.getCode(), e.getMessage());
         } catch (CMBCTradeException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+            txnsLogService.updateTradeStatFlag(trade.getTxnseqno(), TradeStatFlagEnum.OVERTIME);
             resultBean = new ResultBean(e.getCode(), e.getMessage());
         }
         return resultBean;
@@ -122,7 +125,7 @@ public class CMBCQuickPayServiceImpl implements ICMBCQuickPayService{
             e.printStackTrace();
             resultBean = new ResultBean("09", e.getMessage());
         }
-        
+        resultBean = new ResultBean("T000", "交易超时，无法再规定时间内取得交易结果");
         return resultBean;
     }
     

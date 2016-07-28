@@ -108,6 +108,7 @@ public class ChanPayQuickPayServiceImpl implements ChanPayQuickPayService {
 			txnsWithholdingService.updateRealNameResult(txnsWithholdingModel);
 		}
 		log.info("畅捷实名认证结束,txnseqno:" + tradeBean.getTxnseqno());
+		txnsLogService.updateTradeStatFlag(tradeBean.getTxnseqno(), TradeStatFlagEnum.READY);
 		return resultBean;
 	}
 
@@ -196,8 +197,14 @@ public class ChanPayQuickPayServiceImpl implements ChanPayQuickPayService {
 			txnsOrderinfoDAO.updateOrderToFail(tradeBean.getTxnseqno());
 			return resultBean;
 		}
-
-		resultBean = chanPayCollectMoneyService.collectMoney(tradeBean);
+		txnsLogService.updateTradeStatFlag(tradeBean.getTxnseqno(), TradeStatFlagEnum.PAYING);
+		try {
+			resultBean = chanPayCollectMoneyService.collectMoney(tradeBean);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			txnsLogService.updateTradeStatFlag(tradeBean.getTxnseqno(), TradeStatFlagEnum.OVERTIME);
+		}
 		G10001Bean data = (G10001Bean) resultBean.getResultObj();
 		log.info("接收畅捷应答数据：" + JSON.toJSONString(data));
 		txnsWithholdingModel.setExeccode(data.getRetCode());

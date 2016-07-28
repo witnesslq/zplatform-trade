@@ -27,6 +27,7 @@ import com.zlebank.zplatform.trade.bean.TradeBean;
 import com.zlebank.zplatform.trade.bean.enums.ChannelEnmu;
 import com.zlebank.zplatform.trade.bean.enums.OrderStatusEnum;
 import com.zlebank.zplatform.trade.bean.enums.RefundTypeEnum;
+import com.zlebank.zplatform.trade.bean.enums.TradeStatFlagEnum;
 import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
 import com.zlebank.zplatform.trade.dao.TranDataDAO;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
@@ -130,6 +131,7 @@ public class WeChatRefundTrade implements IRefundTrade {
 						TxnsRefundModel refundLog = txnsRefundService.getRefundByTxnseqno(tradeBean.getTxnseqno());
 						refundLog.setRefundtype(refundTypeEnum.getCode());
 						txnsRefundService.update(refundLog);
+						txnsLogService.updateTradeStatFlag(tradeBean.getTxnseqno(), TradeStatFlagEnum.PAYING);
 						resultBean =new ResultBean("success");
 					}else{
 						resultBean = new ResultBean(refund.getErr_code(), refund.getErr_code_des()); 

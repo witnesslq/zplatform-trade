@@ -21,6 +21,7 @@ import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.TradeBean;
 import com.zlebank.zplatform.trade.bean.TradeQueueBean;
 import com.zlebank.zplatform.trade.exception.TradeException;
+import com.zlebank.zplatform.trade.model.TxnsWithholdingModel;
 import com.zlebank.zplatform.trade.service.TradeQueueService;
 import com.zlebank.zplatform.trade.utils.SpringContext;
 
@@ -49,7 +50,8 @@ public class CMBCTradeThread implements TradeQueueQuery{
 		try {
 			ResultBean resultBean = getTradeQuery().queryTrade(trade);
 			if(resultBean.isResultBool()){
-				if("0002".equals(resultBean.getErrCode())||"0001".equals(resultBean.getErrCode())){//待处理，重回队列，等待下次查询
+				
+				if("R".equals(resultBean.getErrCode())){//不确定，等待下次查询
 					tradeQueueService.addTradeQueue(tradeQueueBean);
 					return ;
 				}

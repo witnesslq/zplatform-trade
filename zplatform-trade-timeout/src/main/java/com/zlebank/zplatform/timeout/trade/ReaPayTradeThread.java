@@ -53,7 +53,7 @@ public class ReaPayTradeThread implements TradeQueueQuery{
 		try {
 			ResultBean resultBean = getTradeQuery().queryTrade(trade);
 			if(resultBean.isResultBool()){
-				if("0002".equals(resultBean.getErrCode())||"0001".equals(resultBean.getErrCode())){//待处理，重回队列，等待下次查询
+				if("processing".equals(resultBean.getErrCode())){//支付中，重回队列，等待下次查询
 					tradeQueueService.addTradeQueue(tradeQueueBean);
 					return ;
 				}

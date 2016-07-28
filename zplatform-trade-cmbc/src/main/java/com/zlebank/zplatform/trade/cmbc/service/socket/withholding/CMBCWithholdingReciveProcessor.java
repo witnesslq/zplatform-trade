@@ -187,6 +187,7 @@ public class CMBCWithholdingReciveProcessor implements ReceiveProcessor{
                     log.info("receive msg:"+JSON.toJSONString(realTimeWithholdingResultBean));
                     verifyFlag = verifyMsg(ConsUtil.getInstance().cons.getCmbc_withholding_private_key(), ConsUtil.getInstance().cons.getCmbc_withholding_public_key(), msg, sign);
                     log.info("verify result"+verifyFlag);
+                   
                     if(verifyFlag){
                         //更新交易流水
                         TxnsWithholdingModel withholding = txnsWithholdingService.getWithholdingBySerialNo(realTimeWithholdingResultBean.getReqserialno());

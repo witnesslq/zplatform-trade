@@ -73,6 +73,7 @@ import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.TradeBean;
 import com.zlebank.zplatform.trade.bean.enums.ChannelEnmu;
 import com.zlebank.zplatform.trade.bean.enums.OrderStatusEnum;
+import com.zlebank.zplatform.trade.bean.enums.TradeStatFlagEnum;
 import com.zlebank.zplatform.trade.bean.gateway.AnonOrderAsynRespBean;
 import com.zlebank.zplatform.trade.bean.gateway.OrderAsynRespBean;
 import com.zlebank.zplatform.trade.bean.gateway.OrderBean;
@@ -1100,6 +1101,7 @@ public class GateWayController {
                             "000000000000", commiteTime,
                             DateUtil.getCurrentDateTime(), txnseqno, "AC000000");
                     txnsLogService.updateAppInfo(appParty);
+                    txnsLogService.updateTradeStatFlag(txnseqno, TradeStatFlagEnum.FINISH_SUCCESS);
                     /**异步通知处理开始 **/
                     try {
             			ResultBean orderResp = 
@@ -1156,6 +1158,7 @@ public class GateWayController {
                 TxnsOrderinfoModel gatewayOrderBean = gateWayService
                         .getOrderinfoByOrderNoAndMemberId(reaPayOrderNo,
                                 txnsLog.getAccfirmerno());
+                txnsLogService.updateTradeStatFlag(txnseqno, TradeStatFlagEnum.FINISH_FAILED);
                 ResultBean orderResp = gateWayService.generateAsyncRespMessage(
                          txnsLog.getTxnseqno());
                 if (orderResp.isResultBool()) {

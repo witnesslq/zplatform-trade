@@ -27,6 +27,7 @@ import com.zlebank.zplatform.trade.bean.PayPartyBean;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.TradeBean;
 import com.zlebank.zplatform.trade.bean.enums.ChannelEnmu;
+import com.zlebank.zplatform.trade.bean.enums.TradeStatFlagEnum;
 import com.zlebank.zplatform.trade.cmbc.exception.CMBCTradeException;
 import com.zlebank.zplatform.trade.cmbc.service.CMBCCrossLineQuickPayService;
 import com.zlebank.zplatform.trade.cmbc.service.ICMBCQuickPayService;
@@ -116,7 +117,7 @@ public class CMBCCrossLineQuickPayServiceImpl implements CMBCCrossLineQuickPaySe
 			e.printStackTrace();
 			return resultBean;
 		}
-		
+		txnsLogService.updateTradeStatFlag(tradeBean.getTxnseqno(), TradeStatFlagEnum.READY);
 		return resultBean;
 	}
 
@@ -164,6 +165,7 @@ public class CMBCCrossLineQuickPayServiceImpl implements CMBCCrossLineQuickPaySe
 			tradeBean.setProvno(provinceDAO.getProvinceByXZCode(tradeBean.getCertId().substring(0, 2)).getProvinceId()+ "");
 			// 记录快捷交易流水
 			String payorderno = txnsQuickpayService.saveCMBCOuterWithholding(tradeBean);
+			txnsLogService.updateTradeStatFlag(tradeBean.getTxnseqno(), TradeStatFlagEnum.PAYING);
 			resultBean = cmbcQuickPayService.crossLineWithhold(tradeBean);
 			if(resultBean.isResultBool()) {
 				TxnsWithholdingModel withholding = (TxnsWithholdingModel) resultBean.getResultObj();

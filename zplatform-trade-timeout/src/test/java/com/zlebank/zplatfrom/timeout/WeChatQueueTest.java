@@ -46,6 +46,6 @@ public class WeChatQueueTest {
 	@Test
 	public void test_scan(){
 		test_addQueue();
-		tradeQueueJob.scanTradeQueue();
+		//tradeQueueJob.scanTradeQueue();
 	}
 }

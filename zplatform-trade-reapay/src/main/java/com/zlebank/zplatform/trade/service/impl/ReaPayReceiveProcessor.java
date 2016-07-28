@@ -20,6 +20,7 @@ import com.zlebank.zplatform.trade.bean.PayPartyBean;
 import com.zlebank.zplatform.trade.bean.ReaPayResultBean;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.TradeBean;
+import com.zlebank.zplatform.trade.bean.enums.TradeStatFlagEnum;
 import com.zlebank.zplatform.trade.bean.enums.TradeTypeEnum;
 import com.zlebank.zplatform.trade.bean.gateway.OrderAsynRespBean;
 import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
@@ -83,7 +84,7 @@ public class ReaPayReceiveProcessor implements ITradeReceiveProcessor{
             payPartyBean.setPanName(tradeBean.getAcctName());
             txnsLogService.updatePayInfo_Fast(payPartyBean);
             txnsLogService.updateReaPayRetInfo(tradeBean.getTxnseqno(), payResult);
-            
+            txnsLogService.updateTradeStatFlag(tradeBean.getTxnseqno(), TradeStatFlagEnum.PAYING);
             
     }
 	/**

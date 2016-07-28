@@ -31,6 +31,7 @@ import com.zlebank.zplatform.trade.bean.TradeBean;
 import com.zlebank.zplatform.trade.bean.enums.ChannelEnmu;
 import com.zlebank.zplatform.trade.bean.enums.ChnlTypeEnum;
 import com.zlebank.zplatform.trade.bean.enums.ReaPayTradeStatusEnmu;
+import com.zlebank.zplatform.trade.bean.enums.TradeStatFlagEnum;
 import com.zlebank.zplatform.trade.bean.enums.TradeTypeEnum;
 import com.zlebank.zplatform.trade.bean.reapal.BindBean;
 import com.zlebank.zplatform.trade.bean.reapal.CreditBean;
@@ -168,6 +169,7 @@ public class ReaPayQuickPayServiceImpl implements ReaPayQuickPayService{
             }else{
                 //quickpayCustService.deleteCard(trade.getCardId());
             }
+            txnsLogService.updateTradeStatFlag(trade.getTxnseqno(), TradeStatFlagEnum.READY);
             log.info("ReaPay bank card sign end!");
         } catch (Exception e) {
             // TODO Auto-generated catch block
@@ -195,7 +197,11 @@ public class ReaPayQuickPayServiceImpl implements ReaPayQuickPayService{
         }
         //记录快捷交易流水
         String payorderno = txnsQuickpayService.saveReaPayToPay(trade, payBean);
-        resultBean = reaPayTradeService.submitPay(payBean);
+        
+		resultBean = reaPayTradeService.submitPay(payBean);
+		if(!resultBean.isResultBool()){
+			txnsLogService.updateTradeStatFlag(trade.getTxnseqno(), TradeStatFlagEnum.OVERTIME);
+		}
         //更新快捷交易流水
         txnsQuickpayService.updateReaPaySign(resultBean,payorderno);
         log.info("ReaPay submit Pay end!");

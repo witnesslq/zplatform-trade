@@ -12,7 +12,20 @@
 	<context:annotation-config />
 	<aop:aspectj-autoproxy></aop:aspectj-autoproxy>
 	<!-- 引入属性文件Hibernate属性配置 -->
+	
 	<context:property-placeholder location="classpath:*.properties" />
+	 
+	<!-- <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">  
+        <property name="locations">  
+           <list>  
+              推荐使用file的方式引入，这样可以将配置和代码分离  
+              <value>file:D:/cert/*.properties</value>  
+              <value>classpath:*.properties</value>  
+            </list>  
+        </property>  
+    </bean>   -->
+	
+	
 	<context:component-scan base-package="com.zlebank.zplatform"></context:component-scan>
 	<bean id="springContext" class="com.zlebank.zplatform.trade.utils.SpringContext"></bean>
 
@@ -23,7 +36,10 @@
 				<ref bean="cmbcTrigger1"/> 
 				<!-- 微信 -->
 				<ref bean="refundJobTrigger"/> 
-				<ref bean="wechatOrderTrigger"/> 
+				<ref bean="wechatOrderTrigger"/>
+				
+				<ref bean="tradeQueueJobTrigger"/>
+				 
 				<!-- <ref bean="simpleTrigger" /> -->
 				<!-- <ref bean="simpleTrigger2" />  转移到DB-->
 				<!-- <ref bean="simpleTrigger3" /> 
@@ -158,8 +174,7 @@
 	
 	
 	<bean id="reconJob" class="com.zlebank.zplatform.trade.job.ReconJob" />
-	<bean id="reconJobTrigger"
-		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+	<bean id="reconJobTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
 		<property name="jobDetail" ref="reconJobDetail" />
 		<!-- 启动延迟10秒 -->
 		<property name="startDelay" value="0" />
@@ -203,7 +218,6 @@
 		<property name="startDelay" value="10000" />  
 		<!-- 20分钟执行一次任务 -->
 		<property name="repeatInterval" value="1200000" />
-		
     </bean>
 	
 	<bean id="wechatOrderJobDetail"
@@ -215,4 +229,39 @@
 	</bean>
 	
 	
+	<!--交易队列和超时交易队列-->
+	<bean id="tradeQueueJob" class="com.zlebank.zplatform.timeout.job.TradeQueueJob" />
+	<!-- 交易队列任务 -->
+	<bean id="tradeQueueJobDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="tradeQueueJob" />
+		<property name="targetMethod" value="scanTradeQueue" />
+		<!-- 对于相同的JobDetail，当指定多个Trigger时, 很可能第一个job完成之前，第二个job就开始了。指定concurrent设为false，多个job不会并发运行，第二个job将会被推迟。 -->
+		<property name="concurrent" value="false" />
+	</bean>
+	<bean id="timeOutTradeQueueJobDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="tradeQueueJob" />
+		<property name="targetMethod" value="scanTradeTimeOutQueue" />
+		<!-- 对于相同的JobDetail，当指定多个Trigger时, 很可能第一个job完成之前，第二个job就开始了。指定concurrent设为false，多个job不会并发运行，第二个job将会被推迟。 -->
+		<property name="concurrent" value="false" />
+	</bean>
+	
+	<bean id="tradeQueueJobTrigger"
+	 class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="tradeQueueJobDetail" />
+		<!-- 启动延迟10秒 -->
+		<property name="startDelay" value="10000" />  
+		<!-- 1分钟执行一次任务 -->
+		<property name="repeatInterval" value="60000" />
+    </bean>
+    
+    <bean id="timeOutTradeQueueJobTrigger"
+	 class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="timeOutTradeQueueJobDetail" />
+		<!-- 启动延迟10秒 -->
+		<property name="startDelay" value="10000" />  
+		<!-- 1分钟执行一次任务 -->
+		<property name="repeatInterval" value="60000" />
+    </bean>
 </beans>
