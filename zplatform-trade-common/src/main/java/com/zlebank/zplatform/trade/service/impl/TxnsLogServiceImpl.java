@@ -635,12 +635,15 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
             if("00".equals(data.getBusiType())){//代付
             	txnsLog.setBusicode(BusiTypeEnum.insteadPay.getCode());
                 txnsLog.setBusitype(BusinessEnum.INSTEADPAY.getBusiCode());
+                txnsLog.setPaytype("04"); //支付类型（01：快捷，02：网银，03：账户,07：退款）
             }else if("01".equals(data.getBusiType())){
             	txnsLog.setBusicode(BusiTypeEnum.withdrawal.getCode());
                 txnsLog.setBusitype(BusinessEnum.WITHDRAWALS.getBusiCode());
+                txnsLog.setPaytype("04"); //支付类型（01：快捷，02：网银，03：账户,07：退款）
             }else if("02".equals(data.getBusiType())){
             	txnsLog.setBusicode(BusiTypeEnum.refund.getCode());
                 txnsLog.setBusitype(BusinessEnum.REFUND_BANK.getBusiCode());
+                txnsLog.setPaytype("07"); //支付类型（01：快捷，02：网银，03：账户,07：退款）
             }
             
             txnsLog.setAmount(data.getTranAmt().longValue());
@@ -656,7 +659,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
             txnsLog.setAccordcommitime(DateUtil.getCurrentDateTime());
             txnsLog.setTradestatflag("00000000");//交易初始状态
             txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlcycle().toString())));
-            txnsLog.setPaytype("04"); //支付类型（01：快捷，02：网银，03：账户）
+            
             txnsLog.setPayordno(data.getTranDataSeqNo());//支付定单号
             txnsLog.setPayinst(ChannelEnmu.CMBCINSTEADPAY.getChnlcode());//支付所属机构
             txnsLog.setPayfirmerno(ConsUtil.getInstance().cons.getCmbc_insteadpay_merid());//支付一级商户号
