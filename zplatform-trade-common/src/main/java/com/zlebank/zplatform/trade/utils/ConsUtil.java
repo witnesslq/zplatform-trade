@@ -153,7 +153,7 @@ public class ConsUtil {
 			cons.setChanpay_cj_merchant_name(prop.getProperty("chanpay_cj_merchant_name", ""));
 			cons.setChanpay_cj_product_no(prop.getProperty("chanpay_cj_product_no", ""));
 			
-			
+			cons.setWeb_cash_url(prop.getProperty("web_cash_url"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

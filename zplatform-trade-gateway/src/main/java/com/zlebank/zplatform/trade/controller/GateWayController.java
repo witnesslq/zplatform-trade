@@ -87,7 +87,9 @@ import com.zlebank.zplatform.trade.cmbc.bean.gateway.InsteadPayMessageBean;
 import com.zlebank.zplatform.trade.cmbc.service.ICMBCTransferService;
 import com.zlebank.zplatform.trade.cmbc.service.IWithholdingService;
 import com.zlebank.zplatform.trade.cmbc.service.impl.InsteadPayServiceImpl;
+import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
 import com.zlebank.zplatform.trade.dao.RspmsgDAO;
+import com.zlebank.zplatform.trade.dao.impl.TxnsOrderinfoDAOImpl;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.factory.AccountingAdapterFactory;
 import com.zlebank.zplatform.trade.factory.TradeAdapterFactory;
@@ -182,6 +184,8 @@ public class GateWayController {
     private MerchMKService merchMKService;
     @Autowired
     private CoopInstiDAO coopInstiDAO;
+    @Autowired
+	private ITxnsOrderinfoDAO txnsOrderinfoDAO;
     
     
     /***
@@ -208,8 +212,11 @@ public class GateWayController {
             }
             // 订单记录和业务逻辑处理,取得商户信息，记录交易数据（核心）和订单详细信息，分析交易所属业务
             String txnseqno = gateWayService.dealWithOrder(order, riskRateInfo);
-            return new ModelAndView("redirect:/gateway/cash.htm?txnseqno="
-                    + txnseqno);
+            TxnsOrderinfoModel  orderInfo =this.txnsOrderinfoDAO.getOrderByTxnseqno(txnseqno);
+            /*return new ModelAndView("redirect:/gateway/cash.htm?txnseqno="
+                    + txnseqno);*/
+            String weburl= ConsUtil.getInstance().cons.getWeb_cash_url();
+            return new ModelAndView("redirect:"+weburl+"?tn="+ orderInfo.getTn());
         } catch (Exception e) {
             e.printStackTrace();
             model.put("errMsg", "订单信息错误，请重新提交");
