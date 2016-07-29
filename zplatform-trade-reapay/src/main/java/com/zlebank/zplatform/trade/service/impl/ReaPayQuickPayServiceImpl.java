@@ -17,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.commons.dao.pojo.BusiTypeEnum;
@@ -198,6 +199,10 @@ public class ReaPayQuickPayServiceImpl implements ReaPayQuickPayService{
         }
         //记录快捷交易流水
         String payorderno = txnsQuickpayService.saveReaPayToPay(trade, payBean);
+        
+        PayPartyBean payPartyBean = new PayPartyBean(trade.getTxnseqno(),"01", trade.getReaPayOrderNo(), ConsUtil.getInstance().cons.getReapay_chnl_code(), ConsUtil.getInstance().cons.getReapay_quickpay_merchant_id(), "", DateUtil.getCurrentDateTime(), "",trade.getCardNo());
+        payPartyBean.setPanName(trade.getAcctName());
+        txnsLogService.updatePayInfo_Fast(payPartyBean);
         txnsLogService.updateTradeStatFlag(trade.getTxnseqno(), TradeStatFlagEnum.PAYING);
 		resultBean = reaPayTradeService.submitPay(payBean);
 		if(!resultBean.isResultBool()){
@@ -207,7 +212,18 @@ public class ReaPayQuickPayServiceImpl implements ReaPayQuickPayService{
         txnsQuickpayService.updateReaPaySign(resultBean,payorderno);
         log.info("ReaPay submit Pay end!");
         //receiveProcessor.onReceive(resultBean,trade,TradeTypeEnum.SUBMITPAY);
-        
+        ReaPayResultBean payResult = (ReaPayResultBean) resultBean.getResultObj();
+        if("0000".equals(payResult.getResult_code())||"3006".equals(payResult.getResult_code())||"3053".equals(payResult.getResult_code())||"3054".equals(payResult.getResult_code())||
+                "3056".equals(payResult.getResult_code())||"3083".equals(payResult.getResult_code())||"3081".equals(payResult.getResult_code())){
+            //返回这些信息时，表示融宝已经接受到交易请求，但是没有同步处理，等待异步通知
+            //对于没有绑定的卡进行绑卡确认，更新状态为00
+            quickpayCustService.updateCardStatus(trade.getCardId());
+        }else{
+            //订单状态更新为失败
+            txnsOrderinfoDAO.updateOrderToFail(trade.getTxnseqno());
+        }
+        txnsLogService.updateReaPayRetInfo(trade.getTxnseqno(), payResult);
+        txnsLogService.updateTradeStatFlag(trade.getTxnseqno(), TradeStatFlagEnum.PAYING);
         /*ReaPayResultBean payResult = (ReaPayResultBean) resultBean.getResultObj();
         if("0000".equals(payResult.getResult_code())||"3006".equals(payResult.getResult_code())||"3053".equals(payResult.getResult_code())||"3054".equals(payResult.getResult_code())||
                 "3056".equals(payResult.getResult_code())||"3083".equals(payResult.getResult_code())||"3081".equals(payResult.getResult_code())){
@@ -272,8 +288,9 @@ public class ReaPayQuickPayServiceImpl implements ReaPayQuickPayService{
 			txnsLogService.updateTradeFailed(payPartyBean);
 			//订单状态为失败
 			txnsOrderinfoDAO.updateOrderToFail(txnseqno);
+			return null;
 		}else{//未支付，或者支付中
-			
+			return null;
 		}
 		try {
        	 AppPartyBean appParty = new AppPartyBean("",

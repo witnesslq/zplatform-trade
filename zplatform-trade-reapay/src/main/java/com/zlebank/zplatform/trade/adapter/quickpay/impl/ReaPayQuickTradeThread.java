@@ -236,7 +236,6 @@ public class ReaPayQuickTradeThread implements IQuickPayTrade{
      * @param trade
      * @return
      */
-    
     public ResultBean queryTrade(TradeBean trade) {
         /*ResultBean resultBean = null;
         QueryBean queryBean = ReaPayTradeAnalyzer.generateQueryBean(trade);

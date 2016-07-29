@@ -357,6 +357,7 @@ public class GateWayController {
             model.put("cashier", "");
             model.put("merchName", coopInsti.getInstiName());
             model.put("merchId", txnsLog.getAccfirmerno());
+            model.put("subMerchId", txnsLog.getAccsecmerno());
             model.put("goodsName", orderInfo.getGoodsname());
             model.put("txnseqno", txnseqno);
             model.put("memberId", txnsLog.getAccmemberid());
@@ -662,7 +663,6 @@ public class GateWayController {
                 ChannelEnmu channel = ChannelEnmu.fromValue(routId);
                 trade.setPayinstiId(channel.getChnlcode());
                 webGateWayService.submitPay(trade);
-                txnsLogService.updateAnonOrderToMemberOrder(orderinfo.getRelatetradetxn(), "100000000000576");
                 model.put("trade", trade);
                 switch (channel) {
                     case ZLPAY :

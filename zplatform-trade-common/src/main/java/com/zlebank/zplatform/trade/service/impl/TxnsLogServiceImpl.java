@@ -144,7 +144,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
     }
     
     
-    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public ResultBean updatePayInfo_Fast(PayPartyBean payPartyBean){
         TxnsLogModel txnsLog = getTxnsLogByTxnseqno(payPartyBean.getTxnseqno());
         Map<String, Object> cardMap = null;
@@ -168,7 +168,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         return null;
     }
     
-    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void updatePayInfo_Fast_result(String txnseqno,String retcode,String retinfo){
     	String hql = "update TxnsLogModel set payretcode=?,payretinfo=? where txnseqno=?";
     	
@@ -180,7 +180,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         txnsLog.setPayordfintime(DateUtil.getCurrentDateTime());
         super.update(txnsLog);*/
     }
-    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void updatePayInfo_Fast_result(String txnseqno,String payrettsnseqno,String retcode,String retinfo){
        /* TxnsLogModel txnsLog = super.get(txnseqno);
         txnsLog.setPayretcode(retcode);
@@ -191,7 +191,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         super.updateByHQL(hql, new Object[]{retcode,retinfo,payrettsnseqno,DateUtil.getCurrentDateTime(),txnseqno});
         /*super.update(txnsLog);*/
     }
-    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor = Throwable.class)
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void updateCoreRetResult(String txnseqno,String retcode,String retinfo){
         /* TxnsLogModel txnsLog = super.get(txnseqno);
         txnsLog.setRetcode(retcode);
@@ -208,6 +208,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
     
     
     @Transactional
+    @Deprecated
     public ResultBean updatePayInfo_ecitic(PayPartyBean payPartyBean){
         ResultBean resultBean =null;
           try {
@@ -237,7 +238,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         return resultBean;
     }
     
-    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public ResultBean updateGateWayPayResult(PayPartyBean payPartyBean){
     	TxnsLogModel txnsLog = getTxnsLogByTxnseqno(payPartyBean.getTxnseqno());
     	txnsLog.setPayordfintime(DateUtil.getCurrentDateTime());
@@ -313,7 +314,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         }
         return null;
     }
-    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public ResultBean updateAppInfo(AppPartyBean appParty){
         ResultBean resultBean =null;
         try {
@@ -370,7 +371,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
      * @param payResult
      */
     @Override
-    @Transactional
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void updateReaPayRetInfo(String txnseqno, ReaPayResultBean payResult) {
     	String hql = "update TxnsLogModel set payretcode=?,payretinfo=?,retcode=?,retinfo=?,tradestatflag=? where txnseqno = ?";
     	Object[] paramaters = null;
@@ -394,7 +395,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         
         //super.update(txnsLog);
     }
-    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void updateCMBCWithholdingRetInfo(String txnseqno, TxnsWithholdingModel withholdin) {
     	String hql = "update TxnsLogModel set payretcode=?,payretinfo=?,retcode=?,retinfo=?,tradestatflag=? where txnseqno = ?";
     	Object[] paramaters = null;
@@ -427,6 +428,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
      * @return
      */
     @Override
+    @Transactional(readOnly=true)
     public TxnsLogModel queryTrade(QueryBean queryBean) {
         TxncodeDefModel busiModel = txncodeDefService.getBusiCode(queryBean.getTxnType(), queryBean.getTxnSubType(), queryBean.getBizType());
         List<Object> paramList = new ArrayList<Object>();
@@ -448,7 +450,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         return null;
     }
     
-    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void saveAccountTrade(AccountTradeBean accountTrade) throws TradeException{
         
         try {
@@ -472,7 +474,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
       
     }
     
-    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void updateAccountTrade(AccountTradeBean accountTrade,ResultBean resultBean) throws TradeException{
         try {
             TxnsLogModel txnsLog = super.get(accountTrade.getTxnseqno());
@@ -494,15 +496,16 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         }
     }
     
+    @Transactional(readOnly=true)
     public TxnsLogModel queryLogByTradeseltxn(String queryId){
         return super.getUniqueByHQL(" from TxnsLogModel where  tradeseltxn = ? ", new Object[]{queryId});
     }
-    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void updateAppStatus(String txnseqno,String appOrderStatus,String appOrderinfo){
         String hql = "update TxnsLogModel set appordfintime = ?,apporderstatus = ?,apporderinfo = ? where txnseqno = ?";
         super.updateByHQL(hql,new Object[]{DateUtil.getCurrentDateTime(),appOrderStatus,appOrderinfo,txnseqno});
     }
-    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class) 
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void tradeRiskControl(String txnseqno,String merchId,String subMerchId,String memberId,String busiCode,String txnAmt,String cardType,String cardNo) throws TradeException{
         log.info("trade risk control start");
         int riskLevel = 0;
@@ -564,14 +567,14 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         log.info(" trade risk control end");
     }
     
-    
+    @Transactional(readOnly=true)
     public List<Map<String,String>> getRiskStrategy(int orders){
         String sql = "select * from T_RISK_LIST where ORDERS = ?";
         return (List<Map<String, String>>) super.queryBySQL(sql, new Object[]{orders});
     }
 
     @Override
-    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void updateAccBusiCode(String txnseqno, String busicode) {
         // TODO Auto-generated method stub
         String hql = "update TxnsLogModel set accbusicode = ? where txnseqno = ? ";
@@ -580,7 +583,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 
 
     @Override
-    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void initretMsg(String txnseqno) throws TradeException {
         // TODO Auto-generated method stub
         try {
@@ -595,7 +598,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 
 
     @Override
-    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void updateTxnsLog(TxnsLogModel txnsLog) {
         // TODO Auto-generated method stub
         super.update(txnsLog);
@@ -619,7 +622,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 
 
     @Override
-    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void saveTransferLogs(List<PojoTranData> transferDataList) {
         for(PojoTranData data : transferDataList){
         	
@@ -677,7 +680,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 
 
     @Override
-    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void saveTxnsLog(TxnsLogModel txnsLogModel) throws TradeException {
         try {
             super.save(txnsLogModel);
@@ -691,7 +694,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 
 
 	@Override
-	@Transactional(propagation=Propagation.REQUIRES_NEW)
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
 	public void saveBankTransferLogs(List<PojoBankTransferData> transferDataList) {
 		// TODO Auto-generated method stub
 		for(PojoBankTransferData data : transferDataList){
@@ -786,7 +789,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         }
 	}
 
-	@Transactional(propagation=Propagation.REQUIRES_NEW)
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
 	public void saveBossPayBankTransferLogs(List<PojoBankTransferData> transferDataList) {
 		// TODO Auto-generated method stub
 		for(PojoBankTransferData data : transferDataList){
@@ -898,7 +901,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         return (List<?>) super.queryBySQL(queryString, new Object[]{memberId,date});//,date
     }
     
-    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void excuteRecon(){
     	log.info("start ReconJob");
     	
@@ -996,7 +999,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 		log.info("end ReconJob");
     }
     
-    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void excuteSetted() throws AccBussinessException, AbstractBusiAcctException, NumberFormatException, IllegalEntryRequestException{
     	log.info("start excuteSetted Job");
     	List<Map<String, Object>> selfTxnList = (List<Map<String, Object>>) queryBySQL("SELECT * FROM T_SELF_TXN T WHERE STATUS = ? AND RESULT = ?", new Object[]{"9","03"});
@@ -1079,6 +1082,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 	 * @return
 	 */
 	@Override
+	@Transactional(readOnly=true)
 	public TxnsLogModel getTxnsLogByPayOrderNo(String payOrderNo) {
 		return super.getUniqueByHQL(" from TxnsLogModel where  payordno = ? and paytype = ?", new Object[]{payOrderNo,"05"});
 	}
@@ -1092,7 +1096,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 	 * @param retinfo
 	 */
 	@Override
-	@Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
 	public void updateWeChatRefundResult(String txnseqno,
 			String payrettsnseqno, String retcode, String retinfo) {
 		TxnsLogModel txnsLog = super.get(txnseqno);
@@ -1118,6 +1122,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 
 
 	@Override
+	@Transactional(readOnly=true)
 	public List<?> getRefundOrderInfo(String refundtype,int mins ) {
 		StringBuffer sb= new StringBuffer();
 		sb.append(" select ttl.txnseqno ");
@@ -1197,7 +1202,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 		return null;
 	}
 	
-	@Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
 	public void updateTradeStatFlag(String txnseqno,TradeStatFlagEnum tradeStatFlagEnum){
 		String hql = "update TxnsLogModel set tradestatflag = ? where txnseqno = ?";
 		super.updateByHQL(hql, new Object[]{tradeStatFlagEnum.getStatus(),txnseqno});
@@ -1219,7 +1224,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 		
 	}
 	
-	@Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
 	public void updateCMBCTradeData(PayPartyBean payPartyBean){
 		Object[] paramaters = null;
         TxnsLogModel txnsLog = getTxnsLogByTxnseqno(payPartyBean.getTxnseqno());
@@ -1279,6 +1284,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 	    super.updateByHQL(hql, paramaters);
 	}
 	
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
 	public void updateSMSErrorData(String txnseqno,String retcode,String retinfo){
     	String hql = "update TxnsLogModel set payretcode=?,payretinfo=?,retcode=?,retinfo=?,tradestatflag=? where txnseqno=?";
     	super.updateByHQL(hql, new Object[]{
@@ -1329,7 +1335,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 	    }
 	    super.updateByHQL(hql, paramaters);
 	}
-	@Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
 	public void updateTradeData(PayPartyBean payPartyBean){
 		Object[] paramaters = null;
 	       
@@ -1368,7 +1374,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 	    super.updateByHQL(hql, paramaters);
 	}
 	
-	
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
 	public void updateTradeFailed(PayPartyBean payPartyBean){
 		String hql = "update TxnsLogModel set payretcode=?,payretinfo=?,retcode=?,retinfo=?,tradestatflag=?,payordfintime=? where txnseqno=?";
 		Object[] paramaters = null;
@@ -1385,7 +1391,6 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 	        		payPartyBean.getTxnseqno()};
 	    } catch (Exception e) {
 	        paramaters = new Object[]{
-				    payPartyBean.getPayrettsnseqno(),
 				    payPartyBean.getPayretcode().trim(),
 				    payPartyBean.getPayretinfo().trim(),
 				    UnknowRetCodeEnum.fromChannl(payPartyBean.getPayinst()).getCode(),

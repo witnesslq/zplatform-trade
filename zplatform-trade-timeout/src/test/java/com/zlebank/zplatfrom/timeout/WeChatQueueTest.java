@@ -37,9 +37,9 @@ public class WeChatQueueTest {
 	private TradeQueueJob tradeQueueJob;
 	public void test_addQueue(){
 		TradeQueueBean tradeQueueBean = new TradeQueueBean();
-		tradeQueueBean.setTxnseqno("1607219900064419");
-		tradeQueueBean.setPayInsti("91000001");
-		tradeQueueBean.setTxnDateTime("20160715115026");
+		tradeQueueBean.setTxnseqno("1607299900055486");
+		tradeQueueBean.setPayInsti("96000001");
+		tradeQueueBean.setTxnDateTime("20160729100408");
 		tradeQueueService.addTradeQueue(tradeQueueBean);
 	}
 	

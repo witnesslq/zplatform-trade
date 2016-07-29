@@ -2136,8 +2136,7 @@ public class GateWayServiceImpl extends
 		ResultBean routResultBean = routeConfigService.getWapTransRout(
 				DateUtil.getCurrentDateTime(),
 				orderinfo.getOrderamt() + "",
-				StringUtil.isNotEmpty(orderinfo.getFirmemberno()) ? orderinfo
-						.getFirmemberno() : orderinfo.getSecmemberno(), txnsLog
+				StringUtil.isNotEmpty(orderinfo.getSecmemberno()) ?   orderinfo.getSecmemberno():orderinfo.getFirmemberno(), txnsLog
 						.getBusicode(), cardBean.getCardNo());
 		if (log.isDebugEnabled()) {
 			log.debug("获取路由信息：" + JSON.toJSON(cardBean));
@@ -2245,9 +2244,7 @@ public class GateWayServiceImpl extends
 					.getWapTransRout(
 							DateUtil.getCurrentDateTime(),
 							orderinfo.getOrderamt() + "",
-							StringUtil.isNotEmpty(orderinfo.getFirmemberno()) ? orderinfo
-									.getFirmemberno() : orderinfo
-									.getSecmemberno(), txnsLog.getBusicode(),
+							StringUtil.isNotEmpty(orderinfo.getSecmemberno()) ? orderinfo.getSecmemberno():orderinfo.getFirmemberno() , txnsLog.getBusicode(),
 							card.getCardno());
 			routId = routResultBean.getResultObj().toString();
 			if (routId == null) {
@@ -2332,9 +2329,7 @@ public class GateWayServiceImpl extends
 				orderinfo.getTn(), "", "");
 		ResultBean routResultBean = routeConfigService.getWapTransRout(DateUtil
 				.getCurrentDateTime(), trade.getAmount() + "",
-				StringUtil.isNotEmpty(trade.getMerchId()) ? trade.getMerchId()
-						: trade.getSubMerchId(), trade.getBusicode(), trade
-						.getCardNo());
+				StringUtil.isNotEmpty(trade.getSubMerchId()) ?  trade.getSubMerchId():trade.getMerchId(), trade.getBusicode(), trade.getCardNo());
 		String routId = routResultBean.getResultObj().toString();
 		ChannelEnmu channel = ChannelEnmu.fromValue(routId);
 		if (ChannelEnmu.REAPAY == channel) {// 融宝渠道需要校验reapayOrderNo

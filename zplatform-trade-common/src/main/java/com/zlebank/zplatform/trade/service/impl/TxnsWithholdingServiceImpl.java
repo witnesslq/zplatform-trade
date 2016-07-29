@@ -22,7 +22,7 @@ public class TxnsWithholdingServiceImpl extends BaseServiceImpl<TxnsWithholdingM
         return txnsWithholdingDAO.getSession();
     }
     @Override
-    @Transactional(propagation=Propagation.REQUIRES_NEW,rollbackFor=Throwable.class)
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void saveWithholdingLog(TxnsWithholdingModel withholding)
             throws TradeException {
         try {
@@ -34,7 +34,7 @@ public class TxnsWithholdingServiceImpl extends BaseServiceImpl<TxnsWithholdingM
         
     }
     @Override
-    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void updateRealNameResult(TxnsWithholdingModel withholding) throws TradeException {
         StringBuffer updateHQL = new StringBuffer("update TxnsWithholdingModel set ");
         updateHQL.append("exectype = ?,");
@@ -46,17 +46,17 @@ public class TxnsWithholdingServiceImpl extends BaseServiceImpl<TxnsWithholdingM
         updateByHQL(updateHQL.toString(), new Object[]{withholding.getExectype(),withholding.getExeccode(),withholding.getExecmsg(),withholding.getValidatestatus(),withholding.getPayserialno(),withholding.getSerialno()});
     }
     
-    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void updateWhithholding(TxnsWithholdingModel withholding){
         super.update(withholding);
     }
     
-    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    @Transactional(readOnly=true)
     public TxnsWithholdingModel getWithholdingBySerialNo(String serialno){
         return super.getUniqueByHQL("from TxnsWithholdingModel where serialno = ?", new Object[]{serialno});
     }
     @Override
-    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void updateWithholdingLogError(TxnsWithholdingModel withholding) {
         StringBuffer updateHQL = new StringBuffer("update TxnsWithholdingModel set ");
         updateHQL.append("execmsg = ?,");

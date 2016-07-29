@@ -169,7 +169,7 @@ public class RouteConfigServiceImpl extends BaseServiceImpl<RouteConfigModel, Lo
         log.info("member "+memberId+" no find member rout!!!");
         return new ResultBean("RC99", "交易路由异常");
     }
-    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    @Transactional(readOnly=true)
     public Map<String, Object> getCardInfo(String cardNo){
         StringBuffer sqlBuffer = new StringBuffer();
         sqlBuffer.append("SELECT type,bankcode,bankname ");
@@ -212,7 +212,7 @@ public class RouteConfigServiceImpl extends BaseServiceImpl<RouteConfigModel, Lo
 		return null;
     }
     
-    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    @Transactional(readOnly=true)
     public String getDefaultVerInfo(String instiCode,String busicode,int verType) throws TradeException{
     	List<Map<String, Object>> resultList = (List<Map<String, Object>>) super.queryBySQL("select COOP_INSTI_CODE,BUSI_CODE,VER_TYPE,VER_VALUE from T_NONMER_DEFAULT_CONFIG where COOP_INSTI_CODE=? and BUSI_CODE=? and VER_TYPE=?", new Object[]{instiCode,busicode,verType+""});
     	if(resultList.size()>0){
@@ -222,7 +222,7 @@ public class RouteConfigServiceImpl extends BaseServiceImpl<RouteConfigModel, Lo
     	throw new TradeException("GW03");
 		//return null;
     }
-    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    @Transactional(readOnly=true)
     public ResultBean getWapTransRout(String transTime,String transAmt,String memberId,String busiCode,String cardNo){
         try {
         	String merchRoutver = null;

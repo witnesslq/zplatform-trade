@@ -50,7 +50,7 @@ public class TxnsOrderinfoDAOImpl extends HibernateBaseDAOImpl<TxnsOrderinfoMode
     
     
     
-    @Transactional(propagation=Propagation.REQUIRED)
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void updateOrderToFail(String txnseqno) {
         //TxnsOrderinfoModel orderinfo = getOrderByTxnseqno(txnseqno);
         //if("02".equals(orderinfo.getStatus())){
