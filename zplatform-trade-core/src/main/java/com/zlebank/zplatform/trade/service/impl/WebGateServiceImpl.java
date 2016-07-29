@@ -205,7 +205,7 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         	throw new TradeException("T039");
         }
         
-        ResultBean routResultBean = routeConfigService.getWapTransRout(DateUtil.getCurrentDateTime(), orderinfo.getOrderamt()+"",  StringUtil.isNotEmpty(tradeBean.getMerchId())?tradeBean.getMerchId():tradeBean.getSubMerchId(), txnsLog.getBusicode(), tradeBean.getCardNo());
+        ResultBean routResultBean = routeConfigService.getWapTransRout(DateUtil.getCurrentDateTime(), orderinfo.getOrderamt()+"",  StringUtil.isNotEmpty(tradeBean.getSubMerchId())?tradeBean.getSubMerchId():tradeBean.getMerchId(), txnsLog.getBusicode(), tradeBean.getCardNo());
         String routId = routResultBean.getResultObj().toString();
         IQuickPayTrade quickPayTrade = null;
         try {
@@ -277,7 +277,7 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         
         
         //获取路由信息
-        ResultBean routResultBean = routeConfigService.getWapTransRout(DateUtil.getCurrentDateTime(), orderinfo.getOrderamt()+"", StringUtil.isNotEmpty(trade.getMerchId())?trade.getMerchId():trade.getSubMerchId(), txnsLog.getBusicode(), trade.getCardNo());
+        ResultBean routResultBean = routeConfigService.getWapTransRout(DateUtil.getCurrentDateTime(), orderinfo.getOrderamt()+"", StringUtil.isNotEmpty(trade.getSubMerchId())?trade.getSubMerchId():trade.getMerchId(), txnsLog.getBusicode(), trade.getCardNo());
         if(routResultBean.isResultBool()){
             String routId = routResultBean.getResultObj().toString();
             IQuickPayTrade quickPayTrade = null;
@@ -343,7 +343,7 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
     public void bindPay(TradeBean trade) throws TradeException{
         // 直接获取短信验证码
         PojoQuickpayCust custCard = quickpayCustDAO.getById(Long.valueOf(trade.getBindCardId()));
-        ResultBean routResultBean = routeConfigService.getWapTransRout(DateUtil.getCurrentDateTime(), trade.getAmount()+"", StringUtil.isNotEmpty(trade.getMerchId())?trade.getMerchId():trade.getSubMerchId(), trade.getBusicode(), trade.getCardNo());
+        ResultBean routResultBean = routeConfigService.getWapTransRout(DateUtil.getCurrentDateTime(), trade.getAmount()+"", StringUtil.isNotEmpty(trade.getSubMerchId())?trade.getSubMerchId():trade.getMerchId(), trade.getBusicode(), trade.getCardNo());
         String routId = routResultBean.getResultObj().toString();
         trade.setReaPayOrderNo(OrderNumber.getInstance()
                 .generateReaPayOrderId());
