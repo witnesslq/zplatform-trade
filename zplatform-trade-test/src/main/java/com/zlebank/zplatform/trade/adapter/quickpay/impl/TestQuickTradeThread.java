@@ -12,6 +12,7 @@ package com.zlebank.zplatform.trade.adapter.quickpay.impl;
 
 import java.util.Map;
 
+import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.adapter.quickpay.IQuickPayTrade;
 import com.zlebank.zplatform.trade.analyzer.TestTradeAnalyzer;
@@ -31,6 +32,8 @@ import com.zlebank.zplatform.trade.service.IRouteConfigService;
 import com.zlebank.zplatform.trade.service.ITestTradeService;
 import com.zlebank.zplatform.trade.service.ITradeReceiveProcessor;
 import com.zlebank.zplatform.trade.service.ITxnsQuickpayService;
+import com.zlebank.zplatform.trade.utils.SMSThreadPool;
+import com.zlebank.zplatform.trade.utils.SMSUtil;
 import com.zlebank.zplatform.trade.utils.SpringContext;
 
 /**
@@ -75,6 +78,20 @@ public class TestQuickTradeThread implements IQuickPayTrade,Runnable{
         
     }
 
+	/**
+	 *
+	 * @param trade
+	 * @return
+	 */
+	
+	public ResultBean sendSmsExt(TradeBean trade) {
+		String mobile = trade.getMobile();
+		SMSThreadPool.getInstance().executeMission(
+				new SMSUtil(mobile, "", trade.getTn(), DateUtil
+						.getCurrentDateTime(), "", trade
+						.getMiniCardNo(), trade.getAmount_y()));
+		return new ResultBean("success");
+	}
     /**
     *
     * @param trade
@@ -116,7 +133,13 @@ public class TestQuickTradeThread implements IQuickPayTrade,Runnable{
                resultBean = testTradeService.bindCard(bindBean);
                //更新快捷交易流水
                txnsQuickpayService.updateTestPaySign(resultBean,payorderno);
-               return resultBean;
+               if(resultBean.isResultBool()){
+            	   //增加发送短信
+                   ResultBean smsBean= this.sendSmsExt(trade);
+                   return smsBean;
+               }else{
+            	   return resultBean; 
+               }
            }
            Map<String, Object> cardInfoMap = routeConfigService.getCardInfo(trade.getCardNo());
            if(cardInfoMap==null){
@@ -152,7 +175,14 @@ public class TestQuickTradeThread implements IQuickPayTrade,Runnable{
            if(bindId!=null){
                bean.setBind_id(bindId+"");
            }
-           
+           if(resultBean.isResultBool()){
+        	   //增加发送短信
+               ResultBean smsBean= this.sendSmsExt(trade);
+               sendSms(trade);
+               return smsBean;
+           }else{
+        	   return resultBean; 
+           }
        } catch (Exception e) {
            // TODO Auto-generated catch block
            e.printStackTrace();
@@ -161,6 +191,8 @@ public class TestQuickTradeThread implements IQuickPayTrade,Runnable{
        
        return resultBean;
    }
+   
+   
 
    /**
     *
