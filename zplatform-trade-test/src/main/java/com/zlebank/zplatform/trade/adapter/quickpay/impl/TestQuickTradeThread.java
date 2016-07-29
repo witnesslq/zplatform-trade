@@ -78,20 +78,6 @@ public class TestQuickTradeThread implements IQuickPayTrade,Runnable{
         
     }
 
-	/**
-	 *
-	 * @param trade
-	 * @return
-	 */
-	
-	public ResultBean sendSmsExt(TradeBean trade) {
-		String mobile = trade.getMobile();
-		SMSThreadPool.getInstance().executeMission(
-				new SMSUtil(mobile, "", trade.getTn(), DateUtil
-						.getCurrentDateTime(), "", trade
-						.getMiniCardNo(), trade.getAmount_y()));
-		return new ResultBean("success");
-	}
     /**
     *
     * @param trade
@@ -133,13 +119,7 @@ public class TestQuickTradeThread implements IQuickPayTrade,Runnable{
                resultBean = testTradeService.bindCard(bindBean);
                //更新快捷交易流水
                txnsQuickpayService.updateTestPaySign(resultBean,payorderno);
-               if(resultBean.isResultBool()){
-            	   //增加发送短信
-                   ResultBean smsBean= this.sendSmsExt(trade);
-                   return smsBean;
-               }else{
-            	   return resultBean; 
-               }
+               return resultBean;
            }
            Map<String, Object> cardInfoMap = routeConfigService.getCardInfo(trade.getCardNo());
            if(cardInfoMap==null){
@@ -175,14 +155,6 @@ public class TestQuickTradeThread implements IQuickPayTrade,Runnable{
            if(bindId!=null){
                bean.setBind_id(bindId+"");
            }
-           if(resultBean.isResultBool()){
-        	   //增加发送短信
-               ResultBean smsBean= this.sendSmsExt(trade);
-               sendSms(trade);
-               return smsBean;
-           }else{
-        	   return resultBean; 
-           }
        } catch (Exception e) {
            // TODO Auto-generated catch block
            e.printStackTrace();
@@ -191,7 +163,6 @@ public class TestQuickTradeThread implements IQuickPayTrade,Runnable{
        
        return resultBean;
    }
-   
    
 
    /**
