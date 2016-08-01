@@ -89,7 +89,6 @@ import com.zlebank.zplatform.trade.cmbc.service.IWithholdingService;
 import com.zlebank.zplatform.trade.cmbc.service.impl.InsteadPayServiceImpl;
 import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
 import com.zlebank.zplatform.trade.dao.RspmsgDAO;
-import com.zlebank.zplatform.trade.dao.impl.TxnsOrderinfoDAOImpl;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.factory.AccountingAdapterFactory;
 import com.zlebank.zplatform.trade.factory.TradeAdapterFactory;
@@ -213,16 +212,61 @@ public class GateWayController {
             // 订单记录和业务逻辑处理,取得商户信息，记录交易数据（核心）和订单详细信息，分析交易所属业务
             String txnseqno = gateWayService.dealWithOrder(order, riskRateInfo);
             TxnsOrderinfoModel  orderInfo =this.txnsOrderinfoDAO.getOrderByTxnseqno(txnseqno);
-            /*return new ModelAndView("redirect:/gateway/cash.htm?txnseqno="
-                    + txnseqno);*/
-            String weburl= ConsUtil.getInstance().cons.getWeb_cash_url();
-            return new ModelAndView("redirect:"+weburl+"?tn="+ orderInfo.getTn());
+            return new ModelAndView("redirect:/gateway/cash.htm?txnseqno="
+                    + txnseqno);
+            /*String weburl= ConsUtil.getInstance().cons.getWeb_cash_url();
+            return new ModelAndView("redirect:"+weburl+"?tn="+ orderInfo.getTn());*/
         } catch (Exception e) {
             e.printStackTrace();
             model.put("errMsg", "订单信息错误，请重新提交");
             model.put("errCode", "RC99");
         }
         return new ModelAndView("/erro_gw", model);
+    }
+    
+    /***
+     * 收银台生成订单
+     * @param order
+     * @param httpSession
+     * @param request
+     * @return
+     */
+    @RequestMapping("/coporderWeb.htm")
+    public ModelAndView payExt(OrderBean order,HttpSession httpSession,HttpServletRequest request) {
+        log.info("receive web message(json):" + JSON.toJSONString(order));
+        Map<String, Object> model = new HashMap<String, Object>();
+        String weburl= ConsUtil.getInstance().cons.getWeb_cash_url();
+        String errurl =weburl+"/errOrder.htm";
+        try {
+        	//校验订单信息
+            if (!validateOrder(order, model)) {
+            	String errCode=model.get("errCode")==null?"":model.get("errCode").toString();
+            	String errorMsg=model.get("errMsg")==null?"":model.get("errMsg").toString();
+            	log.error("生成订单 失败 errorCode="+errCode+"errorMsg="+errorMsg);
+            	return new ModelAndView("redirect:"+errurl);
+            }
+            RiskRateInfoBean riskRateInfo = (RiskRateInfoBean) GateWayTradeAnalyzer
+                    .generateRiskBean(order.getRiskRateInfo()).getResultObj();
+            //记录付款人的IP
+            if(StringUtil.isEmpty(order.getCustomerIp())){
+                order.setCustomerIp(getIpAddr(request));
+            }
+            // 订单记录和业务逻辑处理,取得商户信息，记录交易数据（核心）和订单详细信息，分析交易所属业务
+            String txnseqno = gateWayService.dealWithOrder(order, riskRateInfo);
+            TxnsOrderinfoModel  orderInfo =this.txnsOrderinfoDAO.getOrderByTxnseqno(txnseqno);
+            /*return new ModelAndView("redirect:/gateway/cash.htm?txnseqno="
+                    + txnseqno);*/
+            return new ModelAndView("redirect:"+weburl+"/cash.htm?tn="+ orderInfo.getTn());
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.put("errMsg", "订单信息错误，请重新提交");
+            model.put("errCode", "RC99");
+           
+        }
+        String errCode=model.get("errCode")==null?"":model.get("errCode").toString();
+    	String errorMsg=model.get("errMsg")==null?"":model.get("errMsg").toString();
+    	 log.error("生成订单 失败 errorCode="+errCode+"errorMsg="+errorMsg);
+    	return new ModelAndView("redirect:"+errurl);
     }
     /***
      * 校验订单信息
