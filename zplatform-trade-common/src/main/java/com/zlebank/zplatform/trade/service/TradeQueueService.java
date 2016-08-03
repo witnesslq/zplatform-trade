@@ -10,8 +10,9 @@
  */
 package com.zlebank.zplatform.trade.service;
 
-import com.zlebank.zplatform.trade.bean.TradeQueueBean;
 import com.zlebank.zplatform.trade.bean.enums.TradeQueueEnum;
+import com.zlebank.zplatform.trade.bean.queue.NotifyQueueBean;
+import com.zlebank.zplatform.trade.bean.queue.TradeQueueBean;
 
 /**
  * Class Description
@@ -34,6 +35,12 @@ public interface TradeQueueService {
 	 * @param tradeQueueBean
 	 */
 	public void addTimeOutQueue(TradeQueueBean tradeQueueBean);
+	
+	/**
+	 * 添加异步通知进入异步通知队列
+	 * @param notifyQueueBean
+	 */
+	public void addNotifyQueue(NotifyQueueBean notifyQueueBean);
 	
 	/**
 	 * 取得交易队列中最左侧的交易
@@ -60,4 +67,6 @@ public interface TradeQueueService {
 	 * @return
 	 */
 	public long getQueueSize(TradeQueueEnum queueEnum);
+	
+	public <T> T queuePop(TradeQueueEnum tradeQueueEnum, Class<T> clazz);
 }

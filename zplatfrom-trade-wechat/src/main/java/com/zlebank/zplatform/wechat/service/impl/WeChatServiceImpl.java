@@ -751,76 +751,46 @@ public class WeChatServiceImpl implements WeChatService{
 				TradeStateCodeEnum tradeStateCodeEnum = TradeStateCodeEnum.fromValue(result.getTrade_state());
 			     //返回状态为：支付成功，或 退款中
 				if(tradeStateCodeEnum==TradeStateCodeEnum.SUCCESS){
-					/*txnsLog.setPayrettsnseqno(result.getTransaction_id()+"");
-					txnsLog.setPayretcode(TradeStateCodeEnum.SUCCESS.getCode());
-					txnsLog.setPayretinfo("交易成功");
-					txnsLog.setTradestatflag("00000001");//交易完成结束位
-				    txnsLog.setTradetxnflag("10000000");
-				    txnsLog.setRelate("10000000");
-				    txnsLog.setRetdatetime(DateUtil.getCurrentDateTime());
-				    txnsLog.setTradeseltxn(UUIDUtil.uuid());
-				    txnsLog.setRetcode("0000");
-				    txnsLog.setRetinfo("交易成功");*/
-					
-					
 					payPartyBean.setPayrettsnseqno(result.getTransaction_id());
 					payPartyBean.setPayretcode(resultCodeEnum.getCode());
 					payPartyBean.setPayretinfo("交易成功");
 				    txnsOrderinfoDAO.updateOrderToSuccess(txnseqno);
 				    //更新微信核心交易支付方应答信息和核心交易信息
 				    txnsLogService.updateWeChatTradeData(payPartyBean);
+				    
+				    try {
+			            AppPartyBean appParty = new AppPartyBean("",
+			                    "000000000000", DateUtil.getCurrentDateTime(),
+			                    DateUtil.getCurrentDateTime(), txnsLog.getTxnseqno(), "");
+			            txnsLogService.updateAppInfo(appParty);
+			            AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue(txnsLog.getBusitype())).accountedFor(txnsLog.getTxnseqno());
+			        } catch (Exception e) {
+			            log.error(e.getMessage());
+			            e.printStackTrace();
+			            resultBean = new ResultBean("", result.getErr_code_des());
+						return resultBean;
+			        }
 				//返回状态为：支付失败，或 已撤消	
 			    }else if(tradeStateCodeEnum==TradeStateCodeEnum.PAYERROR||
 			    		  tradeStateCodeEnum==TradeStateCodeEnum.REVOKED||
 			    		  tradeStateCodeEnum==TradeStateCodeEnum.CLOSED){
-			    	/*txnsLog.setPayretcode(result.getTrade_state());
-					txnsLog.setPayretinfo(result.getTrade_state_desc());*/
-					//order.setStatus(OrderStatusEnum.FAILED.getStatus());
+			    	
 			    	payPartyBean.setPayretcode(result.getErr_code());
 			    	payPartyBean.setPayretinfo(result.getErr_code_des());
 					txnsOrderinfoDAO.updateOrderToFail(txnseqno);
 					txnsLogService.updateTradeFailed(payPartyBean);
-			    }else if(tradeStateCodeEnum==TradeStateCodeEnum.NOTPAY){
+			    }else if(tradeStateCodeEnum==TradeStateCodeEnum.NOTPAY){//交易未支付
 			    	 
-			    //返回状态为：支付中 
-			    }else if(result.getTrade_state().equals(TradeStateCodeEnum.USERPAYING.getCode())){
-			    	 
+			    	return null;
+			    }else if(result.getTrade_state().equals(TradeStateCodeEnum.USERPAYING.getCode())){//返回状态为：支付中 
+			    	return null;
 			    }
-				
-				
+				//交易成功或者交易失败均有异步通知
+				tradeNotifyService.notify(txnsLog.getTxnseqno());
 			//
-			}else if(ResultCodeEnum.FAIL==resultCodeEnum){
+			}else if(ResultCodeEnum.FAIL==resultCodeEnum){//业务报文失败，没有返回业务报文
 				resultBean = new ResultBean(result.getErr_code(), result.getErr_code_des());
 				return resultBean;
-			}
-			/*txnsLog.setPayordfintime(DateUtil.getCurrentDateTime());
-	        txnsLog.setRetdatetime(DateUtil.getCurrentDateTime());
-			//更新支付方信息
-			txnsLogService.updateTxnsLog(txnsLog);*/
-			//更新支付方信息
-			
-			
-			if((result.getTrade_state().equals(TradeStateCodeEnum.SUCCESS.getCode())
-		    		 ||result.getTrade_state().equals(TradeStateCodeEnum.REFUND.getCode()))){
-				//处理账务
-				//**账务处理开始 **//*
-		        // 应用方信息
-		        try {
-		            AppPartyBean appParty = new AppPartyBean("",
-		                    "000000000000", DateUtil.getCurrentDateTime(),
-		                    DateUtil.getCurrentDateTime(), txnsLog.getTxnseqno(), "");
-		            txnsLogService.updateAppInfo(appParty);
-		            AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue(txnsLog.getBusitype())).accountedFor(txnsLog.getTxnseqno());
-		        } catch (Exception e) {
-		            log.error(e.getMessage());
-		            e.printStackTrace();
-		            resultBean = new ResultBean("", result.getErr_code_des());
-					return resultBean;
-		        }
-		        //**账务处理结束 **//
-				//**异步通知处理开始  **/
-		        tradeNotifyService.notify(txnsLog.getTxnseqno());
-		        //**异步通知处理结束 **/
 			}
 		}else if(busiTypeEnum==BusiTypeEnum.refund){
 			QueryRefundResultBean refund = (QueryRefundResultBean) resultBean.getResultObj();

@@ -182,6 +182,7 @@ public class MerchCashController {
             }
             model.put("merchName", coopInsti.getInstiName());//合作机构名称
             model.put("merchId", txnsLog.getAccfirmerno());
+            model.put("subMerchId", txnsLog.getAccsecmerno());
             model.put("goodsName", orderInfo.getGoodsname());
             model.put("txnseqno", txnseqno);
             model.put("memberId", txnsLog.getAccmemberid());

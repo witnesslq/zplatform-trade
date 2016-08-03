@@ -13,6 +13,7 @@ package com.zlebank.zplatform.trade.service.impl;
 import java.net.URLEncoder;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.ExecutorService;
 
 import net.sf.json.JSONObject;
 
@@ -31,13 +32,19 @@ import com.zlebank.zplatform.member.bean.enums.TerminalAccessType;
 import com.zlebank.zplatform.member.service.CoopInstiService;
 import com.zlebank.zplatform.member.service.MerchMKService;
 import com.zlebank.zplatform.trade.bean.ResultBean;
+import com.zlebank.zplatform.trade.bean.enums.TradeQueueEnum;
 import com.zlebank.zplatform.trade.bean.gateway.AnonOrderAsynRespBean;
 import com.zlebank.zplatform.trade.bean.gateway.OrderAsynRespBean;
+import com.zlebank.zplatform.trade.bean.queue.NotifyQueueBean;
 import com.zlebank.zplatform.trade.dao.ITxnsOrderinfoDAO;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
+import com.zlebank.zplatform.trade.model.TxnsNotifyTaskModel;
 import com.zlebank.zplatform.trade.model.TxnsOrderinfoModel;
+import com.zlebank.zplatform.trade.pool.AsyncNotifyThreadPool;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
+import com.zlebank.zplatform.trade.service.ITxnsNotifyTaskService;
 import com.zlebank.zplatform.trade.service.TradeNotifyService;
+import com.zlebank.zplatform.trade.service.TradeQueueService;
 import com.zlebank.zplatform.trade.utils.DateUtil;
 import com.zlebank.zplatform.trade.utils.ObjectDynamic;
 import com.zlebank.zplatform.trade.utils.SynHttpRequestThread;
@@ -63,21 +70,59 @@ public class TradeNotifyServiceImpl implements TradeNotifyService{
 	private ITxnsLogService txnsLogService;
 	@Autowired
 	private CoopInstiService coopInstiService;
+	@Autowired
+	private TradeQueueService tradeQueueService;
+	@Autowired
+	private ITxnsNotifyTaskService txnsNotifyTaskService; 
 	
 	/**
 	 *
+	 */
+	@Override
+	public void queueNotfiy() {
+		// TODO Auto-generated method stub
+		long queueSize = tradeQueueService.getQueueSize(TradeQueueEnum.NOTIFYQUEUE);
+		if(queueSize>0){
+			for (int i = 0; i < queueSize; i++) {
+				NotifyQueueBean notifyQueueBean = tradeQueueService.queuePop(TradeQueueEnum.NOTIFYQUEUE,NotifyQueueBean.class);
+				if(notifyQueueBean==null){
+					continue;
+				}
+				if(Long.valueOf(DateUtil.getCurrentDateTime())<Long.valueOf(notifyQueueBean.getSendDateTime())){//没有到通知时间，不发送信息，重回队列
+					tradeQueueService.addNotifyQueue(notifyQueueBean);
+					continue;
+				}
+				//判断异步通知是否成功
+				TxnsNotifyTaskModel asyncNotifyTask = txnsNotifyTaskService.getAsyncNotifyTask(notifyQueueBean.getTxnseqno());
+				if("00".equals(asyncNotifyTask.getSendStatus())){
+					continue;
+				}
+				notify(notifyQueueBean.getTxnseqno());
+			}
+			
+		}
+		
+	}
+
+	
+	
+	/**
+	 * 
 	 * @param txnseqno
 	 */
 	@Override
 	public void notify(String txnseqno) {
 		// TODO Auto-generated method stub
+		
+		//AsyncNotifyThreadPool.getInstance().executeMission(null);
+		
 		/**异步通知处理开始 **/
         try {
 			ResultBean orderResp = 
 			        generateAsyncRespMessage(txnseqno);
 			TxnsOrderinfoModel gatewayOrderBean = txnsOrderinfoDAO.getOrderByTxnseqno(txnseqno);
 			TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(txnseqno);
-			
+			Thread notifyThread = null;
 			if (orderResp.isResultBool()) {
 				if("000205".equals(gatewayOrderBean.getBiztype())){
             		AnonOrderAsynRespBean respBean = (AnonOrderAsynRespBean) orderResp.getResultObj();
@@ -85,21 +130,21 @@ public class TradeNotifyServiceImpl implements TradeNotifyService{
             		InsteadPayNotifyTask task = new InsteadPayNotifyTask();
             		//对匿名支付订单数据进行加密加签
             		responseData(respBean, txnsLog.getAccfirmerno(), txnsLog.getAccsecmerno(), task);
-            		new SynHttpRequestThread(
+            		notifyThread=new SynHttpRequestThread(
                             StringUtil.isNotEmpty(gatewayOrderBean.getSecmemberno())?gatewayOrderBean.getSecmemberno():gatewayOrderBean.getFirmemberno(),
                             gatewayOrderBean.getRelatetradetxn(),
                             gatewayOrderBean.getBackurl(),
-                            task).start();
+                            task);
             	}else{
             		OrderAsynRespBean respBean = (OrderAsynRespBean) orderResp
                             .getResultObj();
-                    new SynHttpRequestThread(
+            		notifyThread=new SynHttpRequestThread(
                     		StringUtil.isNotEmpty(gatewayOrderBean.getSecmemberno())?gatewayOrderBean.getSecmemberno():gatewayOrderBean.getFirmemberno(),
                             gatewayOrderBean.getRelatetradetxn(),
                             gatewayOrderBean.getBackurl(),
-                            respBean.getNotifyParam()).start();
+                            respBean.getNotifyParam());
             	}
-			   
+				AsyncNotifyThreadPool.getInstance().executeMission(notifyThread);
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -255,4 +300,5 @@ public class TradeNotifyServiceImpl implements TradeNotifyService{
         return orderAsyncRespBean;
     }
 
+	
 }

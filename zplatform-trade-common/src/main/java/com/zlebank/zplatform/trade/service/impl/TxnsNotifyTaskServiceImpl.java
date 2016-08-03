@@ -93,4 +93,17 @@ public class TxnsNotifyTaskServiceImpl extends BaseServiceImpl<TxnsNotifyTaskMod
         super.updateByHQL("update TxnsOrderinfoModel set syncnotify=? where relatetradetxn = ? ", new Object[]{"00",txnseqno});
     }
 
+
+
+	/**
+	 *
+	 * @param txnseqno
+	 * @return
+	 */
+	@Override
+	@Transactional(readOnly=true)
+	public TxnsNotifyTaskModel getAsyncNotifyTask(String txnseqno) {
+		return super.getUniqueByHQL("from TxnsNotifyTaskModel where txnseqno=? and taskType=?", new Object[]{txnseqno,"1"});
+	}
+
 }

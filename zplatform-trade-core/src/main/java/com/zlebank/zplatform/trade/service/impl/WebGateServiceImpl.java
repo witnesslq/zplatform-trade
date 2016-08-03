@@ -242,7 +242,6 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
      * @param trade
      * @throws TradeException
      */
-    @Transactional
     public void bankCardSign(TradeBean trade) throws TradeException{
         if (log.isDebugEnabled()) {
             log.debug("银行卡签约：开始");
@@ -277,7 +276,7 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         
         
         //获取路由信息
-        ResultBean routResultBean = routeConfigService.getWapTransRout(DateUtil.getCurrentDateTime(), orderinfo.getOrderamt()+"", StringUtil.isNotEmpty(trade.getSubMerchId())?trade.getSubMerchId():trade.getMerchId(), txnsLog.getBusicode(), trade.getCardNo());
+        ResultBean routResultBean = routeConfigService.getWapTransRout(DateUtil.getCurrentDateTime(), orderinfo.getOrderamt()+"", StringUtil.isNotEmpty(txnsLog.getAccsecmerno())?txnsLog.getAccsecmerno():txnsLog.getAccfirmerno(), txnsLog.getBusicode(), trade.getCardNo());
         if(routResultBean.isResultBool()){
             String routId = routResultBean.getResultObj().toString();
             IQuickPayTrade quickPayTrade = null;
@@ -339,7 +338,6 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
     
     
     
-    @Transactional
     public void bindPay(TradeBean trade) throws TradeException{
         // 直接获取短信验证码
         PojoQuickpayCust custCard = quickpayCustDAO.getById(Long.valueOf(trade.getBindCardId()));

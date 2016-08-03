@@ -112,7 +112,7 @@ public class CMBCQuickReceiveProcessor implements ITradeReceiveProcessor{
     }
     
     @SuppressWarnings("unused")
-	@Transactional(propagation=Propagation.REQUIRES_NEW)
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void saveCMBCTradeResult(ResultBean resultBean,TradeBean tradeBean){
             
             if(resultBean.isResultBool()){//交易成功

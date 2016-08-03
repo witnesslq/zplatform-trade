@@ -654,10 +654,10 @@ public class GateWayController {
             }
 
             //获取路由信息
-            ResultBean routResultBean = routeConfigService.getTransRout(
+            ResultBean routResultBean = routeConfigService.getWapTransRout(
                     DateUtil.getCurrentDateTime(), trade.getAmount(),
-                    StringUtil.isNotEmpty(trade.getMerchId())?trade.getMerchId():trade.getSubMerchId(), trade.getBusicode(), trade.getCardNo(),
-                    trade.getCashCode());
+                    StringUtil.isNotEmpty(orderinfo.getSecmemberno())?orderinfo.getSecmemberno():orderinfo.getFirmemberno(), trade.getBusicode(), trade.getCardNo()
+                   );
             if (routResultBean.isResultBool()) {
                 String routId = routResultBean.getResultObj().toString();
                 ChannelEnmu channel = ChannelEnmu.fromValue(routId);
@@ -677,8 +677,7 @@ public class GateWayController {
                         return new ModelAndView("redirect:/gateway/waiting.htm?txnseqno="+ trade.getTxnseqno()+"&reapayOrderNo="+trade.getReaPayOrderNo()+"&orderNo="+trade.getOrderId());
                     case TEST:
                         TxnsOrderinfoModel gatewayOrderBean = gateWayService.getOrderByTxnseqno(trade.getTxnseqno());
-                        ResultBean orderResp = gateWayService.generateRespMessage(
-                                gatewayOrderBean.getOrderno(), trade.getMerchId());
+                        ResultBean orderResp = gateWayService.generateAsyncRespMessage(trade.getTxnseqno());
                         OrderRespBean respBean = (OrderRespBean) orderResp.getResultObj();
                         model.put("suburl",gatewayOrderBean.getFronturl()+ "?"+ ObjectDynamic.generateReturnParamer(respBean, false, null));
                         model.put("errMsg", "交易成功");

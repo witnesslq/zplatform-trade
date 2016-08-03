@@ -334,7 +334,7 @@ public class InsteadPayServiceImpl
                 if ("E000019".equals(e.getCode()))
                     throw new BalanceNotEnoughException();
                 else 
-                    throw new  FailToInsertAccEntryException();
+                    throw new FailToInsertAccEntryException();
             } catch (AbstractBusiAcctException e) {
                 log.error(e.getMessage(),e);
                 throw new  FailToInsertAccEntryException();

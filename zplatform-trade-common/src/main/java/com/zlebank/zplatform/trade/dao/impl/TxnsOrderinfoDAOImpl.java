@@ -63,7 +63,7 @@ public class TxnsOrderinfoDAOImpl extends HibernateBaseDAOImpl<TxnsOrderinfoMode
        // }
     }
     
-    @Transactional(propagation=Propagation.REQUIRED)
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void updateOrderToSuccess(String txnseqno) {
         String hql = "update TxnsOrderinfoModel set status = ? where relatetradetxn = ? ";
         Session session = getSession();

@@ -22,8 +22,9 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.commons.utils.StringUtil;
-import com.zlebank.zplatform.trade.bean.TradeQueueBean;
 import com.zlebank.zplatform.trade.bean.enums.TradeQueueEnum;
+import com.zlebank.zplatform.trade.bean.queue.NotifyQueueBean;
+import com.zlebank.zplatform.trade.bean.queue.TradeQueueBean;
 import com.zlebank.zplatform.trade.service.TradeQueueService;
 
 /**
@@ -80,6 +81,27 @@ public class TradeQueueServiceImpl implements TradeQueueService{
 			return 0;
 		}
 		
+	}
+	
+	public <T> T queuePop(TradeQueueEnum tradeQueueEnum, Class<T> clazz){
+		ListOperations<String, String> opsForList = redisTemplate.opsForList();
+		String leftPop = opsForList.leftPop(tradeQueueEnum.getName());
+		log.info("Queue 【"+tradeQueueEnum.getName()+"】 POP Value:"+leftPop);
+		if(StringUtil.isEmpty(leftPop)){
+			return null;
+		}
+		return JSON.parseObject(leftPop, clazz);
+	}
+
+	/**
+	 *
+	 * @param notifyQueueBean
+	 */
+	@Override
+	public void addNotifyQueue(NotifyQueueBean notifyQueueBean) {
+		// TODO Auto-generated method stub
+		BoundListOperations<String, String> boundListOps = redisTemplate.boundListOps(TradeQueueEnum.NOTIFYQUEUE.getName());
+		boundListOps.rightPush(JSON.toJSONString(notifyQueueBean));
 	}
 	
 }

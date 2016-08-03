@@ -13,11 +13,12 @@ package com.zlebank.zplatform.timeout.trade;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.timeout.service.TradeCompleteProcessingService;
 import com.zlebank.zplatform.timeout.service.TradeQueueQuery;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.TradeBean;
-import com.zlebank.zplatform.trade.bean.TradeQueueBean;
+import com.zlebank.zplatform.trade.bean.queue.TradeQueueBean;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.service.TradeQueueService;
 import com.zlebank.zplatform.trade.utils.SpringContext;
@@ -48,14 +49,17 @@ public class WeChatTradeThread implements TradeQueueQuery {
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-
+		log.info("【微信交易线程查询开始】"+tradeQueueBean.getTxnseqno());
 		ResultBean resultBean = weChatService.queryOrder(tradeQueueBean.getTxnseqno());
+		log.info("【微信交易线程查询结果】"+JSON.toJSONString(resultBean));
 		if (resultBean.isResultBool()) {
 			if ("PROCESSING".equals(resultBean.getErrCode()) || "USERPAYING".equals(resultBean.getErrCode())) {// 处理中，或者用户支付中，重回队列，等待下次查询
 				tradeQueueService.addTradeQueue(tradeQueueBean);
 				return;
 			}
 			completeProcessingService.weChatCompleteTrade(tradeQueueBean.getTxnseqno(), resultBean);
+		}else{
+			tradeQueueService.addTradeQueue(tradeQueueBean);
 		}
 
 	}

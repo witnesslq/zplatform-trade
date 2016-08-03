@@ -42,4 +42,11 @@ public interface ITxnsNotifyTaskService extends IBaseService<TxnsNotifyTaskModel
      * @return
      */
     public List<TxnsNotifyTaskModel> findTaskByTxnseqno(String txnseqno,String memberId);
+    
+    /**
+     * 取得异步 通知类型为异步的异步通知交易
+     * @param txnseqno
+     * @return
+     */
+    public TxnsNotifyTaskModel getAsyncNotifyTask(String txnseqno);
 }

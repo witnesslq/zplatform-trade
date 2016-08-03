@@ -13,13 +13,14 @@ package com.zlebank.zplatform.timeout.trade;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.timeout.service.TradeCompleteProcessingService;
 import com.zlebank.zplatform.timeout.service.TradeQueueQuery;
 import com.zlebank.zplatform.trade.adapter.quickpay.IQuickPayTrade;
 import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.bean.TradeBean;
-import com.zlebank.zplatform.trade.bean.TradeQueueBean;
+import com.zlebank.zplatform.trade.bean.queue.TradeQueueBean;
 import com.zlebank.zplatform.trade.exception.TradeException;
 import com.zlebank.zplatform.trade.service.ITxnsQuickpayService;
 import com.zlebank.zplatform.trade.service.TradeQueueService;
@@ -46,18 +47,23 @@ public class ReaPayTradeThread implements TradeQueueQuery{
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
+		log.info("【融宝交易线程查询开始】"+tradeQueueBean.getTxnseqno());
 		String reapayOrderNo = txnsQuickpayService.getReapayOrderNo(tradeQueueBean.getTxnseqno());
+		log.info("【融宝交易线程，融宝订单号】"+reapayOrderNo);
 		TradeBean trade = new TradeBean();
 		trade.setReaPayOrderNo(reapayOrderNo);
 		trade.setTxnseqno(tradeQueueBean.getTxnseqno());
 		try {
 			ResultBean resultBean = getTradeQuery().queryTrade(trade);
+			log.info("【融宝交易线程查询结果】"+JSON.toJSONString(resultBean));
 			if(resultBean.isResultBool()){
 				if("processing".equals(resultBean.getErrCode())){//支付中，重回队列，等待下次查询
 					tradeQueueService.addTradeQueue(tradeQueueBean);
 					return ;
 				}
 				completeProcessingService.reaPayCompleteTrade(trade.getTxnseqno(), resultBean);
+			}else{
+				tradeQueueService.addTradeQueue(tradeQueueBean);
 			}
 			
 		} catch (TradeException e) {

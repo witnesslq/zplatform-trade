@@ -58,7 +58,7 @@ import com.zlebank.zplatform.trade.utils.UUIDUtil;
  */
 @Service("cmbcCrossLineQuickPayService")
 public class CMBCCrossLineQuickPayServiceImpl implements CMBCCrossLineQuickPayService{
-
+	
 	private static final Log log = LogFactory.getLog(CMBCCrossLineQuickPayServiceImpl.class);
 	@Autowired
 	private ITxnsQuickpayService txnsQuickpayService;
@@ -150,6 +150,12 @@ public class CMBCCrossLineQuickPayServiceImpl implements CMBCCrossLineQuickPaySe
 				//txnsLogService.updateCoreRetResult(tradeBean.getTxnseqno(),resultBean.getErrCode(), resultBean.getErrMsg());
 				txnsLogService.updateSMSErrorData(tradeBean.getTxnseqno(), resultBean.getErrCode(),resultBean.getErrMsg());
                 txnsOrderinfoDAO.updateOrderToFail(tradeBean.getTxnseqno());
+                PayPartyBean payPartyBean = new PayPartyBean(tradeBean.getTxnseqno(),
+    					"01", "", ChannelEnmu.CMBCWITHHOLDING.getChnlcode(),
+    					ConsUtil.getInstance().cons.getCmbc_merid(), "",
+    					DateUtil.getCurrentDateTime(), "", tradeBean.getCardNo());
+    			payPartyBean.setPanName(tradeBean.getAcctName());
+    			txnsLogService.updatePayInfo_Fast(payPartyBean);
 				return resultBean;
 			}
 			// 更新支付方信息
@@ -216,7 +222,7 @@ public class CMBCCrossLineQuickPayServiceImpl implements CMBCCrossLineQuickPaySe
             txnsLogService.updateAppInfo(appParty);
             IAccounting accounting = AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue(txnsLog.getBusitype()));
             accounting.accountedFor(txnseqno);
-          //更新订单状态
+            //更新订单状态
             txnsOrderinfoDAO.updateOrderToSuccess(txnseqno);
             tradeNotifyService.notify(txnseqno);
         } catch (Exception e) {

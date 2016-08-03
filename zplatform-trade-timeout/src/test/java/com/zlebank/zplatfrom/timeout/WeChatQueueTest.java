@@ -17,7 +17,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.zlebank.zplatform.timeout.job.TradeQueueJob;
-import com.zlebank.zplatform.trade.bean.TradeQueueBean;
+import com.zlebank.zplatform.trade.bean.queue.TradeQueueBean;
 import com.zlebank.zplatform.trade.service.TradeQueueService;
 
 /**

@@ -108,11 +108,11 @@ public class CMBCQuickPayServiceImpl implements ICMBCQuickPayService{
                 if(!StringUtil.isEmpty(withholding.getExectype())){
                     if("S".equalsIgnoreCase(withholding.getExectype())){
                         resultBean = new ResultBean(withholding);
-                        break;
+                        return resultBean;
                     }else if("E".equalsIgnoreCase(withholding.getExectype())){
                     	PojoRspmsg msg = rspmsgDAO.getRspmsgByChnlCode(ChnlTypeEnum.CMBCWITHHOLDING, withholding.getExeccode());
                         resultBean = new ResultBean(msg.getWebrspcode(),msg.getRspinfo());
-                        break;
+                        return resultBean;
                     }else if("R".equalsIgnoreCase(withholding.getExectype())){
                         resultBean = new ResultBean("R","正在支付中");
                         break;

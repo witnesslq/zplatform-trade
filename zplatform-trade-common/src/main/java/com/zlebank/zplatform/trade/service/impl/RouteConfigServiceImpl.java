@@ -68,7 +68,7 @@ public class RouteConfigServiceImpl extends BaseServiceImpl<RouteConfigModel, Lo
     }
     
     
-    
+    @Deprecated
     public ResultBean getTransRout(String transTime,String transAmt,String memberId,String busiCode,String cardNo,String cashCode){
         try {
         	String merchRoutver = null;
@@ -226,12 +226,15 @@ public class RouteConfigServiceImpl extends BaseServiceImpl<RouteConfigModel, Lo
     public ResultBean getWapTransRout(String transTime,String transAmt,String memberId,String busiCode,String cardNo){
         try {
         	String merchRoutver = null;
-        	if(memberId.startsWith("3")){//合作机构
-        		merchRoutver = getDefaultVerInfo(memberId,busiCode,20);
-        	}else{//商户
-        		PojoMerchDeta merch = merchService.getMerchBymemberId(memberId);
-        		merchRoutver = merch.getRoutVer();
+        	if(StringUtil.isNotEmpty(memberId)&&"0".equals(memberId)){
+        		if(memberId.startsWith("3")){//合作机构
+            		merchRoutver = getDefaultVerInfo(memberId,busiCode,20);
+            	}else{//商户
+            		PojoMerchDeta merch = merchService.getMerchBymemberId(memberId);
+            		merchRoutver = merch.getRoutVer();
+            	}
         	}
+        	
             
             if (log.isDebugEnabled()) {
                 log.debug("transTime：" + transTime);

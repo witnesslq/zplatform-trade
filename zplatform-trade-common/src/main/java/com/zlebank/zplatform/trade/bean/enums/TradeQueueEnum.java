@@ -22,6 +22,7 @@ public enum TradeQueueEnum {
 
 	TRADEQUEUE("TradeQueue"),
 	TIMEOUTQUEUE("TimeOutQueue"),
+	NOTIFYQUEUE("notifyQueue"),
 	UNKNOW("");
 	
 	private String name;

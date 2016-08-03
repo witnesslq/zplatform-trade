@@ -256,14 +256,15 @@ public class ChanPayQuickPayServiceImpl implements ChanPayQuickPayService {
 		// 更新交易支付方信息
 		txnsLogService.updatePayInfo_Fast_result(txnseqno, payrettsnseqno,retcode, retinfo);
 		String commiteTime = DateUtil.getCurrentDateTime();
-		// 账务处理
-		AccountingAdapterFactory.getInstance()
-				.getAccounting(BusiTypeEnum.fromValue(txnsLog.getBusitype()))
-				.accountedFor(txnseqno);
-		AppPartyBean appParty = new AppPartyBean("", "000000000000",
-				commiteTime, DateUtil.getCurrentDateTime(), txnseqno, "");
-		txnsLogService.updateAppInfo(appParty);
-
+		if ("0000".equals(retcode)) {
+			// 账务处理
+			AccountingAdapterFactory.getInstance()
+					.getAccounting(BusiTypeEnum.fromValue(txnsLog.getBusitype()))
+					.accountedFor(txnseqno);
+			AppPartyBean appParty = new AppPartyBean("", "000000000000",
+					commiteTime, DateUtil.getCurrentDateTime(), txnseqno, "");
+			txnsLogService.updateAppInfo(appParty);
+		}
 		tradeNotifyService.notify(txnseqno);
 		return null;
 	}

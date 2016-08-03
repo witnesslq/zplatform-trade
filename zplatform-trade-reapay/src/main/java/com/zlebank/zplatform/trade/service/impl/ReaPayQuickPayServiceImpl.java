@@ -51,6 +51,7 @@ import com.zlebank.zplatform.trade.service.ITradeReceiveProcessor;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
 import com.zlebank.zplatform.trade.service.ITxnsQuickpayService;
 import com.zlebank.zplatform.trade.service.ReaPayQuickPayService;
+import com.zlebank.zplatform.trade.service.TradeNotifyService;
 import com.zlebank.zplatform.trade.utils.ConsUtil;
 
 /**
@@ -80,6 +81,8 @@ public class ReaPayQuickPayServiceImpl implements ReaPayQuickPayService{
 	private ITxnsLogService txnsLogService;
 	@Autowired
 	private ITxnsOrderinfoDAO txnsOrderinfoDAO;
+	@Autowired
+	private TradeNotifyService tradeNotifyService;
 	
 	public ResultBean sendSms(TradeBean trade) {
         trade.setPayinstiId(ChannelEnmu.REAPAY.getChnlcode());
@@ -282,26 +285,23 @@ public class ReaPayQuickPayServiceImpl implements ReaPayQuickPayService{
 			txnsLogService.updateTradeData(payPartyBean);
 		    //订单状态为成功
 			txnsOrderinfoDAO.updateOrderToSuccess(txnseqno);
+			if(reaPayTradeStatusEnmu==ReaPayTradeStatusEnmu.COMPLETED){//交易成功，账务处理
+		       	 AppPartyBean appParty = new AppPartyBean("",
+		                    "000000000000", DateUtil.getCurrentDateTime(),
+		                    DateUtil.getCurrentDateTime(), txnsLog.getTxnseqno(), "");
+		       	 txnsLogService.updateAppInfo(appParty);
+		         AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue(txnsLog.getBusitype())).accountedFor(txnseqno);
+			}
 		}else if(reaPayTradeStatusEnmu==ReaPayTradeStatusEnmu.FAILED){//交易失败
 			payPartyBean.setPayretcode(ret_code);
 			payPartyBean.setPayretinfo(ret_info);
 			txnsLogService.updateTradeFailed(payPartyBean);
 			//订单状态为失败
 			txnsOrderinfoDAO.updateOrderToFail(txnseqno);
-			return null;
 		}else{//未支付，或者支付中
 			return null;
 		}
-		try {
-       	 AppPartyBean appParty = new AppPartyBean("",
-                    "000000000000", DateUtil.getCurrentDateTime(),
-                    DateUtil.getCurrentDateTime(), txnsLog.getTxnseqno(), "");
-       	 txnsLogService.updateAppInfo(appParty);
-         AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue(txnsLog.getBusitype())).accountedFor(txnseqno);
-       } catch (Exception e) {
-           e.printStackTrace();
-       }
-		
+		tradeNotifyService.notify(txnseqno);//交易成功或者交易失败都有异步通知结果
 		
 		return null;
 	}

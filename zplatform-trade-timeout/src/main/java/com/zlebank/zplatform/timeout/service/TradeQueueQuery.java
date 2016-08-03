@@ -10,7 +10,7 @@
  */
 package com.zlebank.zplatform.timeout.service;
 
-import com.zlebank.zplatform.trade.bean.TradeQueueBean;
+import com.zlebank.zplatform.trade.bean.queue.TradeQueueBean;
 
 /**
  * Class Description

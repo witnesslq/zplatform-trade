@@ -36,7 +36,7 @@
 				<ref bean="cmbcTrigger1"/> 
 				<!-- 微信 -->
 				<ref bean="refundJobTrigger"/> 
-				<ref bean="wechatOrderTrigger"/>
+				<!-- <ref bean="wechatOrderTrigger"/> -->
 				
 				<ref bean="tradeQueueJobTrigger"/>
 				 

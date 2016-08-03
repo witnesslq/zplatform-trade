@@ -20,6 +20,11 @@ package com.zlebank.zplatform.trade.service;
  */
 public interface TradeNotifyService {
 
-	
+	/**
+	 * 
+	 * @param txnseqno
+	 */
 	public void notify(String txnseqno);
+	
+	public void queueNotfiy();
 }

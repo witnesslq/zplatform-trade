@@ -1169,42 +1169,19 @@ public class GateWayServiceImpl extends
 			}
 			txnsLog.setTxnfee(getTxnFee(txnsLog));
 			txnsLog.setTradcomm(0L);
-			txnsLogService.save(txnsLog);
-			// 退款账务处理
-			TradeInfo tradeInfo = new TradeInfo();
-			tradeInfo.setPayMemberId(refundBean.getMemberId());
-			tradeInfo.setPayToMemberId(refundBean.getMerId());
-			tradeInfo.setAmount(new BigDecimal(refundBean.getTxnAmt()));
-			tradeInfo.setCharge(new BigDecimal(txnsLogService
-					.getTxnFee(txnsLog)));
-			tradeInfo.setTxnseqno(txnsLog.getTxnseqno());
-			tradeInfo.setCoopInstCode(txnsLog.getAccfirmerno());
-			tradeInfo.setBusiCode(txnsLog.getBusicode());
-			log.info(JSON.toJSONString(tradeInfo));
-			// 记录分录流水
-			accEntryService.accEntryProcess(tradeInfo, EntryEvent.AUDIT_APPLY);
+			txnsLogService.saveTxnsLog(txnsLog);
+			
 		} catch (NumberFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new TradeException("T016");
-		} catch (AccBussinessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new TradeException("T000", "账务异常:"+e.getMessage());
-		} catch (AbstractBusiAcctException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new TradeException("T000", "账务异常:"+e.getMessage());
-		} catch (IllegalEntryRequestException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new TradeException("T000", "账务异常:"+e.getMessage());
-		}
+		} 
 
 		String tn = "";
+		TxnsOrderinfoModel orderinfo = null;
 		try {
 			// 保存订单信息
-			TxnsOrderinfoModel orderinfo = new TxnsOrderinfoModel();
+			orderinfo = new TxnsOrderinfoModel();
 			orderinfo.setId(OrderNumber.getInstance().generateID());
 			// orderinfo.setInstitution(member.getMerchinsti());
 			orderinfo.setOrderno(refundBean.getOrderId());// 商户提交的订单号
@@ -1229,15 +1206,48 @@ public class GateWayServiceImpl extends
 			orderinfo.setStatus("02");
 			orderinfo.setMemberid(refundBean.getMemberId());
 			orderinfo.setCurrencycode("156");
-			super.save(orderinfo);
+			
+			txnsLogService.tradeRiskControl(txnsLog.getTxnseqno(),txnsLog.getAccfirmerno(),txnsLog.getAccsecmerno(),txnsLog.getAccmemberid(),txnsLog.getBusicode(),txnsLog.getAmount()+"","1","");
+			
+			// 退款账务处理
+			TradeInfo tradeInfo = new TradeInfo();
+			tradeInfo.setPayMemberId(refundBean.getMemberId());
+			tradeInfo.setPayToMemberId(refundBean.getMerId());
+			tradeInfo.setAmount(new BigDecimal(refundBean.getTxnAmt()));
+			tradeInfo.setCharge(new BigDecimal(txnsLogService
+					.getTxnFee(txnsLog)));
+			tradeInfo.setTxnseqno(txnsLog.getTxnseqno());
+			tradeInfo.setCoopInstCode(txnsLog.getAccfirmerno());
+			tradeInfo.setBusiCode(txnsLog.getBusicode());
+			log.info(JSON.toJSONString(tradeInfo));
+			
+			
+			// 记录分录流水
+			accEntryService.accEntryProcess(tradeInfo, EntryEvent.AUDIT_APPLY);
+			
+			saveOrderInfo(orderinfo);
 			tn = orderinfo.getTn();
 		} catch (NumberFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new TradeException("T020");
-		} catch (Exception e) {
+		}catch (AccBussinessException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
-			throw new TradeException("T018");
+			throw new TradeException("T000", "账务异常:"+e.getMessage());
+		} catch (AbstractBusiAcctException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new TradeException("T000", "账务异常:"+e.getMessage());
+		} catch (IllegalEntryRequestException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new TradeException("T000", "账务异常:"+e.getMessage());
+		} catch (TradeException e) {
+			orderinfo.setStatus("03");
+			saveOrderInfo(orderinfo);
+			return null;
+			
 		}
 
 		try {
@@ -1349,7 +1359,7 @@ public class GateWayServiceImpl extends
 			txnsLog.setTradestatflag("00000000");// 交易初始状态
 			txnsLog.setAccmemberid(withdrawBean.getMemberId());
 			txnsLog.setTxnfee(txnsLogService.getTxnFee(txnsLog));
-			txnsLogService.save(txnsLog);
+			txnsLogService.saveTxnsLog(txnsLog);
 
 			
 		} catch (Exception e) {
@@ -1380,7 +1390,7 @@ public class GateWayServiceImpl extends
 			orderinfo.setMemberid(withdrawBean.getMemberId());
 			orderinfo.setCurrencycode("156");
 			orderinfo.setStatus("02");
-			super.save(orderinfo);
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -1390,22 +1400,35 @@ public class GateWayServiceImpl extends
 			TxnsWithdrawModel withdraw = new TxnsWithdrawModel(withdrawBean,withdrawAccBean);
 			withdraw.setTexnseqno(txnsLog.getTxnseqno());
 			withdraw.setFee(txnsLog.getTxnfee());
-			txnsWithdrawService.saveEntity(withdraw);
+			
 			
 			//风控
-			txnsLogService.tradeRiskControl(txnsLog.getTxnseqno(),txnsLog.getAccfirmerno(),txnsLog.getAccsecmerno(),txnsLog.getAccmemberid(),txnsLog.getBusicode(),txnsLog.getAmount()+"","1",withdraw.getAcctno());
-			// 提现账务处理
-			TradeInfo tradeInfo = new TradeInfo();
-			tradeInfo.setPayMemberId(txnsLog.getAccmemberid());
-			tradeInfo.setPayToMemberId(txnsLog.getAccmemberid());
-			tradeInfo.setAmount(new BigDecimal(txnsLog.getAmount()));
-			tradeInfo.setCharge(new BigDecimal(txnsLog.getTxnfee() == null ? 0L
-					: txnsLog.getTxnfee()));
-			tradeInfo.setTxnseqno(txnsLog.getTxnseqno());
-			tradeInfo.setBusiCode(BusinessCodeEnum.WITHDRAWALS.getBusiCode());
-			tradeInfo.setCoopInstCode(txnsLog.getAcccoopinstino());
-			// 记录分录流水
-			accEntryService.accEntryProcess(tradeInfo, EntryEvent.AUDIT_APPLY);
+			
+			try {
+				txnsLogService.tradeRiskControl(txnsLog.getTxnseqno(),txnsLog.getAccfirmerno(),txnsLog.getAccsecmerno(),txnsLog.getAccmemberid(),txnsLog.getBusicode(),txnsLog.getAmount()+"","1",withdraw.getAcctno());
+				saveOrderInfo(orderinfo);
+				txnsWithdrawService.saveEntity(withdraw);
+				// 提现账务处理
+				TradeInfo tradeInfo = new TradeInfo();
+				tradeInfo.setPayMemberId(txnsLog.getAccmemberid());
+				tradeInfo.setPayToMemberId(txnsLog.getAccmemberid());
+				tradeInfo.setAmount(new BigDecimal(txnsLog.getAmount()));
+				tradeInfo.setCharge(new BigDecimal(txnsLog.getTxnfee() == null ? 0L
+						: txnsLog.getTxnfee()));
+				tradeInfo.setTxnseqno(txnsLog.getTxnseqno());
+				tradeInfo.setBusiCode(BusinessCodeEnum.WITHDRAWALS.getBusiCode());
+				tradeInfo.setCoopInstCode(txnsLog.getAcccoopinstino());
+				// 记录分录流水
+				accEntryService.accEntryProcess(tradeInfo, EntryEvent.AUDIT_APPLY);
+			} catch (TradeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				orderinfo.setStatus("03");
+				saveOrderInfo(orderinfo);
+				return null;
+			}
+			
+			
 			return orderinfo.getTn();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -2597,7 +2620,9 @@ public class GateWayServiceImpl extends
 		// 记录退款订单和交易流水 退款流水表
 		String tn = dealWithRefundOrder(refundBean);
 		// 暂时没有退款方案
-
+		if(tn==null){
+			throw new TradeException("T035");
+		}
 		return tn;
 	}
 
@@ -2640,6 +2665,9 @@ public class GateWayServiceImpl extends
 		// 记录提现订单和交易流水 提现流水表
 		String withdrawId = dealWithWithdrawOrder(withdrawBean, accBean);
 		// 暂时没有提现方案
+		if(withdrawBean==null){
+			throw new TradeException("T035");
+		}
 		return withdrawId;
 	}
 
