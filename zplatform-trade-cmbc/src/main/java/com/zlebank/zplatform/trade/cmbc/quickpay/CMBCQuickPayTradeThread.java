@@ -7,6 +7,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.alibaba.fastjson.JSON;
 import com.zlebank.zplatform.commons.dao.ProvinceDAO;
+import com.zlebank.zplatform.commons.dao.pojo.PojoProvince;
 import com.zlebank.zplatform.commons.utils.DateUtil;
 import com.zlebank.zplatform.sms.service.ISMSService;
 import com.zlebank.zplatform.trade.adapter.quickpay.IQuickPayTrade;
@@ -143,11 +144,14 @@ public class CMBCQuickPayTradeThread implements IQuickPayTrade {
 				return resultBean;
 			}
 			trade.setPayinstiId(PAYINSTID);
-
+			//获取持卡人所属省份代码
+			PojoProvince province=provinceDAO.getProvinceByXZCode(trade.getCertId().substring(0, 2));
+			if(province==null){
+				return new ResultBean("T000", "交易失败,证件信息有误！");
+				
+			}	
 			// 获取持卡人所属省份代码
-			trade.setProvno(provinceDAO.getProvinceByXZCode(
-					trade.getCertId().substring(0, 2)).getProvinceId()
-					+ "");
+			trade.setProvno(province.getProvinceId()+ "");
 			// 记录快捷交易流水
 			String payorderno = txnsQuickpayService
 					.saveCMBCOuterWithholding(trade);
