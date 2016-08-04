@@ -101,7 +101,7 @@ public class InsteadPayBatchDAOImpl extends AbstractPagedQueryDAOImpl<PojoInstea
                     && query.getStatusList().size() != 0) {
                 crite.add(Restrictions.in("status", query.getStatusList()));
             }
-            if(query.getOrderNo()!=null){
+            if(StringUtil.isNotEmpty(query.getOrderNo())){
             	crite.setFetchMode("details",FetchMode.JOIN); 
             	crite.createAlias("details","details").add(Restrictions.eq("details.orderId",query.getOrderNo())); 
             }

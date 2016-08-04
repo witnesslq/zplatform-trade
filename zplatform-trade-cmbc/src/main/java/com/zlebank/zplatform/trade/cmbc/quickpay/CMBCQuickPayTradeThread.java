@@ -162,6 +162,7 @@ public class CMBCQuickPayTradeThread implements IQuickPayTrade {
 				txnsQuickpayService.updateCMBCWithholdingResult(withholding,
 						payorderno);
 			} else {// 交易失败
+				log.error("民生支付结果"+resultBean.getErrCode()+""+resultBean.getErrMsg());
 				txnsOrderinfoDAO.updateOrderToFail(tradeBean.getTxnseqno());
 				resultBean = new ResultBean("T000", "交易失败");
 			}
