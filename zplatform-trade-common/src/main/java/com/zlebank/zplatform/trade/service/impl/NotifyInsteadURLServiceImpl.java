@@ -104,9 +104,8 @@ public class NotifyInsteadURLServiceImpl implements NotifyInsteadURLService,  Ap
     @Override
     @Transactional
     public void addInsteadPayTask(Long batchId) {
-        try {
         	 PojoInsteadPayBatch batch = insteadPayBatchDAO.getByBatchId(batchId);
-             System.out.println(batch.getBatchNo());
+              log.info("代付任务："+batch.getBatchNo());
              // 请求报文
              InsteadPayQuery_Request requestBean = new InsteadPayQuery_Request();
              requestBean.setBatchNo(String.valueOf(batch.getBatchNo()));
@@ -153,10 +152,6 @@ public class NotifyInsteadURLServiceImpl implements NotifyInsteadURLService,  Ap
              } else {
                  log.warn("URL为空或非法URL，无法执行通知任务。InsteadPayBatchSeqNo->"+batch.getInsteadPayBatchSeqNo());
              }
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-       
 
     }
     
