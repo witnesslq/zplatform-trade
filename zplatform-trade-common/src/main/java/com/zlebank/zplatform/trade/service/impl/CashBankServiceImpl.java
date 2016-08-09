@@ -88,9 +88,11 @@ public class CashBankServiceImpl extends BaseServiceImpl<CashBankModel, Long> im
 			//类型 01：快捷 02：网关
 			String payType = map.get("paytype")==null ?"" :map.get("paytype").toString();
 			//状态 00-在用
-			String status = map.get("status")==null ?"":map.get("status").toString();
+			String status = map.get("status")==null ?"00":map.get("status").toString();
 			//支持业务类型
 			String busiCode = map.get("busiCode")==null ?"" : map.get("busiCode").toString();
+			//银行卡号
+			String bankCode = map.get("bankCode") ==null?"": map.get("bankCode").toString();
 			if(StringUtils.isNotEmpty(cardType)){
 				hq.append("and cardtype=:cardtype ");
 			}
@@ -103,6 +105,10 @@ public class CashBankServiceImpl extends BaseServiceImpl<CashBankModel, Long> im
 			if(StringUtils.isNotEmpty(busiCode)){
 				hq.append(" and buicode =:busicode ");
 			}
+			if(StringUtils.isNotEmpty(bankCode)){
+				hq.append(" and bankcode=:bankcode ");
+			}
+			
 			//查询列表
 			StringBuffer listHql= new StringBuffer(" from  CashBankModel where 1=1 ").append(hq);
 			//查询总条数
@@ -128,8 +134,11 @@ public class CashBankServiceImpl extends BaseServiceImpl<CashBankModel, Long> im
 				query.setParameter("busiCode", busiCode);
 				tquery.setParameter("busiCode", busiCode);
 			}
+			if(StringUtils.isNotEmpty(bankCode)){
+				query.setParameter("bankcode", bankCode);
+				tquery.setParameter("bankcode", bankCode);
+			}
 			if(pageSize!= null && pageNo !=null){
-				
 				query.setFirstResult(((pageNo==0?1:pageNo)-1)*pageSize);
 		    	query.setMaxResults(pageSize);
 			}

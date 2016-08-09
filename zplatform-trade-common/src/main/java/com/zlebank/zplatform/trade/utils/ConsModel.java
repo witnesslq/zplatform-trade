@@ -124,8 +124,11 @@ public class ConsModel {
 	private String chanpay_cj_account_no="";
 	private String chanpay_cj_product_no="";
 	
+	/***标准收银台**/
+	private String web_cash_url="";
 	
 	
+
 	/**微信扫描支付参数**/
 	private String wechat_qr_create_order_url="";
 	private String wechat_qr_down_load_bill_url="";
@@ -142,6 +145,17 @@ public class ConsModel {
 	private String wechat_qr_short_url="";
 	
 	
+
+	
+	
+	public String getWeb_cash_url() {
+		return web_cash_url;
+	}
+
+	public void setWeb_cash_url(String web_cash_url) {
+		this.web_cash_url = web_cash_url;
+	}
+
 	public String getZlrt_url() {
 		return zlrt_url;
 	}

@@ -2159,6 +2159,7 @@ public class GateWayServiceImpl extends
 		ResultBean routResultBean = routeConfigService.getWapTransRout(
 				DateUtil.getCurrentDateTime(),
 				orderinfo.getOrderamt() + "",
+
 				StringUtil.isNotEmpty(orderinfo.getSecmemberno()) ?   orderinfo.getSecmemberno():orderinfo.getFirmemberno(), txnsLog
 						.getBusicode(), cardBean.getCardNo());
 		if (log.isDebugEnabled()) {
@@ -2352,7 +2353,10 @@ public class GateWayServiceImpl extends
 				orderinfo.getTn(), "", "");
 		ResultBean routResultBean = routeConfigService.getWapTransRout(DateUtil
 				.getCurrentDateTime(), trade.getAmount() + "",
+
 				StringUtil.isNotEmpty(trade.getSubMerchId()) ?  trade.getSubMerchId():trade.getMerchId(), trade.getBusicode(), trade.getCardNo());
+
+				
 		String routId = routResultBean.getResultObj().toString();
 		ChannelEnmu channel = ChannelEnmu.fromValue(routId);
 		if (ChannelEnmu.REAPAY == channel) {// 融宝渠道需要校验reapayOrderNo

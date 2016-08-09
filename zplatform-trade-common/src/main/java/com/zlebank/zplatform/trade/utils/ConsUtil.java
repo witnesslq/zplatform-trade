@@ -153,6 +153,7 @@ public class ConsUtil {
 			cons.setChanpay_cj_merchant_name(prop.getProperty("chanpay_cj_merchant_name", ""));
 			cons.setChanpay_cj_product_no(prop.getProperty("chanpay_cj_product_no", ""));
 			
+
 			
 			cons.setWechat_qr_appID(prop.getProperty("wechat_qr_appID"));
 			cons.setWechat_qr_cerUrl(prop.getProperty("wechat_qr_cerUrl"));
@@ -168,6 +169,7 @@ public class ConsUtil {
 			cons.setWechat_qr_close_order_url(prop.getProperty("wechat_qr_close_order_url"));
 			cons.setWechat_qr_short_url(prop.getProperty("wechat_qr_short_url"));
 			
+			cons.setWeb_cash_url(prop.getProperty("web_cash_url"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

@@ -205,7 +205,10 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         	throw new TradeException("T039");
         }
         
+
         ResultBean routResultBean = routeConfigService.getWapTransRout(DateUtil.getCurrentDateTime(), orderinfo.getOrderamt()+"",  StringUtil.isNotEmpty(txnsLog.getAccsecmerno())?txnsLog.getAccsecmerno():txnsLog.getAccfirmerno(), txnsLog.getBusicode(), tradeBean.getCardNo());
+
+
         String routId = routResultBean.getResultObj().toString();
         IQuickPayTrade quickPayTrade = null;
         try {
@@ -276,7 +279,9 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         
         
         //获取路由信息
-        ResultBean routResultBean = routeConfigService.getWapTransRout(DateUtil.getCurrentDateTime(), orderinfo.getOrderamt()+"", StringUtil.isNotEmpty(txnsLog.getAccsecmerno())?txnsLog.getAccsecmerno():txnsLog.getAccfirmerno(), txnsLog.getBusicode(), trade.getCardNo());
+
+        ResultBean routResultBean = routeConfigService.getWapTransRout(DateUtil.getCurrentDateTime(), orderinfo.getOrderamt()+"", StringUtil.isNotEmpty(trade.getSubMerchId())?trade.getSubMerchId():trade.getMerchId(), txnsLog.getBusicode(), trade.getCardNo());
+
         if(routResultBean.isResultBool()){
             String routId = routResultBean.getResultObj().toString();
             IQuickPayTrade quickPayTrade = null;

@@ -38,7 +38,6 @@ import com.zlebank.zplatform.trade.service.ChanPayAsyncService;
 import com.zlebank.zplatform.trade.service.IGateWayService;
 import com.zlebank.zplatform.trade.service.ITxnsGatewaypayService;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
-import com.zlebank.zplatform.trade.utils.UUIDUtil;
 
 /**
  * Class Description
