@@ -154,6 +154,20 @@ public class ConsUtil {
 			cons.setChanpay_cj_product_no(prop.getProperty("chanpay_cj_product_no", ""));
 			
 			
+			cons.setWechat_qr_appID(prop.getProperty("wechat_qr_appID"));
+			cons.setWechat_qr_cerUrl(prop.getProperty("wechat_qr_cerUrl"));
+			cons.setWechat_qr_create_order_url(prop.getProperty("wechat_qr_create_order_url"));
+			cons.setWechat_qr_down_load_bill_url(prop.getProperty("wechat_qr_down_load_bill_url"));
+			cons.setWechat_qr_key(prop.getProperty("wechat_qr_key"));
+			cons.setWechat_qr_mchID(prop.getProperty("wechat_qr_mchID"));
+			cons.setWechat_qr_query_trade_url(prop.getProperty("wechat_qr_query_trade_url"));
+			cons.setWechat_qr_refund_query_url(prop.getProperty("wechat_qr_refund_query_url"));
+			cons.setWechat_qr_refund_url(prop.getProperty("wechat_qr_refund_url"));
+			cons.setWechat_qr_notify_url(prop.getProperty("wechat_qr_notify_url"));
+			cons.setWechat_qr_overtime(Integer.valueOf(prop.getProperty("wechat_qr_overtime", "60000")));
+			cons.setWechat_qr_close_order_url(prop.getProperty("wechat_qr_close_order_url"));
+			cons.setWechat_qr_short_url(prop.getProperty("wechat_qr_short_url"));
+			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

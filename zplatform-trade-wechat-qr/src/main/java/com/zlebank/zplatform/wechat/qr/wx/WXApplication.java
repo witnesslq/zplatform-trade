@@ -41,6 +41,7 @@ import org.xml.sax.SAXException;
 
 import com.zlebank.zplatform.commons.utils.StringUtil;
 import com.zlebank.zplatform.trade.service.TradeLogService;
+import com.zlebank.zplatform.trade.utils.ConsUtil;
 import com.zlebank.zplatform.trade.utils.SpringContext;
 import com.zlebank.zplatform.wechat.qr.enums.BillTypeEnum;
 import com.zlebank.zplatform.wechat.qr.exception.WXVerifySignFailedException;
@@ -73,16 +74,17 @@ public class WXApplication {
 
 	// private static final String CREATE_ORDER_URL=
 	
-	/** 下订单URL **/
-	private static final String CREATE_ORDER_URL = "https://api.mch.weixin.qq.com/pay/unifiedorder";
-	/** 下载对账单URL **/
-	private static final String DOWN_LOAD_BILL_URL = "https://api.mch.weixin.qq.com/pay/downloadbill";
-	/** 查询订单 **/
-	private static final String QUERY_TRADE_URL = "https://api.mch.weixin.qq.com/pay/orderquery";
+	/**下订单URL**/
+    private static final String CREATE_ORDER_URL= ConsUtil.getInstance().cons.getWechat_qr_create_order_url();//"https://api.mch.weixin.qq.com/pay/unifiedorder";
+    /**下载对账单URL**/
+    private static final String DOWN_LOAD_BILL_URL= ConsUtil.getInstance().cons.getWechat_qr_down_load_bill_url() ;//"https://api.mch.weixin.qq.com/pay/downloadbill";
+    /**查询订单**/
+    private static final String QUERY_TRADE_URL= ConsUtil.getInstance().cons.getWechat_qr_query_trade_url();//"https://api.mch.weixin.qq.com/pay/orderquery";
+    
 	/** 关闭订单 **/
-	private static final String CLOSE_ORDER_URL = "https://api.mch.weixin.qq.com/pay/closeorder";
+	private static final String CLOSE_ORDER_URL = ConsUtil.getInstance().cons.getWechat_qr_close_order_url();//"https://api.mch.weixin.qq.com/pay/closeorder";
 	/** 转换短链接 **/
-	private static final String SHORT_URL = "https://api.mch.weixin.qq.com/tools/shorturl";
+	private static final String SHORT_URL = ConsUtil.getInstance().cons.getWechat_qr_short_url();//"https://api.mch.weixin.qq.com/tools/shorturl";
 
 	/**
 	 * SUCCESS

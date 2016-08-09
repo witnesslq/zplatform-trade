@@ -42,7 +42,7 @@ public class CreateOrderTest {
 	private WeChatQRService weChatQRService;
 	private static final Log log = LogFactory.getLog(CreateOrderTest.class);
 	@Test
-	@Ignore
+	//@Ignore
 	public void test_createorder(){
 		try {
 			JSONObject creatOrder = weChatQRService.creatOrder("160809001400054959");
@@ -51,7 +51,7 @@ public class CreateOrderTest {
 			e.printStackTrace();
 		}
 	}
-	@Test
+	//@Test
 	public void test_queryOrder(){
 		
 		ResultBean queryOrder = weChatQRService.queryOrder("1608099900055899");

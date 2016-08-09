@@ -2,28 +2,29 @@ package com.zlebank.zplatform.wechat.qr.wx.common;
 
 import java.net.InetAddress;
 
+import com.zlebank.zplatform.trade.utils.ConsUtil;
+
 
 
 public class WXConfigure {
     
-    /**退款URL**/
-										  //https://api.mch.weixin.qq.com/secapi/pay/refund
-    public static final String REFUND_URL= "https://api.mch.weixin.qq.com/secapi/pay/refund";
+	 /**退款URL**/
+    public static final String REFUND_URL= ConsUtil.getInstance().cons.getWechat_qr_refund_url();//"https://api.mch.weixin.qq.com/secapi/pay/refund";
     
-    /**退款查询URL**/                              //https://api.mch.weixin.qq.com/pay/refundquery
-    public static final String REFUND_QUERY_URL= "https://api.mch.weixin.qq.com/pay/refundquery";
+    /**退款查询URL**/
+    public static final String REFUND_QUERY_URL= ConsUtil.getInstance().cons.getWechat_qr_refund_query_url();//"https://api.mch.weixin.qq.com/pay/refundquery";
     
     // 微信分配的KEY
-	private static String key = "147852369987456321liuliushuaishu";
+	private static String key = ConsUtil.getInstance().cons.getWechat_qr_key();//"1198aa343b3fb1690fd7ce703784113d";
 
 	//微信分配的公众号ID（开通公众号之后可以获取到）
-	private static String appID = "wx88ad6d2878c15e87";
+	private static String appID = ConsUtil.getInstance().cons.getWechat_qr_appID();//"wx16a0b09dbf94f380";
 
 	//微信支付分配的商户号ID（开通公众号的微信支付功能之后可以获取到）
-	private static String mchID = "1375204802";
+	private static String mchID = ConsUtil.getInstance().cons.getWechat_qr_mchID();//"1345867901";
 	
 	// 证书地址  // TODO: linux下要修改
-	private static String cerUrl = "D:\\cert\\wechat_QR\\apiclient_cert_qr.p12";
+	private static String cerUrl = ConsUtil.getInstance().cons.getWechat_qr_cerUrl();//"D:/10016225.p12";
 
 
 	public static void setKey(String key) {

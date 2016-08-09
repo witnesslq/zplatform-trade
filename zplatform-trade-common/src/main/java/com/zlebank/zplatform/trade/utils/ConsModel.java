@@ -125,6 +125,23 @@ public class ConsModel {
 	private String chanpay_cj_product_no="";
 	
 	
+	
+	/**微信扫描支付参数**/
+	private String wechat_qr_create_order_url="";
+	private String wechat_qr_down_load_bill_url="";
+	private String wechat_qr_refund_url="";
+	private String wechat_qr_refund_query_url="";
+	private String wechat_qr_query_trade_url="";
+	private String wechat_qr_key="";
+	private String wechat_qr_appID="";
+	private String wechat_qr_mchID="";
+	private String wechat_qr_cerUrl="";
+	private String wechat_qr_notify_url="";
+	private int wechat_qr_overtime=60000;
+	private String wechat_qr_close_order_url="";
+	private String wechat_qr_short_url="";
+	
+	
 	public String getZlrt_url() {
 		return zlrt_url;
 	}
@@ -1448,6 +1465,189 @@ public class ConsModel {
 	public void setChanpay_cj_product_no(String chanpay_cj_product_no) {
 		this.chanpay_cj_product_no = chanpay_cj_product_no;
 	}
+
+	/**
+	 * @return the wechat_qr_create_order_url
+	 */
+	public String getWechat_qr_create_order_url() {
+		return wechat_qr_create_order_url;
+	}
+
+	/**
+	 * @param wechat_qr_create_order_url the wechat_qr_create_order_url to set
+	 */
+	public void setWechat_qr_create_order_url(String wechat_qr_create_order_url) {
+		this.wechat_qr_create_order_url = wechat_qr_create_order_url;
+	}
+
+	/**
+	 * @return the wechat_qr_down_load_bill_url
+	 */
+	public String getWechat_qr_down_load_bill_url() {
+		return wechat_qr_down_load_bill_url;
+	}
+
+	/**
+	 * @param wechat_qr_down_load_bill_url the wechat_qr_down_load_bill_url to set
+	 */
+	public void setWechat_qr_down_load_bill_url(String wechat_qr_down_load_bill_url) {
+		this.wechat_qr_down_load_bill_url = wechat_qr_down_load_bill_url;
+	}
+
+	/**
+	 * @return the wechat_qr_refund_url
+	 */
+	public String getWechat_qr_refund_url() {
+		return wechat_qr_refund_url;
+	}
+
+	/**
+	 * @param wechat_qr_refund_url the wechat_qr_refund_url to set
+	 */
+	public void setWechat_qr_refund_url(String wechat_qr_refund_url) {
+		this.wechat_qr_refund_url = wechat_qr_refund_url;
+	}
+
+	/**
+	 * @return the wechat_qr_refund_query_url
+	 */
+	public String getWechat_qr_refund_query_url() {
+		return wechat_qr_refund_query_url;
+	}
+
+	/**
+	 * @param wechat_qr_refund_query_url the wechat_qr_refund_query_url to set
+	 */
+	public void setWechat_qr_refund_query_url(String wechat_qr_refund_query_url) {
+		this.wechat_qr_refund_query_url = wechat_qr_refund_query_url;
+	}
+
+	/**
+	 * @return the wechat_qr_query_trade_url
+	 */
+	public String getWechat_qr_query_trade_url() {
+		return wechat_qr_query_trade_url;
+	}
+
+	/**
+	 * @param wechat_qr_query_trade_url the wechat_qr_query_trade_url to set
+	 */
+	public void setWechat_qr_query_trade_url(String wechat_qr_query_trade_url) {
+		this.wechat_qr_query_trade_url = wechat_qr_query_trade_url;
+	}
+
+	/**
+	 * @return the wechat_qr_key
+	 */
+	public String getWechat_qr_key() {
+		return wechat_qr_key;
+	}
+
+	/**
+	 * @param wechat_qr_key the wechat_qr_key to set
+	 */
+	public void setWechat_qr_key(String wechat_qr_key) {
+		this.wechat_qr_key = wechat_qr_key;
+	}
+
+	/**
+	 * @return the wechat_qr_appID
+	 */
+	public String getWechat_qr_appID() {
+		return wechat_qr_appID;
+	}
+
+	/**
+	 * @param wechat_qr_appID the wechat_qr_appID to set
+	 */
+	public void setWechat_qr_appID(String wechat_qr_appID) {
+		this.wechat_qr_appID = wechat_qr_appID;
+	}
+
+	/**
+	 * @return the wechat_qr_mchID
+	 */
+	public String getWechat_qr_mchID() {
+		return wechat_qr_mchID;
+	}
+
+	/**
+	 * @param wechat_qr_mchID the wechat_qr_mchID to set
+	 */
+	public void setWechat_qr_mchID(String wechat_qr_mchID) {
+		this.wechat_qr_mchID = wechat_qr_mchID;
+	}
+
+	/**
+	 * @return the wechat_qr_cerUrl
+	 */
+	public String getWechat_qr_cerUrl() {
+		return wechat_qr_cerUrl;
+	}
+
+	/**
+	 * @param wechat_qr_cerUrl the wechat_qr_cerUrl to set
+	 */
+	public void setWechat_qr_cerUrl(String wechat_qr_cerUrl) {
+		this.wechat_qr_cerUrl = wechat_qr_cerUrl;
+	}
+
+	/**
+	 * @return the wechat_qr_notify_url
+	 */
+	public String getWechat_qr_notify_url() {
+		return wechat_qr_notify_url;
+	}
+
+	/**
+	 * @param wechat_qr_notify_url the wechat_qr_notify_url to set
+	 */
+	public void setWechat_qr_notify_url(String wechat_qr_notify_url) {
+		this.wechat_qr_notify_url = wechat_qr_notify_url;
+	}
+
+	/**
+	 * @return the wechat_qr_overtime
+	 */
+	public int getWechat_qr_overtime() {
+		return wechat_qr_overtime;
+	}
+
+	/**
+	 * @param wechat_qr_overtime the wechat_qr_overtime to set
+	 */
+	public void setWechat_qr_overtime(int wechat_qr_overtime) {
+		this.wechat_qr_overtime = wechat_qr_overtime;
+	}
+
+	/**
+	 * @return the wechat_qr_close_order_url
+	 */
+	public String getWechat_qr_close_order_url() {
+		return wechat_qr_close_order_url;
+	}
+
+	/**
+	 * @param wechat_qr_close_order_url the wechat_qr_close_order_url to set
+	 */
+	public void setWechat_qr_close_order_url(String wechat_qr_close_order_url) {
+		this.wechat_qr_close_order_url = wechat_qr_close_order_url;
+	}
+
+	/**
+	 * @return the wechat_qr_short_url
+	 */
+	public String getWechat_qr_short_url() {
+		return wechat_qr_short_url;
+	}
+
+	/**
+	 * @param wechat_qr_short_url the wechat_qr_short_url to set
+	 */
+	public void setWechat_qr_short_url(String wechat_qr_short_url) {
+		this.wechat_qr_short_url = wechat_qr_short_url;
+	}
+	
 	
 	
 }
