@@ -59,10 +59,14 @@ public class TxnsNotifyTaskServiceImpl extends BaseServiceImpl<TxnsNotifyTaskMod
     @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class) 
     public void saveTask(TxnsNotifyTaskModel task) {
         // TODO Auto-generated method stub
-        if("00".equals(task.getSendStatus())){
-            updateOrderSync(task.getTxnseqno());
-        }
-        super.save(task);
+    	TxnsNotifyTaskModel asyncNotifyTask = getAsyncNotifyTask(task.getTxnseqno());
+    	if(asyncNotifyTask!=null){
+    		if("00".equals(task.getSendStatus())){
+                updateOrderSync(task.getTxnseqno());
+            }
+    	}else{
+    		super.save(task);
+    	}
     }
     /**
      *

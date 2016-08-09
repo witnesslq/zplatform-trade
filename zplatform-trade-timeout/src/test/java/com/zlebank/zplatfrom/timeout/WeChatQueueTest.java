@@ -18,6 +18,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.zlebank.zplatform.timeout.job.TradeQueueJob;
 import com.zlebank.zplatform.trade.bean.queue.TradeQueueBean;
+import com.zlebank.zplatform.trade.service.TradeNotifyService;
 import com.zlebank.zplatform.trade.service.TradeQueueService;
 
 /**
@@ -35,6 +36,9 @@ public class WeChatQueueTest {
 	private TradeQueueService tradeQueueService;
 	@Autowired
 	private TradeQueueJob tradeQueueJob;
+	@Autowired
+	private TradeNotifyService tradeNotifyService;
+	
 	public void test_addQueue(){
 		TradeQueueBean tradeQueueBean = new TradeQueueBean();
 		tradeQueueBean.setTxnseqno("1607299900055486");
@@ -45,7 +49,8 @@ public class WeChatQueueTest {
 	
 	@Test
 	public void test_scan(){
-		test_addQueue();
+		//test_addQueue();
 		//tradeQueueJob.scanTradeQueue();
+		tradeNotifyService.notify("1608039900055720");
 	}
 }

@@ -104,4 +104,7 @@ public class TradeQueueServiceImpl implements TradeQueueService{
 		boundListOps.rightPush(JSON.toJSONString(notifyQueueBean));
 	}
 	
+	
+	
+	
 }

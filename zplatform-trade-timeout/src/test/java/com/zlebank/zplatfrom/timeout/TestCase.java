@@ -10,14 +10,11 @@
  */
 package com.zlebank.zplatfrom.timeout;
 
-import java.util.List;
-
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.BoundListOperations;
-import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -43,8 +40,11 @@ public class TestCase {
 
 	@Autowired
 	private TradeQueueService tradeQueueService;
+	@Autowired
+	private RedisTemplate<String, String> redisTemplate;
 	
 	@Test
+	@Ignore
 	public void test_redis(){
 		TradeQueueBean tradeQueueBean = new TradeQueueBean();
 		tradeQueueBean.setTxnseqno("1607199900064373");
@@ -59,6 +59,11 @@ public class TestCase {
 		
 		System.out.println(JSON.toJSONString(tradeQueuePop));
 		System.out.println(queueSize);
+	}
+	@Test
+	public void test_seq(){
+		Long increment = redisTemplate.opsForValue().increment("seq", 1);
+		System.out.println(increment);
 	}
 	
 }

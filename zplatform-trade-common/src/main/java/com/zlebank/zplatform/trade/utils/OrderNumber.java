@@ -31,7 +31,7 @@ import com.zlebank.zplatform.trade.service.ITxnsLogService;
  */
 public class OrderNumber {
 
-    private ITxnsLogService txnsLogService;
+    private ITxnsLogService txnsLogService = (ITxnsLogService) SpringContext.getContext().getBean("txnsLogService");
 
     private static OrderNumber orderNumber;
     
@@ -42,7 +42,7 @@ public class OrderNumber {
         return orderNumber;
     }
     @SuppressWarnings("unchecked")
-    @Transactional
+    @Transactional(readOnly=true)
     private String generateSerialNumber(String sequences){
         List<Map<String,Object>> resultList = (List<Map<String, Object>>) txnsLogService.queryBySQL("select "+sequences+".NEXTVAL seq from dual", new Object[]{});
         DecimalFormat df = new DecimalFormat("00000000");
@@ -51,7 +51,7 @@ public class OrderNumber {
         return sdf.format(new Date())+seqNo;
     }
     @SuppressWarnings("unchecked")
-    @Transactional
+    @Transactional(readOnly=true)
     private String generateSerialDateNumber(String sequences){
         List<Map<String,Object>> resultList = (List<Map<String, Object>>) txnsLogService.queryBySQL("select "+sequences+".NEXTVAL seq from dual", new Object[]{});
         DecimalFormat df = new DecimalFormat("00000000");
@@ -59,14 +59,14 @@ public class OrderNumber {
         return DateUtil.getCurrentDate()+seqNo;
     }
     
-    @Transactional
+    @Transactional(readOnly=true)
     private String generateBatchNo(String sequences){
         List<Map<String,Object>> resultList = (List<Map<String, Object>>) txnsLogService.queryBySQL("select "+sequences+".NEXTVAL seq from dual", new Object[]{});
         DecimalFormat df = new DecimalFormat("000");
         String seqNo = df.format( resultList.get(0).get("SEQ"));
         return seqNo;
     }
-    
+    @Transactional(readOnly=true)
     private Long generateID(String sequences){
         List<Map<String,Object>> resultList = (List<Map<String, Object>>) txnsLogService.queryBySQL("select "+sequences+".NEXTVAL seq from dual", new Object[]{});
         String seqNo =  resultList.get(0).get("SEQ")+"";
@@ -84,7 +84,7 @@ public class OrderNumber {
         String seqNo=generateSerialNumber("SEQ_REAPAYORDERNO");
         return seqNo.substring(0,6)+"96"+seqNo.substring(6);
     }
-    @Transactional
+    
     public String generateAppOrderNo(){
         String seqNo=generateSerialNumber("SEQ_APPORDERNO");
         return seqNo.substring(0,6)+"95"+seqNo.substring(6);
@@ -178,11 +178,8 @@ public class OrderNumber {
         return seqNo.substring(0,6)+"90"+seqNo.substring(6);
     }
     
-    /**
-     * seq_zlpay_orderno, "seq_reapayorderno", "seq_apporderno", "seq_txnseqno", "seq_ecitiorderno", "seq_quickpay", "seq_orderinfo_tn","SEQ_ECITIORDERNO"
-     */
+    
     private OrderNumber() {
-        txnsLogService = (ITxnsLogService) SpringContext.getContext().getBean("txnsLogService");
     }
     
     
