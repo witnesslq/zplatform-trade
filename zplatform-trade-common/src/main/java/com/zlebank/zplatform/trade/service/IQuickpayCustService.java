@@ -104,4 +104,17 @@ public interface IQuickpayCustService extends IBaseService<QuickpayCustModel, Lo
     public List<QuickpayCustModel> getCardList(String cardNo ,String accName, String phone, String cerId, String memberId);
     
     public void deleteUnBindCard(Long id);
+    
+    
+    /***
+     * 查询绑卡信息，增加设备ID
+     * @param cardNo
+     * @param accName
+     * @param phone
+     * @param cerId
+     * @param memberId
+     * @param devId
+     * @return
+     */
+    public List<QuickpayCustModel>getCardList(String cardNo ,String accName, String phone, String cerId, String memberId,String devId);
 }
