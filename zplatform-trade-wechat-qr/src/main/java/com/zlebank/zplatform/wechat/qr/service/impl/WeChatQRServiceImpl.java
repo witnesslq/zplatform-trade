@@ -454,7 +454,127 @@ public class WeChatQRServiceImpl implements WeChatQRService {
 	 */
 	@Override
 	public ResultBean queryWechatOrder(TradeBean trade) {
-		return null;
+		ResultBean resultBean = null;
+		//1.查询订单的状态，如果是待支付，消费订单，并且已生成微信预订单号
+		//当交易流水为空
+		if(StringUtil.isEmpty(trade.getTn())){
+			resultBean=new ResultBean("", "交易流水号【tn】不能为空！");
+			return resultBean;
+		}
+		//获取交易订单信息
+		TxnsOrderinfoModel order = txnsOrderinfoDAO.getOrderByTN(trade.getTn());
+		if(order==null){
+			resultBean=new ResultBean("", "请检查交易流水号【tn】！");
+			return resultBean;
+		}
+		//获取交易流水数据
+		TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(order.getRelatetradetxn());
+		if(txnsLog ==null){
+			resultBean=new ResultBean("", "请检查交易流水号【tn】！");
+			return resultBean;
+		}
+		
+		//订单状态为成功或失败
+		Boolean isStatus = order.getStatus().equals(OrderStatusEnum.SUCCESS.getStatus())
+				||order.getStatus().equals(OrderStatusEnum.FAILED.getStatus())
+				||order.getStatus().equals(OrderStatusEnum.INVALID.getStatus());
+		//成功或失败，支付返回
+		if(isStatus){
+			resultBean = new ResultBean(order);
+			return resultBean;
+		}
+		//是否微信渠道
+		Boolean isChnl = txnsLog.getPayinst().equals(ChannelEnmu.WEBCHAT_QR.getChnlcode());
+		//是否微信类型
+		Boolean isChnlType = txnsLog.getPaytype().equals("05");
+		//是否为消费类型
+		Boolean isBusiType = txnsLog.getBusitype().equals(BusiTypeEnum.consumption.getCode());
+		if(isChnl&&isChnlType &&isBusiType){
+			//2.需要调微信查询订单 调微信服务端
+			WXApplication instance = new WXApplication();
+			QueryOrderBean rb = new QueryOrderBean();
+			//商户订单号
+			rb.setOut_trade_no(txnsLog.getPayordno());
+			rb.setTransaction_id(txnsLog.getPayrettsnseqno());
+			log.info("调微信【查询订单状态】入参："+rb.toString());
+			QueryOrderResultBean result = instance.queryOrder(rb);
+			log.info("调微信【查询订单状态】出参："+(null==result?"无返回值":result.getReturn_code().toString()));	
+			//3.通信成功
+			if(ResultCodeEnum.SUCCESS.getCode().equals(result.getReturn_code())){
+			     //返回状态为：支付成功，或 退款中
+				if(result.getTrade_state().equals(TradeStateCodeEnum.SUCCESS.getCode())
+				  ||result.getTrade_state().equals(TradeStateCodeEnum.REFUND.getCode())){
+					txnsLog.setPayrettsnseqno(result.getTransaction_id()+"");
+					txnsLog.setPayretcode(TradeStateCodeEnum.SUCCESS.getCode());
+					txnsLog.setPayretinfo("交易成功");
+					txnsLog.setTradestatflag("00000001");//交易完成结束位
+				    txnsLog.setTradetxnflag("10000000");
+				    txnsLog.setRelate("10000000");
+				    txnsLog.setRetdatetime(DateUtil.getCurrentDateTime());
+				    txnsLog.setTradeseltxn(UUIDUtil.uuid());
+				    txnsLog.setRetcode("0000");
+				    txnsLog.setRetinfo("交易成功");
+					order.setStatus(OrderStatusEnum.SUCCESS.getStatus());
+				//返回状态为：支付失败，或 已撤消	
+			     }else if(result.getTrade_state().equals(TradeStateCodeEnum.PAYERROR.getCode())
+			    		 ||result.getTrade_state().equals(TradeStateCodeEnum.REVOKED.getCode())){
+			    	txnsLog.setPayretcode(result.getTrade_state());
+					txnsLog.setPayretinfo(result.getTrade_state_desc());
+					try {
+						PojoRspmsg rspmsg = rspmsgDAO.getRspmsgByChnlCode(ChnlTypeEnum.WECHAT, result.getErr_code());
+						txnsLog.setRetcode(rspmsg.getWebrspcode());
+					    txnsLog.setRetinfo(rspmsg.getRspinfo());
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						txnsLog.setRetcode("3499");
+					    txnsLog.setRetinfo("交易失败");
+					}
+					order.setStatus(OrderStatusEnum.FAILED.getStatus());
+			     //返回状态为：支付中 
+			     }else if(result.getTrade_state().equals(TradeStateCodeEnum.USERPAYING.getCode())){
+			    	 order.setStatus(OrderStatusEnum.PAYING.getStatus());
+			     }
+			//3.2无业务报文
+			}else if(ResultCodeEnum.FAIL.getCode().equals(result.getReturn_code())){
+				log.error("微信订单查询报错:"+result.getReturn_code()+result.getReturn_msg());
+				resultBean = new ResultBean(result.getErr_code(), result.getErr_code_des());
+				return resultBean;
+			}
+			txnsLog.setPayordfintime(DateUtil.getCurrentDateTime());
+	        txnsLog.setRetdatetime(DateUtil.getCurrentDateTime());
+			//更新支付方信息
+			txnsLogService.updateTxnsLog(txnsLog);
+			//更新交易订单信息
+			txnsOrderinfoDAO.updateOrderinfo(order);
+			if((result.getTrade_state().equals(TradeStateCodeEnum.SUCCESS.getCode())
+		    		 ||result.getTrade_state().equals(TradeStateCodeEnum.REFUND.getCode()))){
+				//处理账务
+				/**账务处理开始 **/
+		        // 应用方信息
+		        try {
+		            AppPartyBean appParty = new AppPartyBean("",
+		                    "000000000000", DateUtil.getCurrentDateTime(),
+		                    DateUtil.getCurrentDateTime(), txnsLog.getTxnseqno(), "AC000000");
+		            txnsLogService.updateAppInfo(appParty);
+		            IAccounting accounting = AccountingAdapterFactory.getInstance().getAccounting(BusiTypeEnum.fromValue(txnsLog.getBusitype()));
+		            ResultBean accountResultBean = accounting.accountedFor(txnsLog.getTxnseqno());
+		            txnsLogService.updateAppStatus(txnsLog.getTxnseqno(), accountResultBean.getErrCode(), accountResultBean.getErrMsg());
+		            
+		        } catch (Exception e) {
+		            log.error(e.getMessage());
+		            e.printStackTrace();
+		            resultBean = new ResultBean("", result.getErr_code_des());
+					return resultBean;
+		        }
+		        /**账务处理结束 **/
+				/**异步通知处理开始  **/
+		        tradeNotifyService.notify(txnsLog.getTxnseqno());
+		        /**异步通知处理结束 **/
+			}
+		}
+		resultBean = new ResultBean(order);
+		return resultBean;
 	}
 
 	/**
