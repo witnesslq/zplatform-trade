@@ -40,17 +40,27 @@ public class TradeQueueServiceImpl implements TradeQueueService{
 	private final static Log log = LogFactory.getLog(TradeQueueServiceImpl.class);
 	
 	
-	
+	@Autowired
 	private RedisTemplate<String, String> redisTemplate; 
 	
 	public void addTradeQueue(TradeQueueBean tradeQueueBean){
-		BoundListOperations<String, String> boundListOps = redisTemplate.boundListOps(TradeQueueEnum.TRADEQUEUE.getName());
-		boundListOps.rightPush(JSON.toJSONString(tradeQueueBean));
+		try {
+			BoundListOperations<String, String> boundListOps = redisTemplate.boundListOps(TradeQueueEnum.TRADEQUEUE.getName());
+			boundListOps.rightPush(JSON.toJSONString(tradeQueueBean));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public void addTimeOutQueue(TradeQueueBean tradeQueueBean){
-		BoundListOperations<String, String> boundListOps = redisTemplate.boundListOps(TradeQueueEnum.TIMEOUTQUEUE.getName());
-		boundListOps.rightPush(JSON.toJSONString(tradeQueueBean));
+		try {
+			BoundListOperations<String, String> boundListOps = redisTemplate.boundListOps(TradeQueueEnum.TIMEOUTQUEUE.getName());
+			boundListOps.rightPush(JSON.toJSONString(tradeQueueBean));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public TradeQueueBean tradeQueuePop(){
@@ -63,13 +73,19 @@ public class TradeQueueServiceImpl implements TradeQueueService{
 	
 	
 	public TradeQueueBean queuePop(TradeQueueEnum tradeQueueEnum){
-		ListOperations<String, String> opsForList = redisTemplate.opsForList();
-		String leftPop = opsForList.leftPop(tradeQueueEnum.getName());
-		log.info("Queue 【"+tradeQueueEnum.getName()+"】 POP Value:"+leftPop);
-		if(StringUtil.isEmpty(leftPop)){
-			return null;
+		TradeQueueBean tradeQueueBean =null;
+		try {
+			ListOperations<String, String> opsForList = redisTemplate.opsForList();
+			String leftPop = opsForList.leftPop(tradeQueueEnum.getName());
+			log.info("Queue 【"+tradeQueueEnum.getName()+"】 POP Value:"+leftPop);
+			if(StringUtil.isEmpty(leftPop)){
+				return null;
+			}
+			tradeQueueBean = JSON.parseObject(leftPop, TradeQueueBean.class);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		TradeQueueBean tradeQueueBean = JSON.parseObject(leftPop, TradeQueueBean.class);
 		return tradeQueueBean;
 	}
 	
@@ -100,8 +116,29 @@ public class TradeQueueServiceImpl implements TradeQueueService{
 	@Override
 	public void addNotifyQueue(NotifyQueueBean notifyQueueBean) {
 		// TODO Auto-generated method stub
-		BoundListOperations<String, String> boundListOps = redisTemplate.boundListOps(TradeQueueEnum.NOTIFYQUEUE.getName());
-		boundListOps.rightPush(JSON.toJSONString(notifyQueueBean));
+		try {
+			BoundListOperations<String, String> boundListOps = redisTemplate.boundListOps(TradeQueueEnum.NOTIFYQUEUE.getName());
+			boundListOps.rightPush(JSON.toJSONString(notifyQueueBean));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 *
+	 * @param tradeQueueBean
+	 */
+	@Override
+	public void addRefundQueue(TradeQueueBean tradeQueueBean) {
+		// TODO Auto-generated method stub
+		try {
+			BoundListOperations<String, String> boundListOps = redisTemplate.boundListOps(TradeQueueEnum.REFUNDQUEUE.getName());
+			boundListOps.rightPush(JSON.toJSONString(tradeQueueBean));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	

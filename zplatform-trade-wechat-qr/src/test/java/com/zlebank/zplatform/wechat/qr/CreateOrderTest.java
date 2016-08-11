@@ -45,7 +45,7 @@ public class CreateOrderTest {
 	//@Ignore
 	public void test_createorder(){
 		try {
-			JSONObject creatOrder = weChatQRService.creatOrder("160809001400054959");
+			JSONObject creatOrder = weChatQRService.creatOrder("160811001400055200");
 			log.info(creatOrder.toString());
 		} catch (TradeException e) {
 			e.printStackTrace();
@@ -54,7 +54,7 @@ public class CreateOrderTest {
 	//@Test
 	public void test_queryOrder(){
 		
-		ResultBean queryOrder = weChatQRService.queryOrder("1608099900055899");
+		ResultBean queryOrder = weChatQRService.queryOrder("160810001400055083");
 		log.info("【交易查询结果】"+JSON.toJSONString(queryOrder));
 		
 	}

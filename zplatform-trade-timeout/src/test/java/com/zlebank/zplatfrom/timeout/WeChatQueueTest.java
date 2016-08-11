@@ -41,16 +41,16 @@ public class WeChatQueueTest {
 	
 	public void test_addQueue(){
 		TradeQueueBean tradeQueueBean = new TradeQueueBean();
-		tradeQueueBean.setTxnseqno("1607299900055486");
-		tradeQueueBean.setPayInsti("96000001");
-		tradeQueueBean.setTxnDateTime("20160729100408");
+		tradeQueueBean.setTxnseqno("1608109900056024");
+		tradeQueueBean.setPayInsti("91000002");
+		tradeQueueBean.setTxnDateTime("20160816134555");
 		tradeQueueService.addTradeQueue(tradeQueueBean);
 	}
 	
 	@Test
 	public void test_scan(){
-		//test_addQueue();
+		test_addQueue();
 		//tradeQueueJob.scanTradeQueue();
-		tradeNotifyService.notify("1608039900055720");
+		//tradeNotifyService.notify("1608039900055720");
 	}
 }

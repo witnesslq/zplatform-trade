@@ -37,4 +37,9 @@ public class TradeQueueJob {
 	public void scanTradeTimeOutQueue(){
 		tradeQueueScanService.scanOverTimeQueue();
 	}
+	
+	public void scanRefundTradeQueue(){
+		tradeQueueScanService.scanRefundTradeQueue();
+	}
+	
 }

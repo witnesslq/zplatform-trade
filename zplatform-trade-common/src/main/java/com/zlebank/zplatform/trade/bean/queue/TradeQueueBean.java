@@ -47,6 +47,12 @@ public class TradeQueueBean implements Serializable{
 	private String txnDateTime;
 	
 	/**
+	 * 交易类型
+	 */
+	@JSONField(name="busiType")
+	private String busiType;
+	
+	/**
 	 * 交易实现类
 	 */
 	@JSONField(serialize = false)
@@ -102,11 +108,18 @@ public class TradeQueueBean implements Serializable{
 	public void setImpl(String impl) {
 		this.impl = impl;
 	}
+	
 	/**
-	 * @return the serialversionuid
+	 * @return the busiType
 	 */
-	public static long getSerialversionuid() {
-		return serialVersionUID;
+	public String getBusiType() {
+		return busiType;
+	}
+	/**
+	 * @param busiType the busiType to set
+	 */
+	public void setBusiType(String busiType) {
+		this.busiType = busiType;
 	}
 	public static void main(String[] args) {
 		TradeQueueBean tradeQueueBean = new TradeQueueBean();

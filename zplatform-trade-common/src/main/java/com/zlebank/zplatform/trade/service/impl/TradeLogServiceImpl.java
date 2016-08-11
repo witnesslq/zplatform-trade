@@ -39,6 +39,7 @@ public class TradeLogServiceImpl implements TradeLogService{
 	@Autowired
 	private ITxnsLogService txnsLogService;
 	private static final String NAMESPACE_SPLIT = ":";
+	private static final String NAMESPACE = "TRADE";
 	/**
 	 *
 	 * @param message
@@ -50,7 +51,7 @@ public class TradeLogServiceImpl implements TradeLogService{
 		// TODO Auto-generated method stub
 		TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(txnseqno);
 		ValueOperations<String, String> opsForValue = redisTemplate.opsForValue();
-		opsForValue.set(txnseqno+NAMESPACE_SPLIT+"Request"+NAMESPACE_SPLIT+txnsLog.getPayordno(), message, 30, TimeUnit.DAYS);
+		opsForValue.set(NAMESPACE+NAMESPACE_SPLIT+txnseqno+NAMESPACE_SPLIT+"Request"+NAMESPACE_SPLIT+txnsLog.getPayordno(), message, 30, TimeUnit.DAYS);
 	}
 
 	/**
@@ -64,7 +65,7 @@ public class TradeLogServiceImpl implements TradeLogService{
 		// TODO Auto-generated method stub
 		TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(txnseqno);
 		ValueOperations<String, String> opsForValue = redisTemplate.opsForValue();
-		opsForValue.set(txnseqno+NAMESPACE_SPLIT+"Response"+NAMESPACE_SPLIT+txnsLog.getPayordno(), message, 30, TimeUnit.DAYS);
+		opsForValue.set(NAMESPACE+NAMESPACE_SPLIT+txnseqno+NAMESPACE_SPLIT+"Response"+NAMESPACE_SPLIT+txnsLog.getPayordno(), message, 30, TimeUnit.DAYS);
 	}
 
 }

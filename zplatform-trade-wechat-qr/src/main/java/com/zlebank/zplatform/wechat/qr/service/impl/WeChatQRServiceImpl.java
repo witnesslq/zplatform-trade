@@ -174,7 +174,7 @@ public class WeChatQRServiceImpl implements WeChatQRService {
 		nowTime.add(Calendar.HOUR, 1);
 		order_wechat.setTime_expire(DateUtil.formatDateTime("yyyyMMddHHmmss",nowTime.getTime()));// 有效期1个小时
 		order_wechat.setGoods_tag("WXG");
-		order_wechat.setNotify_url(ConsUtil.getInstance().cons.getWechat_notify_url());
+		order_wechat.setNotify_url(ConsUtil.getInstance().cons.getWechat_qr_notify_url());
 
 		JSONObject json = null;
 		try {
