@@ -37,6 +37,12 @@ public interface TradeQueueService {
 	public void addTimeOutQueue(TradeQueueBean tradeQueueBean);
 	
 	/**
+	 * 添加退款交易进入退款交易队列
+	 * @param tradeQueueBean
+	 */
+	public void addRefundQueue(TradeQueueBean tradeQueueBean);
+	
+	/**
 	 * 添加异步通知进入异步通知队列
 	 * @param notifyQueueBean
 	 */

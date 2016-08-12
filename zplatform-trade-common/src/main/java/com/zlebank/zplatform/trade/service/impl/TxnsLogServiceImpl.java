@@ -11,13 +11,10 @@
 package com.zlebank.zplatform.trade.service.impl;
 
 import java.math.BigDecimal;
-import java.sql.Date;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
@@ -70,7 +67,6 @@ import com.zlebank.zplatform.trade.model.PojoTranData;
 import com.zlebank.zplatform.trade.model.RiskTradeLogModel;
 import com.zlebank.zplatform.trade.model.TxncodeDefModel;
 import com.zlebank.zplatform.trade.model.TxnsLogModel;
-import com.zlebank.zplatform.trade.model.TxnsOrderinfoModel;
 import com.zlebank.zplatform.trade.model.TxnsWithholdingModel;
 import com.zlebank.zplatform.trade.service.IMemberService;
 import com.zlebank.zplatform.trade.service.IRiskTradeLogService;
@@ -307,7 +303,8 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         sqlBuffer.append("AND t.cardlen = ? ");
         sqlBuffer.append("ORDER BY t.cardbin DESC) ");
         sqlBuffer.append("WHERE ROWNUM = 1 ");
-        List<Map<String, Object>> routList =  (List<Map<String, Object>>) super.queryBySQL(sqlBuffer.toString(), new Object[]{cardNo,cardNo.trim().length()});
+        @SuppressWarnings("unchecked")
+		List<Map<String, Object>> routList =  (List<Map<String, Object>>) super.queryBySQL(sqlBuffer.toString(), new Object[]{cardNo,cardNo.trim().length()});
        
         if(routList.size()>0){
             return routList.get(0);
@@ -350,7 +347,8 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
     @Override
     public Long getTxnFee(TxnsLogModel txnsLog){
         //交易序列号，扣率版本，业务类型，交易金额，会员号，原交易序列号，卡类型 
-        List<Map<String, Object>> feeList = (List<Map<String, Object>>) super.queryBySQL("select FNC_GETFEES(?,?,?,?,?,?,?) as fee from dual", 
+        @SuppressWarnings("unchecked")
+		List<Map<String, Object>> feeList = (List<Map<String, Object>>) super.queryBySQL("select FNC_GETFEES(?,?,?,?,?,?,?) as fee from dual", 
                 new Object[]{txnsLog.getTxnseqno(),txnsLog.getFeever(),txnsLog.getBusicode(),txnsLog.getAmount(),txnsLog.getAccfirmerno(),txnsLog.getTxnseqnoOg(),txnsLog.getCardtype()});
         if(feeList.size()>0){
             if(StringUtil.isNull(feeList.get(0).get("FEE"))){
@@ -443,7 +441,8 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
             queryBuffer.append(" and tradeseltxn = ?");
             paramList.add(queryBean.getQueryId());
         }
-        List<TxnsLogModel> resultList = (List<TxnsLogModel>) super.queryByHQL(queryBuffer.toString(), paramList.toArray());
+        @SuppressWarnings("unchecked")
+		List<TxnsLogModel> resultList = (List<TxnsLogModel>) super.queryByHQL(queryBuffer.toString(), paramList.toArray());
         if(resultList.size()>0){
             return resultList.get(0);
         }
@@ -513,7 +512,8 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         RiskLevelEnum riskLevelEnum = null;
         String riskInfo = "";
         log.info("risk paramaters:"+merchId+"|"+subMerchId+"|"+memberId+"|"+busiCode+"|"+txnAmt+"|"+cardType+"|"+cardNo);
-        List<Map<String, Object>> riskList = (List<Map<String, Object>>) super.queryBySQL("SELECT FNC_GETRISK(?,?,?,?,?,?,?) AS RISK FROM DUAL", 
+        @SuppressWarnings("unchecked")
+		List<Map<String, Object>> riskList = (List<Map<String, Object>>) super.queryBySQL("SELECT FNC_GETRISK(?,?,?,?,?,?,?) AS RISK FROM DUAL", 
                 new Object[]{merchId,subMerchId,memberId,busiCode,txnAmt,cardType,cardNo});
         log.info("trade risk result:"+JSON.toJSONString(riskList));
         if(riskList.size()>0){
@@ -567,7 +567,8 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         log.info(" trade risk control end");
     }
     
-    @Transactional(readOnly=true)
+    @SuppressWarnings("unchecked")
+	@Transactional(readOnly=true)
     public List<Map<String,String>> getRiskStrategy(int orders){
         String sql = "select * from T_RISK_LIST where ORDERS = ?";
         return (List<Map<String, String>>) super.queryBySQL(sql, new Object[]{orders});
@@ -901,7 +902,8 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         return (List<?>) super.queryBySQL(queryString, new Object[]{memberId,date});//,date
     }
     
-    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+    @SuppressWarnings("unchecked")
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void excuteRecon(){
     	log.info("start ReconJob");
     	
@@ -999,7 +1001,8 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 		log.info("end ReconJob");
     }
     
-    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+    @SuppressWarnings("unchecked")
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
     public void excuteSetted() throws AccBussinessException, AbstractBusiAcctException, NumberFormatException, IllegalEntryRequestException{
     	log.info("start excuteSetted Job");
     	List<Map<String, Object>> selfTxnList = (List<Map<String, Object>>) queryBySQL("SELECT * FROM T_SELF_TXN T WHERE STATUS = ? AND RESULT = ?", new Object[]{"9","03"});
@@ -1144,6 +1147,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 	}
 
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Object> queryTxnsLog(Map<String, Object> map) {
 		StringBuffer hql= new StringBuffer();
@@ -1212,6 +1216,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 			tradeQueueBean.setTxnseqno(txnseqno);
 			tradeQueueBean.setPayInsti(txnsLog.getPayinst());
 			tradeQueueBean.setTxnDateTime(txnsLog.getTxndate()+txnsLog.getTxntime());
+			tradeQueueBean.setBusiType(txnsLog.getBusitype());
 			tradeQueueService.addTimeOutQueue(tradeQueueBean);
 		}else if(tradeStatFlagEnum == TradeStatFlagEnum.PAYING){
 			TxnsLogModel txnsLog = getTxnsLogByTxnseqno(txnseqno);
@@ -1219,6 +1224,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 			tradeQueueBean.setTxnseqno(txnseqno);
 			tradeQueueBean.setPayInsti(txnsLog.getPayinst());
 			tradeQueueBean.setTxnDateTime(txnsLog.getTxndate()+txnsLog.getTxntime());
+			tradeQueueBean.setBusiType(txnsLog.getBusitype());
 			tradeQueueService.addTradeQueue(tradeQueueBean);
 		}
 		

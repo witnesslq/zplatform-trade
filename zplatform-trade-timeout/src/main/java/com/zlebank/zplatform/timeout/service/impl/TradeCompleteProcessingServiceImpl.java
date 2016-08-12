@@ -30,6 +30,7 @@ import com.zlebank.zplatform.trade.model.TxnsLogModel;
 import com.zlebank.zplatform.trade.model.TxnsWithholdingModel;
 import com.zlebank.zplatform.trade.service.ITxnsLogService;
 import com.zlebank.zplatform.trade.service.ReaPayQuickPayService;
+import com.zlebank.zplatform.wechat.qr.service.WeChatQRService;
 import com.zlebank.zplatform.wechat.service.WeChatService;
 import com.zlebank.zplatform.wechat.wx.bean.QueryOrderResultBean;
 
@@ -55,6 +56,8 @@ public class TradeCompleteProcessingServiceImpl implements TradeCompleteProcessi
 	private WeChatService weChatService;
 	@Autowired
 	private ReaPayQuickPayService reaPayQuickPayService;
+	@Autowired
+	private WeChatQRService weChatQRService;
 	
 	/**
 	 *
@@ -125,6 +128,22 @@ public class TradeCompleteProcessingServiceImpl implements TradeCompleteProcessi
 			log.info("接收融宝交易查询流水数据：" + JSON.toJSONString(resultBean.getResultObj()));
 			reaPayQuickPayService.dealWithAccounting(txnseqno, resultBean);
 		}
+	}
+	/**
+	 *
+	 * @param txnseqno
+	 * @param resultBean
+	 */
+	@Override
+	public void weChatQRCompleteTrade(String txnseqno, ResultBean resultBean) {
+		TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(txnseqno);
+		TradeStatFlagEnum tradeStatFlagEnum = TradeStatFlagEnum.fromValue(txnsLog.getTradestatflag());
+		if(tradeStatFlagEnum==TradeStatFlagEnum.PAYING||tradeStatFlagEnum==TradeStatFlagEnum.OVERTIME){//交易支付中或者交易超时
+			log.info("接收微信交易查询应答数据：" + JSON.toJSONString(resultBean.getResultObj()));
+			weChatQRService.dealWithAccounting(txnseqno, resultBean);
+			
+		}
+		
 	}
 
 }

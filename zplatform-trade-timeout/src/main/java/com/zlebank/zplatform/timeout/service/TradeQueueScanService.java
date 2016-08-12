@@ -27,4 +27,9 @@ public interface TradeQueueScanService {
 	
 	
 	public void scanOverTimeQueue();
+	
+	/**
+	 * 扫描退款交易队列
+	 */
+	public void scanRefundTradeQueue();
 }

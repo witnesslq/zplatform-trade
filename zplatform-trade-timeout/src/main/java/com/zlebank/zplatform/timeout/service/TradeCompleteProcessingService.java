@@ -49,4 +49,11 @@ public interface TradeCompleteProcessingService {
 	 * @param resultBean
 	 */
 	public void reaPayCompleteTrade(String txnseqno,ResultBean resultBean);
+	
+	/**
+	 * 微信扫码支付交易查询补账方法
+	 * @param txnseqno
+	 * @param resultBean
+	 */
+	public void weChatQRCompleteTrade(String txnseqno,ResultBean resultBean);
 }
