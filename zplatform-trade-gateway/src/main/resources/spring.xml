@@ -38,9 +38,11 @@
 			<list>
 				<ref bean="reconJobTrigger"/> 
 				<ref bean="cmbcTrigger1"/> 
-				<!-- 微信 -
-				<ref bean="refundJobTrigger"/> -->
-				<!-- <ref bean="wechatOrderTrigger"/> -->
+				<!-- 微信 -->
+				<ref bean="refundJobTrigger"/> 
+				 <ref bean="wechatOrderTrigger"/>
+				 <ref bean="refundQrJobTrigger"/> 
+				 <ref bean="wechatQrOrderTrigger"/>
 				
 				<ref bean="tradeQueueJobTrigger"/>
 				<ref bean="tradeNotifyJobTrigger"/>
@@ -200,6 +202,8 @@
 	<!-- 微信退款查询 -->
 	<bean id="refundJob" class="com.zlebank.zplatform.wechat.job.RefundJob" />
 	
+	<bean id="refundQrJob" class="com.zlebank.zplatform.wechat.qr.job.RefundJob" />
+	
 	<bean id="refundJobTrigger"
 	 class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
 		<property name="jobDetail" ref="refundJobDetail" />
@@ -230,6 +234,42 @@
 	<bean id="wechatOrderJobDetail"
 		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
 		<property name="targetObject" ref="refundJob" />
+		<property name="targetMethod" value="queryOrder" />
+		<!-- 对于相同的JobDetail，当指定多个Trigger时, 很可能第一个job完成之前，第二个job就开始了。指定concurrent设为false，多个job不会并发运行，第二个job将会被推迟。 -->
+		<property name="concurrent" value="false" />
+	</bean>
+	
+	
+	<bean id="refundQrJobTrigger"
+	 class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="refundQrJobDetail" />
+		<!-- 启动延迟10秒 -->
+		<property name="startDelay" value="10000" />  
+		<!-- 20分钟执行一次任务 -->
+		<property name="repeatInterval" value="1200000" />
+		
+    </bean>
+    
+	<bean id="refundQrJobDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="refundQrJob" />
+		<property name="targetMethod" value="execute" />
+		<!-- 对于相同的JobDetail，当指定多个Trigger时, 很可能第一个job完成之前，第二个job就开始了。指定concurrent设为false，多个job不会并发运行，第二个job将会被推迟。 -->
+		<property name="concurrent" value="false" />
+	</bean>
+	
+	<bean id="wechatQrOrderTrigger"
+	 class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="wechatQrOrderJobDetail" />
+		<!-- 启动延迟10秒 -->
+		<property name="startDelay" value="10000" />  
+		<!-- 20分钟执行一次任务 -->
+		<property name="repeatInterval" value="1200000" />
+    </bean>
+	
+	<bean id="wechatQrOrderJobDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="refundQrJob" />
 		<property name="targetMethod" value="queryOrder" />
 		<!-- 对于相同的JobDetail，当指定多个Trigger时, 很可能第一个job完成之前，第二个job就开始了。指定concurrent设为false，多个job不会并发运行，第二个job将会被推迟。 -->
 		<property name="concurrent" value="false" />

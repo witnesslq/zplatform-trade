@@ -201,6 +201,7 @@ public class WeChatQRServiceImpl implements WeChatQRService {
 	 * @param result
 	 */
 	@Override
+	@Transactional
 	public void asyncTradeResult(PayResultBean result) {
 		//支付订单号
 		String payOrderNo = result.getOut_trade_no();
@@ -266,10 +267,11 @@ public class WeChatQRServiceImpl implements WeChatQRService {
 	 *
 	 */
 	@Override
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor = Throwable.class)
 	public void dealRefundBatch() {
 		log.info("查询退款定时任务开始【dealRefundBatch】");
 		//1.查询待处理的退款的订单
-		List<Map<String, Object>> txnlogs= (List<Map<String, Object>>) this.txnsLogService.getRefundOrderInfo(null,20);
+		List<Map<String, Object>> txnlogs= (List<Map<String, Object>>) this.txnsLogService.getRefundOrderInfo(ChannelEnmu.WEBCHAT_QR.getChnlcode(),20);
 		//JSONArray jsonArray = JSONArray.fromObject(txnlogs);
 		for(Map<String, Object> txnslogMap : txnlogs){
 			String txnseqno = txnslogMap.get("TXNSEQNO")+"";
@@ -343,6 +345,7 @@ public class WeChatQRServiceImpl implements WeChatQRService {
 	 *
 	 */
 	@Override
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor = Throwable.class)
 	public void dealAnsyOrder() {
 		log.info("定时任务微信订单查询开始：dealAnsyOrder start");
 		Map<String,Object> map= new HashMap<String,Object>();
@@ -354,7 +357,7 @@ public class WeChatQRServiceImpl implements WeChatQRService {
 		//微信类型
 		map.put("paytype", "05");
 		//微信渠道
-		map.put("painst", ChannelEnmu.WEBCHAT.getChnlcode());
+		map.put("painst", ChannelEnmu.WEBCHAT_QR.getChnlcode());
 		//消费类型
 		map.put("busitype", BusiTypeEnum.consumption.getCode());
 		List<Object> txnlogs = this.txnsLogService.queryTxnsLog(map);
