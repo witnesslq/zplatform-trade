@@ -1126,7 +1126,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 
 	@Override
 	@Transactional(readOnly=true)
-	public List<?> getRefundOrderInfo(String refundtype,int mins ) {
+	public List<?> getRefundOrderInfo(String channelId,int mins ) {
 		StringBuffer sb= new StringBuffer();
 		sb.append(" select ttl.txnseqno ");
 		sb.append(" from t_txns_log ttl ");
@@ -1142,7 +1142,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
 		//退款申请成功的
 		sb.append(" and ttl.payretcode=? ");
 		sb.append(" and ceil((to_date(?, 'yyyy-mm-dd hh24:mi:ss')-to_date(ttl.payordcomtime,'yyyy-mm-dd hh24:mi:ss'))*24*60)>=? ");
-		List<?> result = (List<?>) super.queryBySQL(sb.toString(), new Object[]{ChannelEnmu.WEBCHAT.getChnlcode(),OrderStatusEnum.INITIAL.getStatus(),OrderStatusEnum.PAYING.getStatus(),"SUCCESS",DateUtil.getTimeStamp(),mins });
+		List<?> result = (List<?>) super.queryBySQL(sb.toString(), new Object[]{channelId==null?ChannelEnmu.WEBCHAT.getChnlcode():channelId,OrderStatusEnum.INITIAL.getStatus(),OrderStatusEnum.PAYING.getStatus(),"SUCCESS",DateUtil.getTimeStamp(),mins });
 	     return result;
 	}
 

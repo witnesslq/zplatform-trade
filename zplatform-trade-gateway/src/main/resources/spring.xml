@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:jee="http://www.springframework.org/schema/jee" 
 	xsi:schemaLocation="
-	http://www.springframework.org/schema/beans 
-	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
-	http://www.springframework.org/schema/context 
-	http://www.springframework.org/schema/context/spring-context-3.0.xsd
-	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.1.xsd">
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.1.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd">
 	<!--启用注解 -->
 	<context:annotation-config />
 	<aop:aspectj-autoproxy></aop:aspectj-autoproxy>
@@ -35,9 +38,11 @@
 			<list>
 				<ref bean="reconJobTrigger"/> 
 				<ref bean="cmbcTrigger1"/> 
-				<!-- 微信 -
-				<ref bean="refundJobTrigger"/> -->
-				<!-- <ref bean="wechatOrderTrigger"/> -->
+				<!-- 微信 -->
+				<ref bean="refundJobTrigger"/> 
+				 <ref bean="wechatOrderTrigger"/>
+				 <ref bean="refundQrJobTrigger"/> 
+				 <ref bean="wechatQrOrderTrigger"/>
 				
 				<ref bean="tradeQueueJobTrigger"/>
 				<ref bean="tradeNotifyJobTrigger"/>
@@ -197,6 +202,8 @@
 	<!-- 微信退款查询 -->
 	<bean id="refundJob" class="com.zlebank.zplatform.wechat.job.RefundJob" />
 	
+	<bean id="refundQrJob" class="com.zlebank.zplatform.wechat.qr.job.RefundJob" />
+	
 	<bean id="refundJobTrigger"
 	 class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
 		<property name="jobDetail" ref="refundJobDetail" />
@@ -227,6 +234,42 @@
 	<bean id="wechatOrderJobDetail"
 		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
 		<property name="targetObject" ref="refundJob" />
+		<property name="targetMethod" value="queryOrder" />
+		<!-- 对于相同的JobDetail，当指定多个Trigger时, 很可能第一个job完成之前，第二个job就开始了。指定concurrent设为false，多个job不会并发运行，第二个job将会被推迟。 -->
+		<property name="concurrent" value="false" />
+	</bean>
+	
+	
+	<bean id="refundQrJobTrigger"
+	 class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="refundQrJobDetail" />
+		<!-- 启动延迟10秒 -->
+		<property name="startDelay" value="10000" />  
+		<!-- 20分钟执行一次任务 -->
+		<property name="repeatInterval" value="1200000" />
+		
+    </bean>
+    
+	<bean id="refundQrJobDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="refundQrJob" />
+		<property name="targetMethod" value="execute" />
+		<!-- 对于相同的JobDetail，当指定多个Trigger时, 很可能第一个job完成之前，第二个job就开始了。指定concurrent设为false，多个job不会并发运行，第二个job将会被推迟。 -->
+		<property name="concurrent" value="false" />
+	</bean>
+	
+	<bean id="wechatQrOrderTrigger"
+	 class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="wechatQrOrderJobDetail" />
+		<!-- 启动延迟10秒 -->
+		<property name="startDelay" value="10000" />  
+		<!-- 20分钟执行一次任务 -->
+		<property name="repeatInterval" value="1200000" />
+    </bean>
+	
+	<bean id="wechatQrOrderJobDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="refundQrJob" />
 		<property name="targetMethod" value="queryOrder" />
 		<!-- 对于相同的JobDetail，当指定多个Trigger时, 很可能第一个job完成之前，第二个job就开始了。指定concurrent设为false，多个job不会并发运行，第二个job将会被推迟。 -->
 		<property name="concurrent" value="false" />
@@ -300,4 +343,32 @@
 		<!-- 1分钟执行一次任务 -->
 		<property name="repeatInterval" value="60000" />
     </bean>
+    
+    <bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <property name="maxIdle" value="${redis.maxIdle}" />
+        <property name="maxTotal" value="${redis.maxActive}" />
+        <property name="maxWaitMillis" value="${redis.maxWait}" />
+        <property name="testOnBorrow" value="${redis.testOnBorrow}" />
+    </bean>
+    
+    <bean id="connectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"
+        p:host-name="${redis.host}" p:port="${redis.port}"  p:pool-config-ref="poolConfig"/>
+
+ 	<!-- <bean id="stringSerializer" class="org.springframework.data.redis.serializer.StringRedisSerializer"/> -->
+    
+    <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">   
+        <property name="connectionFactory"   ref="connectionFactory" />   
+        <property name="keySerializer">   
+            <bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />   
+        </property>      
+        <property name="valueSerializer">   
+            <bean class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer" />   
+        </property>   
+        <property name="hashKeySerializer">     
+           <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/>     
+        </property>   
+        <property name="hashValueSerializer">   
+           <bean class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer"/>     
+        </property> 
+     </bean> 
 </beans>
