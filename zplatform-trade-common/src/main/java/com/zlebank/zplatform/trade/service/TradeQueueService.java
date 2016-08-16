@@ -61,6 +61,12 @@ public interface TradeQueueService {
 	public TradeQueueBean timeOutQueuePop();
 	
 	/**
+	 * 取得退款交易队列最左侧的交易
+	 * @return
+	 */
+	public TradeQueueBean refundQueuePop();
+	
+	/**
 	 * 根据交易队列枚举取得队列最左侧的交易
 	 * @param tradeQueueEnum
 	 * @return

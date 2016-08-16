@@ -209,6 +209,7 @@ public class TradeQueueScanServiceImpl implements TradeQueueScanService{
 		double hour = time/1000.0/60.0/60.0;//相差的小时
 		return hour>=1;
 	}
+	
 	/**
 	 *扫描退款交易队列
 	 */
@@ -220,7 +221,7 @@ public class TradeQueueScanServiceImpl implements TradeQueueScanService{
 		
 		if(queueSize>0){
 			for(int i=0;i<queueSize;i++){
-				TradeQueueBean tradeQueueBean = tradeQueueService.tradeQueuePop();
+				TradeQueueBean tradeQueueBean = tradeQueueService.refundQueuePop();
 				log.info("【退款交易队列中第"+i+"位】"+JSON.toJSONString(tradeQueueBean));
 				if(tradeQueueBean==null){//此处为空时很可能是队列中已经没有交易了，跳出循环
 					break;

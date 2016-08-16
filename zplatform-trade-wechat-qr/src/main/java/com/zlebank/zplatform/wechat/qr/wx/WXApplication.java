@@ -671,7 +671,7 @@ public class WXApplication {
 		return result;
 	}
 
-	public RefundResultBean refund(RefundBean bean)
+	public RefundResultBean refund(RefundBean bean,String txnseqno)
 			throws WXVerifySignFailedException {
 		// 生成新文档（根节点为xml）
 		Document invokeAPI = genNewDoc("xml");
@@ -692,9 +692,11 @@ public class WXApplication {
 		String sign = sign(getStringXML(invokeAPI));
 		addElement(root, "sign", sign);// 签名
 		String xml = getStringXML(invokeAPI);
-
+		tradeLogService.saveRequestLog(xml, txnseqno);
 		// 发送报文
 		String rtnXml = SSLSender.sendXml(xml);
+		//
+		tradeLogService.saveResponseLog(rtnXml, txnseqno);
 		// 封装成Bean
 		RefundResultBean result = new RefundResultBean();
 		try {

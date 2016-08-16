@@ -106,7 +106,7 @@ public class WeChatQRRefundTrade implements IRefundTrade {
 				rb.setRefund_fee(txnsLog.getAmount()+"");// 退款金额
 				rb.setTotal_fee(txnsLog_old.getAmount()+"");// 总金额
 				rb.setTransaction_id(txnsLog_old.getPayrettsnseqno());// 原微信订单号（微信返回的）
-				RefundResultBean refund = instance.refund(rb); // 进行退款
+				RefundResultBean refund = instance.refund(rb,tradeBean.getTxnseqno()); // 进行退款
 				log.info("【退款返回结果】" + JSONObject.fromObject(refund));
 				//是否调到微信平台
 				if(ResultCodeEnum.SUCCESS.getCode().equals(refund.getReturn_code())){//有业务报文

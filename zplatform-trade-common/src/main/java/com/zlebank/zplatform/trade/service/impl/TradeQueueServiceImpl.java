@@ -71,6 +71,10 @@ public class TradeQueueServiceImpl implements TradeQueueService{
 		return queuePop(TradeQueueEnum.TIMEOUTQUEUE);
 	}
 	
+	public TradeQueueBean refundQueuePop(){
+		return queuePop(TradeQueueEnum.REFUNDQUEUE);
+	}
+	
 	
 	public TradeQueueBean queuePop(TradeQueueEnum tradeQueueEnum){
 		TradeQueueBean tradeQueueBean =null;

@@ -61,15 +61,15 @@ public class TestWX {
 		 */
 
 		/******************** 退款 **************************/
-		RefundBean rb = new RefundBean();
-		rb.setOut_refund_no(String.valueOf(System.currentTimeMillis()));// 退款流水号（唯一，可当场生成）
-		rb.setOut_trade_no("1608109000000783");// 原商户号（证联生成的）
-		rb.setRefund_fee("1");// 退款金额
-		rb.setTotal_fee("1");// 总金额
-		//rb.setTransaction_id("4003872001201605266327894875");// 原微信订单号（微信返回的）
-		RefundResultBean refund = instance.refund(rb); // 进行退款
-		log.info("【退款返回结果】" + JSONObject.fromObject(refund));
-		System.out.println(JSONObject.fromObject(refund));
+//		RefundBean rb = new RefundBean();
+//		rb.setOut_refund_no(String.valueOf(System.currentTimeMillis()));// 退款流水号（唯一，可当场生成）
+//		rb.setOut_trade_no("1608109000000783");// 原商户号（证联生成的）
+//		rb.setRefund_fee("1");// 退款金额
+//		rb.setTotal_fee("1");// 总金额
+//		//rb.setTransaction_id("4003872001201605266327894875");// 原微信订单号（微信返回的）
+//		RefundResultBean refund = instance.refund(rb); // 进行退款
+//		log.info("【退款返回结果】" + JSONObject.fromObject(refund));
+//		System.out.println(JSONObject.fromObject(refund));
 		/******************** 退款查询 **************************/
 		
 		  /*QueryRefundBean qrb = new QueryRefundBean();

@@ -277,7 +277,7 @@
     </bean>
     <bean id="refundTradeQueueJobTrigger"
 	 class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
-		<property name="jobDetail" ref="timeOutTradeQueueJobDetail" />
+		<property name="jobDetail" ref="refundTradeQueueJobDetail" />
 		<!-- 启动延迟10秒 -->
 		<property name="startDelay" value="10000" />  
 		<!-- 1小时执行一次任务 -->
