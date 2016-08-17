@@ -2310,7 +2310,7 @@ public class GateWayServiceImpl extends
 	 * @param json
 	 * @throws TradeException
 	 */
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	@Transactional
 	public void submitPay(String json) throws TradeException {
 		WapSubmitPayBean submitPayBean = JSON.parseObject(json,
 				WapSubmitPayBean.class);
