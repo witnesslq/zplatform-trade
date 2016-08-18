@@ -18,8 +18,10 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.TrueFalseType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.zlebank.zplatform.trade.common.page.PageVo;
 import com.zlebank.zplatform.trade.dao.ICashBankDAO;
@@ -50,15 +52,17 @@ public class CashBankServiceImpl extends BaseServiceImpl<CashBankModel, Long> im
         return cashBankDAO.getSession();
     }
     
+    @Transactional(readOnly=true)
     public List<CashBankModel> findBankByCashCode(String cashCode){
         return (List<CashBankModel>) super.queryByHQL(" from CashBankModel where cashcode = ? and status = ? ", new Object[]{cashCode,"00"});
     }
-    
+    @Transactional(readOnly=true)
     public List<CashBankModel> findBankByPaytype(String payType){
         return (List<CashBankModel>) super.queryByHQL(" from CashBankModel where paytype = ? and status = ? ", new Object[]{payType,"00"});
     }
     
     @SuppressWarnings("unchecked")
+    @Transactional(readOnly=true)
 	public List<CashBankModel> findBankPage(int page,int pageSize){
     	Query query = cashBankDAO.getSession().createQuery("from CashBankModel where paytype = ? and status = ? order by  tid asc");
     	query.setString(0, "01");
@@ -67,7 +71,7 @@ public class CashBankServiceImpl extends BaseServiceImpl<CashBankModel, Long> im
     	query.setMaxResults(pageSize);
 		return query.list();
     }
-    
+    @Transactional(readOnly=true)
     public long findBankCount(){
     	Query query = cashBankDAO.getSession().createSQLQuery("select count(1) as total from T_CASH_BANK where paytype = ? and status = ? ").setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
     	query.setString(0, "01");
@@ -78,6 +82,7 @@ public class CashBankServiceImpl extends BaseServiceImpl<CashBankModel, Long> im
     }
     
 	@Override
+	 @Transactional(readOnly=true)
 	public PageVo<CashBankModel> getCardList(Map<String, Object> map,
 			Integer pageNo, Integer pageSize) {
 		PageVo<CashBankModel> pageVo = new PageVo<CashBankModel>();

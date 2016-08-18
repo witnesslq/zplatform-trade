@@ -167,7 +167,7 @@ public class QuickpayCustServiceImpl extends BaseServiceImpl<QuickpayCustModel, 
      * @return
      */
     @Override
-    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    @Transactional(readOnly=true)
     public QuickpayCustModel getCardByBindId(String bindId) {
         List<QuickpayCustModel> bindCardList = (List<QuickpayCustModel>) super.queryByHQL(" from QuickpayCustModel where id=? and status <> ?", new Object[]{Long.valueOf(bindId),"02"});
         if(bindCardList.size()>0){
@@ -175,7 +175,7 @@ public class QuickpayCustServiceImpl extends BaseServiceImpl<QuickpayCustModel, 
         }
         return null;
     }
-    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    @Transactional(readOnly=true)
     public void updateCardStatus(String memberId,String cardNo){
         List<QuickpayCustModel> bindCardList = (List<QuickpayCustModel>) super.queryByHQL(" from QuickpayCustModel where relatememberno=? and cardno = ? and status = ?", new Object[]{memberId,cardNo,"01"});
         if(bindCardList.size()>0){

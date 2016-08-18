@@ -1,32 +1,30 @@
 /* 
- * InsteadPayBatchDAO.java  
+ * ConfigInfoService.java  
  * 
  * version TODO
  *
- * 2015年11月24日 
+ * 2016年8月17日 
  * 
- * Copyright (c) 2015,zlebank.All rights reserved.
+ * Copyright (c) 2016,zlebank.All rights reserved.
  * 
  */
-package com.zlebank.zplatform.trade.dao;
+package com.zlebank.zplatform.trade.service;
 
 import java.util.List;
 
-import org.hibernate.Session;
-
-import com.zlebank.zplatform.commons.dao.BaseDAO;
 import com.zlebank.zplatform.trade.model.ConfigInfoModel;
 
 /**
- * 配置DAO
+ * Class Description
  *
- * @author Luxiaoshuai
+ * @author guojia
  * @version
- * @date 2015年11月24日 下午12:29:35
+ * @date 2016年8月17日 下午2:01:51
  * @since 
  */
-public interface ConfigInfoDAO  extends BaseDAO<ConfigInfoModel>{
-    /**
+public interface ConfigInfoService extends IBaseService<ConfigInfoModel, String>{
+
+	/**
      * 根据参数名称得到配置信息
      * @param paraName
      * @return
@@ -45,6 +43,4 @@ public interface ConfigInfoDAO  extends BaseDAO<ConfigInfoModel>{
      * @return
      */
     public long getSequence(String sequences);
-    
-    public Session getSession();
 }

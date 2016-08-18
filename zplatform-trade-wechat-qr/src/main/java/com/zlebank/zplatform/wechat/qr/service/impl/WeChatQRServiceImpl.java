@@ -171,7 +171,7 @@ public class WeChatQRServiceImpl implements WeChatQRService {
 		order_wechat.setTotal_fee(txnsLog.getAmount() + "");
 		order_wechat.setTime_start(DateUtil.getCurrentDateTime());
 		Calendar nowTime = Calendar.getInstance();
-		nowTime.add(Calendar.HOUR, 1);
+		nowTime.add(Calendar.MINUTE, 1);
 		order_wechat.setTime_expire(DateUtil.formatDateTime("yyyyMMddHHmmss",nowTime.getTime()));// 有效期1个小时
 		order_wechat.setGoods_tag("WXG");
 		order_wechat.setNotify_url(ConsUtil.getInstance().cons.getWechat_qr_notify_url());
@@ -747,5 +747,4 @@ public class WeChatQRServiceImpl implements WeChatQRService {
 		}
 		return null;
 	}
-
 }

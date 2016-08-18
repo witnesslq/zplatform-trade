@@ -45,7 +45,7 @@ public class CreateOrderTest {
 	//@Ignore
 	public void test_createorder(){
 		try {
-			JSONObject creatOrder = weChatQRService.creatOrder("160815001400055419");
+			JSONObject creatOrder = weChatQRService.creatOrder("160818001400055779");
 			log.info(creatOrder.toString());
 		} catch (TradeException e) {
 			e.printStackTrace();

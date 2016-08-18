@@ -2230,7 +2230,6 @@ public class GateWayServiceImpl extends
 	 * @param json
 	 * @throws TradeException
 	 */
-	@Transactional(propagation = Propagation.REQUIRED)
 	public void sendSMSMessage(String json) throws TradeException {
 		// verifyWapOrder(JSON.parseObject(json));
 		WapSMSMessageBean smsMessageBean = JSON.parseObject(json,
@@ -2310,7 +2309,6 @@ public class GateWayServiceImpl extends
 	 * @param json
 	 * @throws TradeException
 	 */
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void submitPay(String json) throws TradeException {
 		WapSubmitPayBean submitPayBean = JSON.parseObject(json,
 				WapSubmitPayBean.class);

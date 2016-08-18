@@ -175,7 +175,7 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
     }
     
    
-    @Transactional
+    
     public void submitPay(TradeBean tradeBean) throws TradeException{
         TxnsOrderinfoModel orderinfo = getOrderinfoByTxnseqno(tradeBean.getTxnseqno());//getOrderinfoByOrderNoAndMemberId(tradeBean.getOrderId(),tradeBean.getMerchId());
         TxnsLogModel txnsLog = txnsLogService.get(orderinfo.getRelatetradetxn());
@@ -237,6 +237,7 @@ public class WebGateServiceImpl extends BaseServiceImpl<TxnsOrderinfoModel, Long
         	quickPayTrade.submitPay(tradeBean);
         }else{
         	TradeAdapterFactory.getInstance().getThreadPool(routId).executeMission(quickPayTrade);
+        	//quickPayTrade.submitPay(tradeBean);
         }
     }
     /**

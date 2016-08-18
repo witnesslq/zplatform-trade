@@ -52,7 +52,7 @@ import com.zlebank.zplatform.trade.service.UpdateWithdrawService;
  * @date 2016年3月21日 下午4:39:36
  * @since 
  */
-@Service(value="UpdateWithdrawServiceImpl")
+@Service("updateWithdrawServiceImpl")
 public class UpdateWithdrawServiceImpl implements UpdateWithdrawService,UpdateSubject,ApplicationListener<ContextRefreshedEvent>{
 
     private static final Log log = LogFactory.getLog(UpdateWithdrawServiceImpl.class);
