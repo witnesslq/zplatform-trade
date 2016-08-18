@@ -133,7 +133,7 @@ public class WeChatQRServiceImpl implements WeChatQRService {
 				Date orderDate = DateUtil.convertToDate(wechatOrderinfo.getTimeStart(), DateUtil.DEFAULT_DATE_FROMAT);
 				WXApplication instance = new WXApplication();
 				log.info("【订单与当前时间差】"+(System.currentTimeMillis()-orderDate.getTime()));
-				if((System.currentTimeMillis()-orderDate.getTime())>60000){//超过一分钟重新生成订单并关闭订单
+				if((System.currentTimeMillis()-orderDate.getTime())>45000){//超过一分钟重新生成订单并关闭订单
 					CloseOrderResultBean closeOrder = instance.closeOrder(txnsLog.getPayordno());
 					if("SUCCESS".equals(closeOrder.getResult_code())){//关闭成功
 						weChatOrderinfoService.updateOrderToOverdue(txnsLog.getPayordno());
