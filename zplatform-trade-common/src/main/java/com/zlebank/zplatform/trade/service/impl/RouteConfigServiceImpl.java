@@ -226,7 +226,7 @@ public class RouteConfigServiceImpl extends BaseServiceImpl<RouteConfigModel, Lo
     public ResultBean getWapTransRout(String transTime,String transAmt,String memberId,String busiCode,String cardNo){
         try {
         	String merchRoutver = null;
-        	if(StringUtil.isNotEmpty(memberId)&&"0".equals(memberId)){
+        	if(StringUtil.isNotEmpty(memberId)){
         		if(memberId.startsWith("3")){//合作机构
             		merchRoutver = getDefaultVerInfo(memberId,busiCode,20);
             	}else{//商户
