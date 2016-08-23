@@ -100,12 +100,12 @@ public class TxnsRefundServiceImpl extends BaseServiceImpl<TxnsRefundModel,Long>
 	
 	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
 	public void updateToSuccess(String txnseqno){
-		String hql = "update TxnsWithdrawModel set status = ? where texnseqno = ?";
+		String hql = "update TxnsRefundModel set status = ? where reltxnseqno = ?";
 		super.updateByHQL(hql, new Object[]{"00",txnseqno});
 	}
 	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
 	public void updateToFailed(String txnseqno){
-		String hql = "update TxnsWithdrawModel set status = ? where texnseqno = ?";
+		String hql = "update TxnsRefundModel set status = ? where reltxnseqno = ?";
 		super.updateByHQL(hql, new Object[]{"49",txnseqno});
 	}
     

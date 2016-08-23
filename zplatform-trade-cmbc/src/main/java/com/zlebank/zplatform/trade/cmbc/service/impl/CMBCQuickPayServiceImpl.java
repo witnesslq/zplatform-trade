@@ -115,7 +115,7 @@ public class CMBCQuickPayServiceImpl implements ICMBCQuickPayService{
                         return resultBean;
                     }else if("R".equalsIgnoreCase(withholding.getExectype())){
                         resultBean = new ResultBean("R","正在支付中");
-                        break;
+                        continue;
                     }
                 }
                 Thread.sleep(timeArray[i]);
