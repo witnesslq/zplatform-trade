@@ -2778,8 +2778,10 @@ public class GateWayServiceImpl extends
 			WapCardBean cardBean){
 		ResultBean resultBean = null;
 		TxnsOrderinfoModel orderinfo =null;
+		String amount="";
 		if(cardBean.getTn()!=null){
 			orderinfo = getOrderinfoByTN(cardBean.getTn());
+			amount=orderinfo.getOrderamt()+"";
 		}
 		// 获取路由信息
 		ResultBean routResultBean = routeConfigService.getWapTransRout(
@@ -2808,13 +2810,14 @@ public class GateWayServiceImpl extends
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			TradeBean trade = new TradeBean("", "", null==orderinfo.getOrderamt()?"":orderinfo.getOrderamt() + "", cardBean.getCardNo(),
+			TradeBean trade = new TradeBean("", "", amount, cardBean.getCardNo(),
 					cardBean.getCustomerNm(), cardBean.getCertifId(),
 					cardBean.getPhoneNo(), "", "", cardBean.getCertifTp(), "",
 					personMemberId, "", memberId, "", "", memberId, "", "",
 					BusinessEnum.CONSUMEQUICK.getBusiCode(),
-					cardBean.getCardType(), "", null==orderinfo.getTn()?"":orderinfo.getTn(), cardBean.getCvn2(),
+					cardBean.getCardType(), "", "", cardBean.getCvn2(),
 					cardBean.getExpired());
+			trade.setTn(cardBean.getTn());
 			trade.setTradeType("01");// 实名认证交易，不发送绑卡短信
 			trade.setMerUserId(personMemberId);
 			trade.setPayinstiId(routId);
