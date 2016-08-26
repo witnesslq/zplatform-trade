@@ -337,6 +337,8 @@ public interface IGateWayService extends IBaseService<TxnsOrderinfoModel, Long>{
      */
     public Long getRefundFee(String txnseqno,String merchNo,String txnAmt,String busicode);
     
+    public TxnsOrderinfoModel getOrderinfoByOrderNoAndMerch(String orderNo,
+			String merchNo);
     /**
      * 个人提现
      * @param tradeBean

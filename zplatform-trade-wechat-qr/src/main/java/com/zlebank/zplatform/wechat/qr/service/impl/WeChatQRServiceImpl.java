@@ -608,9 +608,9 @@ public class WeChatQRServiceImpl implements WeChatQRService {
 			//商户订单号
 			rb.setOut_trade_no(txnsLog_old.getPayordno());
 			rb.setTransaction_id(txnsLog_old.getPayrettsnseqno());
-			log.info("调微信【查询订单状态】入参："+rb.toString());
+			log.info("调微信退款【查询订单状态】入参："+rb.toString());
 			QueryRefundResultBean result = instance.refundQuery(rb);
-			log.info("调微信【查询订单状态】出参："+(null==result?"无返回值":result.getReturn_code().toString()));	
+			log.info("调微信退款【查询订单状态】出参："+(null==result?"无返回值":result.getReturn_code().toString()));	
 			resultBean = new ResultBean(result);
 			resultBean.setErrCode(result.getRefundSub().get(0).getRefund_status());
 		}

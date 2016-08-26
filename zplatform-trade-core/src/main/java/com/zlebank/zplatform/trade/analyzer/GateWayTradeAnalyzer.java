@@ -50,12 +50,12 @@ import com.zlebank.zplatform.trade.utils.ValidateLocator;
 public class GateWayTradeAnalyzer {
 
     public static byte[] generateOrderParamer(OrderBean order) throws Exception {
-        String[] unParamstring = {"signature"};
+        String[] unParamstring = {"signature","productcode"};
         String msg = ObjectDynamic.generateParamer(order, false, unParamstring);
         return URLEncoder.encode(msg,"utf-8").getBytes();
     }
     public static byte[] generateOrderParamer(QueryBean queryBean) throws Exception {
-        String[] unParamstring = {"signature"};
+        String[] unParamstring = {"signature","productcode"};
         String msg = ObjectDynamic.generateParamer(queryBean, false, unParamstring);
         return URLEncoder.encode(msg,"utf-8").getBytes();
     }

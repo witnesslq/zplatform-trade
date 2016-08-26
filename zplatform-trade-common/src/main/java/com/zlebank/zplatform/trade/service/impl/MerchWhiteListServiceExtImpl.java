@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.zlebank.zplatform.trade.dao.MerchWhiteListDAO;
 import com.zlebank.zplatform.trade.model.PojoMerchWhiteList;
-import com.zlebank.zplatform.trade.service.MerchWhiteListService;
+import com.zlebank.zplatform.trade.service.MerchWhiteListServiceExt;
 
 /**
  * Class Description
@@ -27,8 +27,8 @@ import com.zlebank.zplatform.trade.service.MerchWhiteListService;
  * @date 2016年8月17日 下午2:27:52
  * @since 
  */
-@Service("merchWhiteListService")
-public class MerchWhiteListServiceImpl implements MerchWhiteListService{
+@Service("merchWhiteListServiceExt")
+public class MerchWhiteListServiceExtImpl implements MerchWhiteListServiceExt{
 
 	@Autowired
 	private MerchWhiteListDAO merchWhiteListDAO;

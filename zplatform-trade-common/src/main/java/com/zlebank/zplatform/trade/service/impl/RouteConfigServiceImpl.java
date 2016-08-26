@@ -226,7 +226,7 @@ public class RouteConfigServiceImpl extends BaseServiceImpl<RouteConfigModel, Lo
     public ResultBean getWapTransRout(String transTime,String transAmt,String memberId,String busiCode,String cardNo){
         try {
         	String merchRoutver = null;
-        	if(StringUtil.isNotEmpty(memberId)&&"0".equals(memberId)){
+        	if(StringUtil.isNotEmpty(memberId)){
         		if(memberId.startsWith("3")){//合作机构
             		merchRoutver = getDefaultVerInfo(memberId,busiCode,20);
             	}else{//商户
@@ -236,14 +236,14 @@ public class RouteConfigServiceImpl extends BaseServiceImpl<RouteConfigModel, Lo
         	}
         	
             
-            if (log.isDebugEnabled()) {
-                log.debug("transTime：" + transTime);
-                log.debug("transAmt：" + transAmt);
-                log.debug("memberId：" + memberId);
-                log.debug("busiCode：" + busiCode);
-                log.debug("cardNo：" + cardNo);
-                log.debug("merchRoutver：" + merchRoutver);
-            }
+           
+                log.info("transTime：" + transTime);
+                log.info("transAmt：" + transAmt);
+                log.info("memberId：" + memberId);
+                log.info("busiCode：" + busiCode);
+                log.info("cardNo：" + cardNo);
+                log.info("merchRoutver：" + merchRoutver);
+           
             String bankcode = null;
             String cardType = null;
             if(StringUtils.isNotEmpty(cardNo)){

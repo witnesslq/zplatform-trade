@@ -99,6 +99,9 @@ public class TradeNotifyServiceImpl implements TradeNotifyService{
 				}
 				//判断异步通知是否成功
 				TxnsNotifyTaskModel asyncNotifyTask = txnsNotifyTaskService.getAsyncNotifyTask(notifyQueueBean.getTxnseqno());
+				if(asyncNotifyTask==null){
+					tradeQueueService.addNotifyQueue(notifyQueueBean);
+				}
 				if("00".equals(asyncNotifyTask.getSendStatus())){
 					log.info("【异步通知队列数据,txnseqno:"+notifyQueueBean.getTxnseqno()+"异步通知完成】");
 					continue;

@@ -79,6 +79,7 @@ public class TxnsLogModel implements java.io.Serializable {
     private String accbusicode;
     private String acccoopinstino;
     private String panName;
+    private String productcode;
     // Constructors
 
     /** default constructor */
@@ -737,6 +738,21 @@ public class TxnsLogModel implements java.io.Serializable {
 	 */
 	public void setPanName(String panName) {
 		this.panName = panName;
+	}
+
+	/**
+	 * @return the productcode
+	 */
+	@Column(name = "PRODUCTCODE")
+	public String getProductcode() {
+		return productcode;
+	}
+
+	/**
+	 * @param productcode the productcode to set
+	 */
+	public void setProductcode(String productcode) {
+		this.productcode = productcode;
 	}
 	
     

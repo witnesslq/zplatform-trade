@@ -82,6 +82,9 @@ public class TradeQueueScanServiceImpl implements TradeQueueScanService{
 				}
 				//判断交易是否已经完成，账务也处理完成
 				TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(tradeQueueBean.getTxnseqno());
+				if(txnsLog==null){
+					tradeQueueService.addTradeQueue(tradeQueueBean);
+				}
 				log.info("【交易队列中"+tradeQueueBean.getTxnseqno()+"交易数据】"+JSON.toJSONString(txnsLog));
 				TradeStatFlagEnum tradeStatFlagEnum = TradeStatFlagEnum.fromValue(txnsLog.getTradestatflag());
 				if(tradeStatFlagEnum==TradeStatFlagEnum.PAYING||tradeStatFlagEnum==TradeStatFlagEnum.OVERTIME){//交易支付中或者交易超时
@@ -159,6 +162,9 @@ public class TradeQueueScanServiceImpl implements TradeQueueScanService{
 				}
 				//判断交易是否已经完成，账务也处理完成
 				TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(tradeQueueBean.getTxnseqno());
+				if(txnsLog==null){
+					tradeQueueService.addTimeOutQueue(tradeQueueBean);
+				}
 				log.info("【超时交易队列中"+tradeQueueBean.getTxnseqno()+"交易数据】"+JSON.toJSONString(txnsLog));
 				TradeStatFlagEnum tradeStatFlagEnum = TradeStatFlagEnum.fromValue(txnsLog.getTradestatflag());
 				if(tradeStatFlagEnum==TradeStatFlagEnum.OVERTIME){//交易支付中或者交易超时
@@ -228,6 +234,9 @@ public class TradeQueueScanServiceImpl implements TradeQueueScanService{
 				}
 				//判断交易是否已经完成，账务也处理完成
 				TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(tradeQueueBean.getTxnseqno());
+				if(txnsLog==null){
+					tradeQueueService.addRefundQueue(tradeQueueBean);
+				}
 				log.info("【退款交易队列中"+tradeQueueBean.getTxnseqno()+"交易数据】"+JSON.toJSONString(txnsLog));
 				TradeStatFlagEnum tradeStatFlagEnum = TradeStatFlagEnum.fromValue(txnsLog.getTradestatflag());
 				if(tradeStatFlagEnum==TradeStatFlagEnum.PAYING||tradeStatFlagEnum==TradeStatFlagEnum.OVERTIME){//交易支付中或者交易超时

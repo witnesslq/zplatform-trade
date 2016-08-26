@@ -73,7 +73,7 @@ public class CashBankServiceImpl extends BaseServiceImpl<CashBankModel, Long> im
     }
     @Transactional(readOnly=true)
     public long findBankCount(){
-    	Query query = cashBankDAO.getSession().createSQLQuery("select count(1) as total from T_CASH_BANK where paytype = ? and status = ? ").setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+    	Query query = cashBankDAO.getSession().createSQLQuery("select count(1) as total from T_CASH_BANK where paytype = ? and status = ?").setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
     	query.setString(0, "01");
     	query.setString(1, "00");
     	

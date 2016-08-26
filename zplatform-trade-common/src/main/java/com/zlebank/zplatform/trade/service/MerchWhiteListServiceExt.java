@@ -20,7 +20,7 @@ import com.zlebank.zplatform.trade.model.PojoMerchWhiteList;
  * @date 2016年8月17日 下午2:27:22
  * @since 
  */
-public interface MerchWhiteListService {
+public interface MerchWhiteListServiceExt {
 	/**
      * 得到指定的白名单信息
      * @param accNo

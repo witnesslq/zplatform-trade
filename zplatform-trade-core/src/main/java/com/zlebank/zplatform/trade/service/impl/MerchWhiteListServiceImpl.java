@@ -28,6 +28,7 @@ import com.zlebank.zplatform.trade.dao.RealnameAuthOrderDAO;
 import com.zlebank.zplatform.trade.insteadPay.message.MerWhiteList_Request;
 import com.zlebank.zplatform.trade.model.PojoMerchWhiteList;
 import com.zlebank.zplatform.trade.service.MerchWhiteListService;
+import com.zlebank.zplatform.trade.service.MerchWhiteListServiceExt;
 
 /**
  * Class Description
@@ -40,7 +41,7 @@ import com.zlebank.zplatform.trade.service.MerchWhiteListService;
 @Service
 public class MerchWhiteListServiceImpl implements MerchWhiteListService{
 
-    private static final Log log = LogFactory.getLog(MerchWhiteListServiceImpl.class);
+    private static final Log log = LogFactory.getLog(MerchWhiteListServiceExtImpl.class);
 
     @Autowired
     private ConfigInfoDAO configInfoDAO;

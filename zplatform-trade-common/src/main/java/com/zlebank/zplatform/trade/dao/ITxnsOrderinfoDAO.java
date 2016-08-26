@@ -37,7 +37,7 @@ public interface ITxnsOrderinfoDAO extends BaseDAO<TxnsOrderinfoModel>{
     public TxnsOrderinfoModel getOrderByTxnseqno(String txnseqno);
     public void updateOrderToFail(String txnseqno);
     public void updateOrderToSuccess(String txnseqno) ;
-  
+    public void updateOrderToSuccessByTN(String tn) ;
     
     
 }

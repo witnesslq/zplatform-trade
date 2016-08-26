@@ -729,8 +729,8 @@ public class GateWayController {
                     case TEST:
                         TxnsOrderinfoModel gatewayOrderBean = gateWayService.getOrderByTxnseqno(trade.getTxnseqno());
                         ResultBean orderResp = gateWayService.generateAsyncRespMessage(trade.getTxnseqno());
-                        OrderRespBean respBean = (OrderRespBean) orderResp.getResultObj();
-                        model.put("suburl",gatewayOrderBean.getFronturl()+ "?"+ ObjectDynamic.generateReturnParamer(respBean, false, null));
+                        //OrderAsynRespBean respBean = (OrderAsynRespBean ) orderResp.getResultObj();
+                        //model.put("suburl",gatewayOrderBean.getFronturl()+ "?"+ ObjectDynamic.generateReturnParamer(respBean, false, null));
                         model.put("errMsg", "交易成功");
                         model.put("respCode", "0000");
                         return new ModelAndView("/fastpay/success", model);

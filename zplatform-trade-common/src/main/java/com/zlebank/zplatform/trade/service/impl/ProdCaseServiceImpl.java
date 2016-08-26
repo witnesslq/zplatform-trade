@@ -110,7 +110,7 @@ public class ProdCaseServiceImpl extends BaseServiceImpl<ProdCaseModel, Long> im
         return resultBean;
     }
     
-    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    @Transactional(readOnly=true)
     public ProdCaseModel getMerchProd(String prdtver,String busicode){
         return super.getUniqueByHQL("from ProdCaseModel where prdtver=? and busicode=?", new Object[]{prdtver,busicode});
     }

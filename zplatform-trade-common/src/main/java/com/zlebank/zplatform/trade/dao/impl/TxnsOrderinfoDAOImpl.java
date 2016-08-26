@@ -73,7 +73,7 @@ public class TxnsOrderinfoDAOImpl extends HibernateBaseDAOImpl<TxnsOrderinfoMode
         int rows =  query.executeUpdate();
     }
     
-    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    @Transactional(propagation=Propagation.REQUIRED)
     public TxnsOrderinfoModel getOrderinfoByOrderNo(String orderNo,String merchId) {
         String hql = "from TxnsOrderinfoModel where orderno = ? and firmemberno = ? ";
         Session session = getSession();
@@ -122,5 +122,20 @@ public class TxnsOrderinfoDAOImpl extends HibernateBaseDAOImpl<TxnsOrderinfoMode
         Query query = session.createQuery(hql);
         query.setString(0, txnseqno);
         return (TxnsOrderinfoModel) query.list().get(0);
+	}
+	/**
+	 *
+	 * @param tn
+	 */
+	@Override
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+	public void updateOrderToSuccessByTN(String tn) {
+		// TODO Auto-generated method stub
+		String hql = "update TxnsOrderinfoModel set status = ? where tn = ? ";
+        Session session = getSession();
+        Query query = session.createQuery(hql);
+        query.setString(0, "00");
+        query.setString(1, tn);
+        int rows =  query.executeUpdate();
 	}
 }

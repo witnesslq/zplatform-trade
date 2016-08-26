@@ -952,6 +952,7 @@ public class GateWayServiceImpl extends
 				}
 			}
 			txnsLog.setTradestatflag(TradeStatFlagEnum.INITIAL.getStatus());
+			txnsLog.setProductcode(order.getProductcode());
 			txnsLogService.save(txnsLog);
 
 			orderinfo = new TxnsOrderinfoModel();
@@ -1003,6 +1004,7 @@ public class GateWayServiceImpl extends
 			orderinfo.setPaytimeout(order.getPayTimeout());
 			orderinfo.setMemberid(riskRateInfoBean.getMerUserId());
 			orderinfo.setCurrencycode("156");
+			orderinfo.setProductcode(order.getProductcode());
 			super.save(orderinfo);
 			return orderinfo.getTn();
 		} catch (Exception e) {
@@ -1586,7 +1588,7 @@ public class GateWayServiceImpl extends
 						new Object[] { orderNo, memberId });
 	}
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	@Transactional(readOnly=true)
 	public TxnsOrderinfoModel getOrderinfoByOrderNoAndMerch(String orderNo,
 			String merchNo) {
 		return super

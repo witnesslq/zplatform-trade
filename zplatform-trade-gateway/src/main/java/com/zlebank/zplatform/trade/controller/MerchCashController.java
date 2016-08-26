@@ -416,10 +416,9 @@ public class MerchCashController {
             }
 
             //获取路由信息
-            ResultBean routResultBean = routeConfigService.getTransRout(
+            ResultBean routResultBean = routeConfigService.getWapTransRout(
                     DateUtil.getCurrentDateTime(), trade.getAmount(),
-                    StringUtil.isNotEmpty(trade.getMerchId())?trade.getMerchId():trade.getSubMerchId(), trade.getBusicode(), trade.getCardNo(),
-                    trade.getCashCode());
+                    StringUtil.isNotEmpty(trade.getMerchId())?trade.getMerchId():trade.getSubMerchId(), trade.getBusicode(), trade.getCardNo());
             if (routResultBean.isResultBool()) {
                 String routId = routResultBean.getResultObj().toString();
                 ChannelEnmu channel = ChannelEnmu.fromValue(routId);
