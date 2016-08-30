@@ -349,7 +349,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         //交易序列号，扣率版本，业务类型，交易金额，会员号，原交易序列号，卡类型 
         @SuppressWarnings("unchecked")
 		List<Map<String, Object>> feeList = (List<Map<String, Object>>) super.queryBySQL("select FNC_GETFEES(?,?,?,?,?,?,?) as fee from dual", 
-                new Object[]{txnsLog.getTxnseqno(),txnsLog.getFeever(),txnsLog.getBusicode(),txnsLog.getAmount(),txnsLog.getAccfirmerno(),txnsLog.getTxnseqnoOg(),txnsLog.getCardtype()});
+                new Object[]{txnsLog.getTxnseqno(),txnsLog.getFeever(),txnsLog.getBusicode(),txnsLog.getAmount(),txnsLog.getAccsecmerno(),txnsLog.getTxnseqnoOg(),txnsLog.getCardtype()});
         if(feeList.size()>0){
             if(StringUtil.isNull(feeList.get(0).get("FEE"))){
                 return 0L;
@@ -694,6 +694,15 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
     }
 
 
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+    public void updateBankTransferOfTxnsLog(TxnsLogModel txnsLog){
+        String hql = "update TxnsLogModel set paytype=?, payordno = ?,payinst = ?,payfirmerno = ?,payordcomtime = ?, pan = ?,panName = ?,txnfee = ? where txnseqno = ? ";
+        Object[] paramaters = new Object[]{txnsLog.getPaytype(),txnsLog.getPayordno(),txnsLog.getPayinst(),txnsLog.getPayfirmerno(),txnsLog.getPayordcomtime(),txnsLog.getPan(),
+        		txnsLog.getPanName(),txnsLog.getTxnfee(),txnsLog.getTxnseqno()};
+        super.updateByHQL(hql, paramaters);
+    }
+
+
 	@Override
 	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
 	public void saveBankTransferLogs(List<PojoBankTransferData> transferDataList) {
@@ -711,7 +720,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
                     txnsLog.setPan(data.getAccNo());
                     txnsLog.setPanName(data.getAccName());
                     txnsLog.setTxnfee(data.getTranData().getTranFee().longValue());
-                    update(txnsLog);
+                    updateBankTransferOfTxnsLog(txnsLog);
             	}else if("3000".equals(txnsLog.getBusitype())){
             		txnsLog.setPaytype("04"); //支付类型（01：快捷，02：网银，03：账户 04代付）
                     txnsLog.setPayordno(data.getBankTranDataSeqNo());//支付定单号
@@ -722,7 +731,7 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
                     txnsLog.setPan(data.getAccNo());
                     txnsLog.setPanName(data.getAccName());
                     txnsLog.setTxnfee(data.getTranData().getTranFee().longValue());
-                    update(txnsLog);
+                    updateBankTransferOfTxnsLog(txnsLog);
             	}
             	
                 continue;
