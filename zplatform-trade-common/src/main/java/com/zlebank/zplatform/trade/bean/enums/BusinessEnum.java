@@ -36,6 +36,9 @@ public enum BusinessEnum {
     WITHDRAWALS_SUCCESS("30000001"),//提现退汇
     REFUND_ACCOUNT("40000002"),//退款-账户
     CHARGE_OFFLINE("90000001"),//手工充值
+    
+    CONSUMEQUICK_PRODUCT("11000001"),//产品-消费-快捷
+    CONSUMEACCOUNT_PRODUCT("11000002"),//产品-消费-账户
     UNKNOW("");//未知
     private String busiCode;
     

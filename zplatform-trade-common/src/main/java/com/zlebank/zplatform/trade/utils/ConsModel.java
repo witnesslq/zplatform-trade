@@ -145,7 +145,7 @@ public class ConsModel {
 	private String wechat_qr_short_url="";
 	
 	
-
+	private String zlebank_coopinsti_code;
 	
 	
 	public String getWeb_cash_url() {
@@ -1660,6 +1660,20 @@ public class ConsModel {
 	 */
 	public void setWechat_qr_short_url(String wechat_qr_short_url) {
 		this.wechat_qr_short_url = wechat_qr_short_url;
+	}
+
+	/**
+	 * @return the zlebank_coopinsti_code
+	 */
+	public String getZlebank_coopinsti_code() {
+		return zlebank_coopinsti_code;
+	}
+
+	/**
+	 * @param zlebank_coopinsti_code the zlebank_coopinsti_code to set
+	 */
+	public void setZlebank_coopinsti_code(String zlebank_coopinsti_code) {
+		this.zlebank_coopinsti_code = zlebank_coopinsti_code;
 	}
 	
 	

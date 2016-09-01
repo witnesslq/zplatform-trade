@@ -23,6 +23,10 @@ import org.hibernate.annotations.Parameter;
 @Table(name = "T_TXNS_CHARGE", uniqueConstraints = @UniqueConstraint(columnNames = "CHARGENO"))
 public class PojoTxnsCharge implements java.io.Serializable {
 
+	/**
+	 * serialVersionUID
+	 */
+	private static final long serialVersionUID = 7532263517672128799L;
 	private long id;
 	private String chargeno;
 	private String memberid;
@@ -41,7 +45,9 @@ public class PojoTxnsCharge implements java.io.Serializable {
 	private String notes;
 	private String remarks;
 	private String chargecode;
-
+	private String tn;
+	
+	
 	public PojoTxnsCharge() {
 	}
 
@@ -256,6 +262,21 @@ public class PojoTxnsCharge implements java.io.Serializable {
 
 	public void setChargecode(String chargecode) {
 		this.chargecode = chargecode;
+	}
+
+	/**
+	 * @return the tn
+	 */
+	@Column(name = "TN")
+	public String getTn() {
+		return tn;
+	}
+
+	/**
+	 * @param tn the tn to set
+	 */
+	public void setTn(String tn) {
+		this.tn = tn;
 	}
 
 }

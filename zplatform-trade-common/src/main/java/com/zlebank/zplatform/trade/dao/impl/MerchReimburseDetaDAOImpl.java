@@ -10,6 +10,8 @@
  */
 package com.zlebank.zplatform.trade.dao.impl;
 
+import org.hibernate.Criteria;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
 import com.zlebank.zplatform.commons.dao.impl.HibernateBaseDAOImpl;
@@ -26,5 +28,17 @@ import com.zlebank.zplatform.trade.model.PojoMerchReimburseDeta;
  */
 @Repository("MerchReimburseDetaDAO")
 public class MerchReimburseDetaDAOImpl extends HibernateBaseDAOImpl<PojoMerchReimburseDeta> implements MerchReimburseDetaDAO{
+
+	/**
+	 *
+	 * @param tid
+	 * @return
+	 */
+	@Override
+	public PojoMerchReimburseDeta getDeta(long tid) {
+		Criteria criteria = getSession().createCriteria(PojoMerchReimburseDeta.class);
+		criteria.add(Restrictions.eq("tid", tid));
+		return (PojoMerchReimburseDeta) criteria.uniqueResult();
+	}
 
 }

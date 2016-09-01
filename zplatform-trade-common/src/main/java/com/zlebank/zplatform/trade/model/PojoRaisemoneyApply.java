@@ -22,6 +22,10 @@ import org.hibernate.annotations.Parameter;
 @Table(name = "T_RAISEMONEY_APPLY")
 public class PojoRaisemoneyApply implements java.io.Serializable {
 
+	/**
+	 * serialVersionUID
+	 */
+	private static final long serialVersionUID = 1460094894659641055L;
 	private long tid;
 	private String memberid;
 	private String financingid;

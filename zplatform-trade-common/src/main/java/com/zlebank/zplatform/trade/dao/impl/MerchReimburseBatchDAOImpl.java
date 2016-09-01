@@ -38,7 +38,7 @@ public class MerchReimburseBatchDAOImpl extends HibernateBaseDAOImpl<PojoMerchRe
 	@Override
 	public PojoMerchReimburseBatch getBatchInfoByBatchNo(String batchno) {
 		Criteria criteria = getSession().createCriteria(PojoMerchReimburseBatch.class);
-		criteria.add(Restrictions.eq("batchNo", Long.parseLong(batchno)));
+		criteria.add(Restrictions.eq("batchNo", batchno));
 		return (PojoMerchReimburseBatch) criteria.uniqueResult();
 	}
 

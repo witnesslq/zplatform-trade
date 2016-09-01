@@ -23,5 +23,10 @@ import com.zlebank.zplatform.trade.model.PojoRaisemoneyApply;
  */
 public interface RaisemoneyApplyDAO extends BaseDAO<PojoRaisemoneyApply>{
 
-	
+	/**
+	 * 获取募集款划转数据
+	 * @param tid
+	 * @return
+	 */
+	public PojoRaisemoneyApply getApply(long tid);
 }

@@ -16,6 +16,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundListOperations;
+import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -45,6 +46,8 @@ public class TradeQueueServiceImpl implements TradeQueueService{
 	
 	public void addTradeQueue(TradeQueueBean tradeQueueBean){
 		try {
+			
+			
 			BoundListOperations<String, String> boundListOps = redisTemplate.boundListOps(TradeQueueEnum.TRADEQUEUE.getName());
 			boundListOps.rightPush(JSON.toJSONString(tradeQueueBean));
 		} catch (Exception e) {

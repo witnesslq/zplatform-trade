@@ -23,4 +23,10 @@ import com.zlebank.zplatform.trade.model.PojoMerchReimburseDeta;
  */
 public interface MerchReimburseDetaDAO extends BaseDAO<PojoMerchReimburseDeta>{
 
+	/**
+	 * 获取商户还款数据
+	 * @param tid
+	 * @return
+	 */
+	public PojoMerchReimburseDeta getDeta(long tid);
 }

@@ -183,7 +183,7 @@ public class PojoMerchReimburseDeta implements java.io.Serializable {
 		this.inuser = inuser;
 	}
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "INTIME", nullable = false, length = 7)
 	public Date getIntime() {
 		return this.intime;
@@ -202,7 +202,7 @@ public class PojoMerchReimburseDeta implements java.io.Serializable {
 		this.stexauser = stexauser;
 	}
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "STEXATIME", length = 7)
 	public Date getStexatime() {
 		return this.stexatime;
@@ -230,7 +230,7 @@ public class PojoMerchReimburseDeta implements java.io.Serializable {
 		this.cvlexauser = cvlexauser;
 	}
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "CVLEXATIME", length = 7)
 	public Date getCvlexatime() {
 		return this.cvlexatime;

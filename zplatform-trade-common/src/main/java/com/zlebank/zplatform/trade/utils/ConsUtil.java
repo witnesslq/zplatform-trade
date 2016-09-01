@@ -170,6 +170,7 @@ public class ConsUtil {
 			cons.setWechat_qr_short_url(prop.getProperty("wechat_qr_short_url"));
 			
 			cons.setWeb_cash_url(prop.getProperty("web_cash_url"));
+			cons.setZlebank_coopinsti_code(prop.getProperty("zlebank_coopinsti_code"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

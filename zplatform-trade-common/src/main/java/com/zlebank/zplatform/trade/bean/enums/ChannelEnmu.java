@@ -12,6 +12,7 @@ public enum ChannelEnmu {
     WEBCHAT_QR("91000002"),//中少微信二维码
     CHANPAY("90000001"),//畅捷网关支付
     CHANPAYCOLLECTMONEY("90000002"),//畅捷代收
+    INNERCHANNEL("99999999"),//账务渠道
     UNKNOW("");//未知
     private String chnlcode;
     

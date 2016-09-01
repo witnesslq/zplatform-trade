@@ -33,6 +33,7 @@ public class MerchantReimbursementBean implements Serializable{
 	private String batchNo	;//还款批次号
 	private String totalAmt	;//还款总金额
 	private String productCode	;//产品代码
+	private String coopInsti; //合作机构
 	private List<ReimbursementDetailBean> detaiList;//还款明细列表
 	/**
 	 * @return the memberId
@@ -93,6 +94,18 @@ public class MerchantReimbursementBean implements Serializable{
 	 */
 	public void setDetaiList(List<ReimbursementDetailBean> detaiList) {
 		this.detaiList = detaiList;
+	}
+	/**
+	 * @return the coopInsti
+	 */
+	public String getCoopInsti() {
+		return coopInsti;
+	}
+	/**
+	 * @param coopInsti the coopInsti to set
+	 */
+	public void setCoopInsti(String coopInsti) {
+		this.coopInsti = coopInsti;
 	}
 	
 	

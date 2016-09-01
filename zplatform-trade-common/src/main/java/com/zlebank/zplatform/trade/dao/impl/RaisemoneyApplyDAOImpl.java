@@ -10,6 +10,8 @@
  */
 package com.zlebank.zplatform.trade.dao.impl;
 
+import org.hibernate.Criteria;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
 import com.zlebank.zplatform.commons.dao.impl.HibernateBaseDAOImpl;
@@ -26,5 +28,17 @@ import com.zlebank.zplatform.trade.model.PojoRaisemoneyApply;
  */
 @Repository("raisemoneyApplyDAO")
 public class RaisemoneyApplyDAOImpl extends HibernateBaseDAOImpl<PojoRaisemoneyApply> implements RaisemoneyApplyDAO{
+
+	/**
+	 *
+	 * @param tid
+	 * @return
+	 */
+	@Override
+	public PojoRaisemoneyApply getApply(long tid) {
+		Criteria criteria = getSession().createCriteria(PojoRaisemoneyApply.class);
+		criteria.add(Restrictions.eq("tid", tid));
+		return (PojoRaisemoneyApply) criteria.uniqueResult();
+	}
 
 }

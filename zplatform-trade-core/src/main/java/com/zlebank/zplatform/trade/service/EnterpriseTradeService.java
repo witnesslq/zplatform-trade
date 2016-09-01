@@ -38,7 +38,7 @@ public interface EnterpriseTradeService {
 	 * @throws TradeException
 	 * @throws InvalidMemberDataException
 	 */
-	public String createEnterpriseRealNameOrder(EnterpriseRealNameBean enterpriseRealNameBean) throws TradeException,InvalidMemberDataException;
+	public String createEnterpriseRealNameOrder(EnterpriseRealNameBean enterpriseRealNameBean) throws Exception;
 	
 	/**
 	 * 企业实名认证确认
@@ -58,7 +58,7 @@ public interface EnterpriseTradeService {
 	 * @param bean
 	 * @return
 	 */
-	public String createFinancierOrder(FinancierReimbursementBean bean);
+	public String createFinancierOrder(FinancierReimbursementBean bean) throws TradeException;
 	
 	/**
 	 * 募集款划转

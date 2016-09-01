@@ -54,6 +54,7 @@ public class PojoMerchReimburseBatch implements java.io.Serializable {
 	private String filePath;
 	private String originalFileName;
 	private String tn;
+	private String coopinsticode;
 	public PojoMerchReimburseBatch() {
 	}
 
@@ -193,7 +194,7 @@ public class PojoMerchReimburseBatch implements java.io.Serializable {
 		this.inuser = inuser;
 	}
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "INTIME", length = 7)
 	public Date getIntime() {
 		return this.intime;
@@ -212,7 +213,7 @@ public class PojoMerchReimburseBatch implements java.io.Serializable {
 		this.upuser = upuser;
 	}
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "UPTIME", length = 7)
 	public Date getUptime() {
 		return this.uptime;
@@ -294,7 +295,7 @@ public class PojoMerchReimburseBatch implements java.io.Serializable {
 		this.refuseAmt = refuseAmt;
 	}
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "APPLY_TIME", length = 7)
 	public Date getApplyTime() {
 		return this.applyTime;
@@ -304,7 +305,7 @@ public class PojoMerchReimburseBatch implements java.io.Serializable {
 		this.applyTime = applyTime;
 	}
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "APPROVE_FINISH_TIME", length = 7)
 	public Date getApproveFinishTime() {
 		return this.approveFinishTime;
@@ -314,7 +315,7 @@ public class PojoMerchReimburseBatch implements java.io.Serializable {
 		this.approveFinishTime = approveFinishTime;
 	}
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "FINISH_TIME", length = 7)
 	public Date getFinishTime() {
 		return this.finishTime;
@@ -355,6 +356,21 @@ public class PojoMerchReimburseBatch implements java.io.Serializable {
 	 */
 	public void setTn(String tn) {
 		this.tn = tn;
+	}
+
+	/**
+	 * @return the coopinsticode
+	 */
+	@Column(name = "COOPINSTICODE")
+	public String getCoopinsticode() {
+		return coopinsticode;
+	}
+
+	/**
+	 * @param coopinsticode the coopinsticode to set
+	 */
+	public void setCoopinsticode(String coopinsticode) {
+		this.coopinsticode = coopinsticode;
 	}
 	
 	
