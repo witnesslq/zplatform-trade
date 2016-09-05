@@ -516,7 +516,7 @@ public class GateWayServiceImpl extends
 			}
 		}
 		txnsLog.setTradestatflag(TradeStatFlagEnum.INITIAL.getStatus());
-		
+		txnsLog.setProductcode(order.getProductcode());
 
 		// 记录订单流水
 		TxnsOrderinfoModel orderinfo = new TxnsOrderinfoModel();
@@ -570,6 +570,7 @@ public class GateWayServiceImpl extends
 				order.getCoopInstiId()));
 		orderinfo.setMemberid(riskRateInfoBean.getMerUserId());
 		orderinfo.setCurrencycode("156");
+		orderinfo.setProductcode(order.getProductcode());
 		txnsLogService.saveTxnsLog(txnsLog);
 		saveOrderInfo(orderinfo);
 		
@@ -3214,7 +3215,7 @@ public class GateWayServiceImpl extends
              String privateKey= "";
              if("000204".equals(orderinfo.getBiztype())){
             	 privateKey = coopInstiService.getCoopInstiMK(orderinfo.getFirmemberno(), TerminalAccessType.WIRELESS).getZplatformPriKey();
-             }else if("000201".equals(orderinfo.getBiztype())||"000205".equals(orderinfo.getBiztype())){
+             }else if("000201".equals(orderinfo.getBiztype())||"000205".equals(orderinfo.getBiztype())||"000207".equals(orderinfo.getBiztype())){
             	 if("0".equals(orderinfo.getAccesstype())){
                  	privateKey = merchMKService.get(orderinfo.getSecmemberno()).getLocalPriKey().trim();
                  }else if("2".equals(orderinfo.getAccesstype())){

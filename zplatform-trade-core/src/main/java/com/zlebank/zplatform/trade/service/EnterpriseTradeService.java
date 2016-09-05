@@ -13,11 +13,13 @@ package com.zlebank.zplatform.trade.service;
 import com.zlebank.zplatform.member.bean.EnterpriseRealNameBean;
 import com.zlebank.zplatform.member.bean.EnterpriseRealNameConfirmBean;
 import com.zlebank.zplatform.member.exception.DataCheckFailedException;
+import com.zlebank.zplatform.member.exception.GetAccountFailedException;
 import com.zlebank.zplatform.member.exception.InvalidMemberDataException;
 import com.zlebank.zplatform.trade.bean.FinancierReimbursementBean;
 import com.zlebank.zplatform.trade.bean.MerchantReimbursementBean;
 import com.zlebank.zplatform.trade.bean.OffLineChargeBean;
 import com.zlebank.zplatform.trade.bean.RaiseMoneyTransferBean;
+import com.zlebank.zplatform.trade.bean.ResultBean;
 import com.zlebank.zplatform.trade.exception.TradeException;
 
 
@@ -74,4 +76,19 @@ public interface EnterpriseTradeService {
 	 * @throws Exception
 	 */
 	public String merchReimbusement(MerchantReimbursementBean bean) throws Exception;
+	
+	/**
+	 * 募集款划转完成处理（账务）
+	 * @param tid
+	 * @throws DataCheckFailedException
+	 * @throws GetAccountFailedException
+	 * @throws TradeException
+	 */
+	public void raiseMoneyTransferFinish(Long tid) throws DataCheckFailedException, GetAccountFailedException, TradeException;
+	
+	/**
+	 * 商户还款完成处理（账务）
+	 * @param tid
+	 */
+	public void merchReimbusementFinish(long tid) throws TradeException;
 }

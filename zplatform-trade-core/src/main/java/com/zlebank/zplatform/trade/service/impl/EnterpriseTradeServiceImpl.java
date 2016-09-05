@@ -527,7 +527,7 @@ public class EnterpriseTradeServiceImpl implements EnterpriseTradeService{
 		txnsLog.setPayfirmerno(orderinfo.getFirmemberno());
 		txnsLog.setPaysecmerno(orderinfo.getSecmemberno());
 		txnsLog.setPayordcomtime(DateUtil.getCurrentDateTime());
-		
+		txnsLog.setProductcode(bean.getProductCode());
 		try {
 			txnsLogService.saveTxnsLog(txnsLog);
 		} catch (TradeException e) {
@@ -575,6 +575,7 @@ public class EnterpriseTradeServiceImpl implements EnterpriseTradeService{
 		batch.setStatus("01");
 		batch.setType("01");
 		batch.setIntime(new Date());
+		batch.setApplyTime(new Date());
 		batch.setInuser(0L);
 		batch.setTn(OrderNumber.getInstance().generateTN(bean.getMemberId()));
 		batch.setCoopinsticode(bean.getCoopInsti());
@@ -584,7 +585,8 @@ public class EnterpriseTradeServiceImpl implements EnterpriseTradeService{
 	
 	
 	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
-	public boolean raiseMoneyTransferFinish(Long tid) throws DataCheckFailedException, GetAccountFailedException, TradeException{
+	@Override
+	public void raiseMoneyTransferFinish(Long tid) throws DataCheckFailedException, GetAccountFailedException, TradeException{
 		//募集款划转信息
 		PojoRaisemoneyApply raisemoney = raisemoneyApplyDAO.getApply(tid);
 		if(!"00".equals(raisemoney.getStatus())){
@@ -598,7 +600,13 @@ public class EnterpriseTradeServiceImpl implements EnterpriseTradeService{
 		TxnsOrderinfoModel orderinfo = txnsOrderinfoDAO.getOrderByTN(raisemoney.getTn());
 		//交易日志数据
 		TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(orderinfo.getRelatetradetxn());
+		if("0000".equals(txnsLog.getRetcode())){
+			throw new TradeException("T000","募集款划转订单号"+raisemoney.getOrderid()+"交易已经成功，请不要重复提交");
+		}
+		
+		
 		txnsLog.setAmount(accountBalanceBean.getBalance().longValue());
+		txnsLog.setAcccoopinstino(ConsUtil.getInstance().cons.getZlebank_coopinsti_code());
 		/**交易序列号**/
 		String txnseqno = txnsLog.getTxnseqno();
 		/**支付订单号**/
@@ -656,7 +664,7 @@ public class EnterpriseTradeServiceImpl implements EnterpriseTradeService{
 	        txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
 	        txnsLog.setTradestatflag(TradeStatFlagEnum.FINISH_ACCOUNTING.getStatus());// 交易初始状态
 	        txnsOrderinfoDAO.updateOrderToSuccess(txnseqno);
-			
+	        raisemoney.setRetinfo("交易成功");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -676,20 +684,43 @@ public class EnterpriseTradeServiceImpl implements EnterpriseTradeService{
 	        txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
 			txnsLog.setTradestatflag(TradeStatFlagEnum.FINISH_FAILED.getStatus());// 交易初始状态
 			txnsOrderinfoDAO.updateOrderToFail(txnseqno);
+			raisemoney.setRetinfo("交易失败");
 		}
+		raisemoney.setTxnseqno(txnsLog.getTxnseqno());
 		txnsLogService.updateTxnsLog(txnsLog);
-		return true;
+		raisemoneyApplyDAO.update(raisemoney);
 	}
 	
 	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
-	public ResultBean merchReimbusementFinish(long tid){
+	@Override
+	public void merchReimbusementFinish(long tid) throws TradeException{
 		ResultBean resultBean = null;
+		if(tid<=0){
+			throw new TradeException("T000","未找到商户还款数据（标示不存在）");
+		}
 		//获取商户还款详细数据
 		PojoMerchReimburseDeta deta = merchReimburseDetaDAO.getDeta(tid);
+		if(deta==null){
+			throw new TradeException("T000","未找到商户还款数据");
+		}
+		//判断商户还款状态是否审核完成
+		if(!"00".equals(deta.getStatus())){
+			throw new TradeException("T000","商户还款数据未审核完成");
+		}
 		//获取商户还款批次数据
 		PojoMerchReimburseBatch batchInfo = merchReimburseBatchDAO.getBatchInfoByBatchNo(deta.getBatchno());
 		
-		TxnsLogModel txnsLog = new TxnsLogModel();
+		TxnsLogModel txnsLog = null;
+		//防止重复进行账务
+		if(StringUtil.isNotEmpty(deta.getTxnseqno())){
+			txnsLog = txnsLogService.getTxnsLogByTxnseqno(deta.getTxnseqno());
+			if("0000".equals(txnsLog.getRetcode())){
+				throw new TradeException("T000","商户还款订单号"+deta.getOrderId()+"交易成功，请勿重复提交");
+			}
+			
+		}else{
+			txnsLog = new TxnsLogModel();
+		}
 		PojoMerchDeta member = null;
 		member = merchService.getMerchBymemberId(batchInfo.getMerId());
 		txnsLog.setRiskver(member.getRiskVer());
@@ -718,7 +749,7 @@ public class EnterpriseTradeServiceImpl implements EnterpriseTradeService{
 		txnsLog.setPayfirmerno(deta.getMerId());
 		txnsLog.setPaysecmerno(deta.getInvestors());
 		txnsLog.setPayordcomtime(DateUtil.getCurrentDateTime());
-		
+		txnsLog.setProductcode(batchInfo.getProdcutcode());
 		/**交易序列号**/
 		String txnseqno = txnsLog.getTxnseqno();
 		/**支付订单号**/
@@ -775,6 +806,7 @@ public class EnterpriseTradeServiceImpl implements EnterpriseTradeService{
 	        txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
 	        txnsLog.setTradestatflag(TradeStatFlagEnum.FINISH_ACCOUNTING.getStatus());// 交易初始状态
 	        resultBean = new ResultBean("success");
+	        deta.setRetinfo("交易成功");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -793,14 +825,16 @@ public class EnterpriseTradeServiceImpl implements EnterpriseTradeService{
 			txnsLog.setTradestatflag(TradeStatFlagEnum.FINISH_FAILED.getStatus());// 交易初始状态
 			
 			resultBean = new ResultBean("",e.getMessage());
+			deta.setRetinfo("交易失败");
 		}
 		try {
 			txnsLogService.saveTxnsLog(txnsLog);
+			deta.setTxnseqno(txnsLog.getTxnseqno());
+			merchReimburseDetaDAO.update(deta);
 		} catch (TradeException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			resultBean = new ResultBean("","交易SAVE失败");
 		}
-		return resultBean;
 	}
 }

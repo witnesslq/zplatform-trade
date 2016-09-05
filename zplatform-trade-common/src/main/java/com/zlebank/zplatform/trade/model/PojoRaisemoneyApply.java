@@ -43,7 +43,10 @@ public class PojoRaisemoneyApply implements java.io.Serializable {
 	private String cvlexaOpt;
 	private String notes;
 	private String remarks;
-
+	private String txnseqno;
+	private String retinfo;
+	private String retCode;
+	
 	public PojoRaisemoneyApply() {
 	}
 
@@ -241,4 +244,50 @@ public class PojoRaisemoneyApply implements java.io.Serializable {
 		this.remarks = remarks;
 	}
 
+	/**
+	 * @return the txnseqno
+	 */
+	@Column(name = "TXNSEQNO")
+	public String getTxnseqno() {
+		return txnseqno;
+	}
+
+	/**
+	 * @param txnseqno the txnseqno to set
+	 */
+	public void setTxnseqno(String txnseqno) {
+		this.txnseqno = txnseqno;
+	}
+
+	/**
+	 * @return the retinfo
+	 */
+	@Column(name = "RETINFO")
+	public String getRetinfo() {
+		return retinfo;
+	}
+
+	/**
+	 * @param retinfo the retinfo to set
+	 */
+	public void setRetinfo(String retinfo) {
+		this.retinfo = retinfo;
+	}
+
+	/**
+	 * @return the retCode
+	 */
+	@Column(name = "RETCODE")
+	public String getRetCode() {
+		return retCode;
+	}
+
+	/**
+	 * @param retCode the retCode to set
+	 */
+	public void setRetCode(String retCode) {
+		this.retCode = retCode;
+	}
+
+	
 }

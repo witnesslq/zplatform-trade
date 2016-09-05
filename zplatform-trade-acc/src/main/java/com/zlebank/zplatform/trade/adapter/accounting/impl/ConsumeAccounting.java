@@ -62,12 +62,19 @@ public class ConsumeAccounting implements IAccounting{
         txnsLog = txnsLogService.getTxnsLogByTxnseqno(txnseqno);
         //这里开始进行划分，分为一般消费账务和产品消费账务
         BusinessEnum businessEnum = BusinessEnum.fromValue(txnsLog.getBusicode());
+        
+        log.info(businessEnum);
         //产品消费账务处理
  		if(businessEnum==BusinessEnum.CONSUMEQUICK_PRODUCT){
+ 			log.info("交易:"+txnseqno+"开始产品消费账务");
  			resultBean = productTradeAccounting(txnsLog);
+ 			log.info("交易:"+txnseqno+"结束产品消费账务");
  		}else if(businessEnum==BusinessEnum.CONSUMEQUICK){//一般消费账务处理
+ 			log.info("交易:"+txnseqno+"开始一般消费账务");
  			resultBean = commonTradeAccounting(txnsLog);
+ 			log.info("交易:"+txnseqno+"结束一般消费账务");
  		}
+ 		log.info("交易:"+txnseqno+"消费入账结束");
      	return resultBean;
     }
 

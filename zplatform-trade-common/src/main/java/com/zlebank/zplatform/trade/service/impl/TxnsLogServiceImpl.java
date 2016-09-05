@@ -518,12 +518,24 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
         log.info("trade risk result:"+JSON.toJSONString(riskList));
         if(riskList.size()>0){
             riskInfo = riskList.get(0).get("RISK")+"";
-            String[] riskInfos =riskInfo.split(",");
-            riskOrder = Integer.valueOf(riskInfos[0]);
-            riskLevel = Integer.valueOf(riskInfos[1]);
-            riskLevelEnum = RiskLevelEnum.fromValue(riskLevel);
-            log.info("riskOrder:"+riskOrder);
-            log.info("riskLevel:"+riskLevel);
+            if(riskInfo.indexOf(",")>0){
+            	String[] riskInfos =riskInfo.split(",");
+            	try {
+    				riskOrder = Integer.valueOf(riskInfos[0]);
+    				riskLevel = Integer.valueOf(riskInfos[1]);
+    				riskLevelEnum = RiskLevelEnum.fromValue(riskLevel);
+    				log.info("riskOrder:"+riskOrder);
+    				log.info("riskLevel:"+riskLevel);
+    			} catch (Exception e) {
+    				// TODO Auto-generated catch block
+    				e.printStackTrace();
+    				throw new TradeException("T034");
+    			}
+            }else{
+            	riskLevelEnum = RiskLevelEnum.fromValue(Integer.valueOf(riskInfo));
+            }
+            
+            
         }else{
             throw new TradeException("T034");
         }

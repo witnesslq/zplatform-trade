@@ -10,6 +10,10 @@
  */
 package com.zlebank.zplatform.trade.dao.impl;
 
+import java.math.BigDecimal;
+
+import javassist.expr.NewArray;
+
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
@@ -37,7 +41,7 @@ public class MerchReimburseDetaDAOImpl extends HibernateBaseDAOImpl<PojoMerchRei
 	@Override
 	public PojoMerchReimburseDeta getDeta(long tid) {
 		Criteria criteria = getSession().createCriteria(PojoMerchReimburseDeta.class);
-		criteria.add(Restrictions.eq("tid", tid));
+		criteria.add(Restrictions.eq("tid", new BigDecimal(tid)));
 		return (PojoMerchReimburseDeta) criteria.uniqueResult();
 	}
 
