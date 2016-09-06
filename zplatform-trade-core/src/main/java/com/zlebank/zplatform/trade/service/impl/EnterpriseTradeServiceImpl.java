@@ -37,9 +37,11 @@ import com.zlebank.zplatform.member.bean.FinanceProductQueryBean;
 import com.zlebank.zplatform.member.exception.DataCheckFailedException;
 import com.zlebank.zplatform.member.exception.GetAccountFailedException;
 import com.zlebank.zplatform.member.exception.InvalidMemberDataException;
+import com.zlebank.zplatform.member.pojo.PojoEnterpriseRealnameApply;
 import com.zlebank.zplatform.member.pojo.PojoMember;
 import com.zlebank.zplatform.member.pojo.PojoMerchDeta;
 import com.zlebank.zplatform.member.service.CoopInstiService;
+import com.zlebank.zplatform.member.service.EnterpriseRealnameApplyService;
 import com.zlebank.zplatform.member.service.EnterpriseService;
 import com.zlebank.zplatform.member.service.FinanceProductAccountService;
 import com.zlebank.zplatform.member.service.MemberService;
@@ -113,6 +115,8 @@ public class EnterpriseTradeServiceImpl implements EnterpriseTradeService{
 	private MerchService merchService;
 	@Autowired
 	private FinanceProductAccountService financeProductAccountService;
+	@Autowired
+	private EnterpriseRealnameApplyService enterpriseRealnameApplyService;
 	
 	/**
 	 *
@@ -250,6 +254,7 @@ public class EnterpriseTradeServiceImpl implements EnterpriseTradeService{
 		
 	}
 
+	@Override
 	public void realNameConfirm(EnterpriseRealNameConfirmBean enterpriseRealNameConfirmBean) throws InvalidMemberDataException, DataCheckFailedException, TradeException{
 		TxnsOrderinfoModel orderinfo = txnsOrderinfoDAO.getOrderByTN(enterpriseRealNameConfirmBean.getTn());
 		if("00".equals(orderinfo.getStatus())){
@@ -257,11 +262,21 @@ public class EnterpriseTradeServiceImpl implements EnterpriseTradeService{
 		}
 		//企业实名认证确认
 		enterpriseService.realNameConfirm(enterpriseRealNameConfirmBean);
+		//更新交易流水数据-因为是线下业务所以没有账务，没有记录支付方信息，更新交易金额以及中心应答码
+		TxnsLogModel txnsLog = txnsLogService.getTxnsLogByTxnseqno(orderinfo.getRelatetradetxn());
+		txnsLog.setAmount(Long.valueOf(enterpriseRealNameConfirmBean.getTxnamt()));
+		txnsLog.setRetcode("0000");
+		txnsLog.setRetcode("交易成功");
+		txnsLog.setRetdatetime(DateUtil.getCurrentDateTime());
+		txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
+		txnsLogService.updateTxnsLog(txnsLog);
 		//更新实名认证订单成功
 		txnsOrderinfoDAO.updateOrderToSuccessByTN(enterpriseRealNameConfirmBean.getTn());
 		
 	}
 	
+	
+	@Override
 	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
 	public String offLineCharge(OffLineChargeBean offLineChargeBean){
 		String tn = OrderNumber.getInstance().generateTN(offLineChargeBean.getCoopInsti());
