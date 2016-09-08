@@ -126,7 +126,7 @@ HibernateBaseDAOImpl<PojoBankTransferData>
             query.setParameter(1, data.getResType());
             query.setParameter(2, data.getResCode());
             query.setParameter(3, data.getResInfo());
-            query.setParameter(4, "S".equalsIgnoreCase(data.getResType())? "00": "03");
+            query.setParameter(4, "S".equalsIgnoreCase(data.getResType())? "00": "05");
             query.setParameter(5, data.getBankTranDataSeqNo());
             query.executeUpdate();
             

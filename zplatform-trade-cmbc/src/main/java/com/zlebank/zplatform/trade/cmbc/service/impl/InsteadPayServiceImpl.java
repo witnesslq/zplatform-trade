@@ -454,9 +454,9 @@ public class InsteadPayServiceImpl implements IInsteadPayService {
                 transferBatch.setSuccessAmt(succAmt);
                 transferBatch.setFailCount(failItems);
                 transferBatch.setFailAmt(failAmt);
-                if(failItems>0){
+                if(failItems>0&&succItems>0){//失败数大于0 成功数也大于0 部分转账成功
                 	transferBatch.setTranStatus("02");
-                }else if(succItems==0){
+                }else if(succItems==0){//成功数=0
                 	transferBatch.setTranStatus("04");
                 }else{
                 	transferBatch.setTranStatus("03");

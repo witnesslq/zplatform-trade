@@ -151,6 +151,8 @@ public class UpdateWithdrawServiceImpl implements UpdateWithdrawService,UpdateSu
             txnsLog.setApporderstatus("00");
             if("04".equals(data.getResultCode())){
             	txnsLog.setApporderinfo("提现账务处理成功（退汇）");
+            }else if("03".equals(data.getResultCode())){
+            	txnsLog.setApporderinfo("提现账务处理成功（交易失败）");
             }else{
             	txnsLog.setApporderinfo("提现账务处理成功");
             }
@@ -191,7 +193,7 @@ public class UpdateWithdrawServiceImpl implements UpdateWithdrawService,UpdateSu
         txnsLog.setAccordfintime(DateUtil.getCurrentDateTime());
         txnsLog.setAccbusicode(BusinessEnum.WITHDRAWALS.getBusiCode());
         txnsLogService.update(txnsLog);
-        log.info("提现交易账务处理开始，交易序列号:"+data.getTxnSeqNo());
+        log.info("提现交易账务处理结束，交易序列号:"+data.getTxnSeqNo());
     }
 
     /**
