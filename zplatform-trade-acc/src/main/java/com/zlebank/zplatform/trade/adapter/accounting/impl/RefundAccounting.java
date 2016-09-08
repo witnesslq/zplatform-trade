@@ -75,6 +75,7 @@ public class RefundAccounting implements IAccounting{
         tradeInfo.setCharge(new BigDecimal(txnsLog.getTxnfee()));
         tradeInfo.setTxnseqno(txnsLog.getTxnseqno());
         tradeInfo.setCoopInstCode(txnsLog.getAccfirmerno());
+        tradeInfo.setChannelId(txnsLog.getPayinst());
         tradeInfo.setBusiCode(BusinessEnum.REFUND_BANK.getBusiCode());
         EntryEvent entryEvent = null;
         if ("0000".equals(txnsLog.getRetcode())) {

@@ -714,6 +714,15 @@ public class TxnsLogServiceImpl extends BaseServiceImpl<TxnsLogModel, String> im
     }
 
 
+    @Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+    public void updateBankTransferOfTxnsLog(TxnsLogModel txnsLog){
+        String hql = "update TxnsLogModel set paytype=?, payordno = ?,payinst = ?,payfirmerno = ?,payordcomtime = ?, pan = ?,panName = ?,txnfee = ? where txnseqno = ? ";
+        Object[] paramaters = new Object[]{txnsLog.getPaytype(),txnsLog.getPayordno(),txnsLog.getPayinst(),txnsLog.getPayfirmerno(),txnsLog.getPayordcomtime(),txnsLog.getPan(),
+        		txnsLog.getPanName(),txnsLog.getTxnfee(),txnsLog.getTxnseqno()};
+        super.updateByHQL(hql, paramaters);
+    }
+
+
 	@Override
 	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
 	public void saveBankTransferLogs(List<PojoBankTransferData> transferDataList) {
