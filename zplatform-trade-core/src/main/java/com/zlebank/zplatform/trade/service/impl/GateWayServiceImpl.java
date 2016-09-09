@@ -2781,7 +2781,7 @@ public class GateWayServiceImpl extends
 			WapCardBean cardBean){
 		ResultBean resultBean = null;
 		TxnsOrderinfoModel orderinfo =null;
-		String amount="";
+		String amount="0";
 		if(cardBean.getTn()!=null){
 			orderinfo = getOrderinfoByTN(cardBean.getTn());
 			amount=orderinfo.getOrderamt()+"";
