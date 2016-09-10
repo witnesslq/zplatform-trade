@@ -23,7 +23,6 @@
 				<value>com.zlebank.zplatform.acc.pojo</value>
 				<value>com.zlebank.zplatform.commons.dao.pojo</value>
 				<value>com.zlebank.zplatform.member.pojo</value>
-				<value>com.zlebank.zplatform.sms.pojo</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">

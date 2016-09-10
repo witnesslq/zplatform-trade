@@ -30,11 +30,11 @@
 			<artifactId>xstream</artifactId>
 			<version>1.4.8</version>
 		</dependency>
-		<!-- <dependency>
+		<dependency>
 			<groupId>com.zlebank.zplatform</groupId>
 			<artifactId>zlrt-commonofs-interface</artifactId>
 			<version>1.0</version>
-		</dependency> -->
+		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcprov-jdk15on</artifactId>

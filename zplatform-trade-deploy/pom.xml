@@ -12,7 +12,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<project.nexus>http://192.168.101.238:8081</project.nexus>
+		<project.nexus>http://localhost:8081</project.nexus>
 		<project.gitserver>192.168.101.11</project.gitserver>
 		<project.remoteArtifactRepositories>${project.nexus}/nexus/content/groups/public</project.remoteArtifactRepositories>
 		<sonar.language>java</sonar.language>
@@ -22,7 +22,7 @@
 		<compiler.optimize>true</compiler.optimize>
 		<springframework.version>4.2.0.RELEASE</springframework.version>
 		<hibernate.version>4.2.4.Final</hibernate.version>
-		<git.project>root@${project.gitserver}:zplatform.git</git.project>
+		<git.project>https://github.com/dmcguojia/zplatform-trade.git</git.project>
 	</properties>
 
 	<dependencies>
@@ -318,7 +318,7 @@
 		<module>../zplatform-trade-bosspay</module>
 		<module>../zplatfrom-trade-chanpay</module>
 		<module>../zplatfrom-trade-wechat</module>
-		<module>../zplatform-trade-zlpay</module>
+		<!-- <module>../zplatform-trade-zlpay</module> -->
 		<module>../zplatform-trade-timeout</module>
 		<module>../zplatform-trade-wechat-qr</module>
 	</modules>
